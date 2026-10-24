@@ -1,0 +1,39 @@
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, ground_slam, piercing_thrust
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, piercing_thrust, ground_slam
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] PASSIVE h_mw5 (Battle Scholar) value 0.0602
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] PASSIVE c_w1 (Endurance) value 0.0391
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] PASSIVE c_w2 (Grit) value 0.0605
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] CRAFT Upgrade Base on Executioner Greatsword (main_hand) cost 27 gold, 2 Scrap, 1 Iron Fragment, score +0.079
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] CRAFT Upgrade Base on Padded Vest of the Bear (chest) cost 21 gold, 2 Scrap, 1 Iron Fragment, score +0.005
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] GEM socket sapphire:0 into ring2 socket 1 (score +0.008)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] KIT {"dps_est":72,"ehp_est":361,"equipment":{"amulet":"uncommon Mighty Bone Amulet of Willpower ilvl1 sockets=0 gems=[]","belt":"uncommon Leather Belt of the Salamander ilvl1 sockets=0 gems=[]","boots":"rare Bone Thorn ilvl2 sockets=0 gems=[]","charm":"uncommon Blood Charm of Fortune ilvl4 sockets=0 gems=[]","chest":"uncommon Padded Vest of the Bear ilvl2 sockets=0 gems=[]","gloves":"uncommon Rimecut Iron Gauntlets of the Floe ilvl4 sockets=2 gems=[\"\", \"\"]","helmet":"uncommon Hale Iron Helm of Intellect ilvl4 sockets=0 gems=[]","main_hand":"common Executioner Greatsword ilvl4 sockets=0 gems=[]","ring1":"common Topaz Ring ilvl4 sockets=0 gems=[]","ring2":"uncommon Iron Ring of Agility ilvl1 sockets=1 gems=[\"sapphire:0\"]"},"gold":97,"hotbar":["heavy_strike","cleave","iron_guard","shield_charge","quick_slash","piercing_thrust","ground_slam"],"keystones":[],"level":4,"life":276,"passives":4,"pouch":{},"runes":{},"spec":"","spec_nodes":[]}
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] RUN start forgotten_depths L4 mods=[] monster_level=4 hotbar=["heavy_strike", "cleave", "iron_guard", "shield_charge", "quick_slash", "piercing_thrust", "ground_slam"]
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   12.10] DODGE roll Rotting Ghoul:melee (hit in 0.10s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   13.82] DODGE roll Rotting Ghoul:melee (hit in 0.10s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   15.13] STUCK at (41, 14), sidestepping (target -, goal loot:material)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   15.13]    nearest Plague Rat d=458 state=idle aggro=false los=false; active threats 0; desired (-0.998403, 0.056499)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   19.08] BOSS spawned
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   22.07] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   24.08] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   28.32] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   30.33] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   32.35] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   38.25] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   39.53] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.37s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   42.27] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   44.93] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   46.45] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   46.45] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.75s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   47.97] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.37s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   49.78] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.40s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   51.30] DODGE roll Sir Morcant, the Drowned Warden:ring (hit in 0.40s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   55.12] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   55.57] BOSS killed
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   55.57] PASSIVE c_w3 (Endurance) value 0.0539
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   55.57] PASSIVE c_core (Heart of the Web) value 0.0934
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   55.57] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, piercing_thrust, whirlwind
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0   55.62] RUN end boss_killed in 55.6s, damage taken 170, dodges 17 (rolls 11), avoided 15, potions 0
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] BAG sold 2 (+20 gold), salvaged 0, kept 0
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] BUY uncommon Jagged Executioner Greatsword for 84 gold (expected score +0.025)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] EQUIP main_hand <- uncommon Jagged Executioner Greatsword (ilvl 5, 0 sockets) replacing Executioner Greatsword, score +0.025
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c0-r0    0.00] BAG sold 1 (+11 gold), salvaged 0, kept 0

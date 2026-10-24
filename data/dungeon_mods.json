@@ -1,0 +1,15 @@
+[
+  {"id": "hasted", "name": "Hastened Horde", "desc": "Monsters move 25% faster", "enemy": {"speed": 1.25}, "reward": 12},
+  {"id": "frenzy", "name": "Frenzy", "desc": "Monsters attack 20% faster", "enemy": {"attack_speed": 1.2}, "reward": 12},
+  {"id": "burning", "name": "Burning Blood", "desc": "Monsters deal 30% of their damage as extra fire damage", "enemy": {"added_fire": 0.3}, "reward": 12},
+  {"id": "ironhide", "name": "Ironhide", "desc": "Monsters have 100% more armour", "enemy": {"armour": 2.0}, "reward": 8},
+  {"id": "undying", "name": "Undying", "desc": "Monsters regenerate 2% life per second unless recently hit", "enemy": {"regen": 0.02}, "reward": 8},
+  {"id": "volatile", "name": "Volatile Dead", "desc": "Monsters explode a moment after death", "enemy": {"explode": true}, "reward": 14},
+  {"id": "elite_surge", "name": "Champions Gather", "desc": "Elite packs are twice as common", "elite_mult": 2.0, "reward": 16},
+  {"id": "teeming", "name": "Teeming", "desc": "30% more monsters", "density": 1.3, "reward": 15},
+  {"id": "royal_guard", "name": "Royal Guard", "desc": "Bosses summon additional minions", "enemy": {"boss_summons": true}, "reward": 10},
+  {"id": "tempest", "name": "Tempest", "desc": "Lightning periodically strikes near you", "tempest": true, "reward": 12},
+  {"id": "grim_healing", "name": "Grim Healing", "desc": "Your life regeneration, flasks and life gain are 40% less effective", "player_heal": 0.6, "reward": 14},
+  {"id": "glass_pact", "name": "Glass Pact", "desc": "You deal 25% more damage but have 30% less maximum life", "player_mods": [{"stat": "damage", "type": "more", "value": 25}, {"stat": "max_life", "type": "more", "value": -30}], "reward": 10},
+  {"id": "hexed", "name": "Hexed Ground", "desc": "You have -20% to all elemental resistances", "player_mods": [{"stat": "res_fire", "type": "flat", "value": -20}, {"stat": "res_cold", "type": "flat", "value": -20}, {"stat": "res_lightning", "type": "flat", "value": -20}], "reward": 12}
+]

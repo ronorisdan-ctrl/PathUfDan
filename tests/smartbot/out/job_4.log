@@ -1,0 +1,1436 @@
+ARGS: ["--headless", "--path", "W:/AI game/PathofDan/Pathof Dan/", "res://tests/test_runner.tscn"]
+
+Godot Engine v4.0.stable.official.92bee43ad - https://godotengine.org
+ 
+PASS  data files load
+PASS  three classes defined
+PASS  warrior has 5+ skills
+PASS  skill cleave has a known behavior
+PASS  skill heavy_strike has a known behavior
+PASS  skill ground_slam has a known behavior
+PASS  skill shield_charge has a known behavior
+PASS  skill iron_guard has a known behavior
+PASS  skill seismic_wave has a known behavior
+PASS  skill war_cry has a known behavior
+PASS  skill whirlwind has a known behavior
+PASS  skill battle_leap has a known behavior
+PASS  skill chain_hook has a known behavior
+PASS  skill earthquake has a known behavior
+PASS  skill berserker_rage has a known behavior
+PASS  skill executioners_blow has a known behavior
+PASS  skill shield_bash has a known behavior
+PASS  skill titans_fall has a known behavior
+PASS  skill quick_slash has a known behavior
+PASS  skill piercing_thrust has a known behavior
+PASS  skill tremor_strike has a known behavior
+PASS  skill shield_wall has a known behavior
+PASS  skill adrenaline_surge has a known behavior
+PASS  skill last_stand has a known behavior
+PASS  skill sweeping_arc has a known behavior
+PASS  skill avatar_of_war has a known behavior
+PASS  skill apocalypse_cleave has a known behavior
+PASS  warrior start item rusted_sword exists
+PASS  warrior start item wooden_buckler exists
+PASS  warrior start item padded_vest exists
+PASS  ranger has 5+ skills
+PASS  skill quick_shot has a known behavior
+PASS  skill multishot has a known behavior
+PASS  skill explosive_mine has a known behavior
+PASS  skill ballista_turret has a known behavior
+PASS  skill rain_of_arrows has a known behavior
+PASS  skill piercing_arrow has a known behavior
+PASS  skill hunters_focus has a known behavior
+PASS  skill barrage has a known behavior
+PASS  skill explosive_arrow has a known behavior
+PASS  skill bear_trap has a known behavior
+PASS  skill frost_snare has a known behavior
+PASS  skill lightning_trap has a known behavior
+PASS  skill repeater_turret has a known behavior
+PASS  skill cannon_turret has a known behavior
+PASS  skill smoke_bomb has a known behavior
+PASS  skill death_from_above has a known behavior
+PASS  skill quickdraw has a known behavior
+PASS  skill scattershot has a known behavior
+PASS  skill poison_trap has a known behavior
+PASS  skill cluster_bomb has a known behavior
+PASS  skill tesla_turret has a known behavior
+PASS  skill frost_turret has a known behavior
+PASS  skill marked_prey has a known behavior
+PASS  skill sniper_round has a known behavior
+PASS  skill deadeye has a known behavior
+PASS  skill mechanical_swarm has a known behavior
+PASS  ranger start item shortbow exists
+PASS  ranger start item simple_quiver exists
+PASS  ranger start item leather_jerkin exists
+PASS  mage has 5+ skills
+PASS  skill firebolt has a known behavior
+PASS  skill frost_nova has a known behavior
+PASS  skill summon_skeletons has a known behavior
+PASS  skill chain_lightning has a known behavior
+PASS  skill blink has a known behavior
+PASS  skill meteor has a known behavior
+PASS  skill ice_lance has a known behavior
+PASS  skill fireball has a known behavior
+PASS  skill inferno has a known behavior
+PASS  skill blizzard has a known behavior
+PASS  skill static_field has a known behavior
+PASS  skill arcane_missiles has a known behavior
+PASS  skill curse_of_frailty has a known behavior
+PASS  skill curse_of_agony has a known behavior
+PASS  skill summon_skeleton_archers has a known behavior
+PASS  skill summon_fire_elemental has a known behavior
+PASS  skill mark_of_ruin has a known behavior
+PASS  skill army_of_the_damned has a known behavior
+PASS  skill disintegration_beam has a known behavior
+PASS  skill frostbolt has a known behavior
+PASS  skill spark has a known behavior
+PASS  skill lightning_bolt has a known behavior
+PASS  skill flame_wave has a known behavior
+PASS  skill glacial_eruption has a known behavior
+PASS  skill time_snare has a known behavior
+PASS  skill soul_siphon has a known behavior
+PASS  skill summon_bone_golem has a known behavior
+PASS  skill summon_storm_wisp has a known behavior
+PASS  skill cataclysm has a known behavior
+PASS  skill archmage_ascension has a known behavior
+PASS  mage start item apprentice_wand exists
+PASS  mage start item cracked_focus exists
+PASS  mage start item silk_robe exists
+PASS  affix brutal tier range valid
+PASS  affix brutal tier range valid
+PASS  affix brutal tier range valid
+PASS  affix brutal tier range valid
+PASS  affix brutal tier range valid
+PASS  affix brutal tier range valid
+PASS  affix emberforged tier range valid
+PASS  affix emberforged tier range valid
+PASS  affix emberforged tier range valid
+PASS  affix emberforged tier range valid
+PASS  affix emberforged tier range valid
+PASS  affix emberforged tier range valid
+PASS  affix rimecut tier range valid
+PASS  affix rimecut tier range valid
+PASS  affix rimecut tier range valid
+PASS  affix rimecut tier range valid
+PASS  affix rimecut tier range valid
+PASS  affix rimecut tier range valid
+PASS  affix stormcharged tier range valid
+PASS  affix stormcharged tier range valid
+PASS  affix stormcharged tier range valid
+PASS  affix stormcharged tier range valid
+PASS  affix stormcharged tier range valid
+PASS  affix stormcharged tier range valid
+PASS  affix jagged tier range valid
+PASS  affix jagged tier range valid
+PASS  affix jagged tier range valid
+PASS  affix jagged tier range valid
+PASS  affix jagged tier range valid
+PASS  affix jagged tier range valid
+PASS  affix arcane tier range valid
+PASS  affix arcane tier range valid
+PASS  affix arcane tier range valid
+PASS  affix arcane tier range valid
+PASS  affix arcane tier range valid
+PASS  affix arcane tier range valid
+PASS  affix pyromancers tier range valid
+PASS  affix pyromancers tier range valid
+PASS  affix pyromancers tier range valid
+PASS  affix pyromancers tier range valid
+PASS  affix pyromancers tier range valid
+PASS  affix glacial tier range valid
+PASS  affix glacial tier range valid
+PASS  affix glacial tier range valid
+PASS  affix glacial tier range valid
+PASS  affix glacial tier range valid
+PASS  affix voltaic tier range valid
+PASS  affix voltaic tier range valid
+PASS  affix voltaic tier range valid
+PASS  affix voltaic tier range valid
+PASS  affix voltaic tier range valid
+PASS  affix mighty tier range valid
+PASS  affix mighty tier range valid
+PASS  affix mighty tier range valid
+PASS  affix mighty tier range valid
+PASS  affix mighty tier range valid
+PASS  affix swift tier range valid
+PASS  affix swift tier range valid
+PASS  affix swift tier range valid
+PASS  affix swift tier range valid
+PASS  affix swift tier range valid
+PASS  affix stalwart tier range valid
+PASS  affix stalwart tier range valid
+PASS  affix stalwart tier range valid
+PASS  affix stalwart tier range valid
+PASS  affix stalwart tier range valid
+PASS  affix elusive tier range valid
+PASS  affix elusive tier range valid
+PASS  affix elusive tier range valid
+PASS  affix elusive tier range valid
+PASS  affix elusive tier range valid
+PASS  affix vampiric tier range valid
+PASS  affix vampiric tier range valid
+PASS  affix vampiric tier range valid
+PASS  affix vampiric tier range valid
+PASS  affix vampiric tier range valid
+PASS  affix serrated tier range valid
+PASS  affix serrated tier range valid
+PASS  affix serrated tier range valid
+PASS  affix serrated tier range valid
+PASS  affix serrated tier range valid
+PASS  affix conjurers tier range valid
+PASS  affix conjurers tier range valid
+PASS  affix conjurers tier range valid
+PASS  affix conjurers tier range valid
+PASS  affix conjurers tier range valid
+PASS  affix rigged tier range valid
+PASS  affix rigged tier range valid
+PASS  affix rigged tier range valid
+PASS  affix rigged tier range valid
+PASS  affix rigged tier range valid
+PASS  affix hale tier range valid
+PASS  affix hale tier range valid
+PASS  affix hale tier range valid
+PASS  affix hale tier range valid
+PASS  affix hale tier range valid
+PASS  affix hale tier range valid
+PASS  affix of_the_bear tier range valid
+PASS  affix of_the_bear tier range valid
+PASS  affix of_the_bear tier range valid
+PASS  affix of_the_bear tier range valid
+PASS  affix of_the_bear tier range valid
+PASS  affix of_strength tier range valid
+PASS  affix of_strength tier range valid
+PASS  affix of_strength tier range valid
+PASS  affix of_strength tier range valid
+PASS  affix of_strength tier range valid
+PASS  affix of_dexterity tier range valid
+PASS  affix of_dexterity tier range valid
+PASS  affix of_dexterity tier range valid
+PASS  affix of_dexterity tier range valid
+PASS  affix of_dexterity tier range valid
+PASS  affix of_intellect tier range valid
+PASS  affix of_intellect tier range valid
+PASS  affix of_intellect tier range valid
+PASS  affix of_intellect tier range valid
+PASS  affix of_intellect tier range valid
+PASS  affix of_agility tier range valid
+PASS  affix of_agility tier range valid
+PASS  affix of_agility tier range valid
+PASS  affix of_agility tier range valid
+PASS  affix of_agility tier range valid
+PASS  affix of_willpower tier range valid
+PASS  affix of_willpower tier range valid
+PASS  affix of_willpower tier range valid
+PASS  affix of_willpower tier range valid
+PASS  affix of_willpower tier range valid
+PASS  affix of_precision tier range valid
+PASS  affix of_precision tier range valid
+PASS  affix of_precision tier range valid
+PASS  affix of_precision tier range valid
+PASS  affix of_precision tier range valid
+PASS  affix of_slaughter tier range valid
+PASS  affix of_slaughter tier range valid
+PASS  affix of_slaughter tier range valid
+PASS  affix of_slaughter tier range valid
+PASS  affix of_slaughter tier range valid
+PASS  affix of_the_tempest tier range valid
+PASS  affix of_the_tempest tier range valid
+PASS  affix of_the_tempest tier range valid
+PASS  affix of_the_tempest tier range valid
+PASS  affix of_the_tempest tier range valid
+PASS  affix of_the_salamander tier range valid
+PASS  affix of_the_salamander tier range valid
+PASS  affix of_the_salamander tier range valid
+PASS  affix of_the_salamander tier range valid
+PASS  affix of_the_salamander tier range valid
+PASS  affix of_the_floe tier range valid
+PASS  affix of_the_floe tier range valid
+PASS  affix of_the_floe tier range valid
+PASS  affix of_the_floe tier range valid
+PASS  affix of_the_floe tier range valid
+PASS  affix of_the_guardian tier range valid
+PASS  affix of_the_guardian tier range valid
+PASS  affix of_the_scholar tier range valid
+PASS  affix of_the_scholar tier range valid
+PASS  affix of_the_scholar tier range valid
+PASS  affix of_the_scholar tier range valid
+PASS  affix of_the_scholar tier range valid
+PASS  affix of_focus tier range valid
+PASS  affix of_focus tier range valid
+PASS  affix of_focus tier range valid
+PASS  affix of_focus tier range valid
+PASS  affix of_focus tier range valid
+PASS  affix of_the_hunt tier range valid
+PASS  affix of_the_hunt tier range valid
+PASS  affix of_the_hunt tier range valid
+PASS  affix of_the_hunt tier range valid
+PASS  affix of_the_hunt tier range valid
+PASS  affix of_the_commander tier range valid
+PASS  affix of_the_commander tier range valid
+PASS  affix of_the_commander tier range valid
+PASS  affix of_the_commander tier range valid
+PASS  affix of_the_commander tier range valid
+PASS  affix of_the_engineer tier range valid
+PASS  affix of_the_engineer tier range valid
+PASS  affix of_the_engineer tier range valid
+PASS  affix of_the_engineer tier range valid
+PASS  affix of_the_engineer tier range valid
+PASS  affix of_ruin tier range valid
+PASS  affix of_ruin tier range valid
+PASS  affix of_ruin tier range valid
+PASS  affix of_ruin tier range valid
+PASS  affix of_ruin tier range valid
+PASS  affix of_the_phoenix tier range valid
+PASS  affix of_the_phoenix tier range valid
+PASS  affix of_the_phoenix tier range valid
+PASS  affix of_the_phoenix tier range valid
+PASS  affix of_the_phoenix tier range valid
+PASS  affix of_speed tier range valid
+PASS  affix of_speed tier range valid
+PASS  affix of_speed tier range valid
+PASS  affix of_speed tier range valid
+PASS  affix of_speed tier range valid
+PASS  affix of_haste tier range valid
+PASS  affix of_haste tier range valid
+PASS  affix of_haste tier range valid
+PASS  affix of_haste tier range valid
+PASS  affix of_haste tier range valid
+PASS  affix of_alacrity tier range valid
+PASS  affix of_alacrity tier range valid
+PASS  affix of_fortune tier range valid
+PASS  affix of_fortune tier range valid
+PASS  affix of_fortune tier range valid
+PASS  affix of_fortune tier range valid
+PASS  affix of_fortune tier range valid
+PASS  affix of_the_abyss tier range valid
+PASS  affix of_the_abyss tier range valid
+PASS  affix of_the_abyss tier range valid
+PASS  affix of_the_abyss tier range valid
+PASS  affix ch_warding tier range valid
+PASS  affix ch_warding tier range valid
+PASS  affix ch_warding tier range valid
+PASS  affix ch_warding tier range valid
+PASS  affix ch_tenacious tier range valid
+PASS  affix ch_tenacious tier range valid
+PASS  affix ch_tenacious tier range valid
+PASS  affix ch_tenacious tier range valid
+PASS  affix ch_vicious tier range valid
+PASS  affix ch_vicious tier range valid
+PASS  affix ch_vicious tier range valid
+PASS  affix ch_vicious tier range valid
+PASS  affix ch_commanding tier range valid
+PASS  affix ch_commanding tier range valid
+PASS  affix ch_commanding tier range valid
+PASS  affix ch_commanding tier range valid
+PASS  affix ch_tinkers tier range valid
+PASS  affix ch_tinkers tier range valid
+PASS  affix ch_tinkers tier range valid
+PASS  affix ch_tinkers tier range valid
+PASS  affix ch_of_haste tier range valid
+PASS  affix ch_of_haste tier range valid
+PASS  affix ch_of_haste tier range valid
+PASS  affix ch_of_plenty tier range valid
+PASS  affix ch_of_plenty tier range valid
+PASS  affix ch_of_plenty tier range valid
+PASS  affix ch_of_the_hunt tier range valid
+PASS  affix ch_of_the_hunt tier range valid
+PASS  affix ch_of_the_hunt tier range valid
+PASS  affix ch_of_feasting tier range valid
+PASS  affix ch_of_feasting tier range valid
+PASS  affix ch_of_feasting tier range valid
+PASS  affix ch_of_feasting tier range valid
+PASS  affix ch_of_mastery tier range valid
+PASS  unique worldsplitter base exists
+PASS  unique last_bastion base exists
+PASS  unique bloodletter base exists
+PASS  unique widowmaker base exists
+PASS  unique dead_mans_promise base exists
+PASS  unique clockwork_choir base exists
+PASS  unique ashheart base exists
+PASS  unique stormglass base exists
+PASS  unique gravetender base exists
+PASS  unique hollow_crown base exists
+PASS  unique ember_heart base exists
+PASS  unique wolfmother base exists
+PASS  unique tyrants_signet base exists
+PASS  unique glacial_crest base exists
+PASS  unique thornmail base exists
+PASS  unique phantom_treads base exists
+PASS  unique sigil_of_echoes base exists
+PASS  unique gunsmiths_pride base exists
+PASS  unique warlords_grip base exists
+PASS  unique starfall_staff base exists
+PASS  dungeon enemy ghoul exists
+PASS  dungeon enemy plague_rat exists
+PASS  dungeon enemy bone_archer exists
+PASS  dungeon enemy ash_cultist exists
+PASS  dungeon enemy grave_brute exists
+PASS  dungeon enemy bloater exists
+PASS  dungeon boss exists
+PASS  dungeon enemy ghoul exists
+PASS  dungeon enemy carrion_bat exists
+PASS  dungeon enemy bone_archer exists
+PASS  dungeon enemy bone_bulwark exists
+PASS  dungeon enemy bloater exists
+PASS  dungeon enemy grave_caller exists
+PASS  dungeon enemy grave_brute exists
+PASS  dungeon boss exists
+PASS  dungeon enemy shade_assassin exists
+PASS  dungeon enemy rime_witch exists
+PASS  dungeon enemy storm_acolyte exists
+PASS  dungeon enemy bone_bulwark exists
+PASS  dungeon enemy grave_caller exists
+PASS  dungeon enemy ghoul exists
+PASS  dungeon enemy abyssal_horror exists
+PASS  dungeon enemy carrion_bat exists
+PASS  dungeon boss exists
+PASS  dungeon enemy bone_bulwark exists
+PASS  dungeon enemy shade_assassin exists
+PASS  dungeon enemy storm_acolyte exists
+PASS  dungeon enemy rime_witch exists
+PASS  dungeon enemy abyssal_horror exists
+PASS  dungeon enemy grave_caller exists
+PASS  dungeon enemy ash_cultist exists
+PASS  dungeon enemy grave_brute exists
+PASS  dungeon boss exists
+PASS  dungeon enemy shade_assassin exists
+PASS  dungeon enemy abyssal_horror exists
+PASS  dungeon enemy grave_caller exists
+PASS  dungeon enemy storm_acolyte exists
+PASS  dungeon enemy rime_witch exists
+PASS  dungeon enemy bone_bulwark exists
+PASS  dungeon enemy carrion_bat exists
+PASS  dungeon enemy bloater exists
+PASS  dungeon boss exists
+PASS  dungeon enemy shade_assassin exists
+PASS  dungeon enemy abyssal_horror exists
+PASS  dungeon enemy grave_caller exists
+PASS  dungeon enemy storm_acolyte exists
+PASS  dungeon enemy rime_witch exists
+PASS  dungeon enemy bone_bulwark exists
+PASS  dungeon enemy carrion_bat exists
+PASS  dungeon enemy bloater exists
+PASS  dungeon enemy grave_brute exists
+PASS  dungeon boss exists
+PASS  passive links are symmetric and valid
+PASS  all passives reachable from warrior start
+PASS  all passives reachable from ranger start
+PASS  all passives reachable from mage start
+PASS  tree has 6+ keystones
+PASS  tree has 9+ greater nodes
+PASS  3000 random items are valid
+PASS  all five rarities generated
+PASS  unique worldsplitter builds
+PASS  unique last_bastion builds
+PASS  unique bloodletter builds
+PASS  unique widowmaker builds
+PASS  unique dead_mans_promise builds
+PASS  unique clockwork_choir builds
+PASS  unique ashheart builds
+PASS  unique stormglass builds
+PASS  unique gravetender builds
+PASS  unique hollow_crown builds
+PASS  unique ember_heart builds
+PASS  unique wolfmother builds
+PASS  unique tyrants_signet builds
+PASS  unique glacial_crest builds
+PASS  unique thornmail builds
+PASS  unique phantom_treads builds
+PASS  unique sigil_of_echoes builds
+PASS  unique gunsmiths_pride builds
+PASS  unique warlords_grip builds
+PASS  unique starfall_staff builds
+
+--- class: warrior
+PASS  warrior starts with a weapon
+PASS  warrior stats resolve
+PASS  warrior has two starting skills
+PASS  warrior hub loads
+PASS  warrior dungeon generated with enemies
+PASS  warrior rooms reachable
+PASS  warrior found a target enemy
+PASS  warrior used primary skill
+PASS  warrior primary skill damaged enemy
+PASS  warrior used secondary skill
+PASS  warrior killed enemies
+PASS  warrior gained experience
+PASS  warrior enemies dropped loot
+PASS  warrior picked up items
+PASS  warrior equipped a dropped item
+PASS  warrior shield gives block
+PASS  warrior blocks attacks
+PASS  armour reduces physical damage
+PASS  two-hander unequips shield
+PASS  shield returned to bag
+PASS  warrior cannot allocate disconnected keystone
+PASS  warrior allocates adjacent node
+PASS  warrior refund blocked when it would disconnect
+PASS  warrior refunds leaf node
+
+--- class: ranger
+PASS  ranger starts with a weapon
+PASS  ranger stats resolve
+PASS  ranger has two starting skills
+PASS  ranger hub loads
+PASS  ranger dungeon generated with enemies
+PASS  ranger rooms reachable
+PASS  ranger found a target enemy
+PASS  ranger used primary skill
+PASS  ranger primary skill damaged enemy
+PASS  ranger used secondary skill
+PASS  ranger killed enemies
+PASS  ranger gained experience
+PASS  ranger enemies dropped loot
+PASS  ranger picked up items
+PASS  ranger equipped a dropped item
+PASS  ranger deploys turret
+PASS  one turret active
+PASS  turret damages enemies
+PASS  turret limit respected (2)
+PASS  ranger throws mine
+PASS  mine detonates on enemy
+PASS  ranger cannot allocate disconnected keystone
+PASS  ranger allocates adjacent node
+PASS  ranger refund blocked when it would disconnect
+PASS  ranger refunds leaf node
+
+--- class: mage
+PASS  mage starts with a weapon
+PASS  mage stats resolve
+PASS  mage has two starting skills
+PASS  mage hub loads
+PASS  mage dungeon generated with enemies
+PASS  mage rooms reachable
+PASS  mage found a target enemy
+PASS  mage used primary skill
+PASS  mage primary skill damaged enemy
+PASS  mage used secondary skill
+PASS  mage killed enemies
+PASS  mage gained experience
+PASS  mage enemies dropped loot
+PASS  mage picked up items
+PASS  mage equipped a dropped item
+PASS  mage summon limit is 4
+PASS  skeletons attack enemies
+PASS  minions carried out of dungeon
+PASS  minions follow into next dungeon
+PASS  mage cannot allocate disconnected keystone
+PASS  mage allocates adjacent node
+PASS  mage refund blocked when it would disconnect
+PASS  mage refunds leaf node
+
+--- every skill
+PASS  warrior: cleave can be used
+PASS  warrior: cleave damages enemies
+PASS  warrior: heavy_strike can be used
+PASS  warrior: heavy_strike damages enemies
+PASS  warrior: ground_slam can be used
+PASS  warrior: ground_slam damages enemies
+PASS  warrior: shield_charge can be used
+PASS  warrior: shield_charge damages enemies
+PASS  warrior: iron_guard can be used
+PASS  warrior: iron_guard applies its buff
+PASS  warrior: seismic_wave can be used
+PASS  warrior: seismic_wave damages enemies
+PASS  warrior: war_cry can be used
+PASS  warrior: whirlwind can be used
+PASS  warrior: whirlwind damages enemies
+PASS  warrior: battle_leap can be used
+PASS  warrior: battle_leap damages enemies
+PASS  warrior: chain_hook can be used
+PASS  warrior: chain_hook damages enemies
+PASS  warrior: earthquake can be used
+PASS  warrior: earthquake damages enemies
+PASS  warrior: berserker_rage can be used
+PASS  warrior: berserker_rage applies its buff
+PASS  warrior: executioners_blow can be used
+PASS  warrior: executioners_blow damages enemies
+PASS  warrior: shield_bash can be used
+PASS  warrior: shield_bash damages enemies
+PASS  warrior: titans_fall can be used
+PASS  warrior: titans_fall damages enemies
+PASS  warrior: quick_slash can be used
+PASS  warrior: quick_slash damages enemies
+PASS  warrior: piercing_thrust can be used
+PASS  warrior: piercing_thrust damages enemies
+PASS  warrior: tremor_strike can be used
+PASS  warrior: tremor_strike damages enemies
+PASS  warrior: shield_wall can be used
+PASS  warrior: shield_wall applies its buff
+PASS  warrior: adrenaline_surge can be used
+PASS  warrior: adrenaline_surge applies its buff
+PASS  warrior: last_stand can be used
+PASS  warrior: last_stand applies its buff
+PASS  warrior: sweeping_arc can be used
+PASS  warrior: sweeping_arc damages enemies
+PASS  warrior: avatar_of_war can be used
+PASS  warrior: avatar_of_war applies its buff
+PASS  warrior: apocalypse_cleave can be used
+PASS  warrior: apocalypse_cleave damages enemies
+PASS  ranger: quick_shot can be used
+PASS  ranger: quick_shot damages enemies
+PASS  ranger: multishot can be used
+PASS  ranger: multishot damages enemies
+PASS  ranger: explosive_mine can be used
+PASS  ranger: explosive_mine deploys
+PASS  ranger: ballista_turret can be used
+PASS  ranger: ballista_turret deploys
+PASS  ranger: rain_of_arrows can be used
+PASS  ranger: rain_of_arrows damages enemies
+PASS  ranger: piercing_arrow can be used
+PASS  ranger: piercing_arrow damages enemies
+PASS  ranger: hunters_focus can be used
+PASS  ranger: hunters_focus applies its buff
+PASS  ranger: barrage can be used
+PASS  ranger: barrage damages enemies
+PASS  ranger: explosive_arrow can be used
+PASS  ranger: explosive_arrow damages enemies
+PASS  ranger: bear_trap can be used
+PASS  ranger: bear_trap deploys
+PASS  ranger: frost_snare can be used
+PASS  ranger: frost_snare deploys
+PASS  ranger: lightning_trap can be used
+PASS  ranger: lightning_trap deploys
+PASS  ranger: repeater_turret can be used
+PASS  ranger: repeater_turret deploys
+PASS  ranger: cannon_turret can be used
+PASS  ranger: cannon_turret deploys
+PASS  ranger: smoke_bomb can be used
+PASS  ranger: smoke_bomb applies its buff
+PASS  ranger: death_from_above can be used
+PASS  ranger: death_from_above damages enemies
+PASS  ranger: quickdraw can be used
+PASS  ranger: quickdraw damages enemies
+PASS  ranger: scattershot can be used
+PASS  ranger: scattershot damages enemies
+PASS  ranger: poison_trap can be used
+PASS  ranger: poison_trap deploys
+PASS  ranger: cluster_bomb can be used
+PASS  ranger: cluster_bomb damages enemies
+PASS  ranger: tesla_turret can be used
+PASS  ranger: tesla_turret deploys
+PASS  ranger: frost_turret can be used
+PASS  ranger: frost_turret deploys
+PASS  ranger: marked_prey can be used
+PASS  ranger: marked_prey curses enemies
+PASS  ranger: sniper_round can be used
+PASS  ranger: sniper_round damages enemies
+PASS  ranger: deadeye can be used
+PASS  ranger: deadeye applies its buff
+PASS  ranger: mechanical_swarm can be used
+PASS  ranger: mechanical_swarm summons minions
+PASS  mage: firebolt can be used
+PASS  mage: firebolt damages enemies
+PASS  mage: frost_nova can be used
+PASS  mage: frost_nova damages enemies
+PASS  mage: summon_skeletons can be used
+PASS  mage: summon_skeletons summons minions
+PASS  mage: chain_lightning can be used
+PASS  mage: chain_lightning damages enemies
+PASS  mage: blink can be used
+PASS  mage: meteor can be used
+PASS  mage: meteor damages enemies
+PASS  mage: ice_lance can be used
+PASS  mage: ice_lance damages enemies
+PASS  mage: fireball can be used
+PASS  mage: fireball damages enemies
+PASS  mage: inferno can be used
+PASS  mage: inferno deploys
+PASS  mage: blizzard can be used
+PASS  mage: blizzard deploys
+PASS  mage: static_field can be used
+PASS  mage: static_field deploys
+PASS  mage: arcane_missiles can be used
+PASS  mage: arcane_missiles damages enemies
+PASS  mage: curse_of_frailty can be used
+PASS  mage: curse_of_frailty curses enemies
+PASS  mage: curse_of_agony can be used
+PASS  mage: curse_of_agony curses enemies
+PASS  mage: summon_skeleton_archers can be used
+FAIL  mage: summon_skeleton_archers summons minions  
+PASS  mage: summon_fire_elemental can be used
+PASS  mage: summon_fire_elemental summons minions
+PASS  mage: mark_of_ruin can be used
+PASS  mage: mark_of_ruin curses enemies
+PASS  mage: army_of_the_damned can be used
+PASS  mage: army_of_the_damned summons minions
+PASS  mage: disintegration_beam can be used
+PASS  mage: disintegration_beam damages enemies
+PASS  mage: frostbolt can be used
+PASS  mage: frostbolt damages enemies
+PASS  mage: spark can be used
+PASS  mage: spark damages enemies
+PASS  mage: lightning_bolt can be used
+PASS  mage: lightning_bolt damages enemies
+PASS  mage: flame_wave can be used
+PASS  mage: flame_wave damages enemies
+PASS  mage: glacial_eruption can be used
+PASS  mage: glacial_eruption damages enemies
+PASS  mage: time_snare can be used
+PASS  mage: time_snare deploys
+PASS  mage: soul_siphon can be used
+PASS  mage: soul_siphon damages enemies
+PASS  mage: summon_bone_golem can be used
+PASS  mage: summon_bone_golem summons minions
+PASS  mage: summon_storm_wisp can be used
+PASS  mage: summon_storm_wisp summons minions
+PASS  mage: cataclysm can be used
+PASS  mage: cataclysm damages enemies
+PASS  mage: archmage_ascension can be used
+PASS  mage: archmage_ascension applies its buff
+
+--- runes & specialisations
+PASS  12+ skill runes defined
+PASS  16 specialisations (5/5/6)
+PASS  per-class specialisation counts
+PASS  rune split modifies seismic_wave
+PASS  rune split returns when removed
+PASS  rune split fits some skill
+PASS  rune piercing modifies seismic_wave
+PASS  rune piercing returns when removed
+PASS  rune piercing fits some skill
+PASS  rune chaining modifies seismic_wave
+PASS  rune chaining returns when removed
+PASS  rune chaining fits some skill
+PASS  rune concentrated modifies cleave
+PASS  rune concentrated returns when removed
+PASS  rune concentrated fits some skill
+PASS  rune widened modifies cleave
+PASS  rune widened returns when removed
+PASS  rune widened fits some skill
+PASS  rune echo modifies ground_slam
+PASS  rune echo returns when removed
+PASS  rune echo fits some skill
+PASS  rune haste modifies cleave
+PASS  rune haste returns when removed
+PASS  rune haste fits some skill
+PASS  rune efficiency modifies cleave
+PASS  rune efficiency returns when removed
+PASS  rune efficiency fits some skill
+PASS  rune recharge modifies shield_charge
+PASS  rune recharge returns when removed
+PASS  rune recharge fits some skill
+PASS  rune horde modifies explosive_mine
+PASS  rune horde returns when removed
+PASS  rune horde fits some skill
+PASS  rune bone_frenzy modifies mechanical_swarm
+PASS  rune bone_frenzy returns when removed
+PASS  rune bone_frenzy fits some skill
+PASS  rune longshot modifies ballista_turret
+PASS  rune longshot returns when removed
+PASS  rune longshot fits some skill
+PASS  rune ember modifies cleave
+PASS  rune ember returns when removed
+PASS  rune ember fits some skill
+PASS  rune frost modifies cleave
+PASS  rune frost returns when removed
+PASS  rune frost fits some skill
+PASS  rune volatile modifies seismic_wave
+PASS  rune volatile returns when removed
+PASS  rune volatile fits some skill
+PASS  rune lingering modifies inferno
+PASS  rune lingering returns when removed
+PASS  rune lingering fits some skill
+PASS  rune concussive modifies cleave
+PASS  rune concussive returns when removed
+PASS  rune concussive fits some skill
+PASS  socket split into firebolt
+PASS  minion rune rejected by firebolt
+PASS  split firebolt fires 3 projectiles
+PASS  juggernaut locked below level 12
+PASS  choose juggernaut
+PASS  juggernaut node 4 needs a path
+PASS  juggernaut allocates juggernaut_1
+PASS  juggernaut allocates juggernaut_2
+PASS  juggernaut allocates juggernaut_3
+PASS  juggernaut allocates juggernaut_4
+PASS  juggernaut allocates juggernaut_5
+PASS  juggernaut uses all 5 points
+PASS  juggernaut allows only one capstone
+PASS  juggernaut capstone grants retaliate
+PASS  juggernaut survives save/load
+PASS  juggernaut can be reset
+PASS  berserker locked below level 12
+PASS  choose berserker
+PASS  berserker node 4 needs a path
+PASS  berserker allocates berserker_1
+PASS  berserker allocates berserker_2
+PASS  berserker allocates berserker_3
+PASS  berserker allocates berserker_4
+PASS  berserker allocates berserker_5
+PASS  berserker uses all 5 points
+PASS  berserker allows only one capstone
+PASS  berserker capstone grants rage
+PASS  berserker survives save/load
+PASS  berserker can be reset
+PASS  weapon_master locked below level 12
+PASS  choose weapon_master
+PASS  weapon_master node 4 needs a path
+PASS  weapon_master allocates weapon_master_1
+PASS  weapon_master allocates weapon_master_2
+PASS  weapon_master allocates weapon_master_3
+PASS  weapon_master allocates weapon_master_4
+PASS  weapon_master allocates weapon_master_5
+PASS  weapon_master uses all 5 points
+PASS  weapon_master allows only one capstone
+PASS  weapon_master capstone grants armour_pen
+PASS  weapon_master survives save/load
+PASS  weapon_master can be reset
+PASS  earthbreaker locked below level 12
+PASS  choose earthbreaker
+PASS  earthbreaker node 4 needs a path
+PASS  earthbreaker allocates earthbreaker_1
+PASS  earthbreaker allocates earthbreaker_2
+PASS  earthbreaker allocates earthbreaker_3
+PASS  earthbreaker allocates earthbreaker_4
+PASS  earthbreaker allocates earthbreaker_5
+PASS  earthbreaker uses all 5 points
+PASS  earthbreaker allows only one capstone
+PASS  earthbreaker capstone grants earth_aftershock
+PASS  earthbreaker survives save/load
+PASS  earthbreaker can be reset
+PASS  warlord locked below level 12
+PASS  choose warlord
+PASS  warlord node 4 needs a path
+PASS  warlord allocates warlord_1
+PASS  warlord allocates warlord_2
+PASS  warlord allocates warlord_3
+PASS  warlord allocates warlord_4
+PASS  warlord allocates warlord_5
+PASS  warlord uses all 5 points
+PASS  warlord allows only one capstone
+PASS  warlord capstone grants warlord
+PASS  warlord survives save/load
+PASS  warlord can be reset
+PASS  deadeye locked below level 12
+PASS  choose deadeye
+PASS  deadeye node 4 needs a path
+PASS  deadeye allocates deadeye_1
+PASS  deadeye allocates deadeye_2
+PASS  deadeye allocates deadeye_3
+PASS  deadeye allocates deadeye_4
+PASS  deadeye allocates deadeye_5
+PASS  deadeye uses all 5 points
+PASS  deadeye allows only one capstone
+PASS  deadeye capstone grants far_shot
+PASS  deadeye survives save/load
+PASS  deadeye can be reset
+PASS  trapper locked below level 12
+PASS  choose trapper
+PASS  trapper node 4 needs a path
+PASS  trapper allocates trapper_1
+PASS  trapper allocates trapper_2
+PASS  trapper allocates trapper_3
+PASS  trapper allocates trapper_4
+PASS  trapper allocates trapper_5
+PASS  trapper uses all 5 points
+PASS  trapper allows only one capstone
+PASS  trapper capstone grants toxic_traps
+PASS  trapper survives save/load
+PASS  trapper can be reset
+PASS  gunslinger locked below level 12
+PASS  choose gunslinger
+PASS  gunslinger node 4 needs a path
+PASS  gunslinger allocates gunslinger_1
+PASS  gunslinger allocates gunslinger_2
+PASS  gunslinger allocates gunslinger_3
+PASS  gunslinger allocates gunslinger_4
+PASS  gunslinger allocates gunslinger_5
+PASS  gunslinger uses all 5 points
+PASS  gunslinger allows only one capstone
+PASS  gunslinger capstone grants ricochet
+PASS  gunslinger survives save/load
+PASS  gunslinger can be reset
+PASS  machinist locked below level 12
+PASS  choose machinist
+PASS  machinist node 4 needs a path
+PASS  machinist allocates machinist_1
+PASS  machinist allocates machinist_2
+PASS  machinist allocates machinist_3
+PASS  machinist allocates machinist_4
+PASS  machinist allocates machinist_5
+PASS  machinist uses all 5 points
+PASS  machinist allows only one capstone
+PASS  machinist capstone grants tesla_coils
+PASS  machinist survives save/load
+PASS  machinist can be reset
+PASS  wraith_hunter locked below level 12
+PASS  choose wraith_hunter
+PASS  wraith_hunter node 4 needs a path
+PASS  wraith_hunter allocates wraith_hunter_1
+PASS  wraith_hunter allocates wraith_hunter_2
+PASS  wraith_hunter allocates wraith_hunter_3
+PASS  wraith_hunter allocates wraith_hunter_4
+PASS  wraith_hunter allocates wraith_hunter_5
+PASS  wraith_hunter uses all 5 points
+PASS  wraith_hunter allows only one capstone
+PASS  wraith_hunter capstone grants phantom_step
+PASS  wraith_hunter survives save/load
+PASS  wraith_hunter can be reset
+PASS  pyromancer locked below level 12
+PASS  choose pyromancer
+PASS  pyromancer node 4 needs a path
+PASS  pyromancer allocates pyromancer_1
+PASS  pyromancer allocates pyromancer_2
+PASS  pyromancer allocates pyromancer_3
+PASS  pyromancer allocates pyromancer_4
+PASS  pyromancer allocates pyromancer_5
+PASS  pyromancer uses all 5 points
+PASS  pyromancer allows only one capstone
+PASS  pyromancer capstone grants spreading_flames
+PASS  pyromancer survives save/load
+PASS  pyromancer can be reset
+PASS  cryomancer locked below level 12
+PASS  choose cryomancer
+PASS  cryomancer node 4 needs a path
+PASS  cryomancer allocates cryomancer_1
+PASS  cryomancer allocates cryomancer_2
+PASS  cryomancer allocates cryomancer_3
+PASS  cryomancer allocates cryomancer_4
+PASS  cryomancer allocates cryomancer_5
+PASS  cryomancer uses all 5 points
+PASS  cryomancer allows only one capstone
+PASS  cryomancer capstone grants deep_freeze
+PASS  cryomancer survives save/load
+PASS  cryomancer can be reset
+PASS  stormcaller locked below level 12
+PASS  choose stormcaller
+PASS  stormcaller node 4 needs a path
+PASS  stormcaller allocates stormcaller_1
+PASS  stormcaller allocates stormcaller_2
+PASS  stormcaller allocates stormcaller_3
+PASS  stormcaller allocates stormcaller_4
+PASS  stormcaller allocates stormcaller_5
+PASS  stormcaller uses all 5 points
+PASS  stormcaller allows only one capstone
+PASS  stormcaller capstone grants overcharge
+PASS  stormcaller survives save/load
+PASS  stormcaller can be reset
+PASS  necromancer locked below level 12
+PASS  choose necromancer
+PASS  necromancer node 4 needs a path
+PASS  necromancer allocates necromancer_1
+PASS  necromancer allocates necromancer_2
+PASS  necromancer allocates necromancer_3
+PASS  necromancer allocates necromancer_4
+PASS  necromancer allocates necromancer_5
+PASS  necromancer uses all 5 points
+PASS  necromancer allows only one capstone
+PASS  necromancer capstone grants corpse_blast
+PASS  necromancer survives save/load
+PASS  necromancer can be reset
+PASS  arcanist locked below level 12
+PASS  choose arcanist
+PASS  arcanist node 4 needs a path
+PASS  arcanist allocates arcanist_1
+PASS  arcanist allocates arcanist_2
+PASS  arcanist allocates arcanist_3
+PASS  arcanist allocates arcanist_4
+PASS  arcanist allocates arcanist_5
+PASS  arcanist uses all 5 points
+PASS  arcanist allows only one capstone
+PASS  arcanist capstone grants arcane_flow
+PASS  arcanist survives save/load
+PASS  arcanist can be reset
+PASS  summoner locked below level 12
+PASS  choose summoner
+PASS  summoner node 4 needs a path
+PASS  summoner allocates summoner_1
+PASS  summoner allocates summoner_2
+PASS  summoner allocates summoner_3
+PASS  summoner allocates summoner_4
+PASS  summoner allocates summoner_5
+PASS  summoner uses all 5 points
+PASS  summoner allows only one capstone
+PASS  summoner capstone grants minion_shield
+PASS  summoner survives save/load
+PASS  summoner can be reset
+PASS  deep freeze turns repeated chill into freeze
+PASS  shielded elite absorbs damage
+PASS  summoner elite calls minions
+
+--- stage 4: passive clusters, gems, charms, legendaries
+PASS  passive web has 150+ nodes
+PASS  passive web has 15+ named clusters
+PASS  node w_start belongs to a cluster
+PASS  node r_start belongs to a cluster
+PASS  node m_start belongs to a cluster
+PASS  node w_mel1 belongs to a cluster
+PASS  node w_mel2 belongs to a cluster
+PASS  node w_2h belongs to a cluster
+PASS  node w_mel3 belongs to a cluster
+PASS  node w_brutal belongs to a cluster
+PASS  node ks_momentum belongs to a cluster
+PASS  passive flag momentum is implemented
+PASS  node w_1h belongs to a cluster
+PASS  node w_arm1 belongs to a cluster
+PASS  node w_arm2 belongs to a cluster
+PASS  node w_blk1 belongs to a cluster
+PASS  node w_arm3 belongs to a cluster
+PASS  node w_bulwark belongs to a cluster
+PASS  passive flag bulwark is implemented
+PASS  node ks_fortress belongs to a cluster
+PASS  passive flag fortress is implemented
+PASS  node w_life1 belongs to a cluster
+PASS  node w_life2 belongs to a cluster
+PASS  node w_life3 belongs to a cluster
+PASS  node r_prj1 belongs to a cluster
+PASS  node r_prj2 belongs to a cluster
+PASS  node r_pspd belongs to a cluster
+PASS  node r_prj3 belongs to a cluster
+PASS  node r_deadeye belongs to a cluster
+PASS  node ks_perfect_aim belongs to a cluster
+PASS  passive flag perfect_aim is implemented
+PASS  node r_gun belongs to a cluster
+PASS  node r_trap1 belongs to a cluster
+PASS  node r_tur1 belongs to a cluster
+PASS  node r_trap2 belongs to a cluster
+PASS  node r_tur2 belongs to a cluster
+PASS  node r_engineer belongs to a cluster
+PASS  node ks_automaton belongs to a cluster
+PASS  node r_eva1 belongs to a cluster
+PASS  node r_crit1 belongs to a cluster
+PASS  node r_crit2 belongs to a cluster
+PASS  node m_sp1 belongs to a cluster
+PASS  node m_sp2 belongs to a cluster
+PASS  node m_ele belongs to a cluster
+PASS  node m_fire1 belongs to a cluster
+PASS  node m_flame belongs to a cluster
+PASS  node m_storm belongs to a cluster
+PASS  node ks_convergence belongs to a cluster
+PASS  passive flag convergence is implemented
+PASS  node m_min1 belongs to a cluster
+PASS  node m_min2 belongs to a cluster
+PASS  node m_minl belongs to a cluster
+PASS  node m_min3 belongs to a cluster
+PASS  node m_command belongs to a cluster
+PASS  node ks_one_mind belongs to a cluster
+PASS  node m_mana1 belongs to a cluster
+PASS  node m_mana2 belongs to a cluster
+PASS  node m_flow belongs to a cluster
+PASS  node h_wr1 belongs to a cluster
+PASS  node h_wr2 belongs to a cluster
+PASS  node h_wr3 belongs to a cluster
+PASS  node h_wr4 belongs to a cluster
+PASS  node h_wr5 belongs to a cluster
+PASS  node h_rm1 belongs to a cluster
+PASS  node h_rm2 belongs to a cluster
+PASS  node h_rm3 belongs to a cluster
+PASS  node h_rm4 belongs to a cluster
+PASS  node h_rm5 belongs to a cluster
+PASS  node h_mw1 belongs to a cluster
+PASS  node h_mw2 belongs to a cluster
+PASS  node h_mw3 belongs to a cluster
+PASS  node h_mw4 belongs to a cluster
+PASS  node h_mw5 belongs to a cluster
+PASS  node ks_blood belongs to a cluster
+PASS  passive flag blood_magic is implemented
+PASS  node c_core belongs to a cluster
+PASS  node c_w1 belongs to a cluster
+PASS  node c_w2 belongs to a cluster
+PASS  node c_w3 belongs to a cluster
+PASS  node c_r1 belongs to a cluster
+PASS  node c_r2 belongs to a cluster
+PASS  node c_r3 belongs to a cluster
+PASS  node c_m1 belongs to a cluster
+PASS  node c_m2 belongs to a cluster
+PASS  node c_m3 belongs to a cluster
+PASS  node c_dot1 belongs to a cluster
+PASS  node c_dot2 belongs to a cluster
+PASS  node c_res1 belongs to a cluster
+PASS  node c_res2 belongs to a cluster
+PASS  node ks_glass belongs to a cluster
+PASS  node xs_r0 belongs to a cluster
+PASS  passive flag vampiric is implemented
+PASS  node xs_r1 belongs to a cluster
+PASS  node xs_r2 belongs to a cluster
+PASS  node xs_r3 belongs to a cluster
+PASS  node xs_r4 belongs to a cluster
+PASS  node xs_r5 belongs to a cluster
+PASS  node xs_r6 belongs to a cluster
+PASS  node xs_r7 belongs to a cluster
+PASS  node xs_ks belongs to a cluster
+PASS  passive flag crimson_dance is implemented
+PASS  node xs_p01 belongs to a cluster
+PASS  node xs_p02 belongs to a cluster
+PASS  node xs_p03 belongs to a cluster
+PASS  node xs_p11 belongs to a cluster
+PASS  node xs_p12 belongs to a cluster
+PASS  node xs_p13 belongs to a cluster
+PASS  node xp_r0 belongs to a cluster
+PASS  node xp_r1 belongs to a cluster
+PASS  node xp_r2 belongs to a cluster
+PASS  node xp_r3 belongs to a cluster
+PASS  node xp_r4 belongs to a cluster
+PASS  node xp_r5 belongs to a cluster
+PASS  node xp_r6 belongs to a cluster
+PASS  node xp_r7 belongs to a cluster
+PASS  node xp_ks belongs to a cluster
+PASS  node xp_p01 belongs to a cluster
+PASS  node xp_p02 belongs to a cluster
+PASS  node xp_p03 belongs to a cluster
+PASS  node xp_p11 belongs to a cluster
+PASS  node xp_p12 belongs to a cluster
+PASS  node xp_p13 belongs to a cluster
+PASS  node xp_p14 belongs to a cluster
+PASS  node xw_r0 belongs to a cluster
+PASS  node xw_r1 belongs to a cluster
+PASS  node xw_r2 belongs to a cluster
+PASS  node xw_r3 belongs to a cluster
+PASS  node xw_r4 belongs to a cluster
+PASS  node xw_r5 belongs to a cluster
+PASS  node xw_r6 belongs to a cluster
+PASS  node xw_r7 belongs to a cluster
+PASS  node xw_ks belongs to a cluster
+PASS  passive flag wind_dancer is implemented
+PASS  node xw_p01 belongs to a cluster
+PASS  node xw_p02 belongs to a cluster
+PASS  node xw_p11 belongs to a cluster
+PASS  node xw_p12 belongs to a cluster
+PASS  node xe_r0 belongs to a cluster
+PASS  node xe_r1 belongs to a cluster
+PASS  node xe_r2 belongs to a cluster
+PASS  node xe_r3 belongs to a cluster
+PASS  node xe_r4 belongs to a cluster
+PASS  node xe_r5 belongs to a cluster
+PASS  node xe_r6 belongs to a cluster
+PASS  node xe_r7 belongs to a cluster
+PASS  node xe_ks belongs to a cluster
+PASS  passive flag executioner is implemented
+PASS  node xe_p01 belongs to a cluster
+PASS  node xe_p02 belongs to a cluster
+PASS  node xe_p11 belongs to a cluster
+PASS  node xe_p12 belongs to a cluster
+PASS  node xa_r0 belongs to a cluster
+PASS  node xa_r1 belongs to a cluster
+PASS  node xa_r2 belongs to a cluster
+PASS  node xa_r3 belongs to a cluster
+PASS  node xa_r4 belongs to a cluster
+PASS  node xa_r5 belongs to a cluster
+PASS  node xa_r6 belongs to a cluster
+PASS  node xa_r7 belongs to a cluster
+PASS  node xa_ks belongs to a cluster
+PASS  passive flag mind_over_matter is implemented
+PASS  node xa_p01 belongs to a cluster
+PASS  node xa_p02 belongs to a cluster
+PASS  node xa_p03 belongs to a cluster
+PASS  node xa_p11 belongs to a cluster
+PASS  node xa_p12 belongs to a cluster
+PASS  node xa_p13 belongs to a cluster
+PASS  node xv_r0 belongs to a cluster
+PASS  node xv_r1 belongs to a cluster
+PASS  node xv_r2 belongs to a cluster
+PASS  node xv_r3 belongs to a cluster
+PASS  node xv_r4 belongs to a cluster
+PASS  node xv_r5 belongs to a cluster
+PASS  node xv_r6 belongs to a cluster
+PASS  node xv_r7 belongs to a cluster
+PASS  node xv_ks belongs to a cluster
+PASS  passive flag void_pact is implemented
+PASS  node xv_p01 belongs to a cluster
+PASS  node xv_p02 belongs to a cluster
+PASS  node xv_p11 belongs to a cluster
+PASS  node xv_p12 belongs to a cluster
+PASS  node xo0_1 belongs to a cluster
+PASS  node xo0_2 belongs to a cluster
+PASS  node xo0_3 belongs to a cluster
+PASS  node xo0_4 belongs to a cluster
+PASS  node xo0_5 belongs to a cluster
+PASS  node xo0_6 belongs to a cluster
+PASS  node xo1_1 belongs to a cluster
+PASS  node xo1_2 belongs to a cluster
+PASS  node xo1_3 belongs to a cluster
+PASS  node xo1_4 belongs to a cluster
+PASS  node xo1_5 belongs to a cluster
+PASS  node xo1_6 belongs to a cluster
+PASS  node xo2_1 belongs to a cluster
+PASS  node xo2_2 belongs to a cluster
+PASS  node xo2_3 belongs to a cluster
+PASS  node xo2_4 belongs to a cluster
+PASS  node xo2_5 belongs to a cluster
+PASS  node xo2_6 belongs to a cluster
+PASS  node xo3_1 belongs to a cluster
+PASS  node xo3_2 belongs to a cluster
+PASS  node xo3_3 belongs to a cluster
+PASS  node xo3_4 belongs to a cluster
+PASS  node xo3_5 belongs to a cluster
+PASS  node xo3_6 belongs to a cluster
+PASS  node xo4_1 belongs to a cluster
+PASS  node xo4_2 belongs to a cluster
+PASS  node xo4_3 belongs to a cluster
+PASS  node xo4_4 belongs to a cluster
+PASS  node xo4_5 belongs to a cluster
+PASS  node xo4_6 belongs to a cluster
+PASS  node xo5_1 belongs to a cluster
+PASS  node xo5_2 belongs to a cluster
+PASS  node xo5_3 belongs to a cluster
+PASS  node xo5_4 belongs to a cluster
+PASS  node xo5_5 belongs to a cluster
+PASS  node xo5_6 belongs to a cluster
+PASS  legendary effect worldsplitter is implemented
+PASS  legendary effect last_bastion is implemented
+PASS  legendary effect bloodletter is implemented
+PASS  legendary effect widowmaker is implemented
+PASS  legendary effect dead_mans_promise is implemented
+PASS  legendary effect clockwork_choir is implemented
+PASS  legendary effect ashheart is implemented
+PASS  legendary effect stormglass is implemented
+PASS  legendary effect gravetender is implemented
+PASS  legendary effect hollow_crown is implemented
+PASS  legendary effect ember_heart is implemented
+PASS  legendary effect pack_leader is implemented
+PASS  legendary effect tyrant is implemented
+PASS  legendary effect shatter is implemented
+PASS  legendary effect thorns is implemented
+PASS  legendary effect phantom_treads is implemented
+PASS  legendary effect echo is implemented
+PASS  legendary effect double_shot is implemented
+PASS  legendary effect warlords_grip is implemented
+PASS  legendary effect starfall is implemented
+PASS  20+ legendaries
+PASS  route to Executioner's Creed found
+PASS  route allocates in one go
+PASS  route spends the nodes' point cost
+PASS  keystone flag active after route
+PASS  route refused without enough points
+PASS  Executioner's Creed: hits under 35% life always crit
+PASS  Blood Drinker leeches life
+PASS  Void Pact: 25% more vs ailing enemies
+PASS  Crimson Dance: bleeds deal 60% more
+PASS  route to Mind over Matter
+PASS  Windwalker is reachable by a warrior via the outer road
+PASS  Mind over Matter takes damage from mana first
+PASS  Wind Dancer: dodge grants Wind Dance
+PASS  ranger can route to Wind Dancer
+PASS  warrior can reach xs_ks
+PASS  ranger can reach xs_ks
+PASS  mage can reach xs_ks
+PASS  warrior can reach xp_ks
+PASS  ranger can reach xp_ks
+PASS  mage can reach xp_ks
+PASS  warrior can reach xw_ks
+PASS  ranger can reach xw_ks
+PASS  mage can reach xw_ks
+PASS  warrior can reach xe_ks
+PASS  ranger can reach xe_ks
+PASS  mage can reach xe_ks
+PASS  warrior can reach xa_ks
+PASS  ranger can reach xa_ks
+PASS  mage can reach xa_ks
+PASS  warrior can reach xv_ks
+PASS  ranger can reach xv_ks
+PASS  mage can reach xv_ks
+PASS  8 gem types in 4 grades
+PASS  gem ruby grants stats in weapon
+PASS  gem ruby grants stats in armour
+PASS  gem ruby grants stats in jewelry
+PASS  gem ruby scales with grade
+PASS  gem sapphire grants stats in weapon
+PASS  gem sapphire grants stats in armour
+PASS  gem sapphire grants stats in jewelry
+PASS  gem sapphire scales with grade
+PASS  gem topaz grants stats in weapon
+PASS  gem topaz grants stats in armour
+PASS  gem topaz grants stats in jewelry
+PASS  gem topaz scales with grade
+PASS  gem onyx grants stats in weapon
+PASS  gem onyx grants stats in armour
+PASS  gem onyx grants stats in jewelry
+PASS  gem onyx scales with grade
+PASS  gem emerald grants stats in weapon
+PASS  gem emerald grants stats in armour
+PASS  gem emerald grants stats in jewelry
+PASS  gem emerald scales with grade
+PASS  gem amethyst grants stats in weapon
+PASS  gem amethyst grants stats in armour
+PASS  gem amethyst grants stats in jewelry
+PASS  gem amethyst scales with grade
+PASS  gem diamond grants stats in weapon
+PASS  gem diamond grants stats in armour
+PASS  gem diamond grants stats in jewelry
+PASS  gem diamond scales with grade
+PASS  gem bloodstone grants stats in weapon
+PASS  gem bloodstone grants stats in armour
+PASS  gem bloodstone grants stats in jewelry
+PASS  gem bloodstone scales with grade
+PASS  random gem 0 valid
+PASS  random gem 1 valid
+PASS  random gem 2 valid
+PASS  random gem 3 valid
+PASS  random gem 4 valid
+PASS  random gem 5 valid
+PASS  random gem 6 valid
+PASS  random gem 7 valid
+PASS  random gem 8 valid
+PASS  random gem 9 valid
+PASS  random gem 10 valid
+PASS  random gem 11 valid
+PASS  random gem 12 valid
+PASS  random gem 13 valid
+PASS  random gem 14 valid
+PASS  random gem 15 valid
+PASS  random gem 16 valid
+PASS  random gem 17 valid
+PASS  random gem 18 valid
+PASS  random gem 19 valid
+PASS  level 1 drops chipped gems
+PASS  rings hold one jewellery socket
+PASS  chest supports 3 sockets, starts with none
+PASS  blacksmith can add a socket
+PASS  two sockets added
+PASS  charms cannot be socketed
+PASS  high-level drops can roll several sockets
+PASS  socket a ruby into the chest
+PASS  ruby in armour adds life
+PASS  occupied socket is refused
+PASS  missing gem is refused
+PASS  three chipped rubies combine into a flawed ruby
+PASS  cannot combine with only one gem
+PASS  gems survive save/load
+PASS  unsocketing returns the gem for gold
+PASS  salvaged items give their gems back
+PASS  8+ charm bases
+PASS  charms roll charm affixes
+PASS  charm affix ch_of_feasting is charm-legal
+PASS  charm affix ch_tinkers is charm-legal
+PASS  charm affix ch_tenacious is charm-legal
+PASS  charm affix ch_of_haste is charm-legal
+PASS  charm equips in the charm slot
+PASS  Tyrant's Signet grants its effect and skill levels
+PASS  Tyrant's Signet intimidates nearby enemies
+PASS  Thornwarden reflects melee damage
+PASS  Wolfmother's Fang: movement speed boosts minions
+PASS  Glacial Crest: chilled enemies shatter and chill neighbours
+PASS  hub has a Jeweller
+PASS  jeweller opens with the inventory
+PASS  jeweller lists sockets
+
+--- dungeon tiers
+PASS  six dungeon tiers defined
+PASS  forgotten_depths pre-rolls 0 modifiers
+PASS  forgotten_depths generates
+PASS  forgotten_depths has objectives ending in boss
+PASS  forgotten_depths arena sealed only when pre-objectives exist
+PASS  forgotten_depths arena unsealed after objectives
+PASS  forgotten_depths boss spawns
+PASS  forgotten_depths boss defeated
+PASS  forgotten_depths unlocks next tier
+PASS  corrupted_catacombs pre-rolls 1 modifiers
+PASS  corrupted_catacombs generates
+PASS  corrupted_catacombs has objectives ending in boss
+PASS  corrupted_catacombs arena sealed only when pre-objectives exist
+PASS  corrupted_catacombs guardian spawned
+PASS  corrupted_catacombs objective guardian completes
+PASS  corrupted_catacombs arena unsealed after objectives
+PASS  corrupted_catacombs boss spawns
+PASS  corrupted_catacombs boss defeated
+PASS  corrupted_catacombs unlocks next tier
+PASS  abyssal_warrens pre-rolls 1 modifiers
+PASS  abyssal_warrens generates
+PASS  abyssal_warrens has objectives ending in boss
+PASS  abyssal_warrens arena sealed only when pre-objectives exist
+PASS  abyssal_warrens objective mechanisms completes
+PASS  abyssal_warrens arena unsealed after objectives
+PASS  abyssal_warrens boss spawns
+PASS  abyssal_warrens boss defeated
+PASS  abyssal_warrens unlocks next tier
+PASS  dread_sanctums pre-rolls 2 modifiers
+PASS  dread_sanctums generates
+PASS  dread_sanctums has objectives ending in boss
+PASS  dread_sanctums arena sealed only when pre-objectives exist
+PASS  dread_sanctums objective relics completes
+PASS  dread_sanctums objective waves completes
+PASS  dread_sanctums arena unsealed after objectives
+PASS  dread_sanctums boss spawns
+PASS  dread_sanctums boss defeated
+PASS  dread_sanctums unlocks next tier
+PASS  nightmare_vaults pre-rolls 2 modifiers
+PASS  nightmare_vaults generates
+PASS  nightmare_vaults has objectives ending in boss
+PASS  nightmare_vaults arena sealed only when pre-objectives exist
+PASS  nightmare_vaults guardian spawned
+PASS  nightmare_vaults objective guardian completes
+PASS  nightmare_vaults objective mechanisms completes
+PASS  nightmare_vaults arena unsealed after objectives
+PASS  nightmare_vaults boss spawns
+PASS  nightmare_vaults boss defeated
+PASS  nightmare_vaults unlocks next tier
+PASS  endless_abyss pre-rolls 2 modifiers
+PASS  endless_abyss generates
+PASS  endless_abyss has objectives ending in boss
+PASS  endless_abyss arena sealed only when pre-objectives exist
+PASS  endless_abyss objective relics completes
+PASS  endless_abyss arena unsealed after objectives
+PASS  endless_abyss boss spawns
+PASS  endless_abyss boss defeated
+PASS  endless_abyss unlocks next tier
+PASS  endless abyss descends to depth 2
+PASS  deeper depth scales monsters
+
+--- bosses
+PASS  six or more bosses defined
+PASS  boss warden uses multiple attack patterns
+PASS  boss warden reaches later phase
+PASS  boss warden can damage the player
+PASS  boss gravemaw uses multiple attack patterns
+PASS  boss gravemaw reaches later phase
+PASS  boss gravemaw can damage the player
+PASS  boss archon_velis uses multiple attack patterns
+PASS  boss archon_velis reaches later phase
+PASS  boss archon_velis can damage the player
+PASS  boss iron_penitent uses multiple attack patterns
+PASS  boss iron_penitent reaches later phase
+PASS  boss iron_penitent can damage the player
+PASS  boss malgrath uses multiple attack patterns
+PASS  boss malgrath reaches later phase
+PASS  boss malgrath can damage the player
+PASS  boss stormheart uses multiple attack patterns
+PASS  boss stormheart reaches later phase
+PASS  boss stormheart can damage the player
+
+--- crafting
+PASS  pay upgrade cost
+PASS  upgrade consumes materials and raises level
+PASS  reroll keeps item valid
+PASS  remove affix
+PASS  raise rarity
+PASS  legendary affixes locked
+PASS  salvage yields scrap
+
+--- boss & death
+PASS  boss spawns on entering arena
+PASS  boss can be defeated
+PASS  boss kill recorded
+PASS  boss grants bonus passive point
+PASS  exit portal appears
+PASS  boss drops several items
+PASS  player can die
+PASS  death screen shown
+PASS  returned safely to hub after death
+PASS  completing a run refreshes vendor
+
+--- save/load
+PASS  save/load restores class, level, gold
+PASS  save/load restores passives
+PASS  save/load restores materials
+PASS  save/load restores equipment
+PASS  save/load restores stats
+PASS  save is versioned
+
+--- ui
+PASS  panel inventory opens
+PASS  panel character opens
+PASS  panel passives opens
+PASS  panel skills opens
+PASS  panel spec opens
+PASS  panel vendor opens
+PASS  panel blacksmith opens
+PASS  panel jeweller opens
+PASS  panel stash opens
+PASS  panel dungeon opens
+PASS  item tooltip with comparison renders
+PASS  passive tooltip renders
+
+==== 1403 passed, 1 failed ====
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+     at: cleanup (core/object/object.cpp:1982)

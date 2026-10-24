@@ -1,0 +1,4639 @@
+[
+ {
+  "id": "w_start",
+  "name": "Warrior's Oath",
+  "type": "start",
+  "x": -364,
+  "y": 210,
+  "cost": 0,
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 5
+   },
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "links": [
+   "w_mel1",
+   "w_arm1",
+   "w_life1",
+   "h_wr1",
+   "h_mw5",
+   "c_w1"
+  ],
+  "desc": "Warrior starting point",
+  "class": "warrior",
+  "cluster": "Origins"
+ },
+ {
+  "id": "r_start",
+  "name": "Ranger's Path",
+  "type": "start",
+  "x": 364,
+  "y": 210,
+  "cost": 0,
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 5
+   },
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "links": [
+   "r_prj1",
+   "r_trap1",
+   "r_eva1",
+   "h_wr5",
+   "h_rm1",
+   "c_r1"
+  ],
+  "desc": "Ranger starting point",
+  "class": "ranger",
+  "cluster": "Origins"
+ },
+ {
+  "id": "m_start",
+  "name": "Mage's Sigil",
+  "type": "start",
+  "x": 0,
+  "y": -420,
+  "cost": 0,
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 5
+   },
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "links": [
+   "m_sp1",
+   "m_min1",
+   "m_mana1",
+   "h_rm5",
+   "h_mw1",
+   "c_m1"
+  ],
+  "desc": "Mage starting point",
+  "class": "mage",
+  "cluster": "Origins"
+ },
+ {
+  "id": "w_mel1",
+  "name": "Weapon Training",
+  "type": "minor",
+  "x": -373,
+  "y": 344,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "w_start",
+   "w_mel2"
+  ],
+  "cluster": "Weapon Master"
+ },
+ {
+  "id": "w_mel2",
+  "name": "Weapon Training",
+  "type": "minor",
+  "x": -395,
+  "y": 406,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "w_mel1",
+   "w_2h",
+   "w_1h"
+  ],
+  "cluster": "Weapon Master"
+ },
+ {
+  "id": "w_2h",
+  "name": "Heavy Grip",
+  "type": "notable",
+  "x": -417,
+  "y": 467,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "two_handed_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "w_mel2",
+   "w_mel3"
+  ],
+  "cluster": "Weapon Master"
+ },
+ {
+  "id": "w_mel3",
+  "name": "Weapon Training",
+  "type": "minor",
+  "x": -440,
+  "y": 529,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "w_2h",
+   "w_brutal"
+  ],
+  "cluster": "Weapon Master"
+ },
+ {
+  "id": "w_brutal",
+  "name": "Brutal Force",
+  "type": "greater",
+  "x": -462,
+  "y": 591,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 18
+   },
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "w_mel3",
+   "ks_momentum",
+   "xs_p01"
+  ],
+  "cluster": "Weapon Master"
+ },
+ {
+  "id": "ks_momentum",
+  "name": "Overwhelming Momentum",
+  "type": "keystone",
+  "x": -415,
+  "y": 719,
+  "cost": 2,
+  "mods": [],
+  "links": [
+   "w_brutal"
+  ],
+  "flags": [
+   "momentum"
+  ],
+  "desc": "Each consecutive hit within 2s grants 3% more damage, up to 20 stacks. Stacks are lost when you stop attacking. You deal 10% less damage with your first hit.",
+  "cluster": "Weapon Master"
+ },
+ {
+  "id": "w_1h",
+  "name": "Duelist's Edge",
+  "type": "notable",
+  "x": -532,
+  "y": 373,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "one_handed_damage",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "w_mel2"
+  ],
+  "cluster": "Weapon Master"
+ },
+ {
+  "id": "w_arm1",
+  "name": "Thick Hide",
+  "type": "minor",
+  "x": -479,
+  "y": 171,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "w_start",
+   "w_arm2"
+  ],
+  "cluster": "Iron Bastion"
+ },
+ {
+  "id": "w_arm2",
+  "name": "Thick Hide",
+  "type": "minor",
+  "x": -542,
+  "y": 167,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "w_arm1",
+   "w_blk1"
+  ],
+  "cluster": "Iron Bastion"
+ },
+ {
+  "id": "w_blk1",
+  "name": "Shield Discipline",
+  "type": "notable",
+  "x": -606,
+  "y": 163,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "block_chance",
+    "type": "flat",
+    "value": 3
+   }
+  ],
+  "links": [
+   "w_arm2",
+   "w_arm3"
+  ],
+  "cluster": "Iron Bastion"
+ },
+ {
+  "id": "w_arm3",
+  "name": "Thick Hide",
+  "type": "minor",
+  "x": -670,
+  "y": 160,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "w_blk1",
+   "w_bulwark"
+  ],
+  "cluster": "Iron Bastion"
+ },
+ {
+  "id": "w_bulwark",
+  "name": "Bulwark Mastery",
+  "type": "greater",
+  "x": -734,
+  "y": 156,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "block_chance",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 15
+   }
+  ],
+  "links": [
+   "w_arm3",
+   "ks_fortress",
+   "xe_p11"
+  ],
+  "flags": [
+   "bulwark"
+  ],
+  "desc": "Blocking a hit grants 15% damage reduction for 2 seconds",
+  "cluster": "Iron Bastion"
+ },
+ {
+  "id": "ks_fortress",
+  "name": "Fortress of Flesh",
+  "type": "keystone",
+  "x": -829,
+  "y": 29,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": -15
+   }
+  ],
+  "links": [
+   "w_bulwark"
+  ],
+  "flags": [
+   "fortress"
+  ],
+  "desc": "While stationary for 1 second, gain 30% damage reduction. 15% reduced movement speed.",
+  "cluster": "Iron Bastion"
+ },
+ {
+  "id": "w_life1",
+  "name": "Iron Flesh",
+  "type": "minor",
+  "x": -462,
+  "y": 267,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "w_start",
+   "w_life2"
+  ],
+  "cluster": "Vitality"
+ },
+ {
+  "id": "w_life2",
+  "name": "Iron Flesh",
+  "type": "minor",
+  "x": -525,
+  "y": 303,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "w_life1",
+   "w_life3"
+  ],
+  "cluster": "Vitality"
+ },
+ {
+  "id": "w_life3",
+  "name": "Iron Constitution",
+  "type": "greater",
+  "x": -589,
+  "y": 340,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 10
+   },
+   {
+    "stat": "life_regen",
+    "type": "flat",
+    "value": 1.5
+   }
+  ],
+  "links": [
+   "w_life2",
+   "xe_p01"
+  ],
+  "cluster": "Vitality"
+ },
+ {
+  "id": "r_prj1",
+  "name": "Fletching",
+  "type": "minor",
+  "x": 373,
+  "y": 344,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "r_start",
+   "r_prj2"
+  ],
+  "cluster": "Marksman"
+ },
+ {
+  "id": "r_prj2",
+  "name": "Fletching",
+  "type": "minor",
+  "x": 395,
+  "y": 406,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "r_prj1",
+   "r_pspd",
+   "r_gun"
+  ],
+  "cluster": "Marksman"
+ },
+ {
+  "id": "r_pspd",
+  "name": "Swift Flight",
+  "type": "notable",
+  "x": 417,
+  "y": 467,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_speed",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "bow_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_prj2",
+   "r_prj3"
+  ],
+  "cluster": "Marksman"
+ },
+ {
+  "id": "r_prj3",
+  "name": "Fletching",
+  "type": "minor",
+  "x": 440,
+  "y": 529,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "r_pspd",
+   "r_deadeye"
+  ],
+  "cluster": "Marksman"
+ },
+ {
+  "id": "r_deadeye",
+  "name": "Deadeye Mastery",
+  "type": "greater",
+  "x": 462,
+  "y": 591,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "pierce",
+    "type": "flat",
+    "value": 1
+   },
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 12
+   }
+  ],
+  "links": [
+   "r_prj3",
+   "ks_perfect_aim",
+   "xs_p11"
+  ],
+  "cluster": "Marksman"
+ },
+ {
+  "id": "ks_perfect_aim",
+  "name": "Perfect Aim",
+  "type": "keystone",
+  "x": 415,
+  "y": 719,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 50
+   }
+  ],
+  "links": [
+   "r_deadeye"
+  ],
+  "flags": [
+   "perfect_aim"
+  ],
+  "desc": "Projectile hits against enemies further than 180 units deal 30% more damage. Hits against enemies closer than 100 units deal 30% less damage. +50% increased critical chance.",
+  "cluster": "Marksman"
+ },
+ {
+  "id": "r_gun",
+  "name": "Powder Craft",
+  "type": "notable",
+  "x": 532,
+  "y": 373,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "firearm_damage",
+    "type": "inc",
+    "value": 14
+   },
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": 10
+   }
+  ],
+  "links": [
+   "r_prj2"
+  ],
+  "cluster": "Marksman"
+ },
+ {
+  "id": "r_trap1",
+  "name": "Tinkerer",
+  "type": "minor",
+  "x": 479,
+  "y": 171,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "r_start",
+   "r_tur1"
+  ],
+  "cluster": "Engineer"
+ },
+ {
+  "id": "r_tur1",
+  "name": "Tinkerer",
+  "type": "minor",
+  "x": 542,
+  "y": 167,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "turret_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "r_trap1",
+   "r_trap2"
+  ],
+  "cluster": "Engineer"
+ },
+ {
+  "id": "r_trap2",
+  "name": "Blast Charges",
+  "type": "notable",
+  "x": 606,
+  "y": 163,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_tur1",
+   "r_tur2"
+  ],
+  "cluster": "Engineer"
+ },
+ {
+  "id": "r_tur2",
+  "name": "Tinkerer",
+  "type": "minor",
+  "x": 670,
+  "y": 160,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "turret_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "r_trap2",
+   "r_engineer"
+  ],
+  "cluster": "Engineer"
+ },
+ {
+  "id": "r_engineer",
+  "name": "Engineer's Doctrine",
+  "type": "greater",
+  "x": 734,
+  "y": 156,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "turret_limit",
+    "type": "flat",
+    "value": 1
+   },
+   {
+    "stat": "turret_damage",
+    "type": "inc",
+    "value": 15
+   },
+   {
+    "stat": "turret_speed",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "r_tur2",
+   "ks_automaton",
+   "xw_p11"
+  ],
+  "cluster": "Engineer"
+ },
+ {
+  "id": "ks_automaton",
+  "name": "Automaton Doctrine",
+  "type": "keystone",
+  "x": 829,
+  "y": 29,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "turret_damage",
+    "type": "more",
+    "value": 70
+   },
+   {
+    "stat": "turret_limit",
+    "type": "flat",
+    "value": -1
+   }
+  ],
+  "links": [
+   "r_engineer"
+  ],
+  "flags": [
+   "automaton"
+  ],
+  "desc": "Turrets deal 70% more damage. You can have 1 fewer turret (minimum 1).",
+  "cluster": "Engineer"
+ },
+ {
+  "id": "r_eva1",
+  "name": "Fleet Footed",
+  "type": "minor",
+  "x": 462,
+  "y": 267,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_start",
+   "r_crit1"
+  ],
+  "cluster": "Shadow"
+ },
+ {
+  "id": "r_crit1",
+  "name": "Keen Eye",
+  "type": "minor",
+  "x": 525,
+  "y": 303,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "r_eva1",
+   "r_crit2"
+  ],
+  "cluster": "Shadow"
+ },
+ {
+  "id": "r_crit2",
+  "name": "Killer Instinct",
+  "type": "greater",
+  "x": 589,
+  "y": 340,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": 25
+   },
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 15
+   }
+  ],
+  "links": [
+   "r_crit1",
+   "xw_p01"
+  ],
+  "cluster": "Shadow"
+ },
+ {
+  "id": "m_sp1",
+  "name": "Spellweaving",
+  "type": "minor",
+  "x": -111,
+  "y": -495,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "m_start",
+   "m_sp2"
+  ],
+  "cluster": "Elementalist"
+ },
+ {
+  "id": "m_sp2",
+  "name": "Spellweaving",
+  "type": "minor",
+  "x": -154,
+  "y": -545,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "m_sp1",
+   "m_ele",
+   "m_storm"
+  ],
+  "cluster": "Elementalist"
+ },
+ {
+  "id": "m_ele",
+  "name": "Elemental Attunement",
+  "type": "notable",
+  "x": -196,
+  "y": -595,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "m_sp2",
+   "m_fire1"
+  ],
+  "cluster": "Elementalist"
+ },
+ {
+  "id": "m_fire1",
+  "name": "Kindling",
+  "type": "minor",
+  "x": -239,
+  "y": -645,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "fire_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "m_ele",
+   "m_flame"
+  ],
+  "cluster": "Elementalist"
+ },
+ {
+  "id": "m_flame",
+  "name": "Flame Mastery",
+  "type": "greater",
+  "x": -281,
+  "y": -695,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "fire_damage",
+    "type": "inc",
+    "value": 18
+   },
+   {
+    "stat": "ignite_chance",
+    "type": "flat",
+    "value": 15
+   }
+  ],
+  "links": [
+   "m_fire1",
+   "ks_convergence",
+   "xa_p11"
+  ],
+  "cluster": "Elementalist"
+ },
+ {
+  "id": "m_storm",
+  "name": "Stormcaller",
+  "type": "notable",
+  "x": -57,
+  "y": -648,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "m_sp2"
+  ],
+  "cluster": "Elementalist"
+ },
+ {
+  "id": "ks_convergence",
+  "name": "Elemental Convergence",
+  "type": "keystone",
+  "x": -415,
+  "y": -719,
+  "cost": 2,
+  "mods": [],
+  "links": [
+   "m_flame"
+  ],
+  "flags": [
+   "convergence"
+  ],
+  "desc": "Hitting a chilled or shocked enemy with fire, or a burning enemy with ice or lightning, deals 35% more damage. 10% less damage against enemies with no status ailment.",
+  "cluster": "Elementalist"
+ },
+ {
+  "id": "m_min1",
+  "name": "Dark Pact",
+  "type": "minor",
+  "x": 91,
+  "y": -500,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "minion_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "m_start",
+   "m_min2"
+  ],
+  "cluster": "Necromancy"
+ },
+ {
+  "id": "m_min2",
+  "name": "Dark Pact",
+  "type": "minor",
+  "x": 127,
+  "y": -553,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "minion_life",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "m_min1",
+   "m_minl"
+  ],
+  "cluster": "Necromancy"
+ },
+ {
+  "id": "m_minl",
+  "name": "Bone Binding",
+  "type": "notable",
+  "x": 162,
+  "y": -607,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "minion_life",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "minion_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "m_min2",
+   "m_min3"
+  ],
+  "cluster": "Necromancy"
+ },
+ {
+  "id": "m_min3",
+  "name": "Dark Pact",
+  "type": "minor",
+  "x": 197,
+  "y": -660,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "minion_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "m_minl",
+   "m_command"
+  ],
+  "cluster": "Necromancy"
+ },
+ {
+  "id": "m_command",
+  "name": "Commander Mastery",
+  "type": "greater",
+  "x": 232,
+  "y": -713,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "minion_limit",
+    "type": "flat",
+    "value": 1
+   },
+   {
+    "stat": "minion_speed",
+    "type": "inc",
+    "value": 12
+   }
+  ],
+  "links": [
+   "m_min3",
+   "ks_one_mind",
+   "xp_p11",
+   "xv_p11"
+  ],
+  "cluster": "Necromancy"
+ },
+ {
+  "id": "ks_one_mind",
+  "name": "One Mind",
+  "type": "keystone",
+  "x": 415,
+  "y": -719,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "minion_damage",
+    "type": "more",
+    "value": 60
+   },
+   {
+    "stat": "minion_life",
+    "type": "more",
+    "value": 30
+   },
+   {
+    "stat": "damage",
+    "type": "more",
+    "value": -30
+   }
+  ],
+  "links": [
+   "m_command"
+  ],
+  "flags": [
+   "one_mind"
+  ],
+  "desc": "Minions deal 60% more damage and have 30% more life. Your own spells and attacks deal 30% less damage.",
+  "cluster": "Necromancy"
+ },
+ {
+  "id": "m_mana1",
+  "name": "Deep Wells",
+  "type": "minor",
+  "x": 0,
+  "y": -533,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "m_start",
+   "m_mana2"
+  ],
+  "cluster": "Arcane Flow"
+ },
+ {
+  "id": "m_mana2",
+  "name": "Deep Wells",
+  "type": "minor",
+  "x": 0,
+  "y": -607,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "mana_regen",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "m_mana1",
+   "m_flow"
+  ],
+  "cluster": "Arcane Flow"
+ },
+ {
+  "id": "m_flow",
+  "name": "Arcane Flow",
+  "type": "greater",
+  "x": 0,
+  "y": -680,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "mana_regen",
+    "type": "inc",
+    "value": 25
+   },
+   {
+    "stat": "mana_cost",
+    "type": "inc",
+    "value": -12
+   }
+  ],
+  "links": [
+   "m_mana2",
+   "xv_p01"
+  ],
+  "cluster": "Arcane Flow"
+ },
+ {
+  "id": "h_wr1",
+  "name": "Agile Strikes",
+  "type": "minor",
+  "x": -289,
+  "y": 345,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "w_start",
+   "h_wr2"
+  ],
+  "cluster": "Warrior-Ranger Road"
+ },
+ {
+  "id": "h_wr2",
+  "name": "Quick Hands",
+  "type": "minor",
+  "x": -159,
+  "y": 437,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "h_wr1",
+   "h_wr3"
+  ],
+  "cluster": "Warrior-Ranger Road"
+ },
+ {
+  "id": "h_wr3",
+  "name": "Relentless",
+  "type": "greater",
+  "x": 0,
+  "y": 470,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 8
+   },
+   {
+    "stat": "attack_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "h_wr2",
+   "h_wr4"
+  ],
+  "cluster": "Warrior-Ranger Road"
+ },
+ {
+  "id": "h_wr4",
+  "name": "Quick Hands",
+  "type": "minor",
+  "x": 159,
+  "y": 437,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "h_wr3",
+   "h_wr5"
+  ],
+  "cluster": "Warrior-Ranger Road"
+ },
+ {
+  "id": "h_wr5",
+  "name": "Agile Strikes",
+  "type": "minor",
+  "x": 289,
+  "y": 345,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "h_wr4",
+   "r_start"
+  ],
+  "cluster": "Warrior-Ranger Road"
+ },
+ {
+  "id": "h_rm1",
+  "name": "Charged Shafts",
+  "type": "minor",
+  "x": 443,
+  "y": 78,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "r_start",
+   "h_rm2"
+  ],
+  "cluster": "Ranger-Mage Road"
+ },
+ {
+  "id": "h_rm2",
+  "name": "Elemental Edge",
+  "type": "minor",
+  "x": 458,
+  "y": -81,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "h_rm1",
+   "h_rm3"
+  ],
+  "cluster": "Ranger-Mage Road"
+ },
+ {
+  "id": "h_rm3",
+  "name": "Storm Archer",
+  "type": "greater",
+  "x": 407,
+  "y": -235,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "h_rm2",
+   "h_rm4",
+   "xp_p01"
+  ],
+  "cluster": "Ranger-Mage Road"
+ },
+ {
+  "id": "h_rm4",
+  "name": "Elemental Edge",
+  "type": "minor",
+  "x": 299,
+  "y": -356,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "h_rm3",
+   "h_rm5"
+  ],
+  "cluster": "Ranger-Mage Road"
+ },
+ {
+  "id": "h_rm5",
+  "name": "Charged Shafts",
+  "type": "minor",
+  "x": 154,
+  "y": -423,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "h_rm4",
+   "m_start"
+  ],
+  "cluster": "Ranger-Mage Road"
+ },
+ {
+  "id": "h_mw1",
+  "name": "Battle Scholar",
+  "type": "minor",
+  "x": -154,
+  "y": -423,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "m_start",
+   "h_mw2"
+  ],
+  "cluster": "Mage-Warrior Road"
+ },
+ {
+  "id": "h_mw2",
+  "name": "Sanguine Arts",
+  "type": "minor",
+  "x": -299,
+  "y": -356,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   },
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "h_mw1",
+   "h_mw3"
+  ],
+  "cluster": "Mage-Warrior Road"
+ },
+ {
+  "id": "h_mw3",
+  "name": "Spellblade",
+  "type": "greater",
+  "x": -407,
+  "y": -235,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 10
+   },
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "h_mw2",
+   "h_mw4",
+   "ks_blood",
+   "xa_p01"
+  ],
+  "cluster": "Mage-Warrior Road"
+ },
+ {
+  "id": "h_mw4",
+  "name": "Sanguine Arts",
+  "type": "minor",
+  "x": -458,
+  "y": -81,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   },
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "h_mw3",
+   "h_mw5"
+  ],
+  "cluster": "Mage-Warrior Road"
+ },
+ {
+  "id": "h_mw5",
+  "name": "Battle Scholar",
+  "type": "minor",
+  "x": -443,
+  "y": 78,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "h_mw4",
+   "w_start"
+  ],
+  "cluster": "Mage-Warrior Road"
+ },
+ {
+  "id": "ks_blood",
+  "name": "Blood for Power",
+  "type": "keystone",
+  "x": -497,
+  "y": -287,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "damage",
+    "type": "inc",
+    "value": 15
+   },
+   {
+    "stat": "mana_regen",
+    "type": "more",
+    "value": -100
+   }
+  ],
+  "links": [
+   "h_mw3"
+  ],
+  "flags": [
+   "blood_magic"
+  ],
+  "desc": "Skills cost Life instead of Mana. 15% increased damage. You have no mana regeneration.",
+  "cluster": "Mage-Warrior Road"
+ },
+ {
+  "id": "c_core",
+  "name": "Heart of the Web",
+  "type": "notable",
+  "x": 0,
+  "y": 0,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "damage",
+    "type": "inc",
+    "value": 8
+   },
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "c_w3",
+   "c_r3",
+   "c_m3",
+   "c_dot1",
+   "c_res1",
+   "ks_glass"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_w1",
+  "name": "Endurance",
+  "type": "minor",
+  "x": -273,
+  "y": 157,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "w_start",
+   "c_w2"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_w2",
+  "name": "Grit",
+  "type": "minor",
+  "x": -182,
+  "y": 105,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "links": [
+   "c_w1",
+   "c_w3"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_w3",
+  "name": "Endurance",
+  "type": "minor",
+  "x": -91,
+  "y": 52,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "c_w2",
+   "c_core"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_r1",
+  "name": "Focus",
+  "type": "minor",
+  "x": 273,
+  "y": 157,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_start",
+   "c_r2"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_r2",
+  "name": "Nimble",
+  "type": "minor",
+  "x": 182,
+  "y": 105,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "links": [
+   "c_r1",
+   "c_r3"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_r3",
+  "name": "Focus",
+  "type": "minor",
+  "x": 91,
+  "y": 52,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "c_r2",
+   "c_core"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_m1",
+  "name": "Lore",
+  "type": "minor",
+  "x": 0,
+  "y": -315,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "m_start",
+   "c_m2"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_m2",
+  "name": "Insight",
+  "type": "minor",
+  "x": 0,
+  "y": -210,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "links": [
+   "c_m1",
+   "c_m3"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_m3",
+  "name": "Lore",
+  "type": "minor",
+  "x": 0,
+  "y": -105,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "c_m2",
+   "c_core"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_dot1",
+  "name": "Lingering Pain",
+  "type": "minor",
+  "x": 70,
+  "y": 70,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dot_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "c_core",
+   "c_dot2"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_dot2",
+  "name": "Festering Wounds",
+  "type": "greater",
+  "x": 130,
+  "y": 120,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "dot_damage",
+    "type": "inc",
+    "value": 20
+   },
+   {
+    "stat": "status_chance",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 15
+   }
+  ],
+  "links": [
+   "c_dot1"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_res1",
+  "name": "Warded",
+  "type": "minor",
+  "x": -70,
+  "y": 70,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_void",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "links": [
+   "c_core",
+   "c_res2"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "c_res2",
+  "name": "Warded",
+  "type": "minor",
+  "x": -130,
+  "y": 120,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_void",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "links": [
+   "c_res1"
+  ],
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "ks_glass",
+  "name": "Glass Cannon",
+  "type": "keystone",
+  "x": 0,
+  "y": -110,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "damage",
+    "type": "more",
+    "value": 40
+   },
+   {
+    "stat": "max_life",
+    "type": "more",
+    "value": -40
+   }
+  ],
+  "links": [
+   "c_core"
+  ],
+  "flags": [
+   "glass_cannon"
+  ],
+  "desc": "You deal 40% more damage. You have 40% less maximum life.",
+  "cluster": "Heart of the Web"
+ },
+ {
+  "id": "xs_r0",
+  "name": "Blood Drinker",
+  "type": "notable",
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "value": 12
+   }
+  ],
+  "desc": "2% of hit damage you deal is leeched as life.",
+  "flags": [
+   "vampiric"
+  ],
+  "x": 0,
+  "y": 1250,
+  "cost": 1,
+  "links": [
+   "xs_r1",
+   "xs_r7",
+   "xs_ks"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_r1",
+  "name": "Sanguine Study",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "x": 85,
+  "y": 1215,
+  "cost": 1,
+  "links": [
+   "xs_r0",
+   "xs_r2"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_r2",
+  "name": "Open Veins",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "bleed_chance",
+    "type": "flat",
+    "value": 8
+   },
+   {
+    "stat": "dot_damage",
+    "type": "inc",
+    "value": 15
+   }
+  ],
+  "desc": "",
+  "x": 120,
+  "y": 1130,
+  "cost": 1,
+  "links": [
+   "xs_r1",
+   "xs_r3",
+   "xo1_1"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_r3",
+  "name": "Sanguine Focus",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "bleed_chance",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 85,
+  "y": 1045,
+  "cost": 1,
+  "links": [
+   "xs_r2",
+   "xs_r4",
+   "xs_p13"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_r4",
+  "name": "Sanguine Practice",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "x": 0,
+  "y": 1010,
+  "cost": 1,
+  "links": [
+   "xs_r3",
+   "xs_r5"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_r5",
+  "name": "Sanguine Lore",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "life_on_hit",
+    "type": "flat",
+    "value": 1
+   }
+  ],
+  "x": -85,
+  "y": 1045,
+  "cost": 1,
+  "links": [
+   "xs_r4",
+   "xs_r6",
+   "xs_p03"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_r6",
+  "name": "Iron Blood",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 6
+   },
+   {
+    "stat": "life_regen",
+    "type": "flat",
+    "value": 2
+   }
+  ],
+  "desc": "",
+  "x": -120,
+  "y": 1130,
+  "cost": 1,
+  "links": [
+   "xs_r5",
+   "xs_r7",
+   "xo0_6"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_r7",
+  "name": "Sanguine Insight",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "x": -85,
+  "y": 1215,
+  "cost": 1,
+  "links": [
+   "xs_r6",
+   "xs_r0"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_ks",
+  "name": "Crimson Dance",
+  "type": "keystone",
+  "mods": [
+   {
+    "stat": "bleed_chance",
+    "type": "flat",
+    "value": 20
+   },
+   {
+    "stat": "damage",
+    "type": "more",
+    "value": -10
+   }
+  ],
+  "desc": "Your bleeds deal 60% more damage and last 50% longer. Your hits deal 10% less damage.",
+  "x": 0,
+  "y": 1380,
+  "cost": 1,
+  "links": [
+   "xs_r0"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true,
+  "flags": [
+   "crimson_dance"
+  ]
+ },
+ {
+  "id": "xs_p01",
+  "name": "Sanguine Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "x": -368,
+  "y": 704,
+  "cost": 1,
+  "links": [
+   "w_brutal",
+   "xs_p02"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_p02",
+  "name": "Sanguine Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "life_on_hit",
+    "type": "flat",
+    "value": 1
+   }
+  ],
+  "x": -274,
+  "y": 818,
+  "cost": 1,
+  "links": [
+   "xs_p01",
+   "xs_p03"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_p03",
+  "name": "Sanguine Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "bleed_chance",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -179,
+  "y": 932,
+  "cost": 1,
+  "links": [
+   "xs_p02",
+   "xs_r5"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_p11",
+  "name": "Sanguine Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "life_on_hit",
+    "type": "flat",
+    "value": 1
+   }
+  ],
+  "x": 368,
+  "y": 704,
+  "cost": 1,
+  "links": [
+   "r_deadeye",
+   "xs_p12"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_p12",
+  "name": "Sanguine Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "bleed_chance",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 274,
+  "y": 818,
+  "cost": 1,
+  "links": [
+   "xs_p11",
+   "xs_p13"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xs_p13",
+  "name": "Sanguine Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "x": 179,
+  "y": 932,
+  "cost": 1,
+  "links": [
+   "xs_p12",
+   "xs_r3"
+  ],
+  "cluster": "Sanguine Rites",
+  "gen": true
+ },
+ {
+  "id": "xp_r0",
+  "name": "Elemental Warding",
+  "type": "notable",
+  "mods": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 8
+   },
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 8
+   },
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 8
+   },
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "desc": "",
+  "x": 1083,
+  "y": -625,
+  "cost": 1,
+  "links": [
+   "xp_r1",
+   "xp_r7",
+   "xp_ks"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_r1",
+  "name": "Prismatic Study",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 1010,
+  "y": -681,
+  "cost": 1,
+  "links": [
+   "xp_r0",
+   "xp_r2"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_r2",
+  "name": "Storm Shell",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 10
+   },
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 12
+   }
+  ],
+  "desc": "",
+  "x": 919,
+  "y": -669,
+  "cost": 1,
+  "links": [
+   "xp_r1",
+   "xp_r3",
+   "xo3_1"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_r3",
+  "name": "Prismatic Focus",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "x": 863,
+  "y": -596,
+  "cost": 1,
+  "links": [
+   "xp_r2",
+   "xp_r4",
+   "xp_p14"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_r4",
+  "name": "Prismatic Practice",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 875,
+  "y": -505,
+  "cost": 1,
+  "links": [
+   "xp_r3",
+   "xp_r5",
+   "xp_p03"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_r5",
+  "name": "Prismatic Lore",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 948,
+  "y": -449,
+  "cost": 1,
+  "links": [
+   "xp_r4",
+   "xp_r6",
+   "xo2_6"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_r6",
+  "name": "Hearthguard",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 10
+   },
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 10
+   }
+  ],
+  "desc": "",
+  "x": 1039,
+  "y": -461,
+  "cost": 1,
+  "links": [
+   "xp_r5",
+   "xp_r7"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_r7",
+  "name": "Prismatic Insight",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "x": 1095,
+  "y": -534,
+  "cost": 1,
+  "links": [
+   "xp_r6",
+   "xp_r0"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_ks",
+  "name": "Prismatic Soul",
+  "type": "keystone",
+  "mods": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 25
+   },
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 25
+   },
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 25
+   },
+   {
+    "stat": "elemental_damage",
+    "type": "more",
+    "value": 15
+   },
+   {
+    "stat": "armour",
+    "type": "more",
+    "value": -40
+   },
+   {
+    "stat": "evasion",
+    "type": "more",
+    "value": -40
+   }
+  ],
+  "desc": "+25% fire, cold and lightning resistance and 15% more elemental damage, but 40% less armour and evasion.",
+  "x": 1195,
+  "y": -690,
+  "cost": 1,
+  "links": [
+   "xp_r0"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_p01",
+  "name": "Prismatic Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 524,
+  "y": -302,
+  "cost": 1,
+  "links": [
+   "h_rm3",
+   "xp_p02"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_p02",
+  "name": "Prismatic Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 641,
+  "y": -370,
+  "cost": 1,
+  "links": [
+   "xp_p01",
+   "xp_p03"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_p03",
+  "name": "Prismatic Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "x": 758,
+  "y": -438,
+  "cost": 1,
+  "links": [
+   "xp_p02",
+   "xp_r4"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_p11",
+  "name": "Prismatic Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 358,
+  "y": -690,
+  "cost": 1,
+  "links": [
+   "m_command",
+   "xp_p12"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_p12",
+  "name": "Prismatic Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "x": 484,
+  "y": -666,
+  "cost": 1,
+  "links": [
+   "xp_p11",
+   "xp_p13"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_p13",
+  "name": "Prismatic Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 611,
+  "y": -643,
+  "cost": 1,
+  "links": [
+   "xp_p12",
+   "xp_p14"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xp_p14",
+  "name": "Prismatic Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 737,
+  "y": -619,
+  "cost": 1,
+  "links": [
+   "xp_p13",
+   "xp_r3"
+  ],
+  "cluster": "Prismatic Ward",
+  "gen": true
+ },
+ {
+  "id": "xw_r0",
+  "name": "Tailwind",
+  "type": "notable",
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 8
+   },
+   {
+    "stat": "cooldown_recovery",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "desc": "",
+  "x": 1083,
+  "y": 625,
+  "cost": 1,
+  "links": [
+   "xw_r1",
+   "xw_r7",
+   "xw_ks"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_r1",
+  "name": "Windwalker Study",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": 1095,
+  "y": 534,
+  "cost": 1,
+  "links": [
+   "xw_r0",
+   "xw_r2"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_r2",
+  "name": "Gale Steps",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 6
+   },
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 15
+   }
+  ],
+  "desc": "",
+  "x": 1039,
+  "y": 461,
+  "cost": 1,
+  "links": [
+   "xw_r1",
+   "xw_r3",
+   "xo2_1"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_r3",
+  "name": "Windwalker Focus",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "x": 948,
+  "y": 449,
+  "cost": 1,
+  "links": [
+   "xw_r2",
+   "xw_r4",
+   "xw_p12"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_r4",
+  "name": "Windwalker Practice",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": 875,
+  "y": 505,
+  "cost": 1,
+  "links": [
+   "xw_r3",
+   "xw_r5",
+   "xw_p02"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_r5",
+  "name": "Windwalker Lore",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "x": 863,
+  "y": 596,
+  "cost": 1,
+  "links": [
+   "xw_r4",
+   "xw_r6",
+   "xo1_6"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_r6",
+  "name": "Flurry",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 8
+   },
+   {
+    "stat": "projectile_speed",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "desc": "",
+  "x": 919,
+  "y": 669,
+  "cost": 1,
+  "links": [
+   "xw_r5",
+   "xw_r7"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_r7",
+  "name": "Windwalker Insight",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": 1010,
+  "y": 681,
+  "cost": 1,
+  "links": [
+   "xw_r6",
+   "xw_r0"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_ks",
+  "name": "Wind Dancer",
+  "type": "keystone",
+  "mods": [],
+  "desc": "Dodge rolling grants Wind Dance for 3 seconds: 40% more damage and 15% increased movement speed. Without Wind Dance your hits deal 10% less damage.",
+  "x": 1195,
+  "y": 690,
+  "cost": 1,
+  "links": [
+   "xw_r0"
+  ],
+  "cluster": "Windwalker",
+  "gen": true,
+  "flags": [
+   "wind_dancer"
+  ]
+ },
+ {
+  "id": "xw_p01",
+  "name": "Windwalker Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": 684,
+  "y": 395,
+  "cost": 1,
+  "links": [
+   "r_crit2",
+   "xw_p02"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_p02",
+  "name": "Windwalker Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "x": 780,
+  "y": 450,
+  "cost": 1,
+  "links": [
+   "xw_p01",
+   "xw_r4"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_p11",
+  "name": "Windwalker Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "x": 805,
+  "y": 254,
+  "cost": 1,
+  "links": [
+   "r_engineer",
+   "xw_p12"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xw_p12",
+  "name": "Windwalker Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "x": 877,
+  "y": 351,
+  "cost": 1,
+  "links": [
+   "xw_p11",
+   "xw_r3"
+  ],
+  "cluster": "Windwalker",
+  "gen": true
+ },
+ {
+  "id": "xe_r0",
+  "name": "Deathblow",
+  "type": "notable",
+  "mods": [
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": 20
+   },
+   {
+    "stat": "life_on_kill",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "desc": "",
+  "x": -1083,
+  "y": 625,
+  "cost": 1,
+  "links": [
+   "xe_r1",
+   "xe_r7",
+   "xe_ks"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_r1",
+  "name": "Executioner's Study",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "damage_vs_elite",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -1010,
+  "y": 681,
+  "cost": 1,
+  "links": [
+   "xe_r0",
+   "xe_r2"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_r2",
+  "name": "Headsman",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "damage_vs_elite",
+    "type": "inc",
+    "value": 20
+   },
+   {
+    "stat": "two_handed_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "desc": "",
+  "x": -919,
+  "y": 669,
+  "cost": 1,
+  "links": [
+   "xe_r1",
+   "xe_r3"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_r3",
+  "name": "Executioner's Focus",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -863,
+  "y": 596,
+  "cost": 1,
+  "links": [
+   "xe_r2",
+   "xe_r4",
+   "xo0_1"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_r4",
+  "name": "Executioner's Practice",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "damage_vs_elite",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -875,
+  "y": 505,
+  "cost": 1,
+  "links": [
+   "xe_r3",
+   "xe_r5",
+   "xe_p02"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_r5",
+  "name": "Executioner's Lore",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": -948,
+  "y": 449,
+  "cost": 1,
+  "links": [
+   "xe_r4",
+   "xe_r6",
+   "xe_p12"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_r6",
+  "name": "Precise Cuts",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "crit_chance_flat",
+    "type": "flat",
+    "value": 1
+   },
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 12
+   }
+  ],
+  "desc": "",
+  "x": -1039,
+  "y": 461,
+  "cost": 1,
+  "links": [
+   "xe_r5",
+   "xe_r7",
+   "xo5_6"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_r7",
+  "name": "Executioner's Insight",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "damage_vs_elite",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -1095,
+  "y": 534,
+  "cost": 1,
+  "links": [
+   "xe_r6",
+   "xe_r0"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_ks",
+  "name": "Executioner's Creed",
+  "type": "keystone",
+  "mods": [
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": -30
+   }
+  ],
+  "desc": "Hits against enemies below 35% life are always critical strikes. -30% critical strike multiplier.",
+  "x": -1195,
+  "y": 690,
+  "cost": 1,
+  "links": [
+   "xe_r0"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true,
+  "flags": [
+   "executioner"
+  ]
+ },
+ {
+  "id": "xe_p01",
+  "name": "Executioner's Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "damage_vs_elite",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -684,
+  "y": 395,
+  "cost": 1,
+  "links": [
+   "w_life3",
+   "xe_p02"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_p02",
+  "name": "Executioner's Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": -780,
+  "y": 450,
+  "cost": 1,
+  "links": [
+   "xe_p01",
+   "xe_r4"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_p11",
+  "name": "Executioner's Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": -805,
+  "y": 254,
+  "cost": 1,
+  "links": [
+   "w_bulwark",
+   "xe_p12"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xe_p12",
+  "name": "Executioner's Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -877,
+  "y": 351,
+  "cost": 1,
+  "links": [
+   "xe_p11",
+   "xe_r5"
+  ],
+  "cluster": "Executioner's Path",
+  "gen": true
+ },
+ {
+  "id": "xa_r0",
+  "name": "Arcane Shell",
+  "type": "notable",
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 10
+   },
+   {
+    "stat": "damage_reduction",
+    "type": "flat",
+    "value": 3
+   }
+  ],
+  "desc": "",
+  "x": -1083,
+  "y": -625,
+  "cost": 1,
+  "links": [
+   "xa_r1",
+   "xa_r7",
+   "xa_ks"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_r1",
+  "name": "Mind Study",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -1095,
+  "y": -534,
+  "cost": 1,
+  "links": [
+   "xa_r0",
+   "xa_r2"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_r2",
+  "name": "Runic Plating",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 20
+   },
+   {
+    "stat": "damage_reduction",
+    "type": "flat",
+    "value": 2
+   }
+  ],
+  "desc": "",
+  "x": -1039,
+  "y": -461,
+  "cost": 1,
+  "links": [
+   "xa_r1",
+   "xa_r3"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_r3",
+  "name": "Mind Focus",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "x": -948,
+  "y": -449,
+  "cost": 1,
+  "links": [
+   "xa_r2",
+   "xa_r4",
+   "xo5_1"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_r4",
+  "name": "Mind Practice",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -875,
+  "y": -505,
+  "cost": 1,
+  "links": [
+   "xa_r3",
+   "xa_r5",
+   "xa_p03"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_r5",
+  "name": "Mind Lore",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "x": -863,
+  "y": -596,
+  "cost": 1,
+  "links": [
+   "xa_r4",
+   "xa_r6",
+   "xa_p13"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_r6",
+  "name": "Deep Wells",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "mana_regen",
+    "type": "inc",
+    "value": 15
+   }
+  ],
+  "desc": "",
+  "x": -919,
+  "y": -669,
+  "cost": 1,
+  "links": [
+   "xa_r5",
+   "xa_r7",
+   "xo4_6"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_r7",
+  "name": "Mind Insight",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -1010,
+  "y": -681,
+  "cost": 1,
+  "links": [
+   "xa_r6",
+   "xa_r0"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_ks",
+  "name": "Mind over Matter",
+  "type": "keystone",
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 25
+   }
+  ],
+  "desc": "30% of damage taken is removed from your mana before your life.",
+  "x": -1195,
+  "y": -690,
+  "cost": 1,
+  "links": [
+   "xa_r0"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true,
+  "flags": [
+   "mind_over_matter"
+  ]
+ },
+ {
+  "id": "xa_p01",
+  "name": "Mind Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -524,
+  "y": -302,
+  "cost": 1,
+  "links": [
+   "h_mw3",
+   "xa_p02"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_p02",
+  "name": "Mind Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "x": -641,
+  "y": -370,
+  "cost": 1,
+  "links": [
+   "xa_p01",
+   "xa_p03"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_p03",
+  "name": "Mind Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "x": -758,
+  "y": -438,
+  "cost": 1,
+  "links": [
+   "xa_p02",
+   "xa_r4"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_p11",
+  "name": "Mind Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "x": -426,
+  "y": -670,
+  "cost": 1,
+  "links": [
+   "m_flame",
+   "xa_p12"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_p12",
+  "name": "Mind Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "x": -572,
+  "y": -646,
+  "cost": 1,
+  "links": [
+   "xa_p11",
+   "xa_p13"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xa_p13",
+  "name": "Mind Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "x": -718,
+  "y": -621,
+  "cost": 1,
+  "links": [
+   "xa_p12",
+   "xa_r5"
+  ],
+  "cluster": "Mind Fortress",
+  "gen": true
+ },
+ {
+  "id": "xv_r0",
+  "name": "Abyssal Gaze",
+  "type": "notable",
+  "mods": [
+   {
+    "stat": "void_damage",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "arcane_damage",
+    "type": "inc",
+    "value": 12
+   }
+  ],
+  "desc": "",
+  "x": 0,
+  "y": -1250,
+  "cost": 1,
+  "links": [
+   "xv_r1",
+   "xv_r7",
+   "xv_ks"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_r1",
+  "name": "Void Study",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "x": -85,
+  "y": -1215,
+  "cost": 1,
+  "links": [
+   "xv_r0",
+   "xv_r2"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_r2",
+  "name": "Whispering Dark",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "void_damage",
+    "type": "inc",
+    "value": 15
+   },
+   {
+    "stat": "dot_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "desc": "",
+  "x": -120,
+  "y": -1130,
+  "cost": 1,
+  "links": [
+   "xv_r1",
+   "xv_r3"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_r3",
+  "name": "Void Focus",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "void_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "x": -85,
+  "y": -1045,
+  "cost": 1,
+  "links": [
+   "xv_r2",
+   "xv_r4",
+   "xo4_1"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_r4",
+  "name": "Void Practice",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "x": 0,
+  "y": -1010,
+  "cost": 1,
+  "links": [
+   "xv_r3",
+   "xv_r5",
+   "xv_p02"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_r5",
+  "name": "Void Lore",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_void",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 85,
+  "y": -1045,
+  "cost": 1,
+  "links": [
+   "xv_r4",
+   "xv_r6",
+   "xv_p12"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_r6",
+  "name": "Lingering Curse",
+  "type": "greater",
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 15
+   },
+   {
+    "stat": "status_chance",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "desc": "",
+  "x": 120,
+  "y": -1130,
+  "cost": 1,
+  "links": [
+   "xv_r5",
+   "xv_r7",
+   "xo3_6"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_r7",
+  "name": "Void Insight",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "x": 85,
+  "y": -1215,
+  "cost": 1,
+  "links": [
+   "xv_r6",
+   "xv_r0"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_ks",
+  "name": "Void Pact",
+  "type": "keystone",
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 30
+   },
+   {
+    "stat": "max_life",
+    "type": "more",
+    "value": -10
+   }
+  ],
+  "desc": "Hits against enemies suffering any ailment deal 25% more damage. 30% increased ailment duration. 10% less maximum life.",
+  "x": 0,
+  "y": -1380,
+  "cost": 1,
+  "links": [
+   "xv_r0"
+  ],
+  "cluster": "Void Communion",
+  "gen": true,
+  "flags": [
+   "void_pact"
+  ]
+ },
+ {
+  "id": "xv_p01",
+  "name": "Void Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "x": 0,
+  "y": -790,
+  "cost": 1,
+  "links": [
+   "m_flow",
+   "xv_p02"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_p02",
+  "name": "Void Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_void",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 0,
+  "y": -900,
+  "cost": 1,
+  "links": [
+   "xv_p01",
+   "xv_r4"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_p11",
+  "name": "Void Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "res_void",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "x": 183,
+  "y": -824,
+  "cost": 1,
+  "links": [
+   "m_command",
+   "xv_p12"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xv_p12",
+  "name": "Void Path",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "void_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "x": 134,
+  "y": -934,
+  "cost": 1,
+  "links": [
+   "xv_p11",
+   "xv_r5"
+  ],
+  "cluster": "Void Communion",
+  "gen": true
+ },
+ {
+  "id": "xo0_1",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -776,
+  "y": 706,
+  "cost": 1,
+  "links": [
+   "xe_r3",
+   "xo0_2"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo0_2",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -686,
+  "y": 810,
+  "cost": 1,
+  "links": [
+   "xo0_1",
+   "xo0_3"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo0_3",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -588,
+  "y": 901,
+  "cost": 1,
+  "links": [
+   "xo0_2",
+   "xo0_4"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo0_4",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -482,
+  "y": 977,
+  "cost": 1,
+  "links": [
+   "xo0_3",
+   "xo0_5"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo0_5",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -367,
+  "y": 1039,
+  "cost": 1,
+  "links": [
+   "xo0_4",
+   "xo0_6"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo0_6",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -245,
+  "y": 1088,
+  "cost": 1,
+  "links": [
+   "xo0_5",
+   "xs_r6"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo1_1",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 245,
+  "y": 1088,
+  "cost": 1,
+  "links": [
+   "xs_r2",
+   "xo1_2"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo1_2",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 367,
+  "y": 1039,
+  "cost": 1,
+  "links": [
+   "xo1_1",
+   "xo1_3"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo1_3",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 482,
+  "y": 977,
+  "cost": 1,
+  "links": [
+   "xo1_2",
+   "xo1_4"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo1_4",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 588,
+  "y": 901,
+  "cost": 1,
+  "links": [
+   "xo1_3",
+   "xo1_5"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo1_5",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 686,
+  "y": 810,
+  "cost": 1,
+  "links": [
+   "xo1_4",
+   "xo1_6"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo1_6",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 776,
+  "y": 706,
+  "cost": 1,
+  "links": [
+   "xo1_5",
+   "xw_r5"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo2_1",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 1065,
+  "y": 331,
+  "cost": 1,
+  "links": [
+   "xw_r2",
+   "xo2_2"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo2_2",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 1083,
+  "y": 201,
+  "cost": 1,
+  "links": [
+   "xo2_1",
+   "xo2_3"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo2_3",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 1088,
+  "y": 72,
+  "cost": 1,
+  "links": [
+   "xo2_2",
+   "xo2_4"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo2_4",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 1075,
+  "y": -58,
+  "cost": 1,
+  "links": [
+   "xo2_3",
+   "xo2_5"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo2_5",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 1044,
+  "y": -189,
+  "cost": 1,
+  "links": [
+   "xo2_4",
+   "xo2_6"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo2_6",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 1000,
+  "y": -319,
+  "cost": 1,
+  "links": [
+   "xo2_5",
+   "xp_r5"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo3_1",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 824,
+  "y": -769,
+  "cost": 1,
+  "links": [
+   "xp_r2",
+   "xo3_2"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo3_2",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 726,
+  "y": -862,
+  "cost": 1,
+  "links": [
+   "xo3_1",
+   "xo3_3"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo3_3",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 620,
+  "y": -943,
+  "cost": 1,
+  "links": [
+   "xo3_2",
+   "xo3_4"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo3_4",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 506,
+  "y": -1008,
+  "cost": 1,
+  "links": [
+   "xo3_3",
+   "xo3_5"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo3_5",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 383,
+  "y": -1059,
+  "cost": 1,
+  "links": [
+   "xo3_4",
+   "xo3_6"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo3_6",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": 254,
+  "y": -1098,
+  "cost": 1,
+  "links": [
+   "xo3_5",
+   "xv_r6"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo4_1",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -224,
+  "y": -1025,
+  "cost": 1,
+  "links": [
+   "xv_r3",
+   "xo4_2"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo4_2",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -359,
+  "y": -998,
+  "cost": 1,
+  "links": [
+   "xo4_1",
+   "xo4_3"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo4_3",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -487,
+  "y": -960,
+  "cost": 1,
+  "links": [
+   "xo4_2",
+   "xo4_4"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo4_4",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -606,
+  "y": -906,
+  "cost": 1,
+  "links": [
+   "xo4_3",
+   "xo4_5"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo4_5",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -716,
+  "y": -837,
+  "cost": 1,
+  "links": [
+   "xo4_4",
+   "xo4_6"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo4_6",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -820,
+  "y": -756,
+  "cost": 1,
+  "links": [
+   "xo4_5",
+   "xa_r6"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo5_1",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -1000,
+  "y": -319,
+  "cost": 1,
+  "links": [
+   "xa_r3",
+   "xo5_2"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo5_2",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -1044,
+  "y": -189,
+  "cost": 1,
+  "links": [
+   "xo5_1",
+   "xo5_3"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo5_3",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -1075,
+  "y": -58,
+  "cost": 1,
+  "links": [
+   "xo5_2",
+   "xo5_4"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo5_4",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -1088,
+  "y": 72,
+  "cost": 1,
+  "links": [
+   "xo5_3",
+   "xo5_5"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo5_5",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -1083,
+  "y": 201,
+  "cost": 1,
+  "links": [
+   "xo5_4",
+   "xo5_6"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ },
+ {
+  "id": "xo5_6",
+  "name": "Wanderer's Road",
+  "type": "minor",
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "x": -1065,
+  "y": 331,
+  "cost": 1,
+  "links": [
+   "xo5_5",
+   "xe_r6"
+  ],
+  "cluster": "Wanderer's Road",
+  "gen": true
+ }
+]

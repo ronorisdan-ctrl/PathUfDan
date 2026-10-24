@@ -1,0 +1,2114 @@
+[
+ {
+  "id": "brutal",
+  "name": "Brutal",
+  "kind": "prefix",
+  "group": "phys_inc",
+  "stat": "physical_damage",
+  "type": "inc",
+  "text": "{v}% increased Physical Damage",
+  "slots": [
+   "attack_weapon"
+  ],
+  "weight": 100,
+  "tiers": [
+   [
+    1,
+    10,
+    19
+   ],
+   [
+    6,
+    20,
+    34
+   ],
+   [
+    14,
+    35,
+    54
+   ],
+   [
+    24,
+    55,
+    79
+   ],
+   [
+    32,
+    80,
+    104
+   ],
+   [
+    42,
+    105,
+    129
+   ]
+  ]
+ },
+ {
+  "id": "emberforged",
+  "name": "Emberforged",
+  "kind": "prefix",
+  "group": "added_fire",
+  "stat": "added_fire",
+  "type": "flat",
+  "text": "Adds {v} Fire Damage to Attacks",
+  "slots": [
+   "attack_weapon",
+   "gloves",
+   "quiver"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    2,
+    4
+   ],
+   [
+    6,
+    5,
+    8
+   ],
+   [
+    14,
+    9,
+    14
+   ],
+   [
+    24,
+    15,
+    22
+   ],
+   [
+    32,
+    23,
+    30
+   ],
+   [
+    42,
+    31,
+    38
+   ]
+  ]
+ },
+ {
+  "id": "rimecut",
+  "name": "Rimecut",
+  "kind": "prefix",
+  "group": "added_cold",
+  "stat": "added_cold",
+  "type": "flat",
+  "text": "Adds {v} Ice Damage to Attacks",
+  "slots": [
+   "attack_weapon",
+   "gloves",
+   "quiver"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    2,
+    4
+   ],
+   [
+    6,
+    5,
+    8
+   ],
+   [
+    14,
+    9,
+    14
+   ],
+   [
+    24,
+    15,
+    22
+   ],
+   [
+    32,
+    23,
+    30
+   ],
+   [
+    42,
+    31,
+    38
+   ]
+  ]
+ },
+ {
+  "id": "stormcharged",
+  "name": "Stormcharged",
+  "kind": "prefix",
+  "group": "added_lightning",
+  "stat": "added_lightning",
+  "type": "flat",
+  "text": "Adds {v} Lightning Damage to Attacks",
+  "slots": [
+   "attack_weapon",
+   "gloves",
+   "quiver"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    1,
+    5
+   ],
+   [
+    6,
+    2,
+    10
+   ],
+   [
+    14,
+    3,
+    17
+   ],
+   [
+    24,
+    5,
+    26
+   ],
+   [
+    32,
+    27,
+    35
+   ],
+   [
+    42,
+    36,
+    44
+   ]
+  ]
+ },
+ {
+  "id": "jagged",
+  "name": "Jagged",
+  "kind": "prefix",
+  "group": "added_phys",
+  "stat": "added_physical",
+  "type": "flat",
+  "text": "Adds {v} Physical Damage to Attacks",
+  "slots": [
+   "attack_weapon",
+   "ring",
+   "quiver"
+  ],
+  "weight": 70,
+  "tiers": [
+   [
+    1,
+    1,
+    3
+   ],
+   [
+    6,
+    3,
+    6
+   ],
+   [
+    14,
+    6,
+    10
+   ],
+   [
+    24,
+    10,
+    15
+   ],
+   [
+    32,
+    16,
+    20
+   ],
+   [
+    42,
+    21,
+    25
+   ]
+  ]
+ },
+ {
+  "id": "arcane",
+  "name": "Arcane",
+  "kind": "prefix",
+  "group": "spell_inc",
+  "stat": "spell_damage",
+  "type": "inc",
+  "text": "{v}% increased Spell Damage",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "amulet"
+  ],
+  "weight": 100,
+  "tiers": [
+   [
+    1,
+    10,
+    19
+   ],
+   [
+    6,
+    20,
+    34
+   ],
+   [
+    14,
+    35,
+    54
+   ],
+   [
+    24,
+    55,
+    74
+   ],
+   [
+    32,
+    75,
+    94
+   ],
+   [
+    42,
+    95,
+    114
+   ]
+  ]
+ },
+ {
+  "id": "pyromancers",
+  "name": "Pyromancer's",
+  "kind": "prefix",
+  "group": "fire_inc",
+  "stat": "fire_damage",
+  "type": "inc",
+  "text": "{v}% increased Fire Damage",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "amulet",
+   "ring"
+  ],
+  "weight": 70,
+  "tiers": [
+   [
+    1,
+    8,
+    15
+   ],
+   [
+    6,
+    16,
+    27
+   ],
+   [
+    14,
+    28,
+    42
+   ],
+   [
+    32,
+    43,
+    57
+   ],
+   [
+    42,
+    58,
+    72
+   ]
+  ]
+ },
+ {
+  "id": "glacial",
+  "name": "Glacial",
+  "kind": "prefix",
+  "group": "cold_inc",
+  "stat": "cold_damage",
+  "type": "inc",
+  "text": "{v}% increased Ice Damage",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "amulet",
+   "ring"
+  ],
+  "weight": 70,
+  "tiers": [
+   [
+    1,
+    8,
+    15
+   ],
+   [
+    6,
+    16,
+    27
+   ],
+   [
+    14,
+    28,
+    42
+   ],
+   [
+    32,
+    43,
+    57
+   ],
+   [
+    42,
+    58,
+    72
+   ]
+  ]
+ },
+ {
+  "id": "voltaic",
+  "name": "Voltaic",
+  "kind": "prefix",
+  "group": "lightning_inc",
+  "stat": "lightning_damage",
+  "type": "inc",
+  "text": "{v}% increased Lightning Damage",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "amulet",
+   "ring"
+  ],
+  "weight": 70,
+  "tiers": [
+   [
+    1,
+    8,
+    15
+   ],
+   [
+    6,
+    16,
+    27
+   ],
+   [
+    14,
+    28,
+    42
+   ],
+   [
+    32,
+    43,
+    57
+   ],
+   [
+    42,
+    58,
+    72
+   ]
+  ]
+ },
+ {
+  "id": "mighty",
+  "name": "Mighty",
+  "kind": "prefix",
+  "group": "melee_inc",
+  "stat": "melee_damage",
+  "type": "inc",
+  "text": "{v}% increased Melee Damage",
+  "slots": [
+   "melee_weapon",
+   "gloves",
+   "amulet"
+  ],
+  "weight": 70,
+  "tiers": [
+   [
+    1,
+    6,
+    12
+   ],
+   [
+    6,
+    13,
+    22
+   ],
+   [
+    14,
+    23,
+    34
+   ],
+   [
+    32,
+    35,
+    46
+   ],
+   [
+    42,
+    47,
+    58
+   ]
+  ]
+ },
+ {
+  "id": "swift",
+  "name": "Swift",
+  "kind": "prefix",
+  "group": "attack_speed",
+  "stat": "attack_speed",
+  "type": "inc",
+  "text": "{v}% increased Attack Speed",
+  "slots": [
+   "attack_weapon",
+   "gloves"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    4,
+    7
+   ],
+   [
+    8,
+    8,
+    12
+   ],
+   [
+    18,
+    13,
+    17
+   ],
+   [
+    32,
+    18,
+    22
+   ],
+   [
+    42,
+    23,
+    27
+   ]
+  ]
+ },
+ {
+  "id": "stalwart",
+  "name": "Stalwart",
+  "kind": "prefix",
+  "group": "armour_inc",
+  "stat": "armour",
+  "type": "inc",
+  "text": "{v}% increased Armour",
+  "slots": [
+   "armour_piece",
+   "shield",
+   "belt"
+  ],
+  "weight": 90,
+  "tiers": [
+   [
+    1,
+    10,
+    19
+   ],
+   [
+    6,
+    20,
+    34
+   ],
+   [
+    14,
+    35,
+    54
+   ],
+   [
+    32,
+    55,
+    74
+   ],
+   [
+    42,
+    75,
+    94
+   ]
+  ]
+ },
+ {
+  "id": "elusive",
+  "name": "Elusive",
+  "kind": "prefix",
+  "group": "evasion_inc",
+  "stat": "evasion",
+  "type": "inc",
+  "text": "{v}% increased Evasion",
+  "slots": [
+   "armour_piece"
+  ],
+  "weight": 90,
+  "tiers": [
+   [
+    1,
+    10,
+    19
+   ],
+   [
+    6,
+    20,
+    34
+   ],
+   [
+    14,
+    35,
+    54
+   ],
+   [
+    32,
+    55,
+    74
+   ],
+   [
+    42,
+    75,
+    94
+   ]
+  ]
+ },
+ {
+  "id": "vampiric",
+  "name": "Vampiric",
+  "kind": "prefix",
+  "group": "life_on_kill",
+  "stat": "life_on_kill",
+  "type": "flat",
+  "text": "+{v} Life gained on Kill",
+  "slots": [
+   "weapon",
+   "ring",
+   "gloves"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    2,
+    4
+   ],
+   [
+    8,
+    5,
+    9
+   ],
+   [
+    18,
+    10,
+    16
+   ],
+   [
+    32,
+    17,
+    23
+   ],
+   [
+    42,
+    24,
+    30
+   ]
+  ]
+ },
+ {
+  "id": "serrated",
+  "name": "Serrated",
+  "kind": "prefix",
+  "group": "bleed",
+  "stat": "bleed_chance",
+  "type": "flat",
+  "text": "{v}% chance to cause Bleeding on Attack Hit",
+  "slots": [
+   "melee_weapon",
+   "quiver",
+   "gloves"
+  ],
+  "weight": 50,
+  "tiers": [
+   [
+    1,
+    8,
+    14
+   ],
+   [
+    8,
+    15,
+    24
+   ],
+   [
+    18,
+    25,
+    35
+   ],
+   [
+    32,
+    36,
+    46
+   ],
+   [
+    42,
+    47,
+    57
+   ]
+  ]
+ },
+ {
+  "id": "conjurers",
+  "name": "Conjurer's",
+  "kind": "prefix",
+  "group": "minion_life",
+  "stat": "minion_life",
+  "type": "inc",
+  "text": "Minions have {v}% increased maximum Life",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "helmet",
+   "amulet"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    10,
+    19
+   ],
+   [
+    8,
+    20,
+    32
+   ],
+   [
+    18,
+    33,
+    45
+   ],
+   [
+    32,
+    46,
+    58
+   ],
+   [
+    42,
+    59,
+    71
+   ]
+  ]
+ },
+ {
+  "id": "rigged",
+  "name": "Rigged",
+  "kind": "prefix",
+  "group": "trap_inc",
+  "stat": "trap_damage",
+  "type": "inc",
+  "text": "{v}% increased Trap and Mine Damage",
+  "slots": [
+   "ranged_weapon",
+   "quiver",
+   "gloves",
+   "amulet"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    10,
+    19
+   ],
+   [
+    8,
+    20,
+    32
+   ],
+   [
+    18,
+    33,
+    48
+   ],
+   [
+    32,
+    49,
+    64
+   ],
+   [
+    42,
+    65,
+    80
+   ]
+  ]
+ },
+ {
+  "id": "hale",
+  "name": "Hale",
+  "kind": "prefix",
+  "group": "life_flat",
+  "stat": "max_life",
+  "type": "flat",
+  "text": "+{v} to maximum Life",
+  "slots": [
+   "armour_piece",
+   "shield",
+   "belt",
+   "jewelry"
+  ],
+  "weight": 110,
+  "tiers": [
+   [
+    1,
+    8,
+    15
+   ],
+   [
+    6,
+    16,
+    28
+   ],
+   [
+    14,
+    29,
+    44
+   ],
+   [
+    24,
+    45,
+    64
+   ],
+   [
+    32,
+    65,
+    84
+   ],
+   [
+    42,
+    85,
+    104
+   ]
+  ]
+ },
+ {
+  "id": "of_the_bear",
+  "name": "of the Bear",
+  "kind": "suffix",
+  "group": "vit",
+  "stat": "vit",
+  "type": "flat",
+  "text": "+{v} to Vitality",
+  "slots": [
+   "armour_piece",
+   "shield",
+   "belt",
+   "jewelry"
+  ],
+  "weight": 90,
+  "tiers": [
+   [
+    1,
+    4,
+    8
+   ],
+   [
+    8,
+    9,
+    15
+   ],
+   [
+    18,
+    16,
+    24
+   ],
+   [
+    32,
+    25,
+    33
+   ],
+   [
+    42,
+    34,
+    42
+   ]
+  ]
+ },
+ {
+  "id": "of_strength",
+  "name": "of Strength",
+  "kind": "suffix",
+  "group": "str",
+  "stat": "str",
+  "type": "flat",
+  "text": "+{v} to Strength",
+  "slots": [
+   "melee_weapon",
+   "armour_piece",
+   "shield",
+   "belt",
+   "jewelry"
+  ],
+  "weight": 70,
+  "tiers": [
+   [
+    1,
+    4,
+    8
+   ],
+   [
+    8,
+    9,
+    15
+   ],
+   [
+    18,
+    16,
+    24
+   ],
+   [
+    32,
+    25,
+    33
+   ],
+   [
+    42,
+    34,
+    42
+   ]
+  ]
+ },
+ {
+  "id": "of_dexterity",
+  "name": "of Dexterity",
+  "kind": "suffix",
+  "group": "dex",
+  "stat": "dex",
+  "type": "flat",
+  "text": "+{v} to Dexterity",
+  "slots": [
+   "ranged_weapon",
+   "quiver",
+   "armour_piece",
+   "jewelry"
+  ],
+  "weight": 70,
+  "tiers": [
+   [
+    1,
+    4,
+    8
+   ],
+   [
+    8,
+    9,
+    15
+   ],
+   [
+    18,
+    16,
+    24
+   ],
+   [
+    32,
+    25,
+    33
+   ],
+   [
+    42,
+    34,
+    42
+   ]
+  ]
+ },
+ {
+  "id": "of_intellect",
+  "name": "of Intellect",
+  "kind": "suffix",
+  "group": "int",
+  "stat": "int",
+  "type": "flat",
+  "text": "+{v} to Intelligence",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "armour_piece",
+   "jewelry"
+  ],
+  "weight": 70,
+  "tiers": [
+   [
+    1,
+    4,
+    8
+   ],
+   [
+    8,
+    9,
+    15
+   ],
+   [
+    18,
+    16,
+    24
+   ],
+   [
+    32,
+    25,
+    33
+   ],
+   [
+    42,
+    34,
+    42
+   ]
+  ]
+ },
+ {
+  "id": "of_agility",
+  "name": "of Agility",
+  "kind": "suffix",
+  "group": "agi",
+  "stat": "agi",
+  "type": "flat",
+  "text": "+{v} to Agility",
+  "slots": [
+   "boots",
+   "gloves",
+   "jewelry",
+   "ranged_weapon"
+  ],
+  "weight": 50,
+  "tiers": [
+   [
+    1,
+    4,
+    8
+   ],
+   [
+    8,
+    9,
+    15
+   ],
+   [
+    18,
+    16,
+    24
+   ],
+   [
+    32,
+    25,
+    33
+   ],
+   [
+    42,
+    34,
+    42
+   ]
+  ]
+ },
+ {
+  "id": "of_willpower",
+  "name": "of Willpower",
+  "kind": "suffix",
+  "group": "wil",
+  "stat": "wil",
+  "type": "flat",
+  "text": "+{v} to Willpower",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "helmet",
+   "jewelry"
+  ],
+  "weight": 50,
+  "tiers": [
+   [
+    1,
+    4,
+    8
+   ],
+   [
+    8,
+    9,
+    15
+   ],
+   [
+    18,
+    16,
+    24
+   ],
+   [
+    32,
+    25,
+    33
+   ],
+   [
+    42,
+    34,
+    42
+   ]
+  ]
+ },
+ {
+  "id": "of_precision",
+  "name": "of Precision",
+  "kind": "suffix",
+  "group": "crit",
+  "stat": "crit_chance",
+  "type": "inc",
+  "text": "{v}% increased Critical Chance",
+  "slots": [
+   "weapon",
+   "amulet",
+   "quiver",
+   "gloves"
+  ],
+  "weight": 70,
+  "tiers": [
+   [
+    1,
+    10,
+    19
+   ],
+   [
+    8,
+    20,
+    29
+   ],
+   [
+    18,
+    30,
+    40
+   ],
+   [
+    32,
+    41,
+    51
+   ],
+   [
+    42,
+    52,
+    62
+   ]
+  ]
+ },
+ {
+  "id": "of_slaughter",
+  "name": "of Slaughter",
+  "kind": "suffix",
+  "group": "crit_multi",
+  "stat": "crit_multi",
+  "type": "flat",
+  "text": "+{v}% Critical Multiplier",
+  "slots": [
+   "weapon",
+   "amulet",
+   "quiver"
+  ],
+  "weight": 50,
+  "tiers": [
+   [
+    4,
+    8,
+    14
+   ],
+   [
+    12,
+    15,
+    24
+   ],
+   [
+    20,
+    25,
+    35
+   ],
+   [
+    32,
+    36,
+    46
+   ],
+   [
+    42,
+    47,
+    57
+   ]
+  ]
+ },
+ {
+  "id": "of_the_tempest",
+  "name": "of the Tempest",
+  "kind": "suffix",
+  "group": "res_lightning",
+  "stat": "res_lightning",
+  "type": "flat",
+  "text": "+{v}% Lightning Resistance",
+  "slots": [
+   "armour_piece",
+   "shield",
+   "belt",
+   "jewelry"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    8,
+    15
+   ],
+   [
+    8,
+    16,
+    25
+   ],
+   [
+    18,
+    26,
+    35
+   ],
+   [
+    32,
+    36,
+    45
+   ],
+   [
+    42,
+    46,
+    55
+   ]
+  ]
+ },
+ {
+  "id": "of_the_salamander",
+  "name": "of the Salamander",
+  "kind": "suffix",
+  "group": "res_fire",
+  "stat": "res_fire",
+  "type": "flat",
+  "text": "+{v}% Fire Resistance",
+  "slots": [
+   "armour_piece",
+   "shield",
+   "belt",
+   "jewelry"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    8,
+    15
+   ],
+   [
+    8,
+    16,
+    25
+   ],
+   [
+    18,
+    26,
+    35
+   ],
+   [
+    32,
+    36,
+    45
+   ],
+   [
+    42,
+    46,
+    55
+   ]
+  ]
+ },
+ {
+  "id": "of_the_floe",
+  "name": "of the Floe",
+  "kind": "suffix",
+  "group": "res_cold",
+  "stat": "res_cold",
+  "type": "flat",
+  "text": "+{v}% Ice Resistance",
+  "slots": [
+   "armour_piece",
+   "shield",
+   "belt",
+   "jewelry"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    8,
+    15
+   ],
+   [
+    8,
+    16,
+    25
+   ],
+   [
+    18,
+    26,
+    35
+   ],
+   [
+    32,
+    36,
+    45
+   ],
+   [
+    42,
+    46,
+    55
+   ]
+  ]
+ },
+ {
+  "id": "of_the_guardian",
+  "name": "of the Guardian",
+  "kind": "suffix",
+  "group": "block",
+  "stat": "block_chance",
+  "type": "flat",
+  "text": "+{v}% Block Chance",
+  "slots": [
+   "shield"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    2,
+    4
+   ],
+   [
+    10,
+    5,
+    7
+   ]
+  ]
+ },
+ {
+  "id": "of_the_scholar",
+  "name": "of the Scholar",
+  "kind": "suffix",
+  "group": "mana_flat",
+  "stat": "max_mana",
+  "type": "flat",
+  "text": "+{v} to maximum Mana",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "helmet",
+   "chest",
+   "jewelry",
+   "belt"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    8,
+    15
+   ],
+   [
+    8,
+    16,
+    27
+   ],
+   [
+    18,
+    28,
+    40
+   ],
+   [
+    32,
+    41,
+    53
+   ],
+   [
+    42,
+    54,
+    66
+   ]
+  ]
+ },
+ {
+  "id": "of_focus",
+  "name": "of Focus",
+  "kind": "suffix",
+  "group": "mana_regen",
+  "stat": "mana_regen",
+  "type": "inc",
+  "text": "{v}% increased Mana Regeneration",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "amulet",
+   "ring",
+   "helmet"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    12,
+    22
+   ],
+   [
+    8,
+    23,
+    36
+   ],
+   [
+    18,
+    37,
+    50
+   ],
+   [
+    32,
+    51,
+    64
+   ],
+   [
+    42,
+    65,
+    78
+   ]
+  ]
+ },
+ {
+  "id": "of_the_hunt",
+  "name": "of the Hunt",
+  "kind": "suffix",
+  "group": "proj_inc",
+  "stat": "projectile_damage",
+  "type": "inc",
+  "text": "{v}% increased Projectile Damage",
+  "slots": [
+   "ranged_weapon",
+   "quiver",
+   "amulet",
+   "gloves"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    8,
+    15
+   ],
+   [
+    8,
+    16,
+    27
+   ],
+   [
+    18,
+    28,
+    40
+   ],
+   [
+    32,
+    41,
+    53
+   ],
+   [
+    42,
+    54,
+    66
+   ]
+  ]
+ },
+ {
+  "id": "of_the_commander",
+  "name": "of the Commander",
+  "kind": "suffix",
+  "group": "minion_dmg",
+  "stat": "minion_damage",
+  "type": "inc",
+  "text": "Minions deal {v}% increased Damage",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "amulet",
+   "helmet"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    10,
+    19
+   ],
+   [
+    8,
+    20,
+    32
+   ],
+   [
+    18,
+    33,
+    45
+   ],
+   [
+    32,
+    46,
+    58
+   ],
+   [
+    42,
+    59,
+    71
+   ]
+  ]
+ },
+ {
+  "id": "of_the_engineer",
+  "name": "of the Engineer",
+  "kind": "suffix",
+  "group": "turret_dmg",
+  "stat": "turret_damage",
+  "type": "inc",
+  "text": "{v}% increased Turret Damage",
+  "slots": [
+   "ranged_weapon",
+   "quiver",
+   "amulet",
+   "gloves"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    10,
+    19
+   ],
+   [
+    8,
+    20,
+    32
+   ],
+   [
+    18,
+    33,
+    48
+   ],
+   [
+    32,
+    49,
+    64
+   ],
+   [
+    42,
+    65,
+    80
+   ]
+  ]
+ },
+ {
+  "id": "of_ruin",
+  "name": "of Ruin",
+  "kind": "suffix",
+  "group": "vs_elite",
+  "stat": "damage_vs_elite",
+  "type": "inc",
+  "text": "{v}% increased Damage against Elites and Bosses",
+  "slots": [
+   "weapon",
+   "jewelry"
+  ],
+  "weight": 40,
+  "tiers": [
+   [
+    4,
+    10,
+    18
+   ],
+   [
+    12,
+    19,
+    30
+   ],
+   [
+    20,
+    31,
+    42
+   ],
+   [
+    32,
+    43,
+    54
+   ],
+   [
+    42,
+    55,
+    66
+   ]
+  ]
+ },
+ {
+  "id": "of_the_phoenix",
+  "name": "of the Phoenix",
+  "kind": "suffix",
+  "group": "life_regen",
+  "stat": "life_regen",
+  "type": "flat",
+  "text": "Regenerate {v} Life per second",
+  "slots": [
+   "armour_piece",
+   "belt",
+   "amulet",
+   "ring"
+  ],
+  "weight": 50,
+  "tiers": [
+   [
+    1,
+    1,
+    2
+   ],
+   [
+    8,
+    2,
+    4
+   ],
+   [
+    18,
+    4,
+    7
+   ],
+   [
+    32,
+    8,
+    10
+   ],
+   [
+    42,
+    11,
+    13
+   ]
+  ]
+ },
+ {
+  "id": "of_speed",
+  "name": "of Speed",
+  "kind": "suffix",
+  "group": "move_speed",
+  "stat": "move_speed",
+  "type": "inc",
+  "text": "{v}% increased Movement Speed",
+  "slots": [
+   "boots"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    6,
+    10
+   ],
+   [
+    10,
+    11,
+    16
+   ],
+   [
+    20,
+    17,
+    22
+   ],
+   [
+    32,
+    23,
+    28
+   ],
+   [
+    42,
+    29,
+    34
+   ]
+  ]
+ },
+ {
+  "id": "of_haste",
+  "name": "of Haste",
+  "kind": "suffix",
+  "group": "cast_speed",
+  "stat": "cast_speed",
+  "type": "inc",
+  "text": "{v}% increased Cast Speed",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "amulet"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    5,
+    9
+   ],
+   [
+    8,
+    10,
+    15
+   ],
+   [
+    18,
+    16,
+    21
+   ],
+   [
+    32,
+    22,
+    27
+   ],
+   [
+    42,
+    28,
+    33
+   ]
+  ]
+ },
+ {
+  "id": "of_alacrity",
+  "name": "of Alacrity",
+  "kind": "suffix",
+  "group": "cdr",
+  "stat": "cooldown_recovery",
+  "type": "inc",
+  "text": "{v}% increased Cooldown Recovery",
+  "slots": [
+   "helmet",
+   "amulet",
+   "belt"
+  ],
+  "weight": 40,
+  "tiers": [
+   [
+    4,
+    5,
+    9
+   ],
+   [
+    12,
+    10,
+    15
+   ]
+  ]
+ },
+ {
+  "id": "of_fortune",
+  "name": "of Fortune",
+  "kind": "suffix",
+  "group": "rarity",
+  "stat": "item_rarity",
+  "type": "inc",
+  "text": "{v}% increased Item Rarity",
+  "slots": [
+   "helmet",
+   "jewelry",
+   "charm",
+   "boots"
+  ],
+  "weight": 40,
+  "tiers": [
+   [
+    1,
+    6,
+    12
+   ],
+   [
+    10,
+    13,
+    20
+   ],
+   [
+    20,
+    21,
+    30
+   ],
+   [
+    32,
+    31,
+    40
+   ],
+   [
+    42,
+    41,
+    50
+   ]
+  ]
+ },
+ {
+  "id": "of_the_abyss",
+  "name": "of the Abyss",
+  "kind": "suffix",
+  "group": "res_void",
+  "stat": "res_void",
+  "type": "flat",
+  "text": "+{v}% Void Resistance",
+  "slots": [
+   "armour_piece",
+   "shield",
+   "belt",
+   "jewelry"
+  ],
+  "weight": 50,
+  "tiers": [
+   [
+    8,
+    6,
+    12
+   ],
+   [
+    18,
+    13,
+    20
+   ],
+   [
+    30,
+    21,
+    28
+   ],
+   [
+    42,
+    29,
+    35
+   ]
+  ]
+ },
+ {
+  "id": "ch_warding",
+  "name": "Warding",
+  "kind": "prefix",
+  "group": "ch_ch_warding",
+  "stat": "damage_reduction",
+  "type": "flat",
+  "text": "+{v}% Damage Reduction",
+  "slots": [
+   "charm"
+  ],
+  "weight": 40,
+  "tiers": [
+   [
+    4,
+    1,
+    2
+   ],
+   [
+    16,
+    2,
+    3
+   ],
+   [
+    30,
+    3,
+    4
+   ],
+   [
+    42,
+    4,
+    5
+   ]
+  ],
+  "stage4": true
+ },
+ {
+  "id": "ch_tenacious",
+  "name": "Tenacious",
+  "kind": "prefix",
+  "group": "ch_ch_tenacious",
+  "stat": "max_life",
+  "type": "inc",
+  "text": "{v}% increased Maximum Life",
+  "slots": [
+   "charm"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    3,
+    5
+   ],
+   [
+    14,
+    5,
+    7
+   ],
+   [
+    28,
+    7,
+    9
+   ],
+   [
+    40,
+    9,
+    12
+   ]
+  ],
+  "stage4": true
+ },
+ {
+  "id": "ch_vicious",
+  "name": "Vicious",
+  "kind": "prefix",
+  "group": "ch_ch_vicious",
+  "stat": "damage",
+  "type": "inc",
+  "text": "{v}% increased Damage",
+  "slots": [
+   "charm"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    3,
+    6
+   ],
+   [
+    14,
+    6,
+    9
+   ],
+   [
+    28,
+    9,
+    12
+   ],
+   [
+    40,
+    12,
+    16
+   ]
+  ],
+  "stage4": true
+ },
+ {
+  "id": "ch_commanding",
+  "name": "Commanding",
+  "kind": "prefix",
+  "group": "ch_ch_commanding",
+  "stat": "minion_damage",
+  "type": "inc",
+  "text": "{v}% increased Minion Damage",
+  "slots": [
+   "charm"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    6,
+    10
+   ],
+   [
+    14,
+    10,
+    16
+   ],
+   [
+    28,
+    16,
+    22
+   ],
+   [
+    40,
+    22,
+    30
+   ]
+  ],
+  "stage4": true
+ },
+ {
+  "id": "ch_tinkers",
+  "name": "Tinker's",
+  "kind": "prefix",
+  "group": "ch_ch_tinkers",
+  "stat": "turret_damage",
+  "type": "inc",
+  "text": "{v}% increased Turret Damage",
+  "slots": [
+   "charm"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    6,
+    10
+   ],
+   [
+    14,
+    10,
+    16
+   ],
+   [
+    28,
+    16,
+    22
+   ],
+   [
+    40,
+    22,
+    30
+   ]
+  ],
+  "stage4": true
+ },
+ {
+  "id": "ch_of_haste",
+  "name": "of Haste",
+  "kind": "suffix",
+  "group": "ch_ch_of_haste",
+  "stat": "cooldown_recovery",
+  "type": "inc",
+  "text": "{v}% increased Cooldown Recovery",
+  "slots": [
+   "charm"
+  ],
+  "weight": 50,
+  "tiers": [
+   [
+    6,
+    4,
+    6
+   ],
+   [
+    18,
+    6,
+    9
+   ],
+   [
+    32,
+    9,
+    12
+   ]
+  ],
+  "stage4": true
+ },
+ {
+  "id": "ch_of_plenty",
+  "name": "of Plenty",
+  "kind": "suffix",
+  "group": "ch_ch_of_plenty",
+  "stat": "flask_effect",
+  "type": "inc",
+  "text": "{v}% increased Flask Effect",
+  "slots": [
+   "charm"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    8,
+    14
+   ],
+   [
+    16,
+    14,
+    20
+   ],
+   [
+    30,
+    20,
+    28
+   ]
+  ],
+  "stage4": true
+ },
+ {
+  "id": "ch_of_the_hunt",
+  "name": "of the Hunt",
+  "kind": "suffix",
+  "group": "ch_ch_of_the_hunt",
+  "stat": "damage_vs_elite",
+  "type": "inc",
+  "text": "{v}% increased Damage against Elites and Bosses",
+  "slots": [
+   "charm"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    6,
+    10
+   ],
+   [
+    16,
+    10,
+    16
+   ],
+   [
+    30,
+    16,
+    24
+   ]
+  ],
+  "stage4": true
+ },
+ {
+  "id": "ch_of_feasting",
+  "name": "of Feasting",
+  "kind": "suffix",
+  "group": "ch_ch_of_feasting",
+  "stat": "life_on_kill",
+  "type": "flat",
+  "text": "+{v} Life gained on Kill",
+  "slots": [
+   "charm"
+  ],
+  "weight": 60,
+  "tiers": [
+   [
+    1,
+    2,
+    4
+   ],
+   [
+    14,
+    4,
+    7
+   ],
+   [
+    28,
+    7,
+    11
+   ],
+   [
+    40,
+    11,
+    15
+   ]
+  ],
+  "stage4": true
+ },
+ {
+  "id": "ch_of_mastery",
+  "name": "of Mastery",
+  "kind": "suffix",
+  "group": "ch_ch_of_mastery",
+  "stat": "skill_level",
+  "type": "flat",
+  "text": "+{v} to Level of all Skills",
+  "slots": [
+   "charm"
+  ],
+  "weight": 15,
+  "tiers": [
+   [
+    30,
+    1,
+    1
+   ]
+  ],
+  "stage4": true
+ }
+]

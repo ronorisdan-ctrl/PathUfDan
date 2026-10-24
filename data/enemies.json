@@ -1,0 +1,1203 @@
+[
+ {
+  "id": "ghoul",
+  "name": "Rotting Ghoul",
+  "sprite": "ghoul",
+  "category": "melee",
+  "life": 20,
+  "damage": [
+   3,
+   5
+  ],
+  "dmg_type": "physical",
+  "speed": 62,
+  "radius": 6,
+  "armour": 5,
+  "evasion": 0,
+  "resist": {},
+  "detect": 170,
+  "attack": "melee",
+  "attack_range": 16,
+  "windup": 0.45,
+  "recover": 0.6,
+  "xp": 10,
+  "loot_mult": 1.0
+ },
+ {
+  "id": "plague_rat",
+  "name": "Plague Rat",
+  "sprite": "rat",
+  "category": "swarm",
+  "life": 9,
+  "damage": [
+   1,
+   3
+  ],
+  "dmg_type": "physical",
+  "speed": 110,
+  "radius": 4,
+  "armour": 0,
+  "evasion": 20,
+  "resist": {
+   "cold": -20
+  },
+  "detect": 200,
+  "attack": "melee",
+  "attack_range": 12,
+  "windup": 0.25,
+  "recover": 0.45,
+  "xp": 4,
+  "loot_mult": 0.35,
+  "pack": [
+   3,
+   5
+  ]
+ },
+ {
+  "id": "bone_archer",
+  "name": "Bone Archer",
+  "sprite": "skeleton_archer",
+  "category": "ranged",
+  "life": 16,
+  "damage": [
+   3,
+   5
+  ],
+  "dmg_type": "physical",
+  "speed": 58,
+  "radius": 6,
+  "armour": 0,
+  "evasion": 10,
+  "resist": {
+   "cold": 20
+  },
+  "detect": 230,
+  "attack": "ranged",
+  "attack_range": 190,
+  "preferred_range": 140,
+  "windup": 0.55,
+  "recover": 1.1,
+  "proj": "arrow",
+  "proj_speed": 230,
+  "xp": 12,
+  "loot_mult": 1.0
+ },
+ {
+  "id": "ash_cultist",
+  "name": "Ash Cultist",
+  "sprite": "cultist",
+  "category": "caster",
+  "life": 18,
+  "damage": [
+   5,
+   8
+  ],
+  "dmg_type": "fire",
+  "speed": 55,
+  "radius": 6,
+  "armour": 0,
+  "evasion": 0,
+  "resist": {
+   "fire": 40
+  },
+  "detect": 220,
+  "attack": "ranged",
+  "attack_range": 200,
+  "preferred_range": 160,
+  "windup": 0.8,
+  "recover": 1.4,
+  "proj": "fire",
+  "proj_speed": 170,
+  "xp": 14,
+  "loot_mult": 1.1
+ },
+ {
+  "id": "grave_brute",
+  "name": "Grave Brute",
+  "sprite": "brute",
+  "category": "brute",
+  "life": 60,
+  "damage": [
+   10,
+   15
+  ],
+  "dmg_type": "physical",
+  "speed": 44,
+  "radius": 10,
+  "armour": 60,
+  "evasion": 0,
+  "resist": {
+   "lightning": -20
+  },
+  "detect": 160,
+  "attack": "slam",
+  "attack_range": 30,
+  "slam_radius": 38,
+  "windup": 0.95,
+  "recover": 1.0,
+  "xp": 30,
+  "loot_mult": 1.8,
+  "size_scale": 1.0
+ },
+ {
+  "id": "bloater",
+  "name": "Bilious Bloater",
+  "sprite": "bloater",
+  "category": "explosive",
+  "life": 20,
+  "damage": [
+   12,
+   18
+  ],
+  "dmg_type": "void",
+  "speed": 50,
+  "radius": 7,
+  "armour": 0,
+  "evasion": 0,
+  "resist": {
+   "fire": -25
+  },
+  "detect": 180,
+  "attack": "explode",
+  "attack_range": 22,
+  "slam_radius": 44,
+  "windup": 0.8,
+  "recover": 0,
+  "xp": 12,
+  "loot_mult": 0.9
+ },
+ {
+  "id": "training_dummy",
+  "name": "Training Dummy",
+  "sprite": "dummy",
+  "category": "dummy",
+  "dummy": true,
+  "life": 5000,
+  "damage": [
+   0,
+   0
+  ],
+  "dmg_type": "physical",
+  "speed": 0,
+  "radius": 7,
+  "armour": 0,
+  "resist": {},
+  "detect": 0,
+  "attack": "none",
+  "attack_range": 0,
+  "windup": 1,
+  "recover": 1,
+  "xp": 0,
+  "loot_mult": 0
+ },
+ {
+  "id": "shade_assassin",
+  "name": "Shade Assassin",
+  "sprite": "assassin",
+  "category": "assassin",
+  "life": 18,
+  "damage": [
+   6,
+   9
+  ],
+  "dmg_type": "physical",
+  "speed": 95,
+  "radius": 5,
+  "armour": 0,
+  "resist": {
+   "cold": 10
+  },
+  "detect": 220,
+  "attack": "dash",
+  "attack_range": 110,
+  "dash_speed": 380,
+  "windup": 0.55,
+  "recover": 1.2,
+  "xp": 14,
+  "loot_mult": 1.0,
+  "status": {
+   "type": "bleed",
+   "chance": 30
+  }
+ },
+ {
+  "id": "bone_bulwark",
+  "name": "Bone Bulwark",
+  "sprite": "shieldbearer",
+  "category": "shield",
+  "life": 40,
+  "damage": [
+   5,
+   8
+  ],
+  "dmg_type": "physical",
+  "speed": 48,
+  "radius": 7,
+  "armour": 40,
+  "resist": {
+   "cold": 20
+  },
+  "detect": 170,
+  "attack": "melee",
+  "attack_range": 18,
+  "windup": 0.6,
+  "recover": 0.8,
+  "front_guard": 0.75,
+  "xp": 18,
+  "loot_mult": 1.2
+ },
+ {
+  "id": "grave_caller",
+  "name": "Grave Caller",
+  "sprite": "necromancer",
+  "category": "summoner",
+  "life": 26,
+  "damage": [
+   4,
+   7
+  ],
+  "dmg_type": "void",
+  "speed": 52,
+  "radius": 6,
+  "armour": 0,
+  "resist": {
+   "void": 40
+  },
+  "detect": 230,
+  "attack": "summoner",
+  "attack_range": 200,
+  "preferred_range": 170,
+  "windup": 0.9,
+  "recover": 1.6,
+  "proj": "orb",
+  "proj_speed": 160,
+  "summon": "plague_rat",
+  "summon_count": 2,
+  "summon_max": 4,
+  "xp": 20,
+  "loot_mult": 1.3
+ },
+ {
+  "id": "rime_witch",
+  "name": "Rime Witch",
+  "sprite": "cultist",
+  "tint": "#60b8ff",
+  "category": "caster",
+  "life": 22,
+  "damage": [
+   6,
+   9
+  ],
+  "dmg_type": "cold",
+  "speed": 55,
+  "radius": 6,
+  "armour": 0,
+  "resist": {
+   "cold": 50,
+   "fire": -20
+  },
+  "detect": 220,
+  "attack": "ranged",
+  "attack_range": 200,
+  "preferred_range": 160,
+  "windup": 0.75,
+  "recover": 1.3,
+  "proj": "ice",
+  "proj_speed": 210,
+  "status": {
+   "type": "chill",
+   "chance": 60
+  },
+  "xp": 15,
+  "loot_mult": 1.1
+ },
+ {
+  "id": "storm_acolyte",
+  "name": "Storm Acolyte",
+  "sprite": "cultist",
+  "tint": "#f0e060",
+  "category": "caster",
+  "life": 22,
+  "damage": [
+   3,
+   12
+  ],
+  "dmg_type": "lightning",
+  "speed": 60,
+  "radius": 6,
+  "armour": 0,
+  "resist": {
+   "lightning": 50
+  },
+  "detect": 220,
+  "attack": "nova",
+  "attack_range": 40,
+  "slam_radius": 56,
+  "windup": 0.9,
+  "recover": 1.2,
+  "status": {
+   "type": "shock",
+   "chance": 40
+  },
+  "xp": 16,
+  "loot_mult": 1.1
+ },
+ {
+  "id": "carrion_bat",
+  "name": "Carrion Bat",
+  "sprite": "bat",
+  "category": "swarm",
+  "life": 8,
+  "damage": [
+   2,
+   4
+  ],
+  "dmg_type": "physical",
+  "speed": 125,
+  "radius": 4,
+  "armour": 0,
+  "resist": {
+   "lightning": -30
+  },
+  "detect": 240,
+  "attack": "melee",
+  "attack_range": 12,
+  "windup": 0.2,
+  "recover": 0.5,
+  "xp": 4,
+  "loot_mult": 0.3,
+  "pack": [
+   4,
+   7
+  ]
+ },
+ {
+  "id": "abyssal_horror",
+  "name": "Abyssal Horror",
+  "sprite": "brute",
+  "tint": "#a040c0",
+  "category": "brute",
+  "life": 85,
+  "damage": [
+   10,
+   15
+  ],
+  "dmg_type": "void",
+  "speed": 50,
+  "radius": 10,
+  "armour": 50,
+  "resist": {
+   "void": 40,
+   "fire": 20
+  },
+  "detect": 170,
+  "attack": "slam",
+  "attack_range": 30,
+  "slam_radius": 44,
+  "windup": 0.9,
+  "recover": 0.9,
+  "xp": 36,
+  "loot_mult": 2.0
+ },
+ {
+  "id": "guardian_knight",
+  "name": "Oathbroken Champion",
+  "sprite": "warrior",
+  "tint": "#a0a8b8",
+  "sprite_scale": 1.4,
+  "category": "miniboss",
+  "miniboss": true,
+  "life": 260,
+  "damage": [
+   10,
+   15
+  ],
+  "dmg_type": "physical",
+  "speed": 70,
+  "radius": 8,
+  "armour": 90,
+  "resist": {
+   "fire": 20,
+   "cold": 20,
+   "lightning": 20
+  },
+  "detect": 260,
+  "attack": "melee",
+  "attack_range": 24,
+  "windup": 0.6,
+  "recover": 0.7,
+  "fixed_mods": [
+   "armoured",
+   "frenzied"
+  ],
+  "xp": 120,
+  "loot_mult": 4.0
+ },
+ {
+  "id": "guardian_witch",
+  "name": "The Bone Matriarch",
+  "sprite": "necromancer",
+  "tint": "#e0d0a0",
+  "sprite_scale": 1.4,
+  "category": "miniboss",
+  "miniboss": true,
+  "life": 200,
+  "damage": [
+   8,
+   12
+  ],
+  "dmg_type": "void",
+  "speed": 55,
+  "radius": 8,
+  "armour": 20,
+  "resist": {
+   "void": 50
+  },
+  "detect": 260,
+  "attack": "summoner",
+  "attack_range": 220,
+  "preferred_range": 170,
+  "windup": 0.8,
+  "recover": 1.2,
+  "proj": "orb",
+  "proj_speed": 180,
+  "summon": "carrion_bat",
+  "summon_count": 3,
+  "summon_max": 6,
+  "fixed_mods": [
+   "regenerating",
+   "vampiric"
+  ],
+  "xp": 120,
+  "loot_mult": 4.0
+ },
+ {
+  "id": "warden",
+  "name": "Sir Morcant, the Drowned Warden",
+  "sprite": "warden",
+  "life": 480,
+  "damage": [
+   10,
+   15
+  ],
+  "dmg_type": "physical",
+  "speed": 58,
+  "radius": 13,
+  "armour": 120,
+  "resist": {
+   "fire": 15,
+   "cold": 30
+  },
+  "xp": 260,
+  "loot_mult": 6.0,
+  "summon": "ghoul",
+  "light": "#60d0c0",
+  "patterns": {
+   "cleave": {
+    "type": "cleave",
+    "w": 4,
+    "range": [
+     0,
+     52
+    ],
+    "windup": 0.85,
+    "radius": 46,
+    "arc": 150,
+    "mult": 1.3
+   },
+   "charge": {
+    "type": "charge",
+    "w": 2,
+    "range": [
+     90,
+     260
+    ],
+    "windup": 0.65,
+    "speed": 420,
+    "mult": 1.4,
+    "cooldown": 5
+   },
+   "ring": {
+    "type": "ring",
+    "w": 2,
+    "range": [
+     0,
+     120
+    ],
+    "windup": 0.9,
+    "radius": 75,
+    "mult": 1.2
+   },
+   "eruption": {
+    "type": "eruption",
+    "w": 2,
+    "range": [
+     0,
+     320
+    ],
+    "windup": 0.5,
+    "count": 3,
+    "radius": 34,
+    "mult": 0.9
+   },
+   "summon": {
+    "type": "summon",
+    "w": 1,
+    "range": [
+     0,
+     999
+    ],
+    "windup": 0.8,
+    "count": 3,
+    "cooldown": 14
+   }
+  },
+  "phases": [
+   {
+    "at": 1.0,
+    "patterns": [
+     "cleave",
+     "charge"
+    ]
+   },
+   {
+    "at": 0.55,
+    "patterns": [
+     "cleave",
+     "charge",
+     "ring",
+     "eruption",
+     "summon"
+    ],
+    "speed": 1.15,
+    "attack_speed": 1.15,
+    "tint": "#c03040",
+    "message": "Sir Morcant roars - the drowned rise!"
+   }
+  ],
+  "boss": true,
+  "attack": "boss",
+  "category": "boss",
+  "detect": 420
+ },
+ {
+  "id": "gravemaw",
+  "name": "The Gravemaw",
+  "sprite": "gravemaw",
+  "life": 620,
+  "damage": [
+   13,
+   19
+  ],
+  "dmg_type": "physical",
+  "speed": 62,
+  "radius": 15,
+  "armour": 80,
+  "resist": {
+   "cold": -20,
+   "fire": 25
+  },
+  "xp": 420,
+  "loot_mult": 7.0,
+  "summon": "carrion_bat",
+  "light": "#c08040",
+  "patterns": {
+   "bite": {
+    "type": "cleave",
+    "w": 3,
+    "range": [
+     0,
+     56
+    ],
+    "windup": 0.7,
+    "radius": 50,
+    "arc": 110,
+    "mult": 1.3
+   },
+   "burrow": {
+    "type": "burrow",
+    "w": 3,
+    "range": [
+     0,
+     999
+    ],
+    "windup": 0.5,
+    "duration": 2.2,
+    "radius": 48,
+    "mult": 1.6,
+    "cooldown": 6
+   },
+   "spit": {
+    "type": "fan",
+    "w": 2,
+    "range": [
+     60,
+     320
+    ],
+    "windup": 0.7,
+    "count": 5,
+    "spread": 50,
+    "proj": "orb",
+    "proj_speed": 190,
+    "dtype": "void",
+    "mult": 0.7
+   },
+   "quake": {
+    "type": "eruption",
+    "w": 2,
+    "range": [
+     0,
+     320
+    ],
+    "windup": 0.4,
+    "count": 5,
+    "radius": 30,
+    "mult": 0.8
+   },
+   "summon": {
+    "type": "summon",
+    "w": 1,
+    "range": [
+     0,
+     999
+    ],
+    "windup": 0.8,
+    "count": 4,
+    "cooldown": 12
+   }
+  },
+  "phases": [
+   {
+    "at": 1.0,
+    "patterns": [
+     "bite",
+     "burrow",
+     "spit"
+    ]
+   },
+   {
+    "at": 0.5,
+    "patterns": [
+     "bite",
+     "burrow",
+     "spit",
+     "quake",
+     "summon"
+    ],
+    "speed": 1.2,
+    "attack_speed": 1.15,
+    "tint": "#a03020",
+    "message": "The Gravemaw thrashes in a frenzy!"
+   }
+  ],
+  "boss": true,
+  "attack": "boss",
+  "category": "boss",
+  "detect": 420
+ },
+ {
+  "id": "archon_velis",
+  "name": "Archon Velis, the Corrupted",
+  "sprite": "cultist",
+  "tint": "#b060ff",
+  "sprite_scale": 1.7,
+  "life": 420,
+  "damage": [
+   12,
+   18
+  ],
+  "dmg_type": "fire",
+  "speed": 60,
+  "radius": 10,
+  "armour": 30,
+  "resist": {
+   "fire": 40,
+   "lightning": 30,
+   "void": 30
+  },
+  "xp": 520,
+  "loot_mult": 8.0,
+  "summon": "ash_cultist",
+  "light": "#c080ff",
+  "patterns": {
+   "fan": {
+    "type": "fan",
+    "w": 3,
+    "range": [
+     0,
+     360
+    ],
+    "windup": 0.7,
+    "count": 7,
+    "spread": 70,
+    "proj": "fire",
+    "proj_speed": 200,
+    "dtype": "fire",
+    "mult": 0.75
+   },
+   "spiral": {
+    "type": "spiral",
+    "w": 2,
+    "range": [
+     0,
+     360
+    ],
+    "windup": 0.8,
+    "count": 16,
+    "waves": 2,
+    "proj": "orb",
+    "proj_speed": 150,
+    "dtype": "void",
+    "mult": 0.7
+   },
+   "teleport": {
+    "type": "teleport",
+    "w": 2,
+    "range": [
+     0,
+     999
+    ],
+    "windup": 0.4,
+    "cooldown": 5
+   },
+   "nova": {
+    "type": "ring",
+    "w": 2,
+    "range": [
+     0,
+     90
+    ],
+    "windup": 0.8,
+    "radius": 85,
+    "mult": 1.3,
+    "color": "#ff7020"
+   },
+   "meteors": {
+    "type": "mortar",
+    "w": 2,
+    "range": [
+     0,
+     400
+    ],
+    "windup": 0.5,
+    "count": 6,
+    "radius": 38,
+    "interval": 0.3,
+    "mult": 0.9,
+    "color": "#ff6020"
+   },
+   "summon": {
+    "type": "summon",
+    "w": 1,
+    "range": [
+     0,
+     999
+    ],
+    "windup": 1.0,
+    "count": 2,
+    "cooldown": 16
+   }
+  },
+  "phases": [
+   {
+    "at": 1.0,
+    "patterns": [
+     "fan",
+     "teleport",
+     "nova"
+    ]
+   },
+   {
+    "at": 0.65,
+    "patterns": [
+     "fan",
+     "teleport",
+     "nova",
+     "spiral",
+     "meteors"
+    ],
+    "message": "Velis tears the veil open!",
+    "tint": "#ff40a0"
+   },
+   {
+    "at": 0.3,
+    "patterns": [
+     "fan",
+     "teleport",
+     "nova",
+     "spiral",
+     "meteors",
+     "summon"
+    ],
+    "attack_speed": 1.25,
+    "message": "Velis calls her congregation!"
+   }
+  ],
+  "boss": true,
+  "attack": "boss",
+  "category": "boss",
+  "detect": 420
+ },
+ {
+  "id": "iron_penitent",
+  "name": "The Iron Penitent",
+  "sprite": "construct",
+  "life": 675,
+  "damage": [
+   15,
+   22
+  ],
+  "dmg_type": "physical",
+  "speed": 40,
+  "radius": 16,
+  "armour": 260,
+  "resist": {
+   "lightning": -25,
+   "fire": 30,
+   "cold": 30
+  },
+  "xp": 640,
+  "loot_mult": 9.0,
+  "light": "#ff9040",
+  "patterns": {
+   "hammer": {
+    "type": "cleave",
+    "w": 3,
+    "range": [
+     0,
+     60
+    ],
+    "windup": 1.0,
+    "radius": 56,
+    "arc": 120,
+    "mult": 1.6
+   },
+   "mortar": {
+    "type": "mortar",
+    "w": 3,
+    "range": [
+     0,
+     420
+    ],
+    "windup": 0.6,
+    "count": 8,
+    "radius": 40,
+    "interval": 0.22,
+    "mult": 1.0,
+    "color": "#ffa040"
+   },
+   "shockwave": {
+    "type": "ring",
+    "w": 2,
+    "range": [
+     0,
+     140
+    ],
+    "windup": 1.0,
+    "radius": 110,
+    "mult": 1.2,
+    "color": "#ffb060"
+   },
+   "cannon": {
+    "type": "fan",
+    "w": 2,
+    "range": [
+     80,
+     420
+    ],
+    "windup": 0.9,
+    "count": 3,
+    "spread": 20,
+    "proj": "bolt",
+    "proj_speed": 320,
+    "dtype": "physical",
+    "mult": 1.0
+   },
+   "overheat": {
+    "type": "vent",
+    "w": 1,
+    "range": [
+     0,
+     999
+    ],
+    "windup": 0.3,
+    "duration": 3.0,
+    "cooldown": 14
+   }
+  },
+  "phases": [
+   {
+    "at": 1.0,
+    "patterns": [
+     "hammer",
+     "mortar",
+     "cannon",
+     "overheat"
+    ]
+   },
+   {
+    "at": 0.5,
+    "patterns": [
+     "hammer",
+     "mortar",
+     "cannon",
+     "shockwave",
+     "overheat"
+    ],
+    "attack_speed": 1.2,
+    "tint": "#ff6030",
+    "message": "The Penitent's furnace roars red-hot!"
+   }
+  ],
+  "boss": true,
+  "attack": "boss",
+  "category": "boss",
+  "detect": 420
+ },
+ {
+  "id": "malgrath",
+  "name": "Malgrath the Choirmaster",
+  "sprite": "demon",
+  "life": 615,
+  "damage": [
+   14,
+   21
+  ],
+  "dmg_type": "void",
+  "speed": 55,
+  "radius": 13,
+  "armour": 60,
+  "resist": {
+   "void": 50,
+   "fire": 30,
+   "cold": -10
+  },
+  "xp": 780,
+  "loot_mult": 10.0,
+  "summon": "shade_assassin",
+  "light": "#ff3040",
+  "patterns": {
+   "ward": {
+    "type": "ward",
+    "w": 3,
+    "range": [
+     0,
+     999
+    ],
+    "windup": 1.0,
+    "count": 4,
+    "duration": 10,
+    "cooldown": 18
+   },
+   "claw": {
+    "type": "cleave",
+    "w": 3,
+    "range": [
+     0,
+     54
+    ],
+    "windup": 0.65,
+    "radius": 48,
+    "arc": 140,
+    "mult": 1.3
+   },
+   "hymn": {
+    "type": "spiral",
+    "w": 2,
+    "range": [
+     0,
+     400
+    ],
+    "windup": 0.9,
+    "count": 18,
+    "waves": 3,
+    "proj": "orb",
+    "proj_speed": 140,
+    "dtype": "void",
+    "mult": 0.7
+   },
+   "rift": {
+    "type": "eruption",
+    "w": 2,
+    "range": [
+     0,
+     360
+    ],
+    "windup": 0.5,
+    "count": 4,
+    "radius": 36,
+    "mult": 1.0
+   },
+   "charge": {
+    "type": "charge",
+    "w": 2,
+    "range": [
+     100,
+     280
+    ],
+    "windup": 0.6,
+    "speed": 460,
+    "mult": 1.4,
+    "cooldown": 5
+   }
+  },
+  "phases": [
+   {
+    "at": 1.0,
+    "patterns": [
+     "ward",
+     "claw",
+     "rift"
+    ]
+   },
+   {
+    "at": 0.6,
+    "patterns": [
+     "ward",
+     "claw",
+     "rift",
+     "hymn",
+     "charge"
+    ],
+    "speed": 1.15,
+    "message": "The choir sings for Malgrath!",
+    "tint": "#ff2060"
+   }
+  ],
+  "boss": true,
+  "attack": "boss",
+  "category": "boss",
+  "detect": 420
+ },
+ {
+  "id": "stormheart",
+  "name": "Stormheart Colossus",
+  "sprite": "brute",
+  "tint": "#60e0ff",
+  "sprite_scale": 1.9,
+  "life": 825,
+  "damage": [
+   16,
+   26
+  ],
+  "dmg_type": "lightning",
+  "speed": 46,
+  "radius": 18,
+  "armour": 160,
+  "resist": {
+   "lightning": 75,
+   "cold": 30,
+   "fire": -20
+  },
+  "xp": 950,
+  "loot_mult": 12.0,
+  "summon": "storm_acolyte",
+  "light": "#80e0ff",
+  "patterns": {
+   "slam": {
+    "type": "cleave",
+    "w": 3,
+    "range": [
+     0,
+     64
+    ],
+    "windup": 0.95,
+    "radius": 60,
+    "arc": 160,
+    "mult": 1.5
+   },
+   "storm": {
+    "type": "mortar",
+    "w": 3,
+    "range": [
+     0,
+     500
+    ],
+    "windup": 0.4,
+    "count": 10,
+    "radius": 30,
+    "interval": 0.18,
+    "mult": 0.8,
+    "color": "#a0e8ff",
+    "on_player": true
+   },
+   "nova": {
+    "type": "ring",
+    "w": 2,
+    "range": [
+     0,
+     130
+    ],
+    "windup": 1.0,
+    "radius": 120,
+    "mult": 1.3,
+    "color": "#80e0ff"
+   },
+   "spiral": {
+    "type": "spiral",
+    "w": 2,
+    "range": [
+     0,
+     400
+    ],
+    "windup": 0.8,
+    "count": 20,
+    "waves": 2,
+    "proj": "orb",
+    "proj_speed": 170,
+    "dtype": "lightning",
+    "mult": 0.6
+   },
+   "summon": {
+    "type": "summon",
+    "w": 1,
+    "range": [
+     0,
+     999
+    ],
+    "windup": 0.8,
+    "count": 3,
+    "cooldown": 15
+   }
+  },
+  "phases": [
+   {
+    "at": 1.0,
+    "patterns": [
+     "slam",
+     "storm",
+     "nova"
+    ]
+   },
+   {
+    "at": 0.6,
+    "patterns": [
+     "slam",
+     "storm",
+     "nova",
+     "spiral"
+    ],
+    "attack_speed": 1.15,
+    "message": "The Colossus crackles with fury!"
+   },
+   {
+    "at": 0.3,
+    "patterns": [
+     "slam",
+     "storm",
+     "nova",
+     "spiral",
+     "summon"
+    ],
+    "speed": 1.3,
+    "attack_speed": 1.2,
+    "tint": "#ffffff",
+    "message": "Stormheart overloads!"
+   }
+  ],
+  "boss": true,
+  "attack": "boss",
+  "category": "boss",
+  "detect": 420
+ }
+]

@@ -1,0 +1,1193 @@
+# MASTER GAME DEVELOPMENT PROMPT: DARK FANTASY PIXEL ARPG
+
+## 1. Game Concept and Vision
+
+You are an expert game designer, gameplay programmer, systems architect, pixel artist, and action RPG developer. Your task is to design and build a playable 2D pixel-art action RPG inspired by the deep character customisation, randomised loot, build diversity, and escalating combat difficulty of *Path of Exile*.
+
+Create an original game with its own identity, world, characters, enemies, equipment, abilities, and progression systems. Use the broad design principles of dark fantasy action RPGs as inspiration copying the best and most trusted proprietary assets, characters, or content.
+
+The game should feel like a classic dark fantasy action RPG recreated with beautiful, detailed pixel art. Combat must be responsive, enemies must be dangerous, loot must be exciting, and character progression must offer an enormous range of meaningful choices.
+
+The player begins as one of three classes:
+
+- **The Warrior:** A durable melee fighter specialising in heavy weapons, shields, physical damage, battlefield control, and devastating close-range attacks.
+- **The Ranger:** A mobile ranged combat specialist using bows, firearms, traps, deployable turrets, and projectile-based abilities.
+- **The Mage:** A powerful spellcaster specialising in elemental magic, arcane manipulation, curses, and summoned creatures.
+
+Each class has a unique starting position on a large, interconnected passive skill tree. Players unlock progressively stronger passive nodes as they level up, branching into specialised paths that fundamentally change how their character fights.
+
+The core gameplay loop is:
+
+1. Explore dangerous areas and enter combat.
+2. Kill enemies with active skills and tactical positioning.
+3. Collect randomly generated weapons, armour, accessories, currency, and crafting materials.
+4. Gain experience and level up.
+5. Allocate passive skill points and unlock stronger abilities.
+6. Craft, upgrade, and customise equipment.
+7. Enter increasingly difficult dungeon tiers.
+8. Defeat powerful bosses and hunt for rare, build-defining equipment.
+9. Refine the character into a specialised endgame build.
+
+The experience should reward experimentation. Two characters of the same class should be capable of playing very differently depending on their passive nodes, active skills, equipment, and chosen specialisations.
+
+## 2. Visual Style and Presentation
+
+Use a polished 2D pixel-art visual style with a dark gothic fantasy atmosphere.
+
+### Art direction
+
+- Detailed pixel-art characters with readable silhouettes and distinctive animations.
+- Dark forests, ruined castles, underground crypts, corrupted temples, abandoned mines, and eldritch dungeons.
+- Atmospheric lighting, flickering torches, magical illumination, glowing eyes, fog, embers, rain, and environmental particles.
+- Detailed enemies with distinct attack animations and visual tells.
+- Spectacular pixel-art spell effects, weapon trails, explosions, projectiles, summoned creatures, and boss attacks.
+- Dark environmental palettes contrasted with vibrant spell colours, rare loot effects, and magical highlights.
+- Smooth movement and combat animation while preserving a genuine pixel-art aesthetic.
+- Original sprite designs, environmental tilesets, visual effects, icons, and UI elements.
+
+Use a consistent pixel scale and avoid mixing pixel art with blurry, high-resolution assets. Apply crisp nearest-neighbour scaling where appropriate.
+
+### Camera and controls
+
+Use a top-down or slightly angled top-down perspective.
+
+The player must be able to move freely through connected combat arenas and dungeon rooms.
+
+For a desktop version, implement:
+
+- WASD movement.
+- Mouse aiming and directional attacks where appropriate.
+- Left-click basic attacks or primary skill.
+- Right-click secondary skill.
+- Additional active skills assigned to keyboard hotkeys.
+- Dedicated dodge or movement skill.
+- Inventory, character sheet, skill tree, crafting, and dungeon interfaces.
+- Mouse interaction for all menus.
+
+If controller support is feasible, design the combat and UI architecture so controller support can be added without rewriting the game.
+
+Combat should be responsive, with clear hit feedback, damage numbers, attack animations, cooldown indicators, and readable enemy telegraphs.
+
+## 3. Three Playable Classes
+
+Each class must have a distinct combat identity, starting attributes, equipment restrictions, animations, and skill progression.
+
+### Class A: The Warrior
+
+**Identity:** A brutal frontline combatant who dominates close-range encounters through physical strength, armour, shields, and powerful weapon techniques.
+
+Primary attributes:
+- Strength: increases melee damage, physical power, and heavy-equipment effectiveness.
+- Vitality: increases maximum health, healing effectiveness, and survivability.
+
+Starting equipment: A basic one-handed sword and shield, with the option to switch to a two-handed weapon.
+
+Weapon types:
+- Swords.
+- Axes.
+- Maces.
+- Greatswords.
+- Greataxes.
+- Warhammers.
+- Spears.
+- Daggers designed for melee combat.
+- One-handed weapons paired with shields.
+
+Armour types:
+- Heavy armour.
+- Medium armour.
+- Shields with different defensive properties.
+
+#### Warrior active skill catalogue
+
+**Basic attacks and weapon techniques**
+1. Cleave — sweep a weapon through nearby enemies.
+2. Heavy Strike — deliver a slow, high-damage blow.
+3. Quick Slash — perform a fast sequence of attacks.
+4. Shield Bash — damage and stagger an enemy with a shield.
+5. Piercing Thrust — attack enemies in a narrow line.
+6. Whirlwind — spin while striking surrounding enemies.
+7. Executioner's Blow — deal increased damage to weakened enemies.
+8. Weapon Throw — hurl a weapon at a distant target, if compatible with the equipped weapon.
+
+**Area damage and crowd control**
+9. Ground Slam — smash the ground, damaging enemies in a radius.
+10. Earthquake — create a delayed ground rupture.
+11. Seismic Wave — send a damaging shockwave forward.
+12. Sweeping Arc — perform a broad circular attack.
+13. Chain Hook — pull a target toward the Warrior.
+14. Shield Charge — rush forward and collide with enemies.
+15. War Cry — empower nearby allies and intimidate enemies.
+16. Tremor Strike — create repeated ground impacts.
+
+**Defensive and shield skills**
+17. Iron Guard — temporarily increase armour.
+18. Shield Wall — greatly increase frontal defence.
+19. Riposte — counterattack after successfully blocking.
+20. Bulwark — create a defensive stance that reduces incoming damage.
+21. Last Stand — gain temporary defences when health becomes dangerously low.
+22. Defiant Roar — taunt nearby enemies and reduce their damage.
+23. Fortress Stance — sacrifice mobility for increased defence and resistance to interruption.
+
+**Mobility and berserker skills**
+24. Battle Leap — leap into an area and damage enemies on landing.
+25. Furious Rush — charge through enemies.
+26. Blood Frenzy — gain attack speed after consecutive hits.
+27. Berserker Rage — temporarily increase damage at the cost of defensive capability.
+28. Relentless Assault — perform a sequence of increasingly powerful attacks.
+29. Reckless Swing — deal enormous damage while briefly reducing defence.
+30. Adrenaline Surge — gain temporary movement and attack speed.
+
+**Ultimate skills**
+31. Titan's Fall — deliver a colossal overhead strike that creates a devastating shockwave.
+32. Avatar of War — temporarily transform into an unstoppable melee combatant.
+33. Unbreakable — become extremely resistant to damage for a short duration.
+34. Apocalypse Cleave — unleash a massive weapon arc that deals increased damage to elite enemies.
+
+#### Warrior specialisations
+
+Allow the Warrior to develop into several distinct archetypes.
+
+- **Juggernaut:** Heavy armour, shields, damage reduction, retaliation, and survivability.
+- **Berserker:** High attack speed, critical strikes, rage generation, and dangerous offensive trade-offs.
+- **Weapon Master:** Weapon-specific bonuses, combos, armour penetration, and versatile melee techniques.
+- **Earthbreaker:** Earthquakes, shockwaves, ground effects, and area control.
+- **Warlord:** War cries, taunts, group buffs, and battlefield domination.
+
+The Warrior must be able to build around either a one-handed weapon and shield or a two-handed weapon. Neither approach should be universally superior.
+
+### Class B: The Ranger
+
+**Identity:** A versatile ranged combatant who controls the battlefield through precision attacks, rapid projectiles, traps, deployable machines, and mobility.
+
+Primary attributes:
+- Dexterity: increases ranged damage, attack speed, accuracy, and critical-hit potential.
+- Agility: improves evasion, movement, and mobility-related effects.
+
+Starting equipment: A simple bow and light armour.
+
+Weapon types:
+- Shortbows.
+- Longbows.
+- Crossbows.
+- Flintlock pistols.
+- Dual pistols.
+- Rifles.
+- Hand cannons.
+- Mechanical launchers.
+
+Armour types:
+- Light armour.
+- Medium armour.
+- Evasion-focused equipment.
+
+#### Ranger active skill catalogue
+
+**Bow and projectile skills**
+1. Quick Shot — fire a fast arrow at a target.
+2. Piercing Arrow — fire through enemies in a line.
+3. Multishot — release several arrows in a spread.
+4. Rain of Arrows — bombard a target area.
+5. Explosive Arrow — attach an explosive projectile to an enemy.
+6. Ricochet Shot — fire a projectile that bounces between targets.
+7. Charged Shot — charge and release a powerful arrow.
+8. Sniper's Mark — mark a target to take increased precision damage.
+9. Barrage — unleash a sustained stream of arrows.
+10. Phantom Arrow — fire a spectral projectile that passes through obstacles or enemies where the game rules permit.
+
+**Firearm skills**
+11. Quickdraw — rapidly fire a pistol.
+12. Scattershot — blast nearby enemies with a spread of projectiles.
+13. Piercing Round — fire a high-penetration shot.
+14. Explosive Round — launch a projectile that detonates on impact.
+15. Ricochet Bullet — bounce shots between enemies.
+16. Suppressive Fire — fire repeatedly into an area to hinder enemy movement.
+17. Sniper Round — charge a devastating long-range shot.
+18. Twin Volley — fire both pistols in rapid succession.
+19. Shrapnel Blast — unleash fragments in a cone.
+20. Overload Chamber — temporarily increase firearm output with a drawback such as heat buildup or slower reloads.
+
+**Traps and mines**
+21. Bear Trap — immobilise an enemy that triggers it.
+22. Explosive Mine — detonate when enemies approach.
+23. Poison Trap — create an area of toxic damage.
+24. Frost Snare — slow or freeze enemies.
+25. Lightning Trap — discharge electricity between nearby targets.
+26. Tripwire — create a line-triggered attack.
+27. Cluster Bomb — deploy several smaller explosive charges.
+28. Decoy Trap — lure enemies toward a location before triggering an effect.
+29. Bleeding Wire — damage enemies that cross a concealed wire.
+30. Rune Trap — activate a delayed magical projectile or area effect.
+
+**Turrets and deployables**
+31. Ballista Turret — automatically fire arrows at nearby enemies.
+32. Repeater Turret — fire rapid, low-damage projectiles.
+33. Cannon Turret — launch slow, explosive shots.
+34. Tesla Turret — chain lightning between targets.
+35. Frost Turret — fire projectiles that slow enemies.
+36. Poison Sentry — spread toxic projectiles.
+37. Decoy Totem — attract enemy attention.
+38. Repair Drone — restore turret durability or improve deployment uptime.
+39. Overclock — temporarily increase deployed machine attack speed.
+40. Siege Platform — deploy a powerful, stationary weapon with limited duration.
+
+**Mobility and utility**
+41. Evasive Roll — dodge in a chosen direction.
+42. Smoke Bomb — obscure the area and improve evasion.
+43. Grappling Bolt — pull the Ranger toward a suitable surface or target.
+44. Dash Shot — move quickly while firing.
+45. Hunter's Focus — improve accuracy and critical-hit chance.
+46. Camouflage — temporarily reduce enemy detection.
+47. Marked Prey — increase damage against a designated enemy.
+48. Tactical Reload — reload or recover firearm resources while repositioning.
+
+**Ultimate skills**
+49. Death from Above — unleash a huge volley over an area.
+50. Deadeye — enter a precision stance with greatly improved ranged damage.
+51. Mechanical Swarm — deploy several temporary autonomous combat machines.
+52. Hellfire Barrage — rain explosive projectiles across a large area.
+
+#### Ranger specialisations
+
+- **Deadeye:** Precision, critical hits, long-range damage, and marked targets.
+- **Trapper:** Mines, snares, damage-over-time effects, and battlefield preparation.
+- **Gunslinger:** Firearms, rapid shots, ricochets, and ammunition mechanics.
+- **Machinist:** Turrets, automated weapons, deployables, and engineering.
+- **Wraith Hunter:** Mobility, evasion, camouflage, and hit-and-run combat.
+
+Bows, firearms, traps, and turrets must be viable foundations for separate builds. The Ranger should not be forced to combine every weapon category.
+
+### Class C: The Mage
+
+**Identity:** A fragile but devastating spellcaster who manipulates elemental forces, arcane energy, curses, and supernatural summons.
+
+Primary attributes:
+- Intelligence: increases spell damage, mana capacity, and magical effectiveness.
+- Willpower: improves mana regeneration, summoning, and resistance to magical disruption.
+
+Starting equipment: A basic wand or staff and simple caster robes.
+
+Weapon types:
+- Wands.
+- Staves.
+- Spellbooks.
+- Magical focuses.
+- Ritual implements.
+
+Armour types:
+- Caster robes.
+- Light magical armour.
+- Arcane shields.
+
+The Mage uses a mana resource for spells. Summons and persistent effects should have their own balanced costs, duration rules, or upkeep requirements where appropriate.
+
+#### Mage active skill catalogue
+
+**Fire magic**
+1. Firebolt — launch a basic fire projectile.
+2. Fireball — launch an explosive fireball.
+3. Flame Wave — release a wave of fire.
+4. Meteor — summon a meteor that crashes into an area.
+5. Flame Wall — create a wall of fire.
+6. Combustion Mark — mark an enemy to explode under specified conditions.
+7. Inferno — create a persistent area of burning ground.
+8. Phoenix Burst — unleash a powerful explosion around the Mage.
+
+**Ice magic**
+9. Frostbolt — fire a chilling projectile.
+10. Ice Lance — launch a fast, piercing ice spear.
+11. Frost Nova — freeze or slow nearby enemies.
+12. Blizzard — summon a damaging storm over an area.
+13. Ice Wall — create a temporary barrier.
+14. Frozen Prison — encase a target in ice.
+15. Shatter — deal bonus damage to frozen enemies.
+16. Glacial Eruption — erupt jagged ice from the ground.
+
+**Lightning magic**
+17. Spark — release a small electrical projectile.
+18. Chain Lightning — jump between multiple enemies.
+19. Lightning Bolt — strike a target with concentrated electricity.
+20. Thunderstorm — summon repeated lightning strikes over an area.
+21. Static Field — create an electrical zone.
+22. Arcane Surge — increase spellcasting speed temporarily.
+23. Ball Lightning — release a slowly travelling sphere of electricity.
+24. Storm Convergence — summon a concentrated electrical explosion.
+
+**Arcane and void magic**
+25. Arcane Missile — fire homing magical projectiles.
+26. Arcane Barrage — release a sequence of magical bolts.
+27. Blink — teleport a short distance.
+28. Gravity Well — pull enemies toward a central point.
+29. Mana Detonation — consume stored mana to create an explosion.
+30. Rift Tear — open a temporary damaging rift.
+31. Time Snare — slow enemies within a target area.
+32. Disintegration Beam — channel a powerful beam.
+33. Void Collapse — create a zone that damages and pulls enemies inward.
+34. Mirror Image — create decoys that distract enemies.
+
+**Curses and control**
+35. Curse of Frailty — reduce enemy defences.
+36. Curse of Agony — inflict damage over time.
+37. Curse of Silence — temporarily disrupt enemy spellcasting.
+38. Mark of Ruin — cause marked enemies to take increased damage.
+39. Soul Siphon — drain life or mana from enemies.
+40. Temporal Rupture — damage enemies affected by time-based effects.
+
+**Summoning magic**
+41. Summon Skeletons — raise skeletal melee fighters.
+42. Summon Skeleton Archers — raise ranged skeletons.
+43. Summon Zombie — create a durable undead minion.
+44. Summon Bone Golem — summon a slow, durable frontline creature.
+45. Summon Fire Elemental — summon a creature that deals fire damage.
+46. Summon Ice Elemental — summon a creature that slows enemies.
+47. Summon Storm Wisp — summon a mobile lightning companion.
+48. Summon Arcane Familiar — summon a magical companion that supports spellcasting.
+49. Summon Shadow Wraith — summon a fragile creature that deals high damage.
+50. Raise Fallen — temporarily resurrect a suitable defeated enemy.
+51. Blood Pact — sacrifice a portion of health for increased summoning power.
+52. Empower Minions — increase the damage and durability of active summons.
+53. Sacrificial Detonation — destroy a summon to cause an explosion.
+54. Soul Harvest — gain a temporary benefit when an enemy dies near the Mage.
+
+**Ultimate skills**
+55. Cataclysm — unleash a devastating elemental storm.
+56. Archmage Ascension — temporarily amplify spell power and magical effects.
+57. Army of the Damned — summon a temporary army of undead.
+58. Singularity — create a powerful void zone that draws enemies inward.
+59. Elemental Avatar — empower elemental spells and alter their behaviour.
+60. Worldbreaker — channel a massive arcane blast that consumes a substantial amount of mana.
+
+#### Mage specialisations
+
+- **Pyromancer:** Fire damage, burning, explosions, and spreading ignition.
+- **Cryomancer:** Freezing, slowing, shattering, and defensive ice magic.
+- **Stormcaller:** Lightning, chain reactions, critical hits, and rapid casting.
+- **Necromancer:** Undead minions, corpse mechanics, sacrifices, and minion scaling.
+- **Arcanist:** Mana manipulation, teleportation, time effects, and void magic.
+- **Summoner:** Powerful minions, summon limits, minion commands, and creature enhancement.
+
+Summoning must be a fully playable archetype, not merely a few optional spells. Minions should attack enemies automatically, follow the player, navigate around obstacles, and respond to death, despawning, and dungeon transitions correctly.
+
+## 4. The Passive Skill Tree
+
+The passive skill tree is one of the most important systems in the entire game. Build a large, interconnected, visually impressive tree inspired by the concept of a sprawling ARPG progression web.
+
+Do not create a simple linear upgrade menu. Create a branching network of nodes with multiple paths, junctions, clusters, and powerful specialisation areas.
+
+### Tree structure
+
+Each class begins at a different location on the same overall tree.
+
+The Warrior starts near Strength, Vitality, melee damage, armour, and shield-related nodes.
+
+The Ranger starts near Dexterity, Agility, projectile damage, evasion, traps, and critical-hit nodes.
+
+The Mage starts near Intelligence, Willpower, spell damage, mana, elemental effects, and summoning nodes.
+
+The three starting areas must connect through multiple routes, allowing hybrid builds. Reaching distant parts of the tree should require meaningful investment in connecting nodes.
+
+### Node progression
+
+Create a clear hierarchy of passive nodes.
+
+**Tier 1 — Minor nodes**
+
+Small, inexpensive bonuses that establish a direction for a build.
+
+Examples:
+- +3% melee damage.
+- +2% projectile damage.
+- +3% spell damage.
+- +2% maximum health.
+- +3% armour.
+- +2% attack speed.
+- +2% cast speed.
+- +3% minion damage.
+- +2% evasion.
+- +3% maximum mana.
+
+**Tier 2 — Specialised nodes**
+
+Stronger nodes that improve a particular combat mechanic.
+
+Examples:
+- +8% two-handed weapon damage.
+- +8% bow damage.
+- +8% elemental spell damage.
+- +10% turret damage.
+- +10% trap damage.
+- +8% minion health.
+- +5% critical-hit chance.
+- +8% shield effectiveness.
+- +10% damage over time.
+- +8% projectile speed.
+
+**Tier 3 — Greater nodes**
+
+Powerful upgrades that require progression through several connected minor or specialised nodes.
+
+Examples:
+- +18% melee damage and +5% attack speed.
+- Projectiles have a chance to pierce an additional enemy.
+- Critical strikes have a chance to inflict a damaging bleed.
+- Fire spells have an increased chance to ignite.
+- Summoned creatures gain increased movement speed and attack speed.
+- Turrets gain additional range and improved target acquisition.
+- Blocking an attack grants temporary damage reduction.
+- Frozen enemies take increased critical damage.
+
+**Tier 4 — Keystone nodes**
+
+Rare, defining passives that substantially change the way a character functions.
+
+Examples:
+
+- **Glass Cannon:** Greatly increased damage, but substantially reduced maximum health.
+- **Unstoppable Force:** A portion of incoming damage cannot interrupt attacks.
+- **Blood for Power:** Some skills consume health instead of mana.
+- **Perfect Aim:** Ranged attacks gain significant accuracy and critical bonuses, but close-range damage is reduced.
+- **Living Arsenal:** Switching between compatible weapon types grants temporary bonuses.
+- **Elemental Convergence:** Elemental spells interact with each other to produce additional effects.
+- **One Mind:** Summoned creatures gain significant power, but the Mage's direct spell damage is reduced.
+- **Automaton Doctrine:** Turrets gain substantial power, but their deployment limit is reduced.
+- **Overwhelming Momentum:** Consecutive hits increase damage until the player stops attacking.
+- **Fortress of Flesh:** Gain powerful defensive bonuses while stationary, but lose some mobility.
+- **Explosive Alchemy:** Traps deal additional damage and can trigger chain reactions.
+- **Death's Harvest:** Killing cursed enemies restores a portion of mana or another appropriate resource.
+
+Keystones must create trade-offs or transformative mechanics rather than being simple numerical upgrades.
+
+### Major nodes and cluster paths
+
+Each major branch should contain several small nodes leading toward a powerful reward.
+
+For example:
+
+Minor fire damage → increased burning damage → improved ignition chance → burning enemies spread fire → **Greater Flame Mastery**.
+
+Minor bow damage → increased projectile speed → improved piercing → projectiles gain additional effects → **Greater Deadeye Mastery**.
+
+Minor armour → increased block chance → improved shield recovery → successful blocks trigger retaliation → **Greater Bulwark Mastery**.
+
+Minor minion health → increased minion damage → improved minion AI bonuses → minions inherit selected player bonuses → **Greater Commander Mastery**.
+
+Create at least 15 major specialisation clusters, with multiple minor and greater nodes in each. Include clusters for melee combat, shields, two-handed weapons, attack speed, critical strikes, projectiles, bows, firearms, traps, turrets, elemental magic, curses, summoning, mana, damage over time, armour, evasion, health, and hybrid builds.
+
+### Skill tree rules
+
+- Every node must have a unique identifier.
+- Every node must specify its type, effect, cost, prerequisites, and connections.
+- The UI must clearly display available nodes, allocated nodes, locked nodes, and unaffordable nodes.
+- Players earn passive points by levelling up.
+- Certain quests or bosses may award additional passive points.
+- Nodes must be purchased only when their prerequisites are satisfied.
+- Refunds must be possible using a limited resource or a defined currency cost.
+- The tree must support scrolling, zooming, panning, and selecting nodes.
+- Hovering or selecting a node displays its full description and effects.
+- Prevent invalid connections and accidental allocation.
+- Show a preview of the stat changes before a node is purchased.
+
+Use data-driven node definitions so the tree can be expanded without rewriting the core code.
+
+## 5. Active Skill Progression and Skill Customisation
+
+Passive skills and active abilities must be separate systems.
+
+Active skills are unlocked through character progression, class quests, skill rewards, trainers, dungeon rewards, or other clearly defined sources.
+
+Players equip a limited number of active skills at a time and can change their loadout outside combat or at designated safe locations.
+
+Each active skill should support, where appropriate:
+- Skill level progression.
+- Resource cost.
+- Cooldown.
+- Damage scaling.
+- Attack or cast speed.
+- Area of effect.
+- Projectile count and behaviour.
+- Duration.
+- Status effects.
+- Weapon compatibility.
+- Passive tree synergies.
+- Equipment-based modifiers.
+
+Implement a skill modification system that allows certain active skills to be altered through upgrades or rare support items.
+
+Examples:
+- Fireball can split into multiple projectiles.
+- Cleave can gain additional range.
+- Lightning Bolt can chain to additional enemies.
+- Skeletons can sacrifice durability for increased attack speed.
+- Turrets can gain range at the cost of deployment time.
+- Rain of Arrows can concentrate its damage into a smaller area.
+- Shield Bash can trigger a shockwave after a successful block.
+
+These modifications should create different versions of the same skill rather than simply increasing damage.
+
+Ensure the game can support new skills and modifiers through data definitions instead of hard-coded individual implementations.
+
+## 6. Character Attributes and Combat Statistics
+
+Implement a comprehensive but understandable character stat system.
+
+Core attributes:
+- Strength.
+- Dexterity.
+- Intelligence.
+- Vitality.
+- Agility.
+- Willpower.
+
+Core combat statistics:
+- Maximum health.
+- Health regeneration.
+- Maximum mana or class resource.
+- Resource regeneration.
+- Physical damage.
+- Fire damage.
+- Ice damage.
+- Lightning damage.
+- Arcane damage.
+- Void damage.
+- Attack speed.
+- Cast speed.
+- Critical-hit chance.
+- Critical-hit multiplier.
+- Armour.
+- Evasion.
+- Block chance.
+- Damage reduction.
+- Elemental resistances.
+- Status-effect chance.
+- Status-effect duration.
+- Movement speed.
+- Cooldown reduction.
+- Projectile count.
+- Projectile penetration.
+- Minion damage.
+- Minion health.
+- Trap damage.
+- Turret damage.
+
+Clearly distinguish additive bonuses from multiplicative bonuses. Define consistent rules for damage calculations and apply them throughout the game.
+
+Prevent runaway stat stacking from trivialising combat. Strong builds should feel powerful without rendering every encounter meaningless.
+
+Provide a detailed character sheet showing base values, equipment bonuses, passive bonuses, temporary effects, and final calculated values.
+
+## 7. Randomised Equipment and Loot System
+
+Every enemy kill should have a chance to produce loot based on enemy type, level, rarity, and dungeon tier.
+
+Equipment must be generated from a data-driven item system.
+
+### Equipment slots
+
+- Main hand.
+- Off-hand.
+- Helmet.
+- Chest armour.
+- Gloves.
+- Boots.
+- Belt.
+- Amulet.
+- Ring slot 1.
+- Ring slot 2.
+- Optional relic or charm slot.
+
+Two-handed weapons occupy both hand slots.
+
+### Item rarity
+
+Implement five item rarity levels:
+
+1. **Common:** Basic equipment with minimal or no special modifiers.
+2. **Uncommon:** Equipment with one or more useful affixes.
+3. **Rare:** Equipment with several affixes and strong build potential.
+4. **Epic:** Powerful equipment with high-tier affixes or special properties.
+5. **Legendary:** Distinctive items with unique effects that can fundamentally change a build.
+
+Rarity must influence potential power, but item level, affix quality, and build synergy must also matter.
+
+### Procedural item generation
+
+Every generated item should be rolled using a consistent item-generation system.
+
+Possible item properties include:
+- Item name.
+- Item type.
+- Item level.
+- Required character level.
+- Rarity.
+- Base damage or defence.
+- Randomised affixes.
+- Elemental damage.
+- Critical bonuses.
+- Attribute bonuses.
+- Health or resource bonuses.
+- Resistances.
+- Skill-specific modifiers.
+- Special effects.
+- Sell value.
+- Salvage yield.
+- Equipment requirements.
+
+Create affix pools appropriate to each item category.
+
+Example prefixes:
+- Brutal: increased physical damage.
+- Emberforged: additional fire damage.
+- Stormcharged: additional lightning damage.
+- Stalwart: increased armour.
+- Swift: increased attack speed.
+- Arcane: increased spell damage.
+- Vampiric: restore health under defined combat conditions.
+- Serrated: increased bleeding effectiveness.
+- Hollow: increased void damage.
+- Conjurer's: increased minion effectiveness.
+
+Example suffixes:
+- of the Bear: increased maximum health.
+- of Precision: increased critical-hit chance.
+- of the Tempest: increased lightning resistance.
+- of the Guardian: increased defensive effectiveness.
+- of the Scholar: increased maximum mana.
+- of the Hunt: increased projectile damage.
+- of the Commander: increased minion damage.
+- of the Engineer: increased turret damage.
+- of Ruin: increased damage against elite enemies.
+- of the Phoenix: grants a rare defensive or recovery effect.
+
+Generate appropriate combinations while preventing contradictory or meaningless affixes.
+
+### Legendary items
+
+Create a selection of original legendary items with unique mechanics.
+
+Examples:
+- **Worldsplitter:** A two-handed hammer whose heavy attacks create additional ground ruptures.
+- **The Last Bastion:** A shield that rewards successful blocks with temporary defensive power.
+- **Widowmaker:** A bow that increases damage against isolated enemies.
+- **Dead Man's Promise:** A firearm that causes a portion of overkill damage to trigger an explosion.
+- **The Clockwork Choir:** A mechanical focus that improves turret behaviour.
+- **Ashheart:** A staff that causes burning enemies to release small fire explosions.
+- **Gravetender:** A spellbook that empowers undead summons.
+- **The Hollow Crown:** A helmet that improves void magic while reducing maximum health.
+- **Stormglass:** A wand that allows lightning spells to chain additional times.
+- **Bloodletter:** A sword that enhances bleed effects and rewards consecutive attacks.
+
+Legendary effects should be rare, memorable, and mechanically distinctive.
+
+### Loot generation rules
+
+- Use deterministic random seeds where useful for testing and reproducibility.
+- Scale item level and potential affix strength with enemy and dungeon difficulty.
+- Give elite enemies better loot opportunities than ordinary enemies.
+- Give bosses guaranteed reward opportunities with improved rarity chances.
+- Avoid generating equipment that cannot be used or equipped meaningfully, while still allowing class-independent drops.
+- Ensure rare equipment remains exciting without requiring excessively low drop rates.
+- Display item rarity through consistent colours, borders, particles, and tooltips.
+- Support item comparison when hovering over equipment.
+- Implement inventory sorting, stacking for appropriate items, selling, salvaging, and equipment management.
+- Provide a loot filter that can hide low-value drops and highlight desirable items.
+
+Loot should be one of the central motivations for combat and dungeon progression.
+
+## 8. Basic Gear Crafting System
+
+Create a straightforward but expandable crafting system that allows players to improve equipment without replacing random loot as the primary source of excitement.
+
+### Crafting resources
+
+Enemies and containers can drop:
+- Scrap.
+- Iron fragments.
+- Monster cores.
+- Arcane dust.
+- Elemental essences.
+- Rare crafting catalysts.
+- Dungeon-specific materials.
+
+Resources should be stored in a dedicated materials inventory with stacking.
+
+### Crafting operations
+
+**Upgrade equipment:** Spend materials and currency to improve an item's base damage or defence within defined limits.
+
+**Reroll an affix:** Spend resources to replace one eligible modifier with another valid modifier.
+
+**Add an affix:** Use a rare crafting material to add a modifier if the item has an available affix slot.
+
+**Remove an affix:** Use a more expensive crafting operation to remove an eligible modifier.
+
+**Reroll rarity:** Allow eligible lower-rarity items to be transformed into a higher rarity, with suitable costs and restrictions.
+
+**Salvage equipment:** Destroy unwanted equipment to recover crafting materials, with yields influenced by item rarity and level.
+
+**Socket upgrades:** Allow selected equipment to receive a limited number of sockets for runes or charms.
+
+### Runes and charms
+
+Create socketable items that provide focused bonuses, such as:
+- Increased fire damage.
+- Increased maximum health.
+- Increased attack speed.
+- Improved potion recovery.
+- Increased minion health.
+- Improved turret damage.
+- Increased elemental resistance.
+- Increased critical-hit damage.
+
+Some runes can grant a small special effect, such as causing a portion of fire damage to ignite nearby enemies.
+
+Crafting must have clear costs and success rules. Avoid unnecessary randomness that destroys an item's value without providing a meaningful decision.
+
+The crafting interface should show:
+- The selected item.
+- The current stats.
+- The proposed changes.
+- The materials required.
+- The materials available.
+- The final result before confirming the operation.
+
+Always require player confirmation before permanently modifying or destroying valuable equipment.
+
+## 9. Multi-Tier Dungeon System
+
+Create a dungeon progression system that supports repeatable combat, increasingly dangerous enemies, and endgame farming.
+
+Dungeons should be generated from reusable room templates, enemy encounters, environmental hazards, reward tables, and boss arenas.
+
+Each dungeon run should combine handcrafted room designs with procedural variation.
+
+### Dungeon tiers
+
+**Tier 1 — Forgotten Depths**
+
+- Designed for early characters.
+- Basic enemies and straightforward encounters.
+- Introduces dungeon mechanics and crafting resources.
+- Contains a simple boss.
+
+**Tier 2 — Corrupted Catacombs**
+
+- Stronger enemy variants.
+- More elite enemies and environmental hazards.
+- Improved equipment and crafting-material drops.
+- Bosses gain additional attack patterns.
+
+**Tier 3 — Abyssal Warrens**
+
+- More complex room layouts.
+- Enemy groups with complementary abilities.
+- Increased resistance and damage from enemies.
+- Rare affixes begin appearing more frequently.
+
+**Tier 4 — Dread Sanctums**
+
+- Dangerous elites and minibosses.
+- Multiple combat encounters with limited recovery opportunities.
+- Stronger boss mechanics and rare crafting materials.
+- Greater chances of epic equipment.
+
+**Tier 5 — Nightmare Vaults**
+
+- Endgame-level enemies.
+- Multiple modifiers affecting each run.
+- High-risk combat and exceptional rewards.
+- Legendary equipment becomes a meaningful farming target.
+
+**Tier 6 — The Endless Abyss**
+
+- Optional advanced endgame mode.
+- Escalating enemy health, damage, density, and encounter complexity.
+- Periodic elite waves and increasingly powerful bosses.
+- Rewards scale with progression, but difficulty must remain manageable through appropriate builds and player skill.
+
+These tiers should represent genuine increases in challenge, not merely larger enemy health pools.
+
+### Dungeon modifiers
+
+Randomly assign a small selection of modifiers to eligible dungeon runs.
+
+Examples:
+- Enemies move faster.
+- Enemies deal additional fire damage.
+- Enemies gain increased armour.
+- Elite enemies appear more frequently.
+- Healing is less effective.
+- Enemies explode upon death.
+- Periodic lightning strikes affect the arena.
+- Bosses summon additional minions.
+- Player damage is increased, but maximum health is reduced.
+- Enemies regenerate health unless interrupted.
+
+Modifiers should have clear descriptions and rewards appropriate to their difficulty.
+
+### Dungeon objectives
+
+Use a mixture of:
+- Clear all major enemy encounters.
+- Defeat an elite guardian.
+- Activate ancient mechanisms.
+- Collect keys or relic fragments.
+- Survive a wave encounter.
+- Defeat the final boss.
+
+Not every dungeon needs all of these objectives.
+
+### Dungeon bosses
+
+Create distinct boss archetypes:
+- A heavily armoured undead knight.
+- A giant burrowing beast.
+- A corrupted spellcaster.
+- A mechanical siege construct.
+- A demonic summoner.
+- A colossal elemental creature.
+
+Bosses should have multiple phases, telegraphed attacks, distinct animations, and mechanics that reward movement and correct positioning.
+
+Boss encounters should drop valuable loot and occasionally grant special crafting materials, unique items, or progression keys.
+
+Dungeon generation must avoid impossible layouts, unreachable doors, trapped spawns, and rooms without valid exits. Include a clear exit or extraction mechanism.
+
+## 10. Enemies and Encounter Design
+
+Create a diverse bestiary of original enemies.
+
+Enemy categories:
+- Basic melee enemies.
+- Ranged attackers.
+- Fast assassins.
+- Armoured brutes.
+- Shield-bearing defenders.
+- Spellcasters.
+- Summoners.
+- Explosive enemies.
+- Swarm creatures.
+- Elite variants.
+- Minibosses.
+- Dungeon bosses.
+
+Each enemy should have:
+- Health and damage values.
+- Movement and attack behaviour.
+- Detection and pursuit rules.
+- Attack range.
+- Attack animations and telegraphs.
+- Appropriate resistance or weakness.
+- Loot-generation rules.
+- Experience rewards.
+
+Implement basic enemy AI that can detect the player, pursue them, attack within range, reposition when necessary, and respond appropriately to damage and death.
+
+Elite enemies can spawn with combinations of modifiers, such as:
+- Frenzied.
+- Armoured.
+- Vampiric.
+- Explosive.
+- Frostbound.
+- Summoner.
+- Shielded.
+- Regenerating.
+
+Ensure enemy modifiers interact correctly with the combat system and do not create unavoidable damage or invulnerability loops.
+
+## 11. Character Progression and Economy
+
+The character should gain experience from killing enemies, completing dungeon objectives, and defeating bosses.
+
+Implement:
+- Character levels.
+- Experience thresholds.
+- Attribute progression.
+- Passive skill points.
+- Active skill unlocks.
+- Equipment level requirements.
+- Dungeon unlocks.
+- Quest or milestone rewards.
+
+The economy should use a primary currency for purchases, repairs if included, and crafting.
+
+Provide a basic hub containing:
+- A merchant.
+- A blacksmith or crafting station.
+- An equipment vendor or salvage station.
+- A dungeon entrance or dungeon selection interface.
+- A storage chest.
+- A character preparation area.
+
+Players should have a clear reason to return to the hub after dungeon runs, sort their loot, craft improvements, and prepare for the next challenge.
+
+## 12. User Interface and Game Screens
+
+Create a cohesive pixel-art UI that is readable and easy to navigate.
+
+Required screens and interfaces:
+
+**Main menu**
+- New game.
+- Continue.
+- Character selection.
+- Settings.
+- Exit.
+
+**Character selection**
+- Warrior, Ranger, and Mage previews.
+- Class descriptions.
+- Starting attributes.
+- Starting equipment.
+- Class difficulty and combat identity.
+
+**In-game HUD**
+- Health bar.
+- Mana or resource bar.
+- Experience bar.
+- Active skill hotbar.
+- Cooldown indicators.
+- Potion slots.
+- Currency display.
+- Minimap.
+- Current dungeon tier.
+- Enemy health bars.
+- Damage numbers.
+
+**Inventory**
+- Equipment slots.
+- Item grid.
+- Item tooltips.
+- Compare-item display.
+- Sell and salvage options.
+- Materials inventory.
+- Sorting and filtering.
+
+**Passive skill tree**
+- Large pannable and zoomable node network.
+- Class starting locations.
+- Node categories.
+- Connection lines.
+- Allocated and available points.
+- Node descriptions.
+- Prerequisite validation.
+- Refund functionality.
+
+**Crafting**
+- Item selection.
+- Crafting-operation selection.
+- Cost preview.
+- Stat-change preview.
+- Confirmation dialog.
+
+**Dungeon selection**
+- Dungeon tier.
+- Recommended level.
+- Enemy difficulty.
+- Dungeon modifiers.
+- Expected rewards.
+- Boss information.
+- Entry requirements.
+
+**Character sheet**
+- Attributes.
+- Offensive statistics.
+- Defensive statistics.
+- Resistances.
+- Active skill bonuses.
+- Equipment contributions.
+- Passive tree contributions.
+
+Every interface must be functional. Avoid decorative buttons that do nothing.
+
+## 13. Technical Architecture and Implementation
+
+Choose a game engine appropriate for a 2D pixel-art action RPG. Prefer Godot 4 with GDScript unless the existing project uses a different engine or the development environment imposes a better-supported choice.
+
+Build the game with modular, data-driven systems.
+
+Separate the code into logical components:
+- Player controller.
+- Class and character progression.
+- Combat and damage calculation.
+- Active skill framework.
+- Passive skill tree.
+- Enemy AI.
+- Enemy spawning.
+- Loot generation.
+- Item and equipment management.
+- Crafting.
+- Dungeon generation.
+- Boss encounters.
+- Inventory and UI.
+- Save and load.
+- Audio and visual effects.
+
+Use reusable data resources for skills, items, affixes, passive nodes, enemies, and dungeon modifiers.
+
+Avoid hard-coding every individual skill, item, or passive node into a single large script.
+
+Create a consistent event and state-management system so that damage, deaths, item drops, experience rewards, passive effects, and dungeon progression update correctly.
+
+### Performance and stability
+
+- Support multiple enemies and projectiles on screen.
+- Avoid creating unlimited persistent objects.
+- Clean up expired projectiles, visual effects, dead enemies, and temporary summons.
+- Use pooling or other appropriate optimisation techniques where useful.
+- Keep UI updates efficient.
+- Handle player death, dungeon completion, dungeon failure, and returning to the hub cleanly.
+- Prevent duplicate loot rewards from repeated death events.
+- Ensure saving and loading preserve character progression, inventory, equipment, currency, and relevant unlocks.
+
+### Saving and loading
+
+Implement a persistent save system that stores:
+- Character class and level.
+- Experience and attributes.
+- Allocated passive nodes.
+- Unlocked and equipped active skills.
+- Inventory and equipment.
+- Currency and crafting materials.
+- Dungeon unlocks and progression.
+- Relevant game settings.
+
+Use a versioned save format where possible, allowing future changes to the data structure without unnecessarily invalidating existing saves.
+
+## 14. Balancing Principles
+
+Balance the game around meaningful choices rather than a single optimal build.
+
+The Warrior should be able to trade mobility for durability or durability for devastating damage.
+
+The Ranger should be able to specialise in direct ranged damage, firearms, traps, or automated weapons.
+
+The Mage should be able to focus on elemental spellcasting, curses, arcane control, or minion armies.
+
+Every class must be capable of clearing the game's content with multiple viable builds.
+
+Balance:
+- Enemy health and damage.
+- Player damage scaling.
+- Resource costs.
+- Skill cooldowns.
+- Passive node values.
+- Equipment affix strength.
+- Drop rates.
+- Crafting costs.
+- Dungeon difficulty.
+- Boss attack patterns.
+- Minion and turret effectiveness.
+
+Avoid making a skill mandatory for every build or making an entire class obsolete at higher dungeon tiers.
+
+## 15. Development and Testing Requirements
+
+Build a playable game, not just a concept document, static mock-up, or menu demonstration.
+
+If the project is too large to implement in one pass, develop it in functional milestones.
+
+### Milestone 1: Playable foundation
+
+- Player movement.
+- Combat.
+- All three selectable classes.
+- One functional basic attack per class.
+- Several enemy types.
+- Enemy death and experience.
+- Random equipment drops.
+- Inventory and equipment slots.
+- One playable dungeon.
+- A working exit and return-to-hub loop.
+
+### Milestone 2: Progression systems
+
+- Character levelling.
+- Passive skill tree.
+- Initial branches for all three classes.
+- Active skill hotbar.
+- Several unlockable skills per class.
+- Character statistics.
+- Equipment modifiers.
+
+### Milestone 3: Loot and crafting
+
+- Full item rarity system.
+- Random affixes.
+- Legendary items.
+- Salvaging.
+- Equipment upgrading.
+- Affix rerolling.
+- Crafting materials and costs.
+
+### Milestone 4: Expanded combat
+
+- Implement the full active skill catalogues.
+- Add skill modification mechanics.
+- Implement the five class specialisations per class where applicable, and all six Mage specialisations.
+- Expand enemy AI and elite modifiers.
+- Add summons, traps, turrets, status effects, and their interactions.
+
+### Milestone 5: Dungeon progression
+
+- Six dungeon tiers.
+- Procedural room selection and encounter variation.
+- Dungeon modifiers.
+- Minibosses and bosses.
+- Tier unlocks.
+- Endgame reward progression.
+
+### Milestone 6: Polish and reliability
+
+- Finalise UI and pixel-art effects.
+- Improve animation and combat feedback.
+- Add audio.
+- Implement save/load.
+- Balance progression and loot.
+- Test all core gameplay loops.
+
+These milestones describe development order, not permission to omit requested systems from the final design.
+
+If the full feature set cannot be completed within the available implementation budget, finish a stable, playable vertical slice first, then continue expanding it. Clearly identify any incomplete features rather than presenting placeholders as finished systems.
+
+### Acceptance tests
+
+Verify that:
+- All three classes can be selected and played.
+- Each class has its own starting equipment and abilities.
+- Enemies can take damage, attack, die, and drop loot.
+- Equipment can be collected, equipped, compared, sold, and salvaged.
+- Random affixes generate valid items.
+- Crafting consumes the correct resources and updates item statistics.
+- Passive nodes obey prerequisites and grant their intended effects.
+- Skill damage is correctly affected by equipment and passive nodes.
+- Ranger turrets and traps function correctly.
+- Mage summons attack enemies and obey their configured limits.
+- Warrior shields and two-handed weapons function correctly.
+- Dungeon difficulty and rewards scale appropriately by tier.
+- Bosses can be defeated and award rewards.
+- The player can die, restart or return safely, and continue playing.
+- Saving and loading restore the correct character state.
+- No critical gameplay loop depends on a nonfunctional UI element.
+
+## 16. Final Deliverables
+
+Produce:
+
+1. A playable game project with organised, readable source code.
+2. All required scripts, scenes, configuration files, and data definitions.
+3. Original or clearly identified placeholder pixel-art assets.
+4. The three playable classes and their active skill systems.
+5. A functioning interconnected passive skill tree with minor, greater, and keystone nodes.
+6. A randomised loot and equipment system.
+7. A basic gear crafting system.
+8. A multi-tier dungeon system with elite enemies and bosses.
+9. Inventory, character sheet, crafting, skill tree, and dungeon interfaces.
+10. A persistent save/load system.
+11. Instructions for running the project.
+12. A clear list of implemented features, known limitations, and recommended next development steps.
+
+Prioritise functional gameplay, system integration, and maintainable architecture over excessive menus or visual polish that conceals missing mechanics.
+
+The finished game should feel like the foundation of a deep, replayable dark fantasy action RPG: satisfying combat, hundreds of possible build combinations, exciting loot discoveries, meaningful crafting decisions, and increasingly dangerous dungeons that reward continued experimentation.
+
+Begin by establishing the architecture and a playable vertical slice, then expand each system until the game fulfils the specification above.

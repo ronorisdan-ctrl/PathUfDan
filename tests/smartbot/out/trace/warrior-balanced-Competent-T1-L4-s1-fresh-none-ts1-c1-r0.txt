@@ -1,0 +1,66 @@
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, ground_slam, piercing_thrust
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, piercing_thrust, ground_slam
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] PASSIVE h_mw5 (Battle Scholar) value 0.0686
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] PASSIVE c_w1 (Endurance) value 0.0420
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] PASSIVE c_w2 (Grit) value 0.0678
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] BUY uncommon Plate Cuirass of Dexterity for 72 gold (expected score +0.024)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] EQUIP chest <- uncommon Plate Cuirass of Dexterity (ilvl 4, 0 sockets) replacing Plate Cuirass, score +0.024
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] CRAFT Upgrade Base on Hooked Spear (main_hand) cost 21 gold, 2 Scrap, 1 Iron Fragment, score +0.081
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] GEM socket diamond:0 into gloves socket 1 (score +0.010)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] BAG sold 1 (+9 gold), salvaged 0, kept 0
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] KIT {"dps_est":62,"ehp_est":311,"equipment":{"amulet":"common Bone Amulet ilvl4 sockets=0 gems=[]","belt":"common Leather Belt ilvl2 sockets=0 gems=[]","boots":"common Chain Boots ilvl1 sockets=0 gems=[]","charm":"uncommon Blood Charm of Feasting ilvl4 sockets=0 gems=[]","chest":"uncommon Plate Cuirass of Dexterity ilvl4 sockets=0 gems=[]","gloves":"common Iron Gauntlets ilvl4 sockets=1 gems=[\"diamond:0\"]","helmet":"rare Blood Spire ilvl1 sockets=0 gems=[]","main_hand":"common Hooked Spear ilvl2 sockets=0 gems=[]","ring1":"uncommon Jagged Iron Ring ilvl1 sockets=0 gems=[]","ring2":"common Iron Ring ilvl2 sockets=0 gems=[]"},"gold":61,"hotbar":["heavy_strike","cleave","iron_guard","shield_charge","quick_slash","piercing_thrust","ground_slam"],"keystones":[],"level":4,"life":236,"passives":4,"pouch":{},"runes":{},"spec":"","spec_nodes":[]}
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] RUN start forgotten_depths L4 mods=[] monster_level=4 hotbar=["heavy_strike", "cleave", "iron_guard", "shield_charge", "quick_slash", "piercing_thrust", "ground_slam"]
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    2.92] DODGE move Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    3.35] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   11.43] DODGE move Grave Brute:aoe (hit in 0.58s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   11.45] DODGE roll Grave Brute:aoe (hit in 0.58s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   13.48] DODGE roll Rotting Ghoul:melee (hit in 0.10s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   14.38] DODGE move Grave Brute:aoe (hit in 0.58s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   14.90] DODGE move Grave Brute:aoe (hit in 0.58s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   16.52] DODGE roll Grave Brute:aoe (hit in 0.57s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   16.88] DODGE move Grave Brute:aoe (hit in 0.57s) -> partial
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   18.48] DODGE move Grave Brute:aoe (hit in 0.57s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   26.43] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   27.53] DODGE roll Rotting Ghoul:melee (hit in 0.07s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   28.63] DODGE roll Bilious Bloater:aoe (hit in 0.38s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   33.82] BOSS spawned
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   34.78] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   38.82] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   42.85] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   46.95] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   49.17] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   51.18] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   55.38] DODGE roll Sir Morcant, the Drowned Warden:cleave (hit in 0.37s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   59.02] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   59.02] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.75s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   64.25] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   64.25] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.40s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   65.77] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   65.77] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.75s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   67.28] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.37s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   69.10] DODGE roll Sir Morcant, the Drowned Warden:cleave (hit in 0.37s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   71.63] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   72.68] DODGE move Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> partial
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   72.68] DODGE move Sir Morcant, the Drowned Warden:eruption (hit in 0.75s) -> partial
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   72.78] DODGE move Sir Morcant, the Drowned Warden:eruption (hit in 0.30s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   73.95] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   76.05] DODGE roll Sir Morcant, the Drowned Warden:ring (hit in 0.40s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   77.58] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   83.05] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   84.62] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   85.93] BOSS killed
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   85.93] PASSIVE c_w3 (Endurance) value 0.0544
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   85.93] PASSIVE c_core (Heart of the Web) value 0.0953
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   85.93] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, piercing_thrust, whirlwind
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   86.13] DODGE roll death_explosion (hit in 0.40s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0   86.15] RUN end boss_killed in 86.1s, damage taken 430, dodges 38 (rolls 22), avoided 37, potions 0
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] EQUIP main_hand <- uncommon Reaver Greataxe of Slaughter (ilvl 4, 0 sockets) replacing Hooked Spear, score +0.011
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] EQUIP amulet <- common Bone Amulet (ilvl 4, 1 sockets) replacing Bone Amulet, score +0.006
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] BAG sold 4 (+37 gold), salvaged 1, kept 0
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] BUY rare Dusk Grasp for 168 gold (expected score +0.037)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] EQUIP ring2 <- rare Dusk Grasp (ilvl 5, 0 sockets) replacing Iron Ring, score +0.037
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] CRAFT Upgrade Base on Reaver Greataxe of Slaughter (main_hand) cost 27 gold, 2 Scrap, 1 Iron Fragment, score +0.085
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] CRAFT Upgrade Base on Plate Cuirass of Dexterity (chest) cost 27 gold, 2 Scrap, 1 Iron Fragment, score +0.005
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] CRAFT Upgrade Base on Blood Spire (helmet) cost 18 gold, 2 Scrap, 1 Iron Fragment, score +0.001
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] GEM socket sapphire:0 into amulet socket 1 (score +0.008)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c1-r0    0.00] BAG sold 1 (+6 gold), salvaged 0, kept 0

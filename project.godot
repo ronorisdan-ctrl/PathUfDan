@@ -1,0 +1,42 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Path of Dan"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.0", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+Data="*res://scripts/core/data.gd"
+Events="*res://scripts/core/events.gd"
+Art="*res://scripts/gfx/art.gd"
+Sfx="*res://scripts/core/sfx.gd"
+Combat="*res://scripts/combat/combat.gd"
+Loot="*res://scripts/core/loot.gd"
+Game="*res://scripts/core/game.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[editor]
+
+export/convert_text_resources_to_binary=false
+
+[rendering]
+
+environment/defaults/default_clear_color=Color(0.02, 0.02, 0.03, 1)
+textures/canvas_textures/default_texture_filter=0

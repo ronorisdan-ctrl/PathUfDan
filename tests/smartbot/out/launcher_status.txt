@@ -1,0 +1,6 @@
+2026-10-25T05:06:27  jobs=5 parallel=1 cpus=16  ALL DONE
+job 0 [done] exit=0 secs=48.397 errors=2 :: --class=ranger --tier=2 --runs=10 --seed=7 --profile=Expert --jobs=10 --out=res://tests/smartbot/out/det3_a.csv
+job 1 [done] exit=0 secs=48.474 errors=2 :: --class=ranger --tier=2 --runs=10 --seed=7 --profile=Expert --jobs=10 --out=res://tests/smartbot/out/det3_b.csv
+job 2 [done] exit=0 secs=43.865 errors=2 :: --class=mage --tier=2 --runs=5 --mode=carry --carry=2 --seed=7 --profile=Competent --jobs=5 --out=res://tests/smartbot/out/det3_carry_a.csv
+job 3 [done] exit=0 secs=43.878 errors=2 :: --class=mage --tier=2 --runs=5 --mode=carry --carry=2 --seed=7 --profile=Competent --jobs=5 --out=res://tests/smartbot/out/det3_carry_b.csv
+job 4 [done] exit=1 secs=316.878 errors=0 :: realtime scene=res://tests/test_runner.tscn

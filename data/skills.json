@@ -1,0 +1,2581 @@
+[
+ {
+  "id": "cleave",
+  "name": "Cleave",
+  "class": "warrior",
+  "unlock_level": 1,
+  "kind": "attack",
+  "behavior": "melee_arc",
+  "desc": "Sweep your weapon through all enemies in a wide arc in front of you.",
+  "tags": [
+   "attack",
+   "melee",
+   "area"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 100,
+  "speed_mult": 1.0,
+  "cost": 0,
+  "cooldown": 0,
+  "range": 36,
+  "arc": 150,
+  "knockback": 10,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#d8d0c0",
+  "icon": "cleave"
+ },
+ {
+  "id": "heavy_strike",
+  "name": "Heavy Strike",
+  "class": "warrior",
+  "unlock_level": 1,
+  "kind": "attack",
+  "behavior": "melee_arc",
+  "desc": "A slow, crushing blow that staggers enemies and knocks them back.",
+  "tags": [
+   "attack",
+   "melee",
+   "slam"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 240,
+  "speed_mult": 1.6,
+  "cost": 5,
+  "cooldown": 0,
+  "range": 32,
+  "arc": 75,
+  "knockback": 45,
+  "status": {
+   "type": "stun",
+   "chance": 60
+  },
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#ffcf6a",
+  "icon": "heavy"
+ },
+ {
+  "id": "ground_slam",
+  "name": "Ground Slam",
+  "class": "warrior",
+  "unlock_level": 2,
+  "kind": "attack",
+  "behavior": "ground_aoe",
+  "desc": "Smash the ground in front of you, damaging every enemy in a radius.",
+  "tags": [
+   "attack",
+   "melee",
+   "area",
+   "slam"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 150,
+  "speed_mult": 1.35,
+  "cost": 9,
+  "cooldown": 0,
+  "at_self": true,
+  "forward": 22,
+  "radius": 58,
+  "delay": 0.0,
+  "status": {
+   "type": "stun",
+   "chance": 25
+  },
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#b0906a",
+  "icon": "slam"
+ },
+ {
+  "id": "shield_charge",
+  "name": "Shield Charge",
+  "class": "warrior",
+  "unlock_level": 3,
+  "kind": "attack",
+  "behavior": "dash",
+  "desc": "Rush forward, colliding with every enemy in your path. Deals 40% more damage with a shield equipped.",
+  "tags": [
+   "attack",
+   "melee",
+   "movement"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 120,
+  "speed_mult": 0.8,
+  "cost": 8,
+  "cooldown": 3.0,
+  "distance": 130,
+  "duration": 0.28,
+  "radius": 20,
+  "damage": true,
+  "shield_bonus": 40,
+  "knockback": 35,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#d0c8b0",
+  "icon": "charge"
+ },
+ {
+  "id": "iron_guard",
+  "name": "Iron Guard",
+  "class": "warrior",
+  "unlock_level": 4,
+  "kind": "utility",
+  "behavior": "buff",
+  "desc": "Brace yourself: 80% increased Armour and 10% damage reduction for 6 seconds.",
+  "tags": [
+   "buff",
+   "defence"
+  ],
+  "use_time": 0.3,
+  "cost": 10,
+  "cooldown": 14,
+  "duration": 6,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 80
+   },
+   {
+    "stat": "damage_reduction",
+    "type": "flat",
+    "value": 10
+   }
+  ],
+  "fx": "#9ab0c8",
+  "icon": "guard"
+ },
+ {
+  "id": "seismic_wave",
+  "name": "Seismic Wave",
+  "class": "warrior",
+  "unlock_level": 6,
+  "kind": "attack",
+  "behavior": "projectile",
+  "desc": "Send a shockwave along the ground that tears through every enemy in a line.",
+  "tags": [
+   "attack",
+   "melee",
+   "area"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 115,
+  "speed_mult": 1.25,
+  "cost": 11,
+  "cooldown": 0,
+  "speed": 230,
+  "count": 1,
+  "spread": 0,
+  "pierce": 99,
+  "max_range": 230,
+  "size": 14,
+  "proj": "wave",
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#b0906a",
+  "icon": "wave"
+ },
+ {
+  "id": "war_cry",
+  "name": "War Cry",
+  "class": "warrior",
+  "unlock_level": 8,
+  "kind": "utility",
+  "behavior": "nova",
+  "desc": "Roar, intimidating nearby enemies (they take 15% more damage) and gaining 25% increased damage for 6 seconds.",
+  "tags": [
+   "buff",
+   "warcry",
+   "area"
+  ],
+  "use_time": 0.4,
+  "cost": 12,
+  "cooldown": 12,
+  "radius": 110,
+  "damage": false,
+  "status": {
+   "type": "intimidate",
+   "chance": 100,
+   "duration": 6
+  },
+  "self_buff": {
+   "duration": 6,
+   "mods": [
+    {
+     "stat": "damage",
+     "type": "inc",
+     "value": 25
+    }
+   ]
+  },
+  "fx": "#e06040",
+  "icon": "cry"
+ },
+ {
+  "id": "quick_shot",
+  "name": "Quick Shot",
+  "class": "ranger",
+  "unlock_level": 1,
+  "kind": "attack",
+  "behavior": "projectile",
+  "desc": "Fire a fast projectile at the target.",
+  "tags": [
+   "attack",
+   "projectile"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 100,
+  "speed_mult": 1.0,
+  "cost": 0,
+  "cooldown": 0,
+  "speed": 480,
+  "count": 1,
+  "spread": 0,
+  "pierce": 0,
+  "max_range": 360,
+  "size": 4,
+  "proj": "arrow",
+  "weapon_req": [
+   "ranged"
+  ],
+  "fx": "#e0d8b0",
+  "icon": "shot"
+ },
+ {
+  "id": "multishot",
+  "name": "Multishot",
+  "class": "ranger",
+  "unlock_level": 1,
+  "kind": "attack",
+  "behavior": "projectile",
+  "desc": "Release a spread of five projectiles.",
+  "tags": [
+   "attack",
+   "projectile"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 62,
+  "speed_mult": 1.15,
+  "cost": 6,
+  "cooldown": 0,
+  "speed": 440,
+  "count": 5,
+  "spread": 42,
+  "pierce": 0,
+  "max_range": 320,
+  "size": 4,
+  "proj": "arrow",
+  "weapon_req": [
+   "ranged"
+  ],
+  "fx": "#e0d8b0",
+  "icon": "multi"
+ },
+ {
+  "id": "explosive_mine",
+  "name": "Explosive Mine",
+  "class": "ranger",
+  "unlock_level": 2,
+  "kind": "trap",
+  "behavior": "deploy",
+  "desc": "Throw a mine that arms after a moment and detonates when an enemy approaches. Up to 5 mines.",
+  "tags": [
+   "trap",
+   "mine",
+   "area",
+   "fire"
+  ],
+  "dmg_type": "fire",
+  "base_damage": [
+   14,
+   22
+  ],
+  "use_time": 0.45,
+  "cost": 7,
+  "cooldown": 0,
+  "deployable": "mine",
+  "max": 5,
+  "max_range": 180,
+  "radius": 56,
+  "trigger_radius": 36,
+  "duration": 20,
+  "status": {
+   "type": "ignite",
+   "chance": 30
+  },
+  "fx": "#ff8a3a",
+  "icon": "mine"
+ },
+ {
+  "id": "ballista_turret",
+  "name": "Ballista Turret",
+  "class": "ranger",
+  "unlock_level": 3,
+  "kind": "turret",
+  "behavior": "deploy",
+  "desc": "Deploy a turret that automatically fires bolts at nearby enemies for 15 seconds. Up to 2 turrets.",
+  "tags": [
+   "turret",
+   "projectile"
+  ],
+  "dmg_type": "physical",
+  "base_damage": [
+   6,
+   10
+  ],
+  "use_time": 0.6,
+  "cost": 14,
+  "cooldown": 1.5,
+  "deployable": "turret",
+  "max": 2,
+  "max_range": 120,
+  "duration": 15,
+  "fire_rate": 1.4,
+  "range": 240,
+  "fx": "#c8a060",
+  "icon": "turret"
+ },
+ {
+  "id": "rain_of_arrows",
+  "name": "Rain of Arrows",
+  "class": "ranger",
+  "unlock_level": 4,
+  "kind": "attack",
+  "behavior": "ground_aoe",
+  "desc": "Bombard the target area with several volleys of arrows.",
+  "tags": [
+   "attack",
+   "projectile",
+   "area"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 55,
+  "speed_mult": 1.2,
+  "cost": 12,
+  "cooldown": 0,
+  "at_self": false,
+  "max_range": 300,
+  "radius": 40,
+  "delay": 0.35,
+  "repeats": 5,
+  "interval": 0.16,
+  "scatter": 34,
+  "weapon_req": [
+   "ranged"
+  ],
+  "fx": "#e0d8b0",
+  "icon": "rain"
+ },
+ {
+  "id": "piercing_arrow",
+  "name": "Piercing Arrow",
+  "class": "ranger",
+  "unlock_level": 6,
+  "kind": "attack",
+  "behavior": "projectile",
+  "desc": "Fire a heavy shot that pierces through every enemy in a line.",
+  "tags": [
+   "attack",
+   "projectile"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 145,
+  "speed_mult": 1.3,
+  "cost": 8,
+  "cooldown": 0,
+  "speed": 620,
+  "count": 1,
+  "spread": 0,
+  "pierce": 99,
+  "max_range": 420,
+  "size": 5,
+  "proj": "bolt",
+  "weapon_req": [
+   "ranged"
+  ],
+  "fx": "#ffffff",
+  "icon": "pierce"
+ },
+ {
+  "id": "hunters_focus",
+  "name": "Hunter's Focus",
+  "class": "ranger",
+  "unlock_level": 8,
+  "kind": "utility",
+  "behavior": "buff",
+  "desc": "Steady your aim: 60% increased critical chance and 20% increased projectile damage for 6 seconds.",
+  "tags": [
+   "buff"
+  ],
+  "use_time": 0.2,
+  "cost": 10,
+  "cooldown": 15,
+  "duration": 6,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 60
+   },
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 20
+   }
+  ],
+  "fx": "#a0e080",
+  "icon": "focus"
+ },
+ {
+  "id": "firebolt",
+  "name": "Firebolt",
+  "class": "mage",
+  "unlock_level": 1,
+  "kind": "spell",
+  "behavior": "projectile",
+  "desc": "Launch a bolt of fire that may ignite its target.",
+  "tags": [
+   "spell",
+   "projectile",
+   "fire"
+  ],
+  "dmg_type": "fire",
+  "base_damage": [
+   7,
+   11
+  ],
+  "crit": 6,
+  "use_time": 0.7,
+  "cost": 4,
+  "cooldown": 0,
+  "speed": 340,
+  "count": 1,
+  "spread": 0,
+  "pierce": 0,
+  "max_range": 360,
+  "size": 6,
+  "proj": "fire",
+  "status": {
+   "type": "ignite",
+   "chance": 20
+  },
+  "fx": "#ff7a2a",
+  "icon": "fire"
+ },
+ {
+  "id": "frost_nova",
+  "name": "Frost Nova",
+  "class": "mage",
+  "unlock_level": 1,
+  "kind": "spell",
+  "behavior": "nova",
+  "desc": "Release a ring of frost around you, chilling every enemy it touches.",
+  "tags": [
+   "spell",
+   "area",
+   "cold"
+  ],
+  "dmg_type": "cold",
+  "base_damage": [
+   8,
+   12
+  ],
+  "crit": 6,
+  "use_time": 0.75,
+  "cost": 10,
+  "cooldown": 2.5,
+  "radius": 85,
+  "damage": true,
+  "status": {
+   "type": "chill",
+   "chance": 100
+  },
+  "fx": "#8ad8ff",
+  "icon": "nova"
+ },
+ {
+  "id": "summon_skeletons",
+  "name": "Summon Skeletons",
+  "class": "mage",
+  "unlock_level": 2,
+  "kind": "minion",
+  "behavior": "summon",
+  "desc": "Raise two skeletal warriors that follow you and attack enemies. Up to 4 skeletons.",
+  "tags": [
+   "minion",
+   "summon"
+  ],
+  "use_time": 0.9,
+  "cost": 14,
+  "cooldown": 0.5,
+  "minion": "skeleton_warrior",
+  "count": 2,
+  "max": 4,
+  "fx": "#d0d8c0",
+  "icon": "skull"
+ },
+ {
+  "id": "chain_lightning",
+  "name": "Chain Lightning",
+  "class": "mage",
+  "unlock_level": 3,
+  "kind": "spell",
+  "behavior": "chain",
+  "desc": "Strike the nearest enemy to your cursor with lightning that jumps between foes.",
+  "tags": [
+   "spell",
+   "lightning",
+   "chaining"
+  ],
+  "dmg_type": "lightning",
+  "base_damage": [
+   3,
+   19
+  ],
+  "crit": 7,
+  "use_time": 0.75,
+  "cost": 9,
+  "cooldown": 0,
+  "max_range": 240,
+  "chains": 4,
+  "chain_range": 120,
+  "status": {
+   "type": "shock",
+   "chance": 25
+  },
+  "fx": "#c8d8ff",
+  "icon": "bolt"
+ },
+ {
+  "id": "blink",
+  "name": "Blink",
+  "class": "mage",
+  "unlock_level": 4,
+  "kind": "utility",
+  "behavior": "blink",
+  "desc": "Teleport a short distance toward your cursor.",
+  "tags": [
+   "spell",
+   "movement",
+   "arcane"
+  ],
+  "use_time": 0.15,
+  "cost": 8,
+  "cooldown": 2.5,
+  "max_range": 150,
+  "fx": "#c080ff",
+  "icon": "blink"
+ },
+ {
+  "id": "meteor",
+  "name": "Meteor",
+  "class": "mage",
+  "unlock_level": 5,
+  "kind": "spell",
+  "behavior": "ground_aoe",
+  "desc": "Call down a meteor that crashes into the target area after a short delay.",
+  "tags": [
+   "spell",
+   "area",
+   "fire"
+  ],
+  "dmg_type": "fire",
+  "base_damage": [
+   28,
+   40
+  ],
+  "crit": 6,
+  "use_time": 0.9,
+  "cost": 20,
+  "cooldown": 4,
+  "at_self": false,
+  "max_range": 300,
+  "radius": 66,
+  "delay": 0.9,
+  "status": {
+   "type": "ignite",
+   "chance": 50
+  },
+  "fx": "#ff5a1a",
+  "icon": "meteor"
+ },
+ {
+  "id": "ice_lance",
+  "name": "Ice Lance",
+  "class": "mage",
+  "unlock_level": 7,
+  "kind": "spell",
+  "behavior": "projectile",
+  "desc": "Launch a fast spear of ice that pierces up to three enemies.",
+  "tags": [
+   "spell",
+   "projectile",
+   "cold"
+  ],
+  "dmg_type": "cold",
+  "base_damage": [
+   10,
+   15
+  ],
+  "crit": 8,
+  "use_time": 0.7,
+  "cost": 7,
+  "cooldown": 0,
+  "speed": 540,
+  "count": 1,
+  "spread": 0,
+  "pierce": 3,
+  "max_range": 400,
+  "size": 5,
+  "proj": "ice",
+  "status": {
+   "type": "chill",
+   "chance": 40
+  },
+  "fx": "#8ad8ff",
+  "icon": "lance"
+ },
+ {
+  "id": "whirlwind",
+  "name": "Whirlwind",
+  "class": "warrior",
+  "unlock_level": 5,
+  "kind": "attack",
+  "behavior": "melee_arc",
+  "desc": "Spin with your weapon, striking all around you. Hold to keep spinning; you can move at near full speed.",
+  "tags": [
+   "attack",
+   "melee",
+   "area",
+   "channel"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 55,
+  "speed_mult": 0.45,
+  "cost": 3,
+  "cooldown": 0,
+  "range": 34,
+  "arc": 360,
+  "knockback": 0,
+  "move_mult": 0.85,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#e0e0f0",
+  "icon": "spin",
+  "stage3": true
+ },
+ {
+  "id": "battle_leap",
+  "name": "Battle Leap",
+  "class": "warrior",
+  "unlock_level": 9,
+  "kind": "attack",
+  "behavior": "leap",
+  "desc": "Leap to the target location, crashing down on enemies where you land. You cannot be hit mid-air.",
+  "tags": [
+   "attack",
+   "melee",
+   "area",
+   "movement",
+   "slam"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 160,
+  "speed_mult": 1.0,
+  "cost": 12,
+  "cooldown": 4,
+  "max_range": 170,
+  "duration": 0.35,
+  "radius": 55,
+  "knockback": 30,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#d0b080",
+  "icon": "leap",
+  "stage3": true
+ },
+ {
+  "id": "chain_hook",
+  "name": "Chain Hook",
+  "class": "warrior",
+  "unlock_level": 10,
+  "kind": "attack",
+  "behavior": "projectile",
+  "desc": "Hurl a hooked chain that drags the first enemy hit to you and staggers it.",
+  "tags": [
+   "attack",
+   "projectile"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 80,
+  "speed_mult": 0.9,
+  "cost": 8,
+  "cooldown": 3,
+  "speed": 520,
+  "count": 1,
+  "spread": 0,
+  "pierce": 0,
+  "max_range": 220,
+  "size": 5,
+  "proj": "bolt",
+  "pull": true,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#a0a8b0",
+  "icon": "hook",
+  "stage3": true
+ },
+ {
+  "id": "earthquake",
+  "name": "Earthquake",
+  "class": "warrior",
+  "unlock_level": 12,
+  "kind": "attack",
+  "behavior": "ground_aoe",
+  "desc": "Strike the ground, cracking it at the target area; an aftershock erupts there a moment later.",
+  "tags": [
+   "attack",
+   "melee",
+   "area",
+   "slam"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 120,
+  "speed_mult": 1.3,
+  "cost": 14,
+  "cooldown": 0,
+  "at_self": false,
+  "max_range": 150,
+  "radius": 60,
+  "delay": 0.25,
+  "aftershock": true,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#b09060",
+  "icon": "quake",
+  "stage3": true
+ },
+ {
+  "id": "berserker_rage",
+  "name": "Berserker Rage",
+  "class": "warrior",
+  "unlock_level": 14,
+  "kind": "utility",
+  "behavior": "buff",
+  "desc": "Enter a rage: 35% more damage and 15% increased attack speed, but 30% less armour for 7 seconds.",
+  "tags": [
+   "buff"
+  ],
+  "use_time": 0.3,
+  "cost": 10,
+  "cooldown": 18,
+  "duration": 7,
+  "mods": [
+   {
+    "stat": "damage",
+    "type": "more",
+    "value": 35
+   },
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 15
+   },
+   {
+    "stat": "armour",
+    "type": "more",
+    "value": -30
+   }
+  ],
+  "fx": "#ff4030",
+  "icon": "rage",
+  "stage3": true
+ },
+ {
+  "id": "executioners_blow",
+  "name": "Executioner's Blow",
+  "class": "warrior",
+  "unlock_level": 16,
+  "kind": "attack",
+  "behavior": "melee_arc",
+  "desc": "A precise killing strike. Deals 150% more damage to enemies below 35% life.",
+  "tags": [
+   "attack",
+   "melee"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 180,
+  "speed_mult": 1.3,
+  "cost": 8,
+  "cooldown": 0,
+  "range": 32,
+  "arc": 60,
+  "execute": 150,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#ff6060",
+  "icon": "execute",
+  "stage3": true
+ },
+ {
+  "id": "shield_bash",
+  "name": "Shield Bash",
+  "class": "warrior",
+  "unlock_level": 7,
+  "kind": "attack",
+  "behavior": "melee_arc",
+  "desc": "Bash enemies in front of you with your shield, stunning them. Deals 60% more damage with a shield (scaled by armour).",
+  "tags": [
+   "attack",
+   "melee"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 90,
+  "speed_mult": 0.9,
+  "cost": 6,
+  "cooldown": 1.5,
+  "range": 26,
+  "arc": 90,
+  "knockback": 55,
+  "status": {
+   "type": "stun",
+   "chance": 100
+  },
+  "shield_bonus": 60,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#c0c8ff",
+  "icon": "bash",
+  "stage3": true
+ },
+ {
+  "id": "titans_fall",
+  "name": "Titan's Fall",
+  "class": "warrior",
+  "unlock_level": 20,
+  "kind": "attack",
+  "behavior": "ground_aoe",
+  "desc": "Ultimate. Bring down a colossal overhead strike on the target area, then a second shockwave.",
+  "tags": [
+   "attack",
+   "melee",
+   "area",
+   "slam",
+   "ultimate"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 420,
+  "speed_mult": 1.8,
+  "cost": 30,
+  "cooldown": 20,
+  "at_self": false,
+  "max_range": 120,
+  "radius": 90,
+  "delay": 0.55,
+  "aftershock": true,
+  "status": {
+   "type": "stun",
+   "chance": 80
+  },
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#ffd060",
+  "icon": "titan",
+  "stage3": true
+ },
+ {
+  "id": "barrage",
+  "name": "Barrage",
+  "class": "ranger",
+  "unlock_level": 5,
+  "kind": "attack",
+  "behavior": "projectile",
+  "desc": "Hold to unleash a rapid stream of projectiles.",
+  "tags": [
+   "attack",
+   "projectile",
+   "channel"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 45,
+  "speed_mult": 0.35,
+  "cost": 2,
+  "cooldown": 0,
+  "speed": 520,
+  "count": 1,
+  "spread": 0,
+  "jitter": 7,
+  "pierce": 0,
+  "max_range": 340,
+  "size": 4,
+  "proj": "arrow",
+  "move_mult": 0.5,
+  "weapon_req": [
+   "ranged"
+  ],
+  "fx": "#e0d8b0",
+  "icon": "barrage",
+  "stage3": true
+ },
+ {
+  "id": "explosive_arrow",
+  "name": "Explosive Arrow",
+  "class": "ranger",
+  "unlock_level": 7,
+  "kind": "attack",
+  "behavior": "projectile",
+  "desc": "Fire a projectile that explodes on impact, damaging everything nearby and igniting.",
+  "tags": [
+   "attack",
+   "projectile",
+   "area",
+   "fire"
+  ],
+  "dmg_type": "physical",
+  "convert": false,
+  "weapon_eff": 110,
+  "speed_mult": 1.2,
+  "cost": 9,
+  "cooldown": 0,
+  "speed": 420,
+  "count": 1,
+  "spread": 0,
+  "pierce": 0,
+  "max_range": 320,
+  "size": 5,
+  "proj": "fire",
+  "explode_radius": 42,
+  "status": {
+   "type": "ignite",
+   "chance": 30
+  },
+  "weapon_req": [
+   "ranged"
+  ],
+  "fx": "#ff9040",
+  "icon": "explode",
+  "stage3": true
+ },
+ {
+  "id": "bear_trap",
+  "name": "Bear Trap",
+  "class": "ranger",
+  "unlock_level": 9,
+  "kind": "trap",
+  "behavior": "deploy",
+  "desc": "Set a steel trap that clamps the first enemy to step in, holding it in place for 2 seconds.",
+  "tags": [
+   "trap",
+   "physical"
+  ],
+  "dmg_type": "physical",
+  "base_damage": [
+   20,
+   30
+  ],
+  "use_time": 0.45,
+  "cost": 6,
+  "cooldown": 0,
+  "deployable": "mine",
+  "trap_effect": "bear",
+  "hold": 2.0,
+  "max": 3,
+  "max_range": 160,
+  "radius": 20,
+  "trigger_radius": 18,
+  "duration": 25,
+  "fx": "#a0a8b0",
+  "icon": "beartrap",
+  "stage3": true
+ },
+ {
+  "id": "frost_snare",
+  "name": "Frost Snare",
+  "class": "ranger",
+  "unlock_level": 11,
+  "kind": "trap",
+  "behavior": "deploy",
+  "desc": "A trap that bursts into a freezing field, chilling and slowing everything inside for 4 seconds.",
+  "tags": [
+   "trap",
+   "area",
+   "cold"
+  ],
+  "dmg_type": "cold",
+  "base_damage": [
+   6,
+   9
+  ],
+  "use_time": 0.45,
+  "cost": 8,
+  "cooldown": 0,
+  "deployable": "mine",
+  "trap_effect": "snare",
+  "max": 3,
+  "max_range": 170,
+  "radius": 60,
+  "trigger_radius": 34,
+  "duration": 25,
+  "zone_duration": 4,
+  "tick_fraction": 0.25,
+  "zone_status": [
+   {
+    "type": "chill",
+    "chance": 100
+   },
+   {
+    "type": "snare",
+    "chance": 40,
+    "duration": 1.0
+   }
+  ],
+  "fx": "#90d8ff",
+  "icon": "snare",
+  "stage3": true
+ },
+ {
+  "id": "lightning_trap",
+  "name": "Lightning Trap",
+  "class": "ranger",
+  "unlock_level": 13,
+  "kind": "trap",
+  "behavior": "deploy",
+  "desc": "A trap that discharges lightning between up to five nearby enemies.",
+  "tags": [
+   "trap",
+   "lightning",
+   "chaining"
+  ],
+  "dmg_type": "lightning",
+  "base_damage": [
+   8,
+   30
+  ],
+  "use_time": 0.45,
+  "cost": 9,
+  "cooldown": 0,
+  "deployable": "mine",
+  "trap_effect": "lightning",
+  "chains": 5,
+  "max": 4,
+  "max_range": 170,
+  "radius": 100,
+  "trigger_radius": 36,
+  "duration": 25,
+  "status": {
+   "type": "shock",
+   "chance": 35
+  },
+  "fx": "#e0f070",
+  "icon": "ltrap",
+  "stage3": true
+ },
+ {
+  "id": "repeater_turret",
+  "name": "Repeater Turret",
+  "class": "ranger",
+  "unlock_level": 10,
+  "kind": "turret",
+  "behavior": "deploy",
+  "desc": "Deploy a turret that fires rapid, low-damage bolts.",
+  "tags": [
+   "turret",
+   "projectile"
+  ],
+  "dmg_type": "physical",
+  "base_damage": [
+   3,
+   5
+  ],
+  "use_time": 0.6,
+  "cost": 14,
+  "cooldown": 1.5,
+  "deployable": "turret",
+  "max": 2,
+  "max_range": 120,
+  "duration": 14,
+  "fire_rate": 4.0,
+  "jitter": 6,
+  "range": 220,
+  "fx": "#d0c080",
+  "tint": "#b0a070",
+  "icon": "turret",
+  "stage3": true
+ },
+ {
+  "id": "cannon_turret",
+  "name": "Cannon Turret",
+  "class": "ranger",
+  "unlock_level": 15,
+  "kind": "turret",
+  "behavior": "deploy",
+  "desc": "Deploy a heavy turret that lobs slow explosive shells.",
+  "tags": [
+   "turret",
+   "projectile",
+   "area",
+   "fire"
+  ],
+  "dmg_type": "fire",
+  "base_damage": [
+   18,
+   28
+  ],
+  "use_time": 0.8,
+  "cost": 18,
+  "cooldown": 2,
+  "deployable": "turret",
+  "max": 2,
+  "max_range": 120,
+  "duration": 14,
+  "fire_rate": 0.6,
+  "speed": 260,
+  "proj": "fire",
+  "size": 6,
+  "explode_radius": 48,
+  "range": 260,
+  "fx": "#ff7030",
+  "tint": "#c05030",
+  "icon": "turret",
+  "stage3": true
+ },
+ {
+  "id": "smoke_bomb",
+  "name": "Smoke Bomb",
+  "class": "ranger",
+  "unlock_level": 8,
+  "kind": "utility",
+  "behavior": "buff",
+  "desc": "Vanish in smoke: 100% increased evasion and 20% movement speed for 5 seconds.",
+  "tags": [
+   "buff",
+   "movement"
+  ],
+  "use_time": 0.2,
+  "cost": 8,
+  "cooldown": 12,
+  "duration": 5,
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 100
+   },
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 20
+   }
+  ],
+  "fx": "#a0a0b0",
+  "icon": "smoke",
+  "stage3": true
+ },
+ {
+  "id": "death_from_above",
+  "name": "Death from Above",
+  "class": "ranger",
+  "unlock_level": 20,
+  "kind": "attack",
+  "behavior": "ground_aoe",
+  "desc": "Ultimate. Call a huge volley that saturates a wide area.",
+  "tags": [
+   "attack",
+   "projectile",
+   "area",
+   "ultimate"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 70,
+  "speed_mult": 1.5,
+  "cost": 28,
+  "cooldown": 18,
+  "at_self": false,
+  "max_range": 300,
+  "radius": 45,
+  "delay": 0.4,
+  "repeats": 14,
+  "interval": 0.08,
+  "scatter": 70,
+  "weapon_req": [
+   "ranged"
+  ],
+  "fx": "#ffe0a0",
+  "icon": "rain",
+  "stage3": true
+ },
+ {
+  "id": "fireball",
+  "name": "Fireball",
+  "class": "mage",
+  "unlock_level": 6,
+  "kind": "spell",
+  "behavior": "projectile",
+  "desc": "Launch an explosive fireball that bursts on impact.",
+  "tags": [
+   "spell",
+   "projectile",
+   "area",
+   "fire"
+  ],
+  "dmg_type": "fire",
+  "base_damage": [
+   14,
+   20
+  ],
+  "crit": 6,
+  "use_time": 0.85,
+  "cost": 10,
+  "cooldown": 0,
+  "speed": 300,
+  "count": 1,
+  "spread": 0,
+  "pierce": 0,
+  "max_range": 380,
+  "size": 7,
+  "proj": "fire",
+  "explode_radius": 46,
+  "status": {
+   "type": "ignite",
+   "chance": 30
+  },
+  "fx": "#ff6020",
+  "icon": "fireball",
+  "stage3": true
+ },
+ {
+  "id": "inferno",
+  "name": "Inferno",
+  "class": "mage",
+  "unlock_level": 9,
+  "kind": "spell",
+  "behavior": "zone",
+  "desc": "Set the target area ablaze. Enemies standing in it burn. Up to 2 infernos.",
+  "tags": [
+   "spell",
+   "area",
+   "fire",
+   "dot"
+  ],
+  "dmg_type": "fire",
+  "base_damage": [
+   8,
+   12
+  ],
+  "crit": 0,
+  "use_time": 0.8,
+  "cost": 14,
+  "cooldown": 0,
+  "max_range": 260,
+  "radius": 55,
+  "duration": 5,
+  "tick": 0.5,
+  "tick_fraction": 0.35,
+  "max": 2,
+  "zone_style": "burning",
+  "zone_status": [
+   {
+    "type": "ignite",
+    "chance": 15
+   }
+  ],
+  "fx": "#ff7a2a",
+  "icon": "inferno",
+  "stage3": true
+ },
+ {
+  "id": "blizzard",
+  "name": "Blizzard",
+  "class": "mage",
+  "unlock_level": 11,
+  "kind": "spell",
+  "behavior": "zone",
+  "desc": "Summon a storm of ice over an area, damaging and chilling enemies inside.",
+  "tags": [
+   "spell",
+   "area",
+   "cold"
+  ],
+  "dmg_type": "cold",
+  "base_damage": [
+   9,
+   14
+  ],
+  "crit": 5,
+  "use_time": 0.9,
+  "cost": 16,
+  "cooldown": 0,
+  "max_range": 260,
+  "radius": 70,
+  "duration": 4,
+  "tick": 0.4,
+  "tick_fraction": 0.3,
+  "max": 1,
+  "zone_style": "frost",
+  "zone_status": [
+   {
+    "type": "chill",
+    "chance": 100
+   }
+  ],
+  "fx": "#a0e0ff",
+  "icon": "blizzard",
+  "stage3": true
+ },
+ {
+  "id": "static_field",
+  "name": "Static Field",
+  "class": "mage",
+  "unlock_level": 13,
+  "kind": "spell",
+  "behavior": "zone",
+  "desc": "Electrify the ground around you, shocking enemies that enter. Moves with nothing - place it well.",
+  "tags": [
+   "spell",
+   "area",
+   "lightning"
+  ],
+  "dmg_type": "lightning",
+  "base_damage": [
+   2,
+   14
+  ],
+  "crit": 8,
+  "use_time": 0.6,
+  "cost": 12,
+  "cooldown": 3,
+  "at_self": true,
+  "radius": 75,
+  "duration": 6,
+  "tick": 0.6,
+  "tick_fraction": 0.35,
+  "max": 1,
+  "zone_style": "storm",
+  "zone_status": [
+   {
+    "type": "shock",
+    "chance": 25
+   }
+  ],
+  "fx": "#e0e870",
+  "icon": "static",
+  "stage3": true
+ },
+ {
+  "id": "arcane_missiles",
+  "name": "Arcane Missiles",
+  "class": "mage",
+  "unlock_level": 8,
+  "kind": "spell",
+  "behavior": "projectile",
+  "desc": "Fire three homing bolts of arcane energy.",
+  "tags": [
+   "spell",
+   "projectile",
+   "arcane"
+  ],
+  "dmg_type": "arcane",
+  "base_damage": [
+   5,
+   8
+  ],
+  "crit": 7,
+  "use_time": 0.75,
+  "cost": 8,
+  "cooldown": 0,
+  "speed": 300,
+  "count": 3,
+  "spread": 40,
+  "pierce": 0,
+  "max_range": 360,
+  "size": 4,
+  "proj": "orb",
+  "homing": 6.0,
+  "fx": "#d090ff",
+  "icon": "missiles",
+  "stage3": true
+ },
+ {
+  "id": "curse_of_frailty",
+  "name": "Curse of Frailty",
+  "class": "mage",
+  "unlock_level": 10,
+  "kind": "spell",
+  "behavior": "curse",
+  "desc": "Curse an area: enemies take 20% more damage and have 20% lower resistances for 8 seconds.",
+  "tags": [
+   "spell",
+   "curse",
+   "area"
+  ],
+  "use_time": 0.5,
+  "cost": 10,
+  "cooldown": 0,
+  "max_range": 280,
+  "radius": 70,
+  "curse": [
+   {
+    "type": "frailty",
+    "chance": 100,
+    "duration": 8
+   }
+  ],
+  "fx": "#c060c0",
+  "icon": "curse",
+  "stage3": true
+ },
+ {
+  "id": "curse_of_agony",
+  "name": "Curse of Agony",
+  "class": "mage",
+  "unlock_level": 12,
+  "kind": "spell",
+  "behavior": "curse",
+  "desc": "Curse an area with lingering agony, dealing void damage over 6 seconds.",
+  "tags": [
+   "spell",
+   "curse",
+   "area",
+   "void",
+   "dot"
+  ],
+  "dmg_type": "void",
+  "base_damage": [
+   10,
+   14
+  ],
+  "use_time": 0.5,
+  "cost": 12,
+  "cooldown": 0,
+  "max_range": 280,
+  "radius": 60,
+  "curse": [
+   {
+    "type": "agony",
+    "chance": 100,
+    "duration": 6
+   }
+  ],
+  "fx": "#8040a0",
+  "icon": "curse",
+  "stage3": true
+ },
+ {
+  "id": "summon_skeleton_archers",
+  "name": "Summon Skeleton Archers",
+  "class": "mage",
+  "unlock_level": 9,
+  "kind": "minion",
+  "behavior": "summon",
+  "desc": "Raise two skeleton archers that shoot from range. Up to 4 archers.",
+  "tags": [
+   "minion",
+   "summon"
+  ],
+  "use_time": 0.9,
+  "cost": 16,
+  "cooldown": 0.5,
+  "minion": "skeleton_archer",
+  "count": 2,
+  "max": 4,
+  "fx": "#d0e0ff",
+  "icon": "skull",
+  "stage3": true
+ },
+ {
+  "id": "summon_fire_elemental",
+  "name": "Summon Fire Elemental",
+  "class": "mage",
+  "unlock_level": 14,
+  "kind": "minion",
+  "behavior": "summon",
+  "desc": "Call a durable fire elemental that hurls flame and ignites enemies. Up to 1.",
+  "tags": [
+   "minion",
+   "summon",
+   "fire"
+  ],
+  "use_time": 1.0,
+  "cost": 22,
+  "cooldown": 4,
+  "minion": "fire_elemental",
+  "count": 1,
+  "max": 1,
+  "fx": "#ff7020",
+  "icon": "skull",
+  "stage3": true
+ },
+ {
+  "id": "mark_of_ruin",
+  "name": "Mark of Ruin",
+  "class": "mage",
+  "unlock_level": 16,
+  "kind": "spell",
+  "behavior": "curse",
+  "desc": "Mark the enemy nearest your cursor: it takes 40% more damage for 6 seconds.",
+  "tags": [
+   "spell",
+   "curse"
+  ],
+  "use_time": 0.3,
+  "cost": 8,
+  "cooldown": 4,
+  "max_range": 300,
+  "radius": 40,
+  "single": true,
+  "curse": [
+   {
+    "type": "marked",
+    "chance": 100,
+    "duration": 6
+   }
+  ],
+  "fx": "#ff3060",
+  "icon": "mark",
+  "stage3": true
+ },
+ {
+  "id": "army_of_the_damned",
+  "name": "Army of the Damned",
+  "class": "mage",
+  "unlock_level": 20,
+  "kind": "minion",
+  "behavior": "summon",
+  "desc": "Ultimate. Raise a temporary army of six shadow wraiths for 12 seconds.",
+  "tags": [
+   "minion",
+   "summon",
+   "ultimate"
+  ],
+  "use_time": 1.2,
+  "cost": 35,
+  "cooldown": 30,
+  "minion": "shadow_wraith",
+  "count": 6,
+  "max": 6,
+  "minion_duration": 12,
+  "fx": "#8060c0",
+  "icon": "skull",
+  "stage3": true
+ },
+ {
+  "id": "disintegration_beam",
+  "name": "Disintegration Beam",
+  "class": "mage",
+  "unlock_level": 18,
+  "kind": "spell",
+  "behavior": "beam",
+  "desc": "Channel a searing arcane beam that hits everything in a line. Hold to sustain.",
+  "tags": [
+   "spell",
+   "arcane",
+   "channel"
+  ],
+  "dmg_type": "arcane",
+  "base_damage": [
+   5,
+   8
+  ],
+  "crit": 6,
+  "use_time": 0.22,
+  "cost": 3,
+  "cooldown": 0,
+  "max_range": 260,
+  "width": 7,
+  "move_mult": 0.35,
+  "fx": "#e0a0ff",
+  "icon": "beam",
+  "stage3": true
+ },
+ {
+  "id": "quick_slash",
+  "name": "Quick Slash",
+  "class": "warrior",
+  "unlock_level": 3,
+  "kind": "attack",
+  "behavior": "melee_arc",
+  "desc": "A rapid flurry of light cuts in a narrow arc.",
+  "tags": [
+   "attack",
+   "melee"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 60,
+  "speed_mult": 0.55,
+  "cost": 0,
+  "cooldown": 0,
+  "range": 30,
+  "arc": 70,
+  "bleed_bonus": true,
+  "status": {
+   "type": "bleed",
+   "chance": 15
+  },
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#f0e0e0",
+  "icon": "slash",
+  "stage3b": true
+ },
+ {
+  "id": "piercing_thrust",
+  "name": "Piercing Thrust",
+  "class": "warrior",
+  "unlock_level": 4,
+  "kind": "attack",
+  "behavior": "beam",
+  "desc": "Lunge with your weapon, striking every enemy in a narrow line.",
+  "tags": [
+   "attack",
+   "melee"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 120,
+  "speed_mult": 1.1,
+  "cost": 4,
+  "cooldown": 0,
+  "max_range": 60,
+  "width": 6,
+  "fx_life": 0.15,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#e0e0ff",
+  "icon": "thrust",
+  "stage3b": true
+ },
+ {
+  "id": "tremor_strike",
+  "name": "Tremor Strike",
+  "class": "warrior",
+  "unlock_level": 11,
+  "kind": "attack",
+  "behavior": "ground_aoe",
+  "desc": "Pound the ground, sending three tremors outward in front of you.",
+  "tags": [
+   "attack",
+   "melee",
+   "area",
+   "slam"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 70,
+  "speed_mult": 1.4,
+  "cost": 12,
+  "cooldown": 0,
+  "at_self": true,
+  "forward": 36,
+  "radius": 40,
+  "delay": 0.0,
+  "repeats": 3,
+  "interval": 0.25,
+  "scatter": 24,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#a08060",
+  "icon": "quake",
+  "stage3b": true
+ },
+ {
+  "id": "shield_wall",
+  "name": "Shield Wall",
+  "class": "warrior",
+  "unlock_level": 13,
+  "kind": "utility",
+  "behavior": "buff",
+  "desc": "Raise your guard: +15% block chance and 20% damage reduction, but 30% reduced movement speed for 5 seconds.",
+  "tags": [
+   "buff",
+   "defence"
+  ],
+  "use_time": 0.3,
+  "cost": 10,
+  "cooldown": 16,
+  "duration": 5,
+  "mods": [
+   {
+    "stat": "block_chance",
+    "type": "flat",
+    "value": 15
+   },
+   {
+    "stat": "damage_reduction",
+    "type": "flat",
+    "value": 20
+   },
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": -30
+   }
+  ],
+  "fx": "#a0b0ff",
+  "icon": "guard",
+  "stage3b": true
+ },
+ {
+  "id": "adrenaline_surge",
+  "name": "Adrenaline Surge",
+  "class": "warrior",
+  "unlock_level": 15,
+  "kind": "utility",
+  "behavior": "buff",
+  "desc": "Surge forward: 25% increased movement and attack speed for 5 seconds.",
+  "tags": [
+   "buff",
+   "movement"
+  ],
+  "use_time": 0.2,
+  "cost": 8,
+  "cooldown": 14,
+  "duration": 5,
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 25
+   },
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 25
+   }
+  ],
+  "fx": "#ffe060",
+  "icon": "rage",
+  "stage3b": true
+ },
+ {
+  "id": "last_stand",
+  "name": "Last Stand",
+  "class": "warrior",
+  "unlock_level": 17,
+  "kind": "utility",
+  "behavior": "buff",
+  "desc": "Refuse to fall: heal 25% of your life and gain 35% damage reduction for 4 seconds.",
+  "tags": [
+   "buff",
+   "defence"
+  ],
+  "use_time": 0.2,
+  "cost": 15,
+  "cooldown": 35,
+  "duration": 4,
+  "heal_pct": 25,
+  "mods": [
+   {
+    "stat": "damage_reduction",
+    "type": "flat",
+    "value": 35
+   }
+  ],
+  "fx": "#ff9060",
+  "icon": "guard",
+  "stage3b": true
+ },
+ {
+  "id": "sweeping_arc",
+  "name": "Sweeping Arc",
+  "class": "warrior",
+  "unlock_level": 18,
+  "kind": "attack",
+  "behavior": "melee_arc",
+  "desc": "A huge sweeping blow across a very wide, long arc.",
+  "tags": [
+   "attack",
+   "melee",
+   "area"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 135,
+  "speed_mult": 1.4,
+  "cost": 10,
+  "cooldown": 0,
+  "range": 56,
+  "arc": 220,
+  "knockback": 25,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#e0d0b0",
+  "icon": "cleave",
+  "stage3b": true
+ },
+ {
+  "id": "avatar_of_war",
+  "name": "Avatar of War",
+  "class": "warrior",
+  "unlock_level": 24,
+  "kind": "utility",
+  "behavior": "buff",
+  "desc": "Ultimate. Become an unstoppable avatar: 40% more damage, 25% attack speed and 50% more armour for 10 seconds.",
+  "tags": [
+   "buff",
+   "ultimate"
+  ],
+  "use_time": 0.5,
+  "cost": 30,
+  "cooldown": 45,
+  "duration": 10,
+  "mods": [
+   {
+    "stat": "damage",
+    "type": "more",
+    "value": 40
+   },
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 25
+   },
+   {
+    "stat": "armour",
+    "type": "more",
+    "value": 50
+   }
+  ],
+  "fx": "#ffd040",
+  "icon": "rage",
+  "stage3b": true
+ },
+ {
+  "id": "apocalypse_cleave",
+  "name": "Apocalypse Cleave",
+  "class": "warrior",
+  "unlock_level": 28,
+  "kind": "attack",
+  "behavior": "melee_arc",
+  "desc": "Ultimate. A massive all-around cleave that deals 100% more damage to elites and bosses.",
+  "tags": [
+   "attack",
+   "melee",
+   "area",
+   "ultimate"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 320,
+  "speed_mult": 1.8,
+  "cost": 25,
+  "cooldown": 16,
+  "range": 80,
+  "arc": 360,
+  "knockback": 40,
+  "elite_bonus": 100,
+  "weapon_req": [
+   "melee"
+  ],
+  "fx": "#ff4020",
+  "icon": "spin",
+  "stage3b": true
+ },
+ {
+  "id": "quickdraw",
+  "name": "Quickdraw",
+  "class": "ranger",
+  "unlock_level": 2,
+  "kind": "attack",
+  "behavior": "projectile",
+  "desc": "Rapidly fire your firearm. Requires a pistol or rifle.",
+  "tags": [
+   "attack",
+   "projectile"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 75,
+  "speed_mult": 0.6,
+  "cost": 0,
+  "cooldown": 0,
+  "speed": 620,
+  "count": 1,
+  "spread": 0,
+  "jitter": 3,
+  "pierce": 0,
+  "max_range": 320,
+  "size": 4,
+  "proj": "bolt",
+  "weapon_req": [
+   "firearm"
+  ],
+  "fx": "#f0d080",
+  "icon": "shot",
+  "stage3b": true
+ },
+ {
+  "id": "scattershot",
+  "name": "Scattershot",
+  "class": "ranger",
+  "unlock_level": 6,
+  "kind": "attack",
+  "behavior": "projectile",
+  "desc": "Blast a wide cone of shot at close range.",
+  "tags": [
+   "attack",
+   "projectile"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 45,
+  "speed_mult": 1.1,
+  "cost": 6,
+  "cooldown": 0,
+  "speed": 520,
+  "count": 7,
+  "spread": 70,
+  "pierce": 0,
+  "max_range": 150,
+  "size": 3,
+  "proj": "bolt",
+  "weapon_req": [
+   "firearm",
+   "bow"
+  ],
+  "fx": "#f0d080",
+  "icon": "multi",
+  "stage3b": true
+ },
+ {
+  "id": "poison_trap",
+  "name": "Poison Trap",
+  "class": "ranger",
+  "unlock_level": 12,
+  "kind": "trap",
+  "behavior": "deploy",
+  "desc": "A trap that bursts into a toxic cloud, poisoning enemies inside for 5 seconds.",
+  "tags": [
+   "trap",
+   "area",
+   "void",
+   "dot"
+  ],
+  "dmg_type": "void",
+  "base_damage": [
+   6,
+   9
+  ],
+  "use_time": 0.45,
+  "cost": 8,
+  "cooldown": 0,
+  "deployable": "mine",
+  "trap_effect": "poison",
+  "max": 3,
+  "max_range": 170,
+  "radius": 55,
+  "trigger_radius": 34,
+  "duration": 25,
+  "zone_duration": 5,
+  "tick_fraction": 0.3,
+  "zone_status": [
+   {
+    "type": "poison",
+    "chance": 60
+   }
+  ],
+  "fx": "#90e050",
+  "icon": "snare",
+  "stage3b": true
+ },
+ {
+  "id": "cluster_bomb",
+  "name": "Cluster Bomb",
+  "class": "ranger",
+  "unlock_level": 14,
+  "kind": "trap",
+  "behavior": "ground_aoe",
+  "desc": "Lob a bomb that splits into five scattering explosions.",
+  "tags": [
+   "trap",
+   "area",
+   "fire"
+  ],
+  "dmg_type": "fire",
+  "base_damage": [
+   12,
+   18
+  ],
+  "use_time": 0.6,
+  "cost": 12,
+  "cooldown": 0,
+  "at_self": false,
+  "max_range": 220,
+  "radius": 32,
+  "delay": 0.5,
+  "repeats": 5,
+  "interval": 0.1,
+  "scatter": 45,
+  "status": {
+   "type": "ignite",
+   "chance": 20
+  },
+  "fx": "#ff9040",
+  "icon": "mine",
+  "stage3b": true
+ },
+ {
+  "id": "tesla_turret",
+  "name": "Tesla Turret",
+  "class": "ranger",
+  "unlock_level": 16,
+  "kind": "turret",
+  "behavior": "deploy",
+  "desc": "Deploy a turret whose sparks chain between three enemies.",
+  "tags": [
+   "turret",
+   "projectile",
+   "lightning"
+  ],
+  "dmg_type": "lightning",
+  "base_damage": [
+   3,
+   13
+  ],
+  "use_time": 0.6,
+  "cost": 16,
+  "cooldown": 1.5,
+  "deployable": "turret",
+  "max": 2,
+  "max_range": 120,
+  "duration": 14,
+  "fire_rate": 1.6,
+  "speed": 380,
+  "proj": "orb",
+  "chain": 2,
+  "range": 220,
+  "status": {
+   "type": "shock",
+   "chance": 20
+  },
+  "fx": "#e0f070",
+  "tint": "#c0c060",
+  "icon": "turret",
+  "stage3b": true
+ },
+ {
+  "id": "frost_turret",
+  "name": "Frost Turret",
+  "class": "ranger",
+  "unlock_level": 17,
+  "kind": "turret",
+  "behavior": "deploy",
+  "desc": "Deploy a turret that fires piercing ice shards that chill.",
+  "tags": [
+   "turret",
+   "projectile",
+   "cold"
+  ],
+  "dmg_type": "cold",
+  "base_damage": [
+   6,
+   9
+  ],
+  "use_time": 0.6,
+  "cost": 14,
+  "cooldown": 1.5,
+  "deployable": "turret",
+  "max": 2,
+  "max_range": 120,
+  "duration": 14,
+  "fire_rate": 1.3,
+  "speed": 420,
+  "proj": "ice",
+  "range": 230,
+  "status": {
+   "type": "chill",
+   "chance": 60
+  },
+  "fx": "#90d8ff",
+  "tint": "#80a0c0",
+  "icon": "turret",
+  "stage3b": true
+ },
+ {
+  "id": "marked_prey",
+  "name": "Marked Prey",
+  "class": "ranger",
+  "unlock_level": 10,
+  "kind": "utility",
+  "behavior": "curse",
+  "desc": "Mark the enemy nearest your cursor; it takes 40% more damage for 8 seconds.",
+  "tags": [
+   "curse"
+  ],
+  "use_time": 0.2,
+  "cost": 6,
+  "cooldown": 4,
+  "max_range": 320,
+  "radius": 40,
+  "single": true,
+  "curse": [
+   {
+    "type": "marked",
+    "chance": 100,
+    "duration": 8
+   }
+  ],
+  "fx": "#ff5040",
+  "icon": "mark",
+  "stage3b": true
+ },
+ {
+  "id": "sniper_round",
+  "name": "Sniper Round",
+  "class": "ranger",
+  "unlock_level": 19,
+  "kind": "attack",
+  "behavior": "projectile",
+  "desc": "A slow, devastating long-range shot that pierces everything.",
+  "tags": [
+   "attack",
+   "projectile"
+  ],
+  "dmg_type": "physical",
+  "weapon_eff": 380,
+  "speed_mult": 2.4,
+  "cost": 14,
+  "cooldown": 0,
+  "speed": 900,
+  "count": 1,
+  "spread": 0,
+  "pierce": 99,
+  "max_range": 520,
+  "size": 5,
+  "proj": "bolt",
+  "weapon_req": [
+   "ranged"
+  ],
+  "fx": "#ffffff",
+  "icon": "pierce",
+  "stage3b": true
+ },
+ {
+  "id": "deadeye",
+  "name": "Deadeye",
+  "class": "ranger",
+  "unlock_level": 24,
+  "kind": "utility",
+  "behavior": "buff",
+  "desc": "Ultimate. A precision trance: 50% more projectile damage and +15% critical chance for 10 seconds.",
+  "tags": [
+   "buff",
+   "ultimate"
+  ],
+  "use_time": 0.3,
+  "cost": 25,
+  "cooldown": 45,
+  "duration": 10,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "more",
+    "value": 50
+   },
+   {
+    "stat": "crit_chance_flat",
+    "type": "flat",
+    "value": 15
+   }
+  ],
+  "fx": "#e0ffa0",
+  "icon": "focus",
+  "stage3b": true
+ },
+ {
+  "id": "mechanical_swarm",
+  "name": "Mechanical Swarm",
+  "class": "ranger",
+  "unlock_level": 28,
+  "kind": "minion",
+  "behavior": "summon",
+  "desc": "Ultimate. Release five clockwork drones that hunt enemies for 15 seconds.",
+  "tags": [
+   "minion",
+   "summon",
+   "ultimate"
+  ],
+  "use_time": 1.0,
+  "cost": 30,
+  "cooldown": 40,
+  "minion": "clockwork_drone",
+  "count": 5,
+  "max": 5,
+  "minion_duration": 15,
+  "fx": "#d0b070",
+  "icon": "turret",
+  "stage3b": true
+ },
+ {
+  "id": "frostbolt",
+  "name": "Frostbolt",
+  "class": "mage",
+  "unlock_level": 2,
+  "kind": "spell",
+  "behavior": "projectile",
+  "desc": "A chilling bolt of ice.",
+  "tags": [
+   "spell",
+   "projectile",
+   "cold"
+  ],
+  "dmg_type": "cold",
+  "base_damage": [
+   6,
+   10
+  ],
+  "crit": 6,
+  "use_time": 0.65,
+  "cost": 4,
+  "cooldown": 0,
+  "speed": 300,
+  "count": 1,
+  "spread": 0,
+  "pierce": 0,
+  "max_range": 360,
+  "size": 5,
+  "proj": "ice",
+  "status": {
+   "type": "chill",
+   "chance": 40
+  },
+  "fx": "#90d8ff",
+  "icon": "lance",
+  "stage3b": true
+ },
+ {
+  "id": "spark",
+  "name": "Spark",
+  "class": "mage",
+  "unlock_level": 4,
+  "kind": "spell",
+  "behavior": "projectile",
+  "desc": "Release four erratic sparks that crackle across the ground.",
+  "tags": [
+   "spell",
+   "projectile",
+   "lightning"
+  ],
+  "dmg_type": "lightning",
+  "base_damage": [
+   1,
+   10
+  ],
+  "crit": 7,
+  "use_time": 0.65,
+  "cost": 6,
+  "cooldown": 0,
+  "speed": 240,
+  "count": 4,
+  "spread": 50,
+  "jitter": 12,
+  "pierce": 1,
+  "max_range": 300,
+  "size": 4,
+  "proj": "orb",
+  "status": {
+   "type": "shock",
+   "chance": 10
+  },
+  "fx": "#f0f070",
+  "icon": "bolt",
+  "stage3b": true
+ },
+ {
+  "id": "lightning_bolt",
+  "name": "Lightning Bolt",
+  "class": "mage",
+  "unlock_level": 10,
+  "kind": "spell",
+  "behavior": "ground_aoe",
+  "desc": "Strike the target area with a concentrated bolt of lightning.",
+  "tags": [
+   "spell",
+   "area",
+   "lightning"
+  ],
+  "dmg_type": "lightning",
+  "base_damage": [
+   6,
+   34
+  ],
+  "crit": 8,
+  "use_time": 0.7,
+  "cost": 11,
+  "cooldown": 0,
+  "at_self": false,
+  "max_range": 280,
+  "radius": 34,
+  "delay": 0.15,
+  "status": {
+   "type": "shock",
+   "chance": 40
+  },
+  "fx": "#f0f080",
+  "icon": "bolt",
+  "stage3b": true
+ },
+ {
+  "id": "flame_wave",
+  "name": "Flame Wave",
+  "class": "mage",
+  "unlock_level": 12,
+  "kind": "spell",
+  "behavior": "projectile",
+  "desc": "Release a rolling wave of fire that passes through enemies.",
+  "tags": [
+   "spell",
+   "projectile",
+   "fire",
+   "area"
+  ],
+  "dmg_type": "fire",
+  "base_damage": [
+   12,
+   17
+  ],
+  "crit": 5,
+  "use_time": 0.85,
+  "cost": 13,
+  "cooldown": 0,
+  "speed": 210,
+  "count": 1,
+  "spread": 0,
+  "pierce": 99,
+  "max_range": 220,
+  "size": 16,
+  "proj": "wave",
+  "status": {
+   "type": "ignite",
+   "chance": 25
+  },
+  "fx": "#ff7020",
+  "icon": "wave",
+  "stage3b": true
+ },
+ {
+  "id": "glacial_eruption",
+  "name": "Glacial Eruption",
+  "class": "mage",
+  "unlock_level": 15,
+  "kind": "spell",
+  "behavior": "ground_aoe",
+  "desc": "Jagged ice erupts from the ground in a cluster around the target.",
+  "tags": [
+   "spell",
+   "area",
+   "cold"
+  ],
+  "dmg_type": "cold",
+  "base_damage": [
+   14,
+   20
+  ],
+  "crit": 6,
+  "use_time": 0.9,
+  "cost": 16,
+  "cooldown": 0,
+  "at_self": false,
+  "max_range": 260,
+  "radius": 30,
+  "delay": 0.3,
+  "repeats": 4,
+  "interval": 0.12,
+  "scatter": 40,
+  "status": {
+   "type": "chill",
+   "chance": 60
+  },
+  "fx": "#a0e8ff",
+  "icon": "blizzard",
+  "stage3b": true
+ },
+ {
+  "id": "time_snare",
+  "name": "Time Snare",
+  "class": "mage",
+  "unlock_level": 16,
+  "kind": "spell",
+  "behavior": "zone",
+  "desc": "Slow time in an area: enemies inside are heavily slowed for 5 seconds.",
+  "tags": [
+   "spell",
+   "area",
+   "arcane"
+  ],
+  "use_time": 0.5,
+  "cost": 12,
+  "cooldown": 8,
+  "max_range": 260,
+  "radius": 70,
+  "duration": 5,
+  "tick": 0.4,
+  "max": 1,
+  "zone_style": "time",
+  "zone_status": [
+   {
+    "type": "snare",
+    "chance": 100,
+    "duration": 0.6
+   }
+  ],
+  "fx": "#c0a0ff",
+  "icon": "static",
+  "stage3b": true
+ },
+ {
+  "id": "soul_siphon",
+  "name": "Soul Siphon",
+  "class": "mage",
+  "unlock_level": 13,
+  "kind": "spell",
+  "behavior": "chain",
+  "desc": "Drain the life of an enemy near your cursor, healing yourself for part of the damage.",
+  "tags": [
+   "spell",
+   "void"
+  ],
+  "dmg_type": "void",
+  "base_damage": [
+   10,
+   16
+  ],
+  "crit": 5,
+  "use_time": 0.7,
+  "cost": 9,
+  "cooldown": 0,
+  "max_range": 220,
+  "chains": 1,
+  "chain_range": 90,
+  "leech": 0.3,
+  "fx": "#a060c0",
+  "icon": "bolt",
+  "stage3b": true
+ },
+ {
+  "id": "summon_bone_golem",
+  "name": "Summon Bone Golem",
+  "class": "mage",
+  "unlock_level": 17,
+  "kind": "minion",
+  "behavior": "summon",
+  "desc": "Raise a slow, massively durable golem to hold the front line. Up to 1.",
+  "tags": [
+   "minion",
+   "summon"
+  ],
+  "use_time": 1.1,
+  "cost": 24,
+  "cooldown": 6,
+  "minion": "bone_golem",
+  "count": 1,
+  "max": 1,
+  "fx": "#e0d8c0",
+  "icon": "skull",
+  "stage3b": true
+ },
+ {
+  "id": "summon_storm_wisp",
+  "name": "Summon Storm Wisp",
+  "class": "mage",
+  "unlock_level": 15,
+  "kind": "minion",
+  "behavior": "summon",
+  "desc": "Summon a fast lightning wisp that zips around shocking enemies. Up to 3.",
+  "tags": [
+   "minion",
+   "summon",
+   "lightning"
+  ],
+  "use_time": 0.8,
+  "cost": 14,
+  "cooldown": 0.5,
+  "minion": "storm_wisp",
+  "count": 1,
+  "max": 3,
+  "fx": "#f0f080",
+  "icon": "skull",
+  "stage3b": true
+ },
+ {
+  "id": "cataclysm",
+  "name": "Cataclysm",
+  "class": "mage",
+  "unlock_level": 26,
+  "kind": "spell",
+  "behavior": "ground_aoe",
+  "desc": "Ultimate. Unleash an elemental storm of falling fire across a huge area.",
+  "tags": [
+   "spell",
+   "area",
+   "fire",
+   "ultimate"
+  ],
+  "dmg_type": "fire",
+  "base_damage": [
+   30,
+   45
+  ],
+  "crit": 6,
+  "use_time": 1.2,
+  "cost": 40,
+  "cooldown": 30,
+  "at_self": false,
+  "max_range": 260,
+  "radius": 44,
+  "delay": 0.5,
+  "repeats": 12,
+  "interval": 0.12,
+  "scatter": 90,
+  "status": {
+   "type": "ignite",
+   "chance": 40
+  },
+  "fx": "#ff5010",
+  "icon": "meteor",
+  "stage3b": true
+ },
+ {
+  "id": "archmage_ascension",
+  "name": "Archmage Ascension",
+  "class": "mage",
+  "unlock_level": 24,
+  "kind": "utility",
+  "behavior": "buff",
+  "desc": "Ultimate. 40% more spell damage and 25% increased cast speed for 10 seconds.",
+  "tags": [
+   "buff",
+   "ultimate"
+  ],
+  "use_time": 0.3,
+  "cost": 30,
+  "cooldown": 45,
+  "duration": 10,
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "more",
+    "value": 40
+   },
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 25
+   }
+  ],
+  "fx": "#e0b0ff",
+  "icon": "focus",
+  "stage3b": true
+ }
+]

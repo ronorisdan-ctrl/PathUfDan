@@ -1,0 +1,29 @@
+{
+  "rarities": [
+    {"id": "common", "name": "Common", "color": "#c8c8c8", "affixes": [0, 0], "weight": 1000, "value_mult": 1.0},
+    {"id": "uncommon", "name": "Uncommon", "color": "#5ab0ff", "affixes": [1, 2], "weight": 450, "value_mult": 2.0},
+    {"id": "rare", "name": "Rare", "color": "#ffe35a", "affixes": [3, 4], "weight": 110, "value_mult": 4.0},
+    {"id": "epic", "name": "Epic", "color": "#c070ff", "affixes": [4, 6], "weight": 18, "value_mult": 8.0, "tier_bonus": 1},
+    {"id": "legendary", "name": "Legendary", "color": "#ff8c2a", "affixes": [0, 0], "weight": 5, "value_mult": 15.0}
+  ],
+  "max_prefixes": 3,
+  "max_suffixes": 3,
+  "item_drop_chance": 0.16,
+  "gold_drop_chance": 0.4,
+  "material_drop_chance": 0.12,
+  "elite_item_rolls": 2,
+  "elite_rarity_bonus": 150,
+  "boss_item_rolls": 4,
+  "boss_rarity_bonus": 400,
+  "class_bias": 0.7,
+  "materials": {
+    "scrap": {"name": "Scrap", "color": "#a08060", "weight": 50, "desc": "Salvaged metal. Used to upgrade equipment."},
+    "iron_fragment": {"name": "Iron Fragment", "color": "#b0b8c8", "weight": 30, "desc": "Upgrades item base damage and defence."},
+    "arcane_dust": {"name": "Arcane Dust", "color": "#a080ff", "weight": 18, "desc": "Rerolls an affix on an item."},
+    "monster_core": {"name": "Monster Core", "color": "#e04060", "weight": 10, "desc": "Removes an affix from an item."},
+    "elemental_essence": {"name": "Elemental Essence", "color": "#60e0c0", "weight": 8, "desc": "Raises an item's rarity."},
+    "catalyst": {"name": "Rare Catalyst", "color": "#ffd040", "weight": 4, "desc": "Adds an affix to an item with a free slot."}
+  },
+  "rare_name_a": ["Grim", "Dread", "Hollow", "Ash", "Blood", "Storm", "Grave", "Rune", "Night", "Bone", "Dusk", "Wrath", "Gloom", "Iron", "Shadow", "Viper"],
+  "rare_name_b": ["Bane", "Fang", "Song", "Ward", "Bite", "Veil", "Call", "Mark", "Shroud", "Grasp", "Spire", "Howl", "Brand", "Coil", "Thorn", "Hymn"]
+}

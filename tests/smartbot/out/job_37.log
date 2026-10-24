@@ -1,0 +1,10 @@
+ARGS: ["--headless", "--path", "W:/AI game/PathofDan/Pathof Dan/", "res://tests/bot.tscn"]
+
+Godot Engine v4.0.stable.official.92bee43ad - https://godotengine.org
+ 
+  died to Sir Morcant, the Drowned Warden, in boss room: true, boss life 387/614
+RUN 0 warrior: result=died  game_time=155s  level=3  kills=32  deaths=0  items_in_bag=7  life=0/156
+  died to Ash Cultist, in boss room: false, boss life -
+RUN 1 warrior: result=died  game_time=174s  level=3  kills=13  deaths=1  items_in_bag=1  life=0/191
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+     at: cleanup (core/object/object.cpp:1982)

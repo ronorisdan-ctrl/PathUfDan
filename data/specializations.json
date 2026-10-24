@@ -1,0 +1,2136 @@
+[
+ {
+  "id": "juggernaut",
+  "class": "warrior",
+  "name": "Juggernaut",
+  "desc": "Heavy armour, shields and retaliation. Trades speed for near-immovable defence.",
+  "color": "#a0a8c0",
+  "nodes": [
+   {
+    "id": "juggernaut_1",
+    "name": "Iron Will",
+    "mods": [
+     {
+      "stat": "armour",
+      "type": "inc",
+      "value": 30
+     },
+     {
+      "stat": "max_life",
+      "type": "inc",
+      "value": 6
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "juggernaut_2",
+    "name": "Shield Mastery",
+    "mods": [
+     {
+      "stat": "block_chance",
+      "type": "flat",
+      "value": 6
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "juggernaut_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "juggernaut_3",
+    "name": "Thick Skin",
+    "mods": [
+     {
+      "stat": "damage_reduction",
+      "type": "flat",
+      "value": 6
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "juggernaut_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "juggernaut_4",
+    "name": "Unbowed",
+    "mods": [
+     {
+      "stat": "armour",
+      "type": "inc",
+      "value": 40
+     },
+     {
+      "stat": "res_fire",
+      "type": "flat",
+      "value": 10
+     },
+     {
+      "stat": "res_cold",
+      "type": "flat",
+      "value": 10
+     },
+     {
+      "stat": "res_lightning",
+      "type": "flat",
+      "value": 10
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "juggernaut_2",
+     "juggernaut_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "juggernaut_5",
+    "name": "Retaliation",
+    "mods": [
+     {
+      "stat": "block_chance",
+      "type": "flat",
+      "value": 4
+     }
+    ],
+    "flags": [
+     "retaliate"
+    ],
+    "desc": "Blocking a hit releases a shockwave dealing physical damage based on your armour and may stun.",
+    "req": [
+     "juggernaut_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "juggernaut_6",
+    "name": "Unstoppable",
+    "mods": [
+     {
+      "stat": "damage_reduction",
+      "type": "flat",
+      "value": 10
+     },
+     {
+      "stat": "move_speed",
+      "type": "inc",
+      "value": -5
+     }
+    ],
+    "flags": [
+     "fortress"
+    ],
+    "desc": "While stationary for 1 second, gain 30% damage reduction.",
+    "req": [
+     "juggernaut_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "berserker",
+  "class": "warrior",
+  "name": "Berserker",
+  "desc": "Relentless offence: attack speed, criticals and rage that builds with every hit.",
+  "color": "#e04030",
+  "nodes": [
+   {
+    "id": "berserker_1",
+    "name": "Bloodlust",
+    "mods": [
+     {
+      "stat": "attack_speed",
+      "type": "inc",
+      "value": 8
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "berserker_2",
+    "name": "Savagery",
+    "mods": [
+     {
+      "stat": "crit_chance",
+      "type": "inc",
+      "value": 30
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "berserker_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "berserker_3",
+    "name": "Red Mist",
+    "mods": [
+     {
+      "stat": "melee_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "berserker_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "berserker_4",
+    "name": "Frenzy",
+    "mods": [
+     {
+      "stat": "attack_speed",
+      "type": "inc",
+      "value": 10
+     },
+     {
+      "stat": "crit_multi",
+      "type": "flat",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "berserker_2",
+     "berserker_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "berserker_5",
+    "name": "Rage",
+    "mods": [
+     {
+      "stat": "life_on_kill",
+      "type": "flat",
+      "value": 8
+     }
+    ],
+    "flags": [
+     "rage"
+    ],
+    "desc": "Each consecutive hit grants 2% more damage, up to 20 stacks.",
+    "req": [
+     "berserker_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "berserker_6",
+    "name": "Reckless Abandon",
+    "mods": [
+     {
+      "stat": "damage",
+      "type": "more",
+      "value": 20
+     },
+     {
+      "stat": "armour",
+      "type": "more",
+      "value": -25
+     }
+    ],
+    "flags": [],
+    "desc": "20% more damage, 25% less armour.",
+    "req": [
+     "berserker_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "weapon_master",
+  "class": "warrior",
+  "name": "Weapon Master",
+  "desc": "A specialist of steel: one- and two-handed mastery, criticals and armour penetration.",
+  "color": "#d0c080",
+  "nodes": [
+   {
+    "id": "weapon_master_1",
+    "name": "Drilled",
+    "mods": [
+     {
+      "stat": "one_handed_damage",
+      "type": "inc",
+      "value": 15
+     },
+     {
+      "stat": "two_handed_damage",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "weapon_master_2",
+    "name": "Precise Cuts",
+    "mods": [
+     {
+      "stat": "crit_chance",
+      "type": "inc",
+      "value": 25
+     },
+     {
+      "stat": "bleed_chance",
+      "type": "flat",
+      "value": 10
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "weapon_master_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "weapon_master_3",
+    "name": "Heavy Swings",
+    "mods": [
+     {
+      "stat": "two_handed_damage",
+      "type": "inc",
+      "value": 25
+     },
+     {
+      "stat": "area",
+      "type": "inc",
+      "value": 10
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "weapon_master_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "weapon_master_4",
+    "name": "Blade Dancer",
+    "mods": [
+     {
+      "stat": "attack_speed",
+      "type": "inc",
+      "value": 8
+     },
+     {
+      "stat": "crit_multi",
+      "type": "flat",
+      "value": 25
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "weapon_master_2",
+     "weapon_master_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "weapon_master_5",
+    "name": "Sunder",
+    "mods": [
+     {
+      "stat": "physical_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [
+     "armour_pen"
+    ],
+    "desc": "Your hits ignore 50% of enemy armour.",
+    "req": [
+     "weapon_master_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "weapon_master_6",
+    "name": "Executioner",
+    "mods": [
+     {
+      "stat": "damage_vs_elite",
+      "type": "inc",
+      "value": 40
+     }
+    ],
+    "flags": [],
+    "desc": "40% increased damage against elites and bosses.",
+    "req": [
+     "weapon_master_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "earthbreaker",
+  "class": "warrior",
+  "name": "Earthbreaker",
+  "desc": "Earthquakes and shockwaves: every slam echoes through the ground.",
+  "color": "#b09060",
+  "nodes": [
+   {
+    "id": "earthbreaker_1",
+    "name": "Tectonic",
+    "mods": [
+     {
+      "stat": "area_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "earthbreaker_2",
+    "name": "Wide Stance",
+    "mods": [
+     {
+      "stat": "area",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "earthbreaker_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "earthbreaker_3",
+    "name": "Stone Fist",
+    "mods": [
+     {
+      "stat": "melee_damage",
+      "type": "inc",
+      "value": 20
+     },
+     {
+      "stat": "status_chance",
+      "type": "flat",
+      "value": 5
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "earthbreaker_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "earthbreaker_4",
+    "name": "Fault Lines",
+    "mods": [
+     {
+      "stat": "area",
+      "type": "inc",
+      "value": 15
+     },
+     {
+      "stat": "area_damage",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "earthbreaker_2",
+     "earthbreaker_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "earthbreaker_5",
+    "name": "Aftershocks",
+    "mods": [],
+    "flags": [
+     "earth_aftershock"
+    ],
+    "desc": "Slam skills create an additional aftershock that deals 70% of their damage.",
+    "req": [
+     "earthbreaker_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "earthbreaker_6",
+    "name": "Mountain's Weight",
+    "mods": [
+     {
+      "stat": "area_damage",
+      "type": "more",
+      "value": 20
+     },
+     {
+      "stat": "attack_speed",
+      "type": "inc",
+      "value": -8
+     }
+    ],
+    "flags": [],
+    "desc": "20% more area damage, 8% reduced attack speed.",
+    "req": [
+     "earthbreaker_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "warlord",
+  "class": "warrior",
+  "name": "Warlord",
+  "desc": "Battlefield command: war cries, intimidation and sustain.",
+  "color": "#e06040",
+  "nodes": [
+   {
+    "id": "warlord_1",
+    "name": "Commanding Voice",
+    "mods": [
+     {
+      "stat": "cooldown_recovery",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "warlord_2",
+    "name": "Stalwart Leader",
+    "mods": [
+     {
+      "stat": "max_life",
+      "type": "inc",
+      "value": 8
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "warlord_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "warlord_3",
+    "name": "Battle Hymn",
+    "mods": [
+     {
+      "stat": "damage",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "warlord_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "warlord_4",
+    "name": "Rallying Cry",
+    "mods": [
+     {
+      "stat": "life_regen",
+      "type": "flat",
+      "value": 4
+     },
+     {
+      "stat": "life_on_kill",
+      "type": "flat",
+      "value": 6
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "warlord_2",
+     "warlord_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "warlord_5",
+    "name": "Dread Banner",
+    "mods": [],
+    "flags": [
+     "warlord"
+    ],
+    "desc": "Your melee hits have a 30% chance to intimidate enemies (they take 15% more damage).",
+    "req": [
+     "warlord_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "warlord_6",
+    "name": "Warmonger",
+    "mods": [
+     {
+      "stat": "damage",
+      "type": "more",
+      "value": 10
+     },
+     {
+      "stat": "cooldown_recovery",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "warlord_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "deadeye",
+  "class": "ranger",
+  "name": "Deadeye",
+  "desc": "Precision marksmanship: criticals, piercing shots and long-range power.",
+  "color": "#e0e0a0",
+  "nodes": [
+   {
+    "id": "deadeye_1",
+    "name": "Steady Aim",
+    "mods": [
+     {
+      "stat": "projectile_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "deadeye_2",
+    "name": "Keen Sight",
+    "mods": [
+     {
+      "stat": "crit_chance",
+      "type": "inc",
+      "value": 35
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "deadeye_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "deadeye_3",
+    "name": "Through and Through",
+    "mods": [
+     {
+      "stat": "pierce",
+      "type": "flat",
+      "value": 1
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "deadeye_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "deadeye_4",
+    "name": "Lethal Precision",
+    "mods": [
+     {
+      "stat": "crit_multi",
+      "type": "flat",
+      "value": 30
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "deadeye_2",
+     "deadeye_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "deadeye_5",
+    "name": "Far Shot",
+    "mods": [
+     {
+      "stat": "projectile_speed",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [
+     "far_shot"
+    ],
+    "desc": "Projectiles deal up to 30% more damage the further they travel.",
+    "req": [
+     "deadeye_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "deadeye_6",
+    "name": "Split Shot",
+    "mods": [
+     {
+      "stat": "projectile_count",
+      "type": "flat",
+      "value": 1
+     },
+     {
+      "stat": "projectile_damage",
+      "type": "more",
+      "value": -10
+     }
+    ],
+    "flags": [],
+    "desc": "+1 projectile, 10% less projectile damage.",
+    "req": [
+     "deadeye_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "trapper",
+  "class": "ranger",
+  "name": "Trapper",
+  "desc": "Mines, snares and toxins: prepare the field and let enemies walk in.",
+  "color": "#a0d060",
+  "nodes": [
+   {
+    "id": "trapper_1",
+    "name": "Rigging",
+    "mods": [
+     {
+      "stat": "trap_damage",
+      "type": "inc",
+      "value": 25
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "trapper_2",
+    "name": "Quick Hands",
+    "mods": [
+     {
+      "stat": "cast_speed",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "trapper_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "trapper_3",
+    "name": "Blast Radius",
+    "mods": [
+     {
+      "stat": "area",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "trapper_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "trapper_4",
+    "name": "Saboteur",
+    "mods": [
+     {
+      "stat": "trap_damage",
+      "type": "inc",
+      "value": 30
+     },
+     {
+      "stat": "dot_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "trapper_2",
+     "trapper_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "trapper_5",
+    "name": "Toxic Traps",
+    "mods": [
+     {
+      "stat": "dot_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [
+     "toxic_traps"
+    ],
+    "desc": "Traps and mines have a 60% chance to poison.",
+    "req": [
+     "trapper_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "trapper_6",
+    "name": "Explosive Alchemy",
+    "mods": [
+     {
+      "stat": "trap_damage",
+      "type": "more",
+      "value": 25
+     },
+     {
+      "stat": "status_chance",
+      "type": "flat",
+      "value": 10
+     }
+    ],
+    "flags": [],
+    "desc": "25% more trap damage.",
+    "req": [
+     "trapper_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "gunslinger",
+  "class": "ranger",
+  "name": "Gunslinger",
+  "desc": "Firearms, rapid shots and ricochets.",
+  "color": "#d0a060",
+  "nodes": [
+   {
+    "id": "gunslinger_1",
+    "name": "Quickdraw",
+    "mods": [
+     {
+      "stat": "attack_speed",
+      "type": "inc",
+      "value": 10
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "gunslinger_2",
+    "name": "Powder Burns",
+    "mods": [
+     {
+      "stat": "firearm_damage",
+      "type": "inc",
+      "value": 25
+     },
+     {
+      "stat": "added_fire",
+      "type": "flat",
+      "value": 4
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "gunslinger_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "gunslinger_3",
+    "name": "Gun Kata",
+    "mods": [
+     {
+      "stat": "crit_chance",
+      "type": "inc",
+      "value": 25
+     },
+     {
+      "stat": "move_speed",
+      "type": "inc",
+      "value": 5
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "gunslinger_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "gunslinger_4",
+    "name": "Hair Trigger",
+    "mods": [
+     {
+      "stat": "attack_speed",
+      "type": "inc",
+      "value": 12
+     },
+     {
+      "stat": "firearm_damage",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "gunslinger_2",
+     "gunslinger_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "gunslinger_5",
+    "name": "Ricochet",
+    "mods": [],
+    "flags": [
+     "ricochet"
+    ],
+    "desc": "Firearm attack projectiles chain to an additional enemy.",
+    "req": [
+     "gunslinger_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "gunslinger_6",
+    "name": "Dual Wield Discipline",
+    "mods": [
+     {
+      "stat": "projectile_count",
+      "type": "flat",
+      "value": 1
+     }
+    ],
+    "flags": [],
+    "desc": "+1 projectile.",
+    "req": [
+     "gunslinger_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "machinist",
+  "class": "ranger",
+  "name": "Machinist",
+  "desc": "Turrets and engineering: more machines, firing faster.",
+  "color": "#c0a070",
+  "nodes": [
+   {
+    "id": "machinist_1",
+    "name": "Tinkering",
+    "mods": [
+     {
+      "stat": "turret_damage",
+      "type": "inc",
+      "value": 25
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "machinist_2",
+    "name": "Overclock",
+    "mods": [
+     {
+      "stat": "turret_speed",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "machinist_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "machinist_3",
+    "name": "Reinforced Plating",
+    "mods": [
+     {
+      "stat": "turret_damage",
+      "type": "inc",
+      "value": 20
+     },
+     {
+      "stat": "max_life",
+      "type": "inc",
+      "value": 5
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "machinist_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "machinist_4",
+    "name": "Assembly Line",
+    "mods": [
+     {
+      "stat": "turret_limit",
+      "type": "flat",
+      "value": 1
+     }
+    ],
+    "flags": [],
+    "desc": "+1 maximum turret.",
+    "req": [
+     "machinist_2",
+     "machinist_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "machinist_5",
+    "name": "Tesla Coils",
+    "mods": [
+     {
+      "stat": "turret_damage",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [
+     "tesla_coils"
+    ],
+    "desc": "Turret projectiles chain to an additional enemy.",
+    "req": [
+     "machinist_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "machinist_6",
+    "name": "Automaton Doctrine",
+    "mods": [
+     {
+      "stat": "turret_damage",
+      "type": "more",
+      "value": 40
+     },
+     {
+      "stat": "turret_speed",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "40% more turret damage.",
+    "req": [
+     "machinist_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "wraith_hunter",
+  "class": "ranger",
+  "name": "Wraith Hunter",
+  "desc": "Hit and run: evasion, speed and a ghostly dodge.",
+  "color": "#9080c0",
+  "nodes": [
+   {
+    "id": "wraith_hunter_1",
+    "name": "Light Step",
+    "mods": [
+     {
+      "stat": "move_speed",
+      "type": "inc",
+      "value": 8
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "wraith_hunter_2",
+    "name": "Shadowcloak",
+    "mods": [
+     {
+      "stat": "evasion",
+      "type": "inc",
+      "value": 40
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "wraith_hunter_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "wraith_hunter_3",
+    "name": "Hunter's Instinct",
+    "mods": [
+     {
+      "stat": "crit_chance",
+      "type": "inc",
+      "value": 25
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "wraith_hunter_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "wraith_hunter_4",
+    "name": "Ghost Dance",
+    "mods": [
+     {
+      "stat": "evasion",
+      "type": "inc",
+      "value": 40
+     },
+     {
+      "stat": "damage_reduction",
+      "type": "flat",
+      "value": 5
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "wraith_hunter_2",
+     "wraith_hunter_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "wraith_hunter_5",
+    "name": "Phantom Step",
+    "mods": [],
+    "flags": [
+     "phantom_step"
+    ],
+    "desc": "Dodge roll cooldown is halved, and dodging grants 30% more damage for 3 seconds.",
+    "req": [
+     "wraith_hunter_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "wraith_hunter_6",
+    "name": "Predator",
+    "mods": [
+     {
+      "stat": "damage",
+      "type": "more",
+      "value": 15
+     },
+     {
+      "stat": "move_speed",
+      "type": "inc",
+      "value": 5
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "wraith_hunter_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "pyromancer",
+  "class": "mage",
+  "name": "Pyromancer",
+  "desc": "Fire, burning and spreading ignition.",
+  "color": "#ff6020",
+  "nodes": [
+   {
+    "id": "pyromancer_1",
+    "name": "Kindle",
+    "mods": [
+     {
+      "stat": "fire_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "pyromancer_2",
+    "name": "Searing Heat",
+    "mods": [
+     {
+      "stat": "ignite_chance",
+      "type": "flat",
+      "value": 10
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "pyromancer_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "pyromancer_3",
+    "name": "Fuel the Fire",
+    "mods": [
+     {
+      "stat": "dot_damage",
+      "type": "inc",
+      "value": 25
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "pyromancer_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "pyromancer_4",
+    "name": "Conflagration",
+    "mods": [
+     {
+      "stat": "fire_damage",
+      "type": "inc",
+      "value": 25
+     },
+     {
+      "stat": "area",
+      "type": "inc",
+      "value": 10
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "pyromancer_2",
+     "pyromancer_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "pyromancer_5",
+    "name": "Spreading Flames",
+    "mods": [
+     {
+      "stat": "ignite_chance",
+      "type": "flat",
+      "value": 10
+     }
+    ],
+    "flags": [
+     "spreading_flames"
+    ],
+    "desc": "Burning enemies ignite nearby enemies when they die.",
+    "req": [
+     "pyromancer_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "pyromancer_6",
+    "name": "Heart of the Sun",
+    "mods": [
+     {
+      "stat": "fire_damage",
+      "type": "more",
+      "value": 20
+     },
+     {
+      "stat": "res_cold",
+      "type": "flat",
+      "value": -15
+     }
+    ],
+    "flags": [],
+    "desc": "20% more fire damage, -15% ice resistance.",
+    "req": [
+     "pyromancer_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "cryomancer",
+  "class": "mage",
+  "name": "Cryomancer",
+  "desc": "Freezing, slowing and shattering - and the defences of ice.",
+  "color": "#80d0ff",
+  "nodes": [
+   {
+    "id": "cryomancer_1",
+    "name": "Rime",
+    "mods": [
+     {
+      "stat": "cold_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "cryomancer_2",
+    "name": "Glacial Ward",
+    "mods": [
+     {
+      "stat": "armour",
+      "type": "inc",
+      "value": 40
+     },
+     {
+      "stat": "res_cold",
+      "type": "flat",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "cryomancer_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "cryomancer_3",
+    "name": "Bitter Cold",
+    "mods": [
+     {
+      "stat": "status_duration",
+      "type": "inc",
+      "value": 30
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "cryomancer_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "cryomancer_4",
+    "name": "Frostbite",
+    "mods": [
+     {
+      "stat": "cold_damage",
+      "type": "inc",
+      "value": 25
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "cryomancer_2",
+     "cryomancer_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "cryomancer_5",
+    "name": "Deep Freeze",
+    "mods": [],
+    "flags": [
+     "deep_freeze"
+    ],
+    "desc": "Chilling an already chilled enemy freezes it solid; frozen enemies take 25% more damage.",
+    "req": [
+     "cryomancer_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "cryomancer_6",
+    "name": "Ice Armour",
+    "mods": [
+     {
+      "stat": "damage_reduction",
+      "type": "flat",
+      "value": 10
+     },
+     {
+      "stat": "max_life",
+      "type": "inc",
+      "value": 8
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "cryomancer_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "stormcaller",
+  "class": "mage",
+  "name": "Stormcaller",
+  "desc": "Lightning, chain reactions and rapid casting.",
+  "color": "#f0e060",
+  "nodes": [
+   {
+    "id": "stormcaller_1",
+    "name": "Static",
+    "mods": [
+     {
+      "stat": "lightning_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "stormcaller_2",
+    "name": "Quickening",
+    "mods": [
+     {
+      "stat": "cast_speed",
+      "type": "inc",
+      "value": 10
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "stormcaller_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "stormcaller_3",
+    "name": "Arc Flash",
+    "mods": [
+     {
+      "stat": "crit_chance",
+      "type": "inc",
+      "value": 30
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "stormcaller_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "stormcaller_4",
+    "name": "Thunderhead",
+    "mods": [
+     {
+      "stat": "lightning_damage",
+      "type": "inc",
+      "value": 25
+     },
+     {
+      "stat": "chain",
+      "type": "flat",
+      "value": 1
+     }
+    ],
+    "flags": [],
+    "desc": "+1 chain.",
+    "req": [
+     "stormcaller_2",
+     "stormcaller_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "stormcaller_5",
+    "name": "Overcharge",
+    "mods": [
+     {
+      "stat": "lightning_damage",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [
+     "overcharge"
+    ],
+    "desc": "Shocked enemies take 35% more damage instead of 20%.",
+    "req": [
+     "stormcaller_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "stormcaller_6",
+    "name": "Eye of the Storm",
+    "mods": [
+     {
+      "stat": "cast_speed",
+      "type": "inc",
+      "value": 15
+     },
+     {
+      "stat": "crit_multi",
+      "type": "flat",
+      "value": 30
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "stormcaller_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "necromancer",
+  "class": "mage",
+  "name": "Necromancer",
+  "desc": "Undead servants, curses and corpse explosions.",
+  "color": "#a0c080",
+  "nodes": [
+   {
+    "id": "necromancer_1",
+    "name": "Grave Pact",
+    "mods": [
+     {
+      "stat": "minion_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "necromancer_2",
+    "name": "Bone Armour",
+    "mods": [
+     {
+      "stat": "minion_life",
+      "type": "inc",
+      "value": 25
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "necromancer_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "necromancer_3",
+    "name": "Hex Master",
+    "mods": [
+     {
+      "stat": "status_duration",
+      "type": "inc",
+      "value": 25
+     },
+     {
+      "stat": "dot_damage",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "necromancer_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "necromancer_4",
+    "name": "Lich Lore",
+    "mods": [
+     {
+      "stat": "minion_damage",
+      "type": "inc",
+      "value": 25
+     },
+     {
+      "stat": "minion_life",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "necromancer_2",
+     "necromancer_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "necromancer_5",
+    "name": "Corpse Blast",
+    "mods": [],
+    "flags": [
+     "corpse_blast"
+    ],
+    "desc": "Enemies killed by your minions explode for 15% of their maximum life as void damage.",
+    "req": [
+     "necromancer_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "necromancer_6",
+    "name": "Death's Harvest",
+    "mods": [
+     {
+      "stat": "mana_on_kill",
+      "type": "flat",
+      "value": 6
+     },
+     {
+      "stat": "life_on_kill",
+      "type": "flat",
+      "value": 6
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "necromancer_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "arcanist",
+  "class": "mage",
+  "name": "Arcanist",
+  "desc": "Mana mastery, teleportation and raw arcane power.",
+  "color": "#c080ff",
+  "nodes": [
+   {
+    "id": "arcanist_1",
+    "name": "Wellspring",
+    "mods": [
+     {
+      "stat": "max_mana",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "arcanist_2",
+    "name": "Flow",
+    "mods": [
+     {
+      "stat": "mana_regen",
+      "type": "inc",
+      "value": 30
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "arcanist_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "arcanist_3",
+    "name": "Spell Echo",
+    "mods": [
+     {
+      "stat": "spell_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "arcanist_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "arcanist_4",
+    "name": "Arcane Mastery",
+    "mods": [
+     {
+      "stat": "spell_damage",
+      "type": "inc",
+      "value": 20
+     },
+     {
+      "stat": "mana_cost",
+      "type": "inc",
+      "value": -15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "arcanist_2",
+     "arcanist_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "arcanist_5",
+    "name": "Arcane Flow",
+    "mods": [
+     {
+      "stat": "max_mana",
+      "type": "inc",
+      "value": 10
+     }
+    ],
+    "flags": [
+     "arcane_flow"
+    ],
+    "desc": "Spells deal up to 30% more damage the fuller your mana pool.",
+    "req": [
+     "arcanist_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "arcanist_6",
+    "name": "Time Weaver",
+    "mods": [
+     {
+      "stat": "cooldown_recovery",
+      "type": "inc",
+      "value": 30
+     },
+     {
+      "stat": "cast_speed",
+      "type": "inc",
+      "value": 10
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "arcanist_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ },
+ {
+  "id": "summoner",
+  "class": "mage",
+  "name": "Summoner",
+  "desc": "Command a larger, faster horde that shields you.",
+  "color": "#d0d8c0",
+  "nodes": [
+   {
+    "id": "summoner_1",
+    "name": "Binding Words",
+    "mods": [
+     {
+      "stat": "minion_life",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [],
+    "x": 0,
+    "y": 0,
+    "capstone": false
+   },
+   {
+    "id": "summoner_2",
+    "name": "Swarm Tactics",
+    "mods": [
+     {
+      "stat": "minion_speed",
+      "type": "inc",
+      "value": 15
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "summoner_1"
+    ],
+    "x": -70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "summoner_3",
+    "name": "Pack Leader",
+    "mods": [
+     {
+      "stat": "minion_damage",
+      "type": "inc",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "",
+    "req": [
+     "summoner_1"
+    ],
+    "x": 70,
+    "y": 70,
+    "capstone": false
+   },
+   {
+    "id": "summoner_4",
+    "name": "Endless Ranks",
+    "mods": [
+     {
+      "stat": "minion_limit",
+      "type": "flat",
+      "value": 2
+     }
+    ],
+    "flags": [],
+    "desc": "+2 maximum minions.",
+    "req": [
+     "summoner_2",
+     "summoner_3"
+    ],
+    "x": 0,
+    "y": 140,
+    "capstone": false
+   },
+   {
+    "id": "summoner_5",
+    "name": "Living Shield",
+    "mods": [],
+    "flags": [
+     "minion_shield"
+    ],
+    "desc": "Take 5% less damage for each of your minions, up to 30%.",
+    "req": [
+     "summoner_4"
+    ],
+    "x": -70,
+    "y": 210,
+    "capstone": true
+   },
+   {
+    "id": "summoner_6",
+    "name": "One Mind",
+    "mods": [
+     {
+      "stat": "minion_damage",
+      "type": "more",
+      "value": 30
+     },
+     {
+      "stat": "minion_life",
+      "type": "more",
+      "value": 20
+     }
+    ],
+    "flags": [],
+    "desc": "Minions deal 30% more damage and have 20% more life.",
+    "req": [
+     "summoner_4"
+    ],
+    "x": 70,
+    "y": 210,
+    "capstone": true
+   }
+  ]
+ }
+]

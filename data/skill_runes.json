@@ -1,0 +1,421 @@
+[
+ {
+  "id": "split",
+  "name": "Rune of Splitting",
+  "color": "#ffd060",
+  "desc": "+2 projectiles, wider spread, 25% less damage",
+  "applies": [
+   "projectile"
+  ],
+  "mods": [
+   [
+    "count",
+    "add",
+    2
+   ],
+   [
+    "spread",
+    "add",
+    20
+   ],
+   [
+    "damage_mult",
+    "mult",
+    0.75
+   ]
+  ]
+ },
+ {
+  "id": "piercing",
+  "name": "Rune of Piercing",
+  "color": "#e0e0e0",
+  "desc": "Projectiles pierce 2 additional enemies",
+  "applies": [
+   "projectile"
+  ],
+  "mods": [
+   [
+    "pierce",
+    "add",
+    2
+   ]
+  ]
+ },
+ {
+  "id": "chaining",
+  "name": "Rune of Chaining",
+  "color": "#e0f070",
+  "desc": "Chains to 2 additional enemies",
+  "applies": [
+   "projectile",
+   "chain"
+  ],
+  "mods": [
+   [
+    "chain",
+    "add",
+    2
+   ],
+   [
+    "chains",
+    "add",
+    2
+   ],
+   [
+    "damage_mult",
+    "mult",
+    0.9
+   ]
+  ]
+ },
+ {
+  "id": "concentrated",
+  "name": "Rune of Focus",
+  "color": "#ff8060",
+  "desc": "30% smaller area, 35% more damage",
+  "applies_tag": [
+   "area"
+  ],
+  "mods": [
+   [
+    "area",
+    "mult",
+    0.7
+   ],
+   [
+    "damage_mult",
+    "mult",
+    1.35
+   ]
+  ]
+ },
+ {
+  "id": "widened",
+  "name": "Rune of Reach",
+  "color": "#80c0ff",
+  "desc": "35% larger area, 10% less damage (Cleave gains range)",
+  "applies_tag": [
+   "area"
+  ],
+  "mods": [
+   [
+    "area",
+    "mult",
+    1.35
+   ],
+   [
+    "damage_mult",
+    "mult",
+    0.9
+   ]
+  ]
+ },
+ {
+  "id": "echo",
+  "name": "Rune of Echoes",
+  "color": "#c0a0ff",
+  "desc": "Repeats one additional time",
+  "applies": [
+   "ground_aoe"
+  ],
+  "mods": [
+   [
+    "repeats",
+    "add",
+    1
+   ],
+   [
+    "interval",
+    "max",
+    0.35
+   ],
+   [
+    "damage_mult",
+    "mult",
+    0.85
+   ]
+  ]
+ },
+ {
+  "id": "haste",
+  "name": "Rune of Haste",
+  "color": "#a0ffa0",
+  "desc": "20% faster use, 15% less damage",
+  "applies": [
+   "melee_arc",
+   "projectile",
+   "ground_aoe",
+   "nova",
+   "chain",
+   "beam",
+   "zone",
+   "curse",
+   "leap"
+  ],
+  "mods": [
+   [
+    "speed_mult",
+    "mult",
+    0.8
+   ],
+   [
+    "use_time",
+    "mult",
+    0.8
+   ],
+   [
+    "damage_mult",
+    "mult",
+    0.85
+   ]
+  ]
+ },
+ {
+  "id": "efficiency",
+  "name": "Rune of Efficiency",
+  "color": "#80a0ff",
+  "desc": "40% less mana cost",
+  "applies": [
+   "any"
+  ],
+  "mods": [
+   [
+    "cost",
+    "mult",
+    0.6
+   ]
+  ]
+ },
+ {
+  "id": "recharge",
+  "name": "Rune of Recharge",
+  "color": "#60e0e0",
+  "desc": "40% shorter cooldown, 10% less damage",
+  "applies": [
+   "any"
+  ],
+  "requires": "cooldown",
+  "mods": [
+   [
+    "cooldown",
+    "mult",
+    0.6
+   ],
+   [
+    "damage_mult",
+    "mult",
+    0.9
+   ]
+  ]
+ },
+ {
+  "id": "horde",
+  "name": "Rune of the Horde",
+  "color": "#d0d8c0",
+  "desc": "+1 summoned/deployed per use, +2 maximum, 15% less damage",
+  "applies": [
+   "summon",
+   "deploy"
+  ],
+  "mods": [
+   [
+    "count",
+    "add",
+    1
+   ],
+   [
+    "max",
+    "add",
+    2
+   ],
+   [
+    "damage_mult",
+    "mult",
+    0.85
+   ]
+  ]
+ },
+ {
+  "id": "bone_frenzy",
+  "name": "Rune of Bone Frenzy",
+  "color": "#f0e0c0",
+  "desc": "Minions attack and move 40% faster but have 40% less life",
+  "applies": [
+   "summon"
+  ],
+  "mods": [
+   [
+    "minion_speed_mult",
+    "mult",
+    1.4
+   ],
+   [
+    "minion_life_mult",
+    "mult",
+    0.6
+   ]
+  ]
+ },
+ {
+  "id": "longshot",
+  "name": "Rune of the Longshot",
+  "color": "#c0a070",
+  "desc": "Turrets gain 40% range but take 60% longer to deploy",
+  "applies": [
+   "deploy"
+  ],
+  "requires": "range",
+  "mods": [
+   [
+    "range",
+    "mult",
+    1.4
+   ],
+   [
+    "use_time",
+    "mult",
+    1.6
+   ]
+  ]
+ },
+ {
+  "id": "ember",
+  "name": "Ember Rune",
+  "color": "#ff7030",
+  "desc": "Converts the skill to fire damage; 25% chance to ignite",
+  "applies": [
+   "melee_arc",
+   "projectile",
+   "ground_aoe",
+   "nova",
+   "chain",
+   "beam",
+   "leap"
+  ],
+  "requires": "damage",
+  "mods": [
+   [
+    "dmg_type",
+    "set",
+    "fire"
+   ],
+   [
+    "convert",
+    "set",
+    true
+   ],
+   [
+    "status",
+    "set",
+    {
+     "type": "ignite",
+     "chance": 25
+    }
+   ]
+  ]
+ },
+ {
+  "id": "frost",
+  "name": "Frost Rune",
+  "color": "#90d8ff",
+  "desc": "Converts the skill to ice damage; 50% chance to chill",
+  "applies": [
+   "melee_arc",
+   "projectile",
+   "ground_aoe",
+   "nova",
+   "chain",
+   "beam",
+   "leap"
+  ],
+  "requires": "damage",
+  "mods": [
+   [
+    "dmg_type",
+    "set",
+    "cold"
+   ],
+   [
+    "convert",
+    "set",
+    true
+   ],
+   [
+    "status",
+    "set",
+    {
+     "type": "chill",
+     "chance": 50
+    }
+   ]
+  ]
+ },
+ {
+  "id": "volatile",
+  "name": "Volatile Rune",
+  "color": "#ffa040",
+  "desc": "Projectiles explode on impact, 15% less damage",
+  "applies": [
+   "projectile"
+  ],
+  "mods": [
+   [
+    "explode_radius",
+    "max",
+    34
+   ],
+   [
+    "damage_mult",
+    "mult",
+    0.85
+   ]
+  ]
+ },
+ {
+  "id": "lingering",
+  "name": "Rune of Lingering",
+  "color": "#b080e0",
+  "desc": "Ground effects last 60% longer, 15% less damage",
+  "applies": [
+   "zone"
+  ],
+  "mods": [
+   [
+    "duration",
+    "mult",
+    1.6
+   ],
+   [
+    "damage_mult",
+    "mult",
+    0.85
+   ]
+  ]
+ },
+ {
+  "id": "concussive",
+  "name": "Concussive Rune",
+  "color": "#c0c8ff",
+  "desc": "Knocks back and has a 30% chance to stun",
+  "applies": [
+   "melee_arc",
+   "leap",
+   "dash"
+  ],
+  "mods": [
+   [
+    "knockback",
+    "add",
+    40
+   ],
+   [
+    "status",
+    "set",
+    {
+     "type": "stun",
+     "chance": 30
+    }
+   ]
+  ]
+ }
+]

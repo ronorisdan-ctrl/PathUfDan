@@ -1,0 +1,2662 @@
+[
+ {
+  "id": "rusted_sword",
+  "name": "Rusted Sword",
+  "slot": "main_hand",
+  "category": "sword",
+  "icon": "sword",
+  "two_handed": false,
+  "req_level": 1,
+  "damage": [
+   4,
+   8
+  ],
+  "aps": 1.45,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ]
+ },
+ {
+  "id": "bearded_axe",
+  "name": "Bearded Axe",
+  "slot": "main_hand",
+  "category": "axe",
+  "icon": "axe",
+  "two_handed": false,
+  "req_level": 2,
+  "damage": [
+   5,
+   11
+  ],
+  "aps": 1.3,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ]
+ },
+ {
+  "id": "flanged_mace",
+  "name": "Flanged Mace",
+  "slot": "main_hand",
+  "category": "mace",
+  "icon": "mace",
+  "two_handed": false,
+  "req_level": 3,
+  "damage": [
+   7,
+   11
+  ],
+  "aps": 1.2,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "status_chance",
+    "type": "flat",
+    "value": 5
+   }
+  ]
+ },
+ {
+  "id": "war_dagger",
+  "name": "War Dagger",
+  "slot": "main_hand",
+  "category": "dagger",
+  "icon": "dagger",
+  "two_handed": false,
+  "req_level": 1,
+  "damage": [
+   3,
+   7
+  ],
+  "aps": 1.65,
+  "crit": 8,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ]
+ },
+ {
+  "id": "greatsword",
+  "name": "Executioner Greatsword",
+  "slot": "main_hand",
+  "category": "greatsword",
+  "icon": "greatsword",
+  "two_handed": true,
+  "req_level": 2,
+  "damage": [
+   11,
+   19
+  ],
+  "aps": 1.05,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ]
+ },
+ {
+  "id": "greataxe",
+  "name": "Reaver Greataxe",
+  "slot": "main_hand",
+  "category": "greataxe",
+  "icon": "greataxe",
+  "two_handed": true,
+  "req_level": 4,
+  "damage": [
+   12,
+   23
+  ],
+  "aps": 0.98,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ]
+ },
+ {
+  "id": "warhammer",
+  "name": "Grave Warhammer",
+  "slot": "main_hand",
+  "category": "warhammer",
+  "icon": "hammer",
+  "two_handed": true,
+  "req_level": 5,
+  "damage": [
+   15,
+   24
+  ],
+  "aps": 0.9,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 10
+   }
+  ]
+ },
+ {
+  "id": "spear",
+  "name": "Hooked Spear",
+  "slot": "main_hand",
+  "category": "spear",
+  "icon": "spear",
+  "two_handed": true,
+  "req_level": 3,
+  "damage": [
+   9,
+   16
+  ],
+  "aps": 1.2,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ]
+ },
+ {
+  "id": "wooden_buckler",
+  "name": "Wooden Buckler",
+  "slot": "off_hand",
+  "category": "shield",
+  "icon": "shield",
+  "req_level": 1,
+  "armour": 10,
+  "block": 18,
+  "tags": [
+   "shield",
+   "offhand",
+   "armour_piece"
+  ]
+ },
+ {
+  "id": "tower_shield",
+  "name": "Iron Tower Shield",
+  "slot": "off_hand",
+  "category": "shield",
+  "icon": "tower",
+  "req_level": 5,
+  "armour": 26,
+  "block": 24,
+  "tags": [
+   "shield",
+   "offhand",
+   "armour_piece"
+  ]
+ },
+ {
+  "id": "shortbow",
+  "name": "Ashwood Shortbow",
+  "slot": "main_hand",
+  "category": "shortbow",
+  "icon": "bow",
+  "two_handed": true,
+  "req_level": 1,
+  "damage": [
+   4,
+   9
+  ],
+  "aps": 1.45,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "bow",
+   "two_handed"
+  ]
+ },
+ {
+  "id": "longbow",
+  "name": "Yew Longbow",
+  "slot": "main_hand",
+  "category": "longbow",
+  "icon": "longbow",
+  "two_handed": true,
+  "req_level": 4,
+  "damage": [
+   7,
+   15
+  ],
+  "aps": 1.15,
+  "crit": 7,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "bow",
+   "two_handed"
+  ]
+ },
+ {
+  "id": "crossbow",
+  "name": "Arbalest",
+  "slot": "main_hand",
+  "category": "crossbow",
+  "icon": "crossbow",
+  "two_handed": true,
+  "req_level": 3,
+  "damage": [
+   10,
+   17
+  ],
+  "aps": 0.92,
+  "crit": 8,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "bow",
+   "two_handed"
+  ]
+ },
+ {
+  "id": "flintlock",
+  "name": "Flintlock Pistol",
+  "slot": "main_hand",
+  "category": "pistol",
+  "icon": "pistol",
+  "two_handed": false,
+  "req_level": 2,
+  "damage": [
+   5,
+   12
+  ],
+  "aps": 1.3,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "firearm",
+   "one_handed"
+  ]
+ },
+ {
+  "id": "rifle",
+  "name": "Long Rifle",
+  "slot": "main_hand",
+  "category": "rifle",
+  "icon": "rifle",
+  "two_handed": true,
+  "req_level": 5,
+  "damage": [
+   13,
+   22
+  ],
+  "aps": 0.82,
+  "crit": 9,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "firearm",
+   "two_handed"
+  ]
+ },
+ {
+  "id": "simple_quiver",
+  "name": "Simple Quiver",
+  "slot": "off_hand",
+  "category": "quiver",
+  "icon": "quiver",
+  "req_level": 1,
+  "tags": [
+   "quiver",
+   "offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ]
+ },
+ {
+  "id": "hunters_quiver",
+  "name": "Hunter's Quiver",
+  "slot": "off_hand",
+  "category": "quiver",
+  "icon": "quiver",
+  "req_level": 5,
+  "tags": [
+   "quiver",
+   "offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 12
+   }
+  ]
+ },
+ {
+  "id": "apprentice_wand",
+  "name": "Apprentice Wand",
+  "slot": "main_hand",
+  "category": "wand",
+  "icon": "wand",
+  "two_handed": false,
+  "req_level": 1,
+  "damage": [
+   3,
+   6
+  ],
+  "aps": 1.3,
+  "crit": 7,
+  "tags": [
+   "weapon",
+   "caster_weapon",
+   "one_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ]
+ },
+ {
+  "id": "bone_wand",
+  "name": "Bone Wand",
+  "slot": "main_hand",
+  "category": "wand",
+  "icon": "wand",
+  "two_handed": false,
+  "req_level": 4,
+  "damage": [
+   4,
+   8
+  ],
+  "aps": 1.3,
+  "crit": 7,
+  "tags": [
+   "weapon",
+   "caster_weapon",
+   "one_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 16
+   }
+  ]
+ },
+ {
+  "id": "oak_staff",
+  "name": "Gnarled Staff",
+  "slot": "main_hand",
+  "category": "staff",
+  "icon": "staff",
+  "two_handed": true,
+  "req_level": 2,
+  "damage": [
+   6,
+   11
+  ],
+  "aps": 1.1,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "caster_weapon",
+   "two_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 22
+   },
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 15
+   }
+  ]
+ },
+ {
+  "id": "cracked_focus",
+  "name": "Cracked Focus",
+  "slot": "off_hand",
+  "category": "focus",
+  "icon": "orb",
+  "req_level": 1,
+  "tags": [
+   "focus",
+   "offhand",
+   "caster_offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ]
+ },
+ {
+  "id": "tome",
+  "name": "Ritual Tome",
+  "slot": "off_hand",
+  "category": "spellbook",
+  "icon": "book",
+  "req_level": 3,
+  "tags": [
+   "spellbook",
+   "offhand",
+   "caster_offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 12
+   },
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 5
+   }
+  ]
+ },
+ {
+  "id": "iron_helm",
+  "name": "Iron Helm",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "heavy",
+  "icon": "helm",
+  "req_level": 1,
+  "armour": 14,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ]
+ },
+ {
+  "id": "chain_coif",
+  "name": "Chain Coif",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "medium",
+  "icon": "coif",
+  "req_level": 1,
+  "armour": 7,
+  "evasion": 7,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ]
+ },
+ {
+  "id": "leather_cap",
+  "name": "Leather Cap",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "light",
+  "icon": "cap",
+  "req_level": 1,
+  "evasion": 14,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ]
+ },
+ {
+  "id": "scholar_hood",
+  "name": "Scholar's Hood",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "robe",
+  "icon": "hood",
+  "req_level": 1,
+  "evasion": 5,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 8
+   }
+  ]
+ },
+ {
+  "id": "plate_cuirass",
+  "name": "Plate Cuirass",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "heavy",
+  "icon": "plate",
+  "req_level": 3,
+  "armour": 34,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ]
+ },
+ {
+  "id": "padded_vest",
+  "name": "Padded Vest",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "medium",
+  "icon": "vest",
+  "req_level": 1,
+  "armour": 14,
+  "evasion": 10,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ]
+ },
+ {
+  "id": "leather_jerkin",
+  "name": "Leather Jerkin",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "light",
+  "icon": "jerkin",
+  "req_level": 1,
+  "evasion": 26,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ]
+ },
+ {
+  "id": "silk_robe",
+  "name": "Silk Robe",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "robe",
+  "icon": "robe",
+  "req_level": 1,
+  "evasion": 8,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 15
+   }
+  ]
+ },
+ {
+  "id": "gauntlets",
+  "name": "Iron Gauntlets",
+  "slot": "gloves",
+  "category": "gloves",
+  "armour_type": "heavy",
+  "icon": "gauntlet",
+  "req_level": 1,
+  "armour": 9,
+  "tags": [
+   "armour_piece",
+   "gloves"
+  ]
+ },
+ {
+  "id": "leather_gloves",
+  "name": "Leather Gloves",
+  "slot": "gloves",
+  "category": "gloves",
+  "armour_type": "light",
+  "icon": "glove",
+  "req_level": 1,
+  "evasion": 9,
+  "tags": [
+   "armour_piece",
+   "gloves"
+  ]
+ },
+ {
+  "id": "silk_gloves",
+  "name": "Silk Gloves",
+  "slot": "gloves",
+  "category": "gloves",
+  "armour_type": "robe",
+  "icon": "glove",
+  "req_level": 1,
+  "evasion": 3,
+  "tags": [
+   "armour_piece",
+   "gloves"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 5
+   }
+  ]
+ },
+ {
+  "id": "greaves",
+  "name": "Iron Greaves",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "heavy",
+  "icon": "greaves",
+  "req_level": 1,
+  "armour": 9,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ]
+ },
+ {
+  "id": "leather_boots",
+  "name": "Leather Boots",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "light",
+  "icon": "boot",
+  "req_level": 1,
+  "evasion": 9,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ],
+  "implicit": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ]
+ },
+ {
+  "id": "chain_boots",
+  "name": "Chain Boots",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "medium",
+  "icon": "boot",
+  "req_level": 2,
+  "armour": 5,
+  "evasion": 5,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ]
+ },
+ {
+  "id": "silk_slippers",
+  "name": "Silk Slippers",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "robe",
+  "icon": "slipper",
+  "req_level": 1,
+  "evasion": 4,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ],
+  "implicit": [
+   {
+    "stat": "mana_regen",
+    "type": "inc",
+    "value": 8
+   }
+  ]
+ },
+ {
+  "id": "leather_belt",
+  "name": "Leather Belt",
+  "slot": "belt",
+  "category": "belt",
+  "icon": "belt",
+  "req_level": 1,
+  "tags": [
+   "belt"
+  ],
+  "implicit": [
+   {
+    "stat": "max_life",
+    "type": "flat",
+    "value": 10
+   }
+  ]
+ },
+ {
+  "id": "chain_belt",
+  "name": "Chain Belt",
+  "slot": "belt",
+  "category": "belt",
+  "icon": "belt",
+  "req_level": 3,
+  "tags": [
+   "belt"
+  ],
+  "implicit": [
+   {
+    "stat": "armour",
+    "type": "flat",
+    "value": 20
+   }
+  ]
+ },
+ {
+  "id": "bone_amulet",
+  "name": "Bone Amulet",
+  "slot": "amulet",
+  "category": "amulet",
+  "icon": "amulet",
+  "req_level": 1,
+  "tags": [
+   "jewelry",
+   "amulet"
+  ],
+  "implicit": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ]
+ },
+ {
+  "id": "jade_amulet",
+  "name": "Jade Amulet",
+  "slot": "amulet",
+  "category": "amulet",
+  "icon": "amulet",
+  "req_level": 2,
+  "tags": [
+   "jewelry",
+   "amulet"
+  ],
+  "implicit": [
+   {
+    "stat": "life_regen",
+    "type": "flat",
+    "value": 1.0
+   }
+  ]
+ },
+ {
+  "id": "iron_ring",
+  "name": "Iron Ring",
+  "slot": "ring",
+  "category": "ring",
+  "icon": "ring",
+  "req_level": 1,
+  "tags": [
+   "jewelry",
+   "ring"
+  ],
+  "implicit": [
+   {
+    "stat": "max_life",
+    "type": "flat",
+    "value": 8
+   }
+  ]
+ },
+ {
+  "id": "garnet_ring",
+  "name": "Garnet Ring",
+  "slot": "ring",
+  "category": "ring",
+  "icon": "ring",
+  "req_level": 1,
+  "tags": [
+   "jewelry",
+   "ring"
+  ],
+  "implicit": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 10
+   }
+  ]
+ },
+ {
+  "id": "sapphire_ring",
+  "name": "Sapphire Ring",
+  "slot": "ring",
+  "category": "ring",
+  "icon": "ring",
+  "req_level": 1,
+  "tags": [
+   "jewelry",
+   "ring"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 12
+   }
+  ]
+ },
+ {
+  "id": "topaz_ring",
+  "name": "Topaz Ring",
+  "slot": "ring",
+  "category": "ring",
+  "icon": "ring",
+  "req_level": 1,
+  "tags": [
+   "jewelry",
+   "ring"
+  ],
+  "implicit": [
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 10
+   }
+  ]
+ },
+ {
+  "id": "bone_charm",
+  "name": "Bone Charm",
+  "slot": "charm",
+  "category": "charm",
+  "icon": "charm",
+  "req_level": 2,
+  "tags": [
+   "charm"
+  ],
+  "implicit": [
+   {
+    "stat": "item_rarity",
+    "type": "inc",
+    "value": 8
+   }
+  ]
+ },
+ {
+  "id": "rusted_sword_t2",
+  "name": "Tempered Sword",
+  "slot": "main_hand",
+  "category": "sword",
+  "icon": "sword",
+  "two_handed": false,
+  "req_level": 15,
+  "damage": [
+   8,
+   15
+  ],
+  "aps": 1.45,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "rusted_sword_t3",
+  "name": "Runeforged Sword",
+  "slot": "main_hand",
+  "category": "sword",
+  "icon": "sword",
+  "two_handed": false,
+  "req_level": 31,
+  "damage": [
+   12,
+   24
+  ],
+  "aps": 1.45,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "bearded_axe_t2",
+  "name": "Tempered Axe",
+  "slot": "main_hand",
+  "category": "axe",
+  "icon": "axe",
+  "two_handed": false,
+  "req_level": 16,
+  "damage": [
+   10,
+   21
+  ],
+  "aps": 1.3,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "bearded_axe_t3",
+  "name": "Runeforged Axe",
+  "slot": "main_hand",
+  "category": "axe",
+  "icon": "axe",
+  "two_handed": false,
+  "req_level": 32,
+  "damage": [
+   15,
+   33
+  ],
+  "aps": 1.3,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "flanged_mace_t2",
+  "name": "Tempered Mace",
+  "slot": "main_hand",
+  "category": "mace",
+  "icon": "mace",
+  "two_handed": false,
+  "req_level": 17,
+  "damage": [
+   13,
+   21
+  ],
+  "aps": 1.2,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "status_chance",
+    "type": "flat",
+    "value": 8
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "flanged_mace_t3",
+  "name": "Runeforged Mace",
+  "slot": "main_hand",
+  "category": "mace",
+  "icon": "mace",
+  "two_handed": false,
+  "req_level": 33,
+  "damage": [
+   21,
+   33
+  ],
+  "aps": 1.2,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "status_chance",
+    "type": "flat",
+    "value": 11
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "war_dagger_t2",
+  "name": "Tempered Dagger",
+  "slot": "main_hand",
+  "category": "dagger",
+  "icon": "dagger",
+  "two_handed": false,
+  "req_level": 15,
+  "damage": [
+   6,
+   13
+  ],
+  "aps": 1.65,
+  "crit": 8,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "war_dagger_t3",
+  "name": "Runeforged Dagger",
+  "slot": "main_hand",
+  "category": "dagger",
+  "icon": "dagger",
+  "two_handed": false,
+  "req_level": 31,
+  "damage": [
+   9,
+   21
+  ],
+  "aps": 1.65,
+  "crit": 8,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "one_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "greatsword_t2",
+  "name": "Tempered Greatsword",
+  "slot": "main_hand",
+  "category": "greatsword",
+  "icon": "greatsword",
+  "two_handed": true,
+  "req_level": 16,
+  "damage": [
+   21,
+   36
+  ],
+  "aps": 1.05,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "greatsword_t3",
+  "name": "Runeforged Greatsword",
+  "slot": "main_hand",
+  "category": "greatsword",
+  "icon": "greatsword",
+  "two_handed": true,
+  "req_level": 32,
+  "damage": [
+   33,
+   57
+  ],
+  "aps": 1.05,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "greataxe_t2",
+  "name": "Tempered Greataxe",
+  "slot": "main_hand",
+  "category": "greataxe",
+  "icon": "greataxe",
+  "two_handed": true,
+  "req_level": 18,
+  "damage": [
+   23,
+   44
+  ],
+  "aps": 0.98,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "greataxe_t3",
+  "name": "Runeforged Greataxe",
+  "slot": "main_hand",
+  "category": "greataxe",
+  "icon": "greataxe",
+  "two_handed": true,
+  "req_level": 34,
+  "damage": [
+   36,
+   69
+  ],
+  "aps": 0.98,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "warhammer_t2",
+  "name": "Tempered Warhammer",
+  "slot": "main_hand",
+  "category": "warhammer",
+  "icon": "hammer",
+  "two_handed": true,
+  "req_level": 19,
+  "damage": [
+   28,
+   46
+  ],
+  "aps": 0.9,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 16
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "warhammer_t3",
+  "name": "Runeforged Warhammer",
+  "slot": "main_hand",
+  "category": "warhammer",
+  "icon": "hammer",
+  "two_handed": true,
+  "req_level": 35,
+  "damage": [
+   45,
+   72
+  ],
+  "aps": 0.9,
+  "crit": 5,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 22
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "spear_t2",
+  "name": "Tempered Spear",
+  "slot": "main_hand",
+  "category": "spear",
+  "icon": "spear",
+  "two_handed": true,
+  "req_level": 17,
+  "damage": [
+   17,
+   30
+  ],
+  "aps": 1.2,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "spear_t3",
+  "name": "Runeforged Spear",
+  "slot": "main_hand",
+  "category": "spear",
+  "icon": "spear",
+  "two_handed": true,
+  "req_level": 33,
+  "damage": [
+   27,
+   48
+  ],
+  "aps": 1.2,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "melee_weapon",
+   "attack_weapon",
+   "two_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "wooden_buckler_t2",
+  "name": "Tempered Buckler",
+  "slot": "off_hand",
+  "category": "shield",
+  "icon": "shield",
+  "req_level": 15,
+  "armour": 20,
+  "block": 20,
+  "tags": [
+   "shield",
+   "offhand",
+   "armour_piece"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "wooden_buckler_t3",
+  "name": "Runeforged Buckler",
+  "slot": "off_hand",
+  "category": "shield",
+  "icon": "shield",
+  "req_level": 31,
+  "armour": 32,
+  "block": 22,
+  "tags": [
+   "shield",
+   "offhand",
+   "armour_piece"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "tower_shield_t2",
+  "name": "Tempered Tower Shield",
+  "slot": "off_hand",
+  "category": "shield",
+  "icon": "tower",
+  "req_level": 19,
+  "armour": 52,
+  "block": 26,
+  "tags": [
+   "shield",
+   "offhand",
+   "armour_piece"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "tower_shield_t3",
+  "name": "Runeforged Tower Shield",
+  "slot": "off_hand",
+  "category": "shield",
+  "icon": "tower",
+  "req_level": 35,
+  "armour": 83,
+  "block": 28,
+  "tags": [
+   "shield",
+   "offhand",
+   "armour_piece"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "shortbow_t2",
+  "name": "Tempered Shortbow",
+  "slot": "main_hand",
+  "category": "shortbow",
+  "icon": "bow",
+  "two_handed": true,
+  "req_level": 15,
+  "damage": [
+   8,
+   17
+  ],
+  "aps": 1.45,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "bow",
+   "two_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "shortbow_t3",
+  "name": "Runeforged Shortbow",
+  "slot": "main_hand",
+  "category": "shortbow",
+  "icon": "bow",
+  "two_handed": true,
+  "req_level": 31,
+  "damage": [
+   12,
+   27
+  ],
+  "aps": 1.45,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "bow",
+   "two_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "longbow_t2",
+  "name": "Tempered Longbow",
+  "slot": "main_hand",
+  "category": "longbow",
+  "icon": "longbow",
+  "two_handed": true,
+  "req_level": 18,
+  "damage": [
+   13,
+   28
+  ],
+  "aps": 1.15,
+  "crit": 7,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "bow",
+   "two_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "longbow_t3",
+  "name": "Runeforged Longbow",
+  "slot": "main_hand",
+  "category": "longbow",
+  "icon": "longbow",
+  "two_handed": true,
+  "req_level": 34,
+  "damage": [
+   21,
+   45
+  ],
+  "aps": 1.15,
+  "crit": 7,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "bow",
+   "two_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "crossbow_t2",
+  "name": "Tempered Arbalest",
+  "slot": "main_hand",
+  "category": "crossbow",
+  "icon": "crossbow",
+  "two_handed": true,
+  "req_level": 17,
+  "damage": [
+   19,
+   32
+  ],
+  "aps": 0.92,
+  "crit": 8,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "bow",
+   "two_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "crossbow_t3",
+  "name": "Runeforged Arbalest",
+  "slot": "main_hand",
+  "category": "crossbow",
+  "icon": "crossbow",
+  "two_handed": true,
+  "req_level": 33,
+  "damage": [
+   30,
+   51
+  ],
+  "aps": 0.92,
+  "crit": 8,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "bow",
+   "two_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "flintlock_t2",
+  "name": "Tempered Pistol",
+  "slot": "main_hand",
+  "category": "pistol",
+  "icon": "pistol",
+  "two_handed": false,
+  "req_level": 16,
+  "damage": [
+   10,
+   23
+  ],
+  "aps": 1.3,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "firearm",
+   "one_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "flintlock_t3",
+  "name": "Runeforged Pistol",
+  "slot": "main_hand",
+  "category": "pistol",
+  "icon": "pistol",
+  "two_handed": false,
+  "req_level": 32,
+  "damage": [
+   15,
+   36
+  ],
+  "aps": 1.3,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "firearm",
+   "one_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "rifle_t2",
+  "name": "Tempered Rifle",
+  "slot": "main_hand",
+  "category": "rifle",
+  "icon": "rifle",
+  "two_handed": true,
+  "req_level": 19,
+  "damage": [
+   25,
+   42
+  ],
+  "aps": 0.82,
+  "crit": 9,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "firearm",
+   "two_handed"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "rifle_t3",
+  "name": "Runeforged Rifle",
+  "slot": "main_hand",
+  "category": "rifle",
+  "icon": "rifle",
+  "two_handed": true,
+  "req_level": 35,
+  "damage": [
+   39,
+   66
+  ],
+  "aps": 0.82,
+  "crit": 9,
+  "tags": [
+   "weapon",
+   "ranged_weapon",
+   "attack_weapon",
+   "firearm",
+   "two_handed"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "simple_quiver_t2",
+  "name": "Tempered Quiver",
+  "slot": "off_hand",
+  "category": "quiver",
+  "icon": "quiver",
+  "req_level": 15,
+  "tags": [
+   "quiver",
+   "offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "simple_quiver_t3",
+  "name": "Runeforged Quiver",
+  "slot": "off_hand",
+  "category": "quiver",
+  "icon": "quiver",
+  "req_level": 31,
+  "tags": [
+   "quiver",
+   "offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 13
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "hunters_quiver_t2",
+  "name": "Tempered Quiver",
+  "slot": "off_hand",
+  "category": "quiver",
+  "icon": "quiver",
+  "req_level": 19,
+  "tags": [
+   "quiver",
+   "offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 19
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "hunters_quiver_t3",
+  "name": "Runeforged Quiver",
+  "slot": "off_hand",
+  "category": "quiver",
+  "icon": "quiver",
+  "req_level": 35,
+  "tags": [
+   "quiver",
+   "offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 26
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "apprentice_wand_t2",
+  "name": "Tempered Wand",
+  "slot": "main_hand",
+  "category": "wand",
+  "icon": "wand",
+  "two_handed": false,
+  "req_level": 15,
+  "damage": [
+   6,
+   11
+  ],
+  "aps": 1.3,
+  "crit": 7,
+  "tags": [
+   "weapon",
+   "caster_weapon",
+   "one_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 16
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "apprentice_wand_t3",
+  "name": "Runeforged Wand",
+  "slot": "main_hand",
+  "category": "wand",
+  "icon": "wand",
+  "two_handed": false,
+  "req_level": 31,
+  "damage": [
+   9,
+   18
+  ],
+  "aps": 1.3,
+  "crit": 7,
+  "tags": [
+   "weapon",
+   "caster_weapon",
+   "one_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 22
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "bone_wand_t2",
+  "name": "Tempered Wand",
+  "slot": "main_hand",
+  "category": "wand",
+  "icon": "wand",
+  "two_handed": false,
+  "req_level": 18,
+  "damage": [
+   8,
+   15
+  ],
+  "aps": 1.3,
+  "crit": 7,
+  "tags": [
+   "weapon",
+   "caster_weapon",
+   "one_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 26
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "bone_wand_t3",
+  "name": "Runeforged Wand",
+  "slot": "main_hand",
+  "category": "wand",
+  "icon": "wand",
+  "two_handed": false,
+  "req_level": 34,
+  "damage": [
+   12,
+   24
+  ],
+  "aps": 1.3,
+  "crit": 7,
+  "tags": [
+   "weapon",
+   "caster_weapon",
+   "one_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 35
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "oak_staff_t2",
+  "name": "Tempered Staff",
+  "slot": "main_hand",
+  "category": "staff",
+  "icon": "staff",
+  "two_handed": true,
+  "req_level": 16,
+  "damage": [
+   11,
+   21
+  ],
+  "aps": 1.1,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "caster_weapon",
+   "two_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 35
+   },
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 24
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "oak_staff_t3",
+  "name": "Runeforged Staff",
+  "slot": "main_hand",
+  "category": "staff",
+  "icon": "staff",
+  "two_handed": true,
+  "req_level": 32,
+  "damage": [
+   18,
+   33
+  ],
+  "aps": 1.1,
+  "crit": 6,
+  "tags": [
+   "weapon",
+   "caster_weapon",
+   "two_handed"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 48
+   },
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 33
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "cracked_focus_t2",
+  "name": "Tempered Focus",
+  "slot": "off_hand",
+  "category": "focus",
+  "icon": "orb",
+  "req_level": 15,
+  "tags": [
+   "focus",
+   "offhand",
+   "caster_offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "cracked_focus_t3",
+  "name": "Runeforged Focus",
+  "slot": "off_hand",
+  "category": "focus",
+  "icon": "orb",
+  "req_level": 31,
+  "tags": [
+   "focus",
+   "offhand",
+   "caster_offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 13
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "tome_t2",
+  "name": "Tempered Tome",
+  "slot": "off_hand",
+  "category": "spellbook",
+  "icon": "book",
+  "req_level": 17,
+  "tags": [
+   "spellbook",
+   "offhand",
+   "caster_offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 19
+   },
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "tome_t3",
+  "name": "Runeforged Tome",
+  "slot": "off_hand",
+  "category": "spellbook",
+  "icon": "book",
+  "req_level": 33,
+  "tags": [
+   "spellbook",
+   "offhand",
+   "caster_offhand"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 26
+   },
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 11
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "iron_helm_t2",
+  "name": "Tempered Helm",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "heavy",
+  "icon": "helm",
+  "req_level": 15,
+  "armour": 28,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "iron_helm_t3",
+  "name": "Runeforged Helm",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "heavy",
+  "icon": "helm",
+  "req_level": 31,
+  "armour": 45,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "chain_coif_t2",
+  "name": "Tempered Coif",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "medium",
+  "icon": "coif",
+  "req_level": 15,
+  "armour": 14,
+  "evasion": 14,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "chain_coif_t3",
+  "name": "Runeforged Coif",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "medium",
+  "icon": "coif",
+  "req_level": 31,
+  "armour": 22,
+  "evasion": 22,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "leather_cap_t2",
+  "name": "Tempered Cap",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "light",
+  "icon": "cap",
+  "req_level": 15,
+  "evasion": 28,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "leather_cap_t3",
+  "name": "Runeforged Cap",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "light",
+  "icon": "cap",
+  "req_level": 31,
+  "evasion": 45,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "scholar_hood_t2",
+  "name": "Tempered Hood",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "robe",
+  "icon": "hood",
+  "req_level": 15,
+  "evasion": 10,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 13
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "scholar_hood_t3",
+  "name": "Runeforged Hood",
+  "slot": "helmet",
+  "category": "helmet",
+  "armour_type": "robe",
+  "icon": "hood",
+  "req_level": 31,
+  "evasion": 16,
+  "tags": [
+   "armour_piece",
+   "helmet"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 18
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "plate_cuirass_t2",
+  "name": "Tempered Cuirass",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "heavy",
+  "icon": "plate",
+  "req_level": 17,
+  "armour": 68,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "plate_cuirass_t3",
+  "name": "Runeforged Cuirass",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "heavy",
+  "icon": "plate",
+  "req_level": 33,
+  "armour": 109,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "padded_vest_t2",
+  "name": "Tempered Vest",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "medium",
+  "icon": "vest",
+  "req_level": 15,
+  "armour": 28,
+  "evasion": 20,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "padded_vest_t3",
+  "name": "Runeforged Vest",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "medium",
+  "icon": "vest",
+  "req_level": 31,
+  "armour": 45,
+  "evasion": 32,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "leather_jerkin_t2",
+  "name": "Tempered Jerkin",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "light",
+  "icon": "jerkin",
+  "req_level": 15,
+  "evasion": 52,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "leather_jerkin_t3",
+  "name": "Runeforged Jerkin",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "light",
+  "icon": "jerkin",
+  "req_level": 31,
+  "evasion": 83,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "silk_robe_t2",
+  "name": "Tempered Robe",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "robe",
+  "icon": "robe",
+  "req_level": 15,
+  "evasion": 16,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 24
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "silk_robe_t3",
+  "name": "Runeforged Robe",
+  "slot": "chest",
+  "category": "chest",
+  "armour_type": "robe",
+  "icon": "robe",
+  "req_level": 31,
+  "evasion": 26,
+  "tags": [
+   "armour_piece",
+   "chest"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 33
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "gauntlets_t2",
+  "name": "Tempered Gauntlets",
+  "slot": "gloves",
+  "category": "gloves",
+  "armour_type": "heavy",
+  "icon": "gauntlet",
+  "req_level": 15,
+  "armour": 18,
+  "tags": [
+   "armour_piece",
+   "gloves"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "gauntlets_t3",
+  "name": "Runeforged Gauntlets",
+  "slot": "gloves",
+  "category": "gloves",
+  "armour_type": "heavy",
+  "icon": "gauntlet",
+  "req_level": 31,
+  "armour": 29,
+  "tags": [
+   "armour_piece",
+   "gloves"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "leather_gloves_t2",
+  "name": "Tempered Gloves",
+  "slot": "gloves",
+  "category": "gloves",
+  "armour_type": "light",
+  "icon": "glove",
+  "req_level": 15,
+  "evasion": 18,
+  "tags": [
+   "armour_piece",
+   "gloves"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "leather_gloves_t3",
+  "name": "Runeforged Gloves",
+  "slot": "gloves",
+  "category": "gloves",
+  "armour_type": "light",
+  "icon": "glove",
+  "req_level": 31,
+  "evasion": 29,
+  "tags": [
+   "armour_piece",
+   "gloves"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "silk_gloves_t2",
+  "name": "Tempered Gloves",
+  "slot": "gloves",
+  "category": "gloves",
+  "armour_type": "robe",
+  "icon": "glove",
+  "req_level": 15,
+  "evasion": 6,
+  "tags": [
+   "armour_piece",
+   "gloves"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 8
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "silk_gloves_t3",
+  "name": "Runeforged Gloves",
+  "slot": "gloves",
+  "category": "gloves",
+  "armour_type": "robe",
+  "icon": "glove",
+  "req_level": 31,
+  "evasion": 10,
+  "tags": [
+   "armour_piece",
+   "gloves"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 11
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "greaves_t2",
+  "name": "Tempered Greaves",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "heavy",
+  "icon": "greaves",
+  "req_level": 15,
+  "armour": 18,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "greaves_t3",
+  "name": "Runeforged Greaves",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "heavy",
+  "icon": "greaves",
+  "req_level": 31,
+  "armour": 29,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "leather_boots_t2",
+  "name": "Tempered Boots",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "light",
+  "icon": "boot",
+  "req_level": 15,
+  "evasion": 18,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ],
+  "implicit": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "leather_boots_t3",
+  "name": "Runeforged Boots",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "light",
+  "icon": "boot",
+  "req_level": 31,
+  "evasion": 29,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ],
+  "implicit": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 7
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "chain_boots_t2",
+  "name": "Tempered Boots",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "medium",
+  "icon": "boot",
+  "req_level": 16,
+  "armour": 10,
+  "evasion": 10,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "chain_boots_t3",
+  "name": "Runeforged Boots",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "medium",
+  "icon": "boot",
+  "req_level": 32,
+  "armour": 16,
+  "evasion": 16,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "silk_slippers_t2",
+  "name": "Tempered Slippers",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "robe",
+  "icon": "slipper",
+  "req_level": 15,
+  "evasion": 8,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ],
+  "implicit": [
+   {
+    "stat": "mana_regen",
+    "type": "inc",
+    "value": 13
+   }
+  ],
+  "base_tier": 2
+ },
+ {
+  "id": "silk_slippers_t3",
+  "name": "Runeforged Slippers",
+  "slot": "boots",
+  "category": "boots",
+  "armour_type": "robe",
+  "icon": "slipper",
+  "req_level": 31,
+  "evasion": 13,
+  "tags": [
+   "armour_piece",
+   "boots"
+  ],
+  "implicit": [
+   {
+    "stat": "mana_regen",
+    "type": "inc",
+    "value": 18
+   }
+  ],
+  "base_tier": 3
+ },
+ {
+  "id": "blood_charm",
+  "name": "Blood Charm",
+  "slot": "charm",
+  "category": "charm",
+  "icon": "charm",
+  "req_level": 4,
+  "tags": [
+   "charm"
+  ],
+  "implicit": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "stage4": true
+ },
+ {
+  "id": "wolf_charm",
+  "name": "Wolf Charm",
+  "slot": "charm",
+  "category": "charm",
+  "icon": "charm",
+  "req_level": 6,
+  "tags": [
+   "charm"
+  ],
+  "implicit": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "stage4": true
+ },
+ {
+  "id": "sage_charm",
+  "name": "Sage Charm",
+  "slot": "charm",
+  "category": "charm",
+  "icon": "charm",
+  "req_level": 8,
+  "tags": [
+   "charm"
+  ],
+  "implicit": [
+   {
+    "stat": "mana_regen",
+    "type": "inc",
+    "value": 12
+   }
+  ],
+  "stage4": true
+ },
+ {
+  "id": "war_charm",
+  "name": "War Charm",
+  "slot": "charm",
+  "category": "charm",
+  "icon": "charm",
+  "req_level": 10,
+  "tags": [
+   "charm"
+  ],
+  "implicit": [
+   {
+    "stat": "damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "stage4": true
+ },
+ {
+  "id": "ember_charm",
+  "name": "Ember Charm",
+  "slot": "charm",
+  "category": "charm",
+  "icon": "charm",
+  "req_level": 14,
+  "tags": [
+   "charm"
+  ],
+  "implicit": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 8
+   },
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 8
+   }
+  ],
+  "stage4": true
+ },
+ {
+  "id": "storm_charm",
+  "name": "Storm Charm",
+  "slot": "charm",
+  "category": "charm",
+  "icon": "charm",
+  "req_level": 18,
+  "tags": [
+   "charm"
+  ],
+  "implicit": [
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 8
+   },
+   {
+    "stat": "status_chance",
+    "type": "flat",
+    "value": 3
+   }
+  ],
+  "stage4": true
+ },
+ {
+  "id": "void_charm",
+  "name": "Void Charm",
+  "slot": "charm",
+  "category": "charm",
+  "icon": "charm",
+  "req_level": 24,
+  "tags": [
+   "charm"
+  ],
+  "implicit": [
+   {
+    "stat": "res_void",
+    "type": "flat",
+    "value": 10
+   }
+  ],
+  "stage4": true
+ },
+ {
+  "id": "relic_charm",
+  "name": "Relic Charm",
+  "slot": "charm",
+  "category": "charm",
+  "icon": "charm",
+  "req_level": 32,
+  "tags": [
+   "charm"
+  ],
+  "implicit": [
+   {
+    "stat": "damage",
+    "type": "inc",
+    "value": 8
+   },
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "stage4": true
+ },
+ {
+  "id": "crown_charm",
+  "name": "Crown Charm",
+  "slot": "charm",
+  "category": "charm",
+  "icon": "charm",
+  "req_level": 40,
+  "tags": [
+   "charm"
+  ],
+  "implicit": [
+   {
+    "stat": "item_rarity",
+    "type": "inc",
+    "value": 15
+   },
+   {
+    "stat": "damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "stage4": true
+ }
+]

@@ -1,0 +1,31 @@
+ARGS: ["--headless", "--fixed-fps", "60", "--path", "W:/AI game/PathofDan/Pathof Dan/", "res://tests/smartbot/smartbot.tscn", "--", "--class=ranger", "--tier=1", "--runs=10", "--seed=700", "--profile=Expert", "--jobs=10", "--out=res://tests/smartbot/out/val2.csv"]
+
+Godot Engine v4.0.stable.official.92bee43ad - https://godotengine.org
+ 
+ROW ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c0-r0,smartbot-1.0,ranger,balanced,Expert,1,forgotten_depths,fresh,0,0,700,173374585,4,5,boss_killed,,11.9,30.2,0.0,24,2,10,0,9,1,13,12,0,3,11,0,113,45,277,205,,5,,,quickdraw|quick_shot|ballista_turret|explosive_mine|barrage|multishot|rain_of_arrows,,rain_of_arrows:3|quick_shot:1|ballista_turret:3|explosive_mine:29|multishot:2|quickdraw:3,,4,"Sir Morcant, the Drowned Warden:eruption=24",4,0,none,1,60,
+UNIT ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c0-r0 exit=0
+ROW ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c8-r0,smartbot-1.0,ranger,balanced,Expert,1,forgotten_depths,fresh,8,0,700,1489904514,4,5,boss_killed,,19.1,51.2,0.0,37,6,12,7,12,0,30,26,0,4,19,0,80,28,229,180,,5,,bloodstone:0,quickdraw|quick_shot|ballista_turret|explosive_mine|barrage|multishot|rain_of_arrows,,quick_shot:3|rain_of_arrows:12|ballista_turret:6|explosive_mine:30|multishot:1|quickdraw:25,,4,Ash Cultist:projectile=21|Rotting Ghoul:melee=16,3,0,none,1,60,
+UNIT ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c8-r0 exit=0
+ROW ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c7-r0,smartbot-1.0,ranger,balanced,Expert,1,forgotten_depths,fresh,7,0,700,199662099,4,5,boss_killed,,26.0,49.9,0.0,6,1,10,3,10,0,20,19,0,6,28,0,108,46,254,198,,5,,diamond:0,quickdraw|quick_shot|ballista_turret|explosive_mine|barrage|multishot|rain_of_arrows,,quick_shot:4|rain_of_arrows:8|ballista_turret:7|explosive_mine:39|quickdraw:15,,4,dead_enemy:projectile=6,7,0,none,1,60,
+UNIT ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c7-r0 exit=0
+ROW ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c2-r0,smartbot-1.0,ranger,balanced,Expert,1,forgotten_depths,fresh,2,0,700,1072449548,4,6,boss_killed,,28.2,47.1,0.0,0,0,10,4,10,0,12,12,0,6,47,0,171,122,238,194,,5,,ruby:0,quick_shot|piercing_arrow|ballista_turret|explosive_mine|barrage|multishot|scattershot,,quick_shot:12|rain_of_arrows:12|ballista_turret:6|explosive_mine:21|multishot:1|barrage:13,,4,,6,0,none,1,60,
+UNIT ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c2-r0 exit=0
+ROW ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c6-r0,smartbot-1.0,ranger,balanced,Expert,1,forgotten_depths,fresh,6,0,700,779306205,4,5,boss_killed,,31.9,57.3,0.0,6,1,10,3,9,1,17,16,0,7,34,0,111,54,224,161,,5,,ruby:0,barrage|multishot|ballista_turret|explosive_mine|quick_shot|rain_of_arrows,,quick_shot:13|rain_of_arrows:10|ballista_turret:7|explosive_mine:38,,4,dead_enemy:projectile=6,4,1,none,1,60,
+UNIT ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c6-r0 exit=0
+ROW ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c3-r0,smartbot-1.0,ranger,balanced,Expert,1,forgotten_depths,fresh,3,0,700,1755842427,4,5,boss_killed,,23.8,54.7,0.0,44,3,19,7,19,0,30,26,0,5,30,0,128,62,262,199,,3,,ruby:0,quick_shot|multishot|ballista_turret|explosive_mine|rain_of_arrows|barrage,,quick_shot:31|ballista_turret:6|explosive_mine:33|rain_of_arrows:4,,4,"Sir Morcant, the Drowned Warden:cleave=22|Sir Morcant, the Drowned Warden:eruption=17|Rotting Ghoul:melee=5",2,0,none,1,60,
+UNIT ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c3-r0 exit=0
+ROW ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c4-r0,smartbot-1.0,ranger,balanced,Expert,1,forgotten_depths,fresh,4,0,700,583952642,4,5,boss_killed,,26.2,57.2,0.0,42,3,11,2,10,1,25,23,0,5,23,0,100,35,282,198,,3,,onyx:0,quickdraw|quick_shot|ballista_turret|explosive_mine|multishot|rain_of_arrows|barrage,,quick_shot:3|rain_of_arrows:7|ballista_turret:8|explosive_mine:38|quickdraw:12,,4,"Sir Morcant, the Drowned Warden:eruption=42",3,0,none,1,60,
+UNIT ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c4-r0 exit=0
+ROW ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c5-r0,smartbot-1.0,ranger,balanced,Expert,1,forgotten_depths,fresh,5,0,700,1984807666,4,5,boss_killed,,25.1,61.8,0.0,65,5,10,4,8,2,24,19,0,5,25,0,117,48,284,211,,5,,amethyst:0,quickdraw|multishot|ballista_turret|explosive_mine|barrage|quick_shot|rain_of_arrows,,rain_of_arrows:15|ballista_turret:7|explosive_mine:26|quick_shot:2|quickdraw:32|multishot:1,,4,"Sir Morcant, the Drowned Warden:eruption=55|dead_enemy:projectile=10",5,1,none,1,60,
+UNIT ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c5-r0 exit=0
+ROW ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c1-r0,smartbot-1.0,ranger,balanced,Expert,1,forgotten_depths,fresh,1,0,700,872802868,4,5,boss_killed,,32.1,59.9,0.0,67,5,14,0,10,4,21,20,0,7,30,0,121,52,276,210,,4,,,quickdraw|multishot|ballista_turret|explosive_mine|quick_shot|rain_of_arrows|barrage,,rain_of_arrows:7|quick_shot:3|ballista_turret:6|explosive_mine:43|barrage:1|quickdraw:25|multishot:1,,4,"Sir Morcant, the Drowned Warden:eruption=60|death_explosion=7",7,0,none,1,60,
+UNIT ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c1-r0 exit=0
+ROW ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c9-r0,smartbot-1.0,ranger,balanced,Expert,1,forgotten_depths,fresh,9,0,700,89310109,4,5,boss_killed,,31.4,83.0,0.0,19,1,38,13,38,0,63,59,0,9,34,0,104,45,233,181,,4,,,quick_shot|multishot|ballista_turret|explosive_mine|rain_of_arrows|barrage,,rain_of_arrows:9|ballista_turret:8|explosive_mine:38|quick_shot:12|barrage:35|multishot:2,,4,"Sir Morcant, the Drowned Warden:eruption=19",6,1,none,1,60,
+UNIT ranger-balanced-Expert-T1-L4-s700-fresh-none-ts1-c9-r0 exit=0
+SMARTBOT DONE
+ERROR: Condition "_first != nullptr" is true.
+   at: ~List (./core/templates/self_list.h:106)
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+     at: cleanup (core/object/object.cpp:1982)
+ERROR: Resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:489)

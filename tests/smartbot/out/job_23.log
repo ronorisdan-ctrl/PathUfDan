@@ -1,0 +1,31 @@
+ARGS: ["--headless", "--fixed-fps", "60", "--path", "W:/AI game/PathofDan/Pathof Dan/", "res://tests/smartbot/smartbot.tscn", "--", "--class=mage", "--tier=1", "--runs=10", "--seed=700", "--profile=Expert", "--jobs=10", "--out=res://tests/smartbot/out/val2.csv"]
+
+Godot Engine v4.0.stable.official.92bee43ad - https://godotengine.org
+ 
+ROW mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c8-r0,smartbot-1.0,mage,balanced,Expert,1,forgotten_depths,fresh,8,0,700,1489904514,4,5,boss_killed,,14.1,52.6,0.0,0,0,5,3,5,0,31,30,0,3,16,0,106,55,202,153,,5,,onyx:0,chain_lightning|spark|summon_skeletons|blink|firebolt|frostbolt|frost_nova,,summon_skeletons:14|firebolt:2|frostbolt:2|chain_lightning:41|frost_nova:3|spark:1,,4,,3,0,none,1,60,
+UNIT mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c8-r0 exit=0
+ROW mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c0-r0,smartbot-1.0,mage,balanced,Expert,1,forgotten_depths,fresh,0,0,700,173374585,4,5,boss_killed,,18.2,57.2,0.0,0,0,1,0,1,0,32,30,0,3,14,0,141,93,211,175,,5,,emerald:0,firebolt|chain_lightning|summon_skeletons|blink|frostbolt|spark|frost_nova,,summon_skeletons:16|firebolt:3|chain_lightning:43|frostbolt:1,,4,,2,0,none,1,60,
+UNIT mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c0-r0 exit=0
+ROW mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c4-r0,smartbot-1.0,mage,balanced,Expert,1,forgotten_depths,fresh,4,0,700,583952642,4,5,boss_killed,,26.7,66.1,0.0,0,0,4,1,4,0,30,30,0,4,24,0,100,51,192,149,,5,,diamond:0,chain_lightning|spark|summon_skeletons|blink|firebolt|frostbolt|frost_nova,,summon_skeletons:17|firebolt:8|chain_lightning:43|spark:1|frost_nova:6,,4,,3,0,none,1,60,
+UNIT mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c4-r0 exit=0
+ROW mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c5-r0,smartbot-1.0,mage,balanced,Expert,1,forgotten_depths,fresh,5,0,700,1984807666,4,5,boss_killed,,30.3,72.4,0.0,0,0,6,1,6,0,44,39,0,2,22,0,151,103,219,172,,5,,emerald:0,firebolt|chain_lightning|summon_skeletons|blink|frostbolt|spark|frost_nova,,summon_skeletons:18|spark:3|chain_lightning:14|firebolt:40|frost_nova:4,,4,,5,0,none,1,60,
+UNIT mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c5-r0 exit=0
+ROW mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c3-r0,smartbot-1.0,mage,balanced,Expert,1,forgotten_depths,fresh,3,0,700,1755842427,4,5,boss_killed,,28.4,67.1,0.0,0,0,5,0,5,0,41,34,0,3,31,0,123,58,258,213,,5,,topaz:0,chain_lightning|spark|summon_skeletons|blink|firebolt|frostbolt|frost_nova,,summon_skeletons:17|spark:5|chain_lightning:47|frostbolt:8,,4,,5,2,none,1,60,
+UNIT mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c3-r0 exit=0
+ROW mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c6-r0,smartbot-1.0,mage,balanced,Expert,1,forgotten_depths,fresh,6,0,700,779306205,4,5,boss_killed,,35.8,75.8,0.0,0,0,3,1,3,0,49,44,0,4,34,0,116,55,244,195,,5,,topaz:0,chain_lightning|spark|summon_skeletons|blink|firebolt|frostbolt|frost_nova,,summon_skeletons:18|frostbolt:4|chain_lightning:54|frost_nova:2|spark:2,,4,,7,2,none,1,60,
+UNIT mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c6-r0 exit=0
+ROW mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c7-r0,smartbot-1.0,mage,balanced,Expert,1,forgotten_depths,fresh,7,0,700,199662099,4,5,boss_killed,,32.7,74.1,0.0,0,0,8,2,8,0,35,29,0,4,28,0,142,94,214,177,,5,,,firebolt|chain_lightning|summon_skeletons|blink|spark|frostbolt|frost_nova,,summon_skeletons:16|firebolt:14|chain_lightning:51|frostbolt:1|spark:1|frost_nova:7,,4,,6,0,none,1,60,
+UNIT mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c7-r0 exit=0
+ROW mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c1-r0,smartbot-1.0,mage,balanced,Expert,1,forgotten_depths,fresh,1,0,700,872802868,4,6,boss_killed,,44.4,70.9,0.0,23,1,10,4,10,0,51,48,0,4,45,0,127,67,240,176,,6,,bloodstone:0,frostbolt|spark|summon_skeletons|blink|firebolt|fireball|chain_lightning,,summon_skeletons:11|chain_lightning:64|frostbolt:7|spark:2|firebolt:1|frost_nova:4,,4,"Sir Morcant, the Drowned Warden:eruption=23",12,1,none,1,60,
+UNIT mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c1-r0 exit=0
+ROW mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c2-r0,smartbot-1.0,mage,balanced,Expert,1,forgotten_depths,fresh,2,0,700,1072449548,4,6,boss_killed,,47.2,76.4,0.0,0,0,2,0,2,0,30,30,0,2,42,0,156,110,218,197,,6,,ruby:0,fireball|chain_lightning|summon_skeletons|blink|firebolt|spark|frostbolt,,summon_skeletons:11|firebolt:9|spark:3|chain_lightning:52,,4,,9,1,none,1,60,
+UNIT mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c2-r0 exit=0
+ROW mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c9-r0,smartbot-1.0,mage,balanced,Expert,1,forgotten_depths,fresh,9,0,700,89310109,4,6,boss_killed,,65.0,100.0,0.0,0,0,2,1,2,0,69,59,0,5,41,0,134,56,313,259,,6,,,firebolt|spark|summon_skeletons|blink|frostbolt|fireball|chain_lightning,,summon_skeletons:27|chain_lightning:58|firebolt:4|frost_nova:3|frostbolt:2|spark:3,,4,,7,0,none,1,60,
+UNIT mage-balanced-Expert-T1-L4-s700-fresh-none-ts1-c9-r0 exit=0
+SMARTBOT DONE
+ERROR: Condition "_first != nullptr" is true.
+   at: ~List (./core/templates/self_list.h:106)
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+     at: cleanup (core/object/object.cpp:1982)
+ERROR: Resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:489)

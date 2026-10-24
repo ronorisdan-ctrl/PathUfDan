@@ -1,0 +1,581 @@
+[
+ {
+  "id": "worldsplitter",
+  "name": "Worldsplitter",
+  "base": "warhammer",
+  "req_level": 5,
+  "flavor": "The mountain remembers every blow.",
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "range": [
+     60,
+     90
+    ]
+   },
+   {
+    "stat": "str",
+    "type": "flat",
+    "range": [
+     12,
+     20
+    ]
+   },
+   {
+    "stat": "area",
+    "type": "inc",
+    "range": [
+     15,
+     20
+    ]
+   }
+  ],
+  "effect": "worldsplitter",
+  "effect_text": "Heavy Strike and Ground Slam create an additional ground rupture after a short delay"
+ },
+ {
+  "id": "last_bastion",
+  "name": "The Last Bastion",
+  "base": "tower_shield",
+  "req_level": 5,
+  "flavor": "When the walls fell, it did not.",
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "range": [
+     40,
+     70
+    ]
+   },
+   {
+    "stat": "max_life",
+    "type": "flat",
+    "range": [
+     25,
+     40
+    ]
+   },
+   {
+    "stat": "block_chance",
+    "type": "flat",
+    "range": [
+     4,
+     6
+    ]
+   }
+  ],
+  "effect": "last_bastion",
+  "effect_text": "Blocking a hit grants 25% damage reduction for 3 seconds"
+ },
+ {
+  "id": "bloodletter",
+  "name": "Bloodletter",
+  "base": "rusted_sword",
+  "req_level": 3,
+  "flavor": "It drinks before you do.",
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "range": [
+     40,
+     70
+    ]
+   },
+   {
+    "stat": "bleed_chance",
+    "type": "flat",
+    "range": [
+     25,
+     35
+    ]
+   },
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "range": [
+     8,
+     12
+    ]
+   }
+  ],
+  "effect": "bloodletter",
+  "effect_text": "Each consecutive hit within 2 seconds grants 4% more attack damage, up to 10 stacks"
+ },
+ {
+  "id": "widowmaker",
+  "name": "Widowmaker",
+  "base": "longbow",
+  "req_level": 4,
+  "flavor": "Every widow it makes is a little more alone.",
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "range": [
+     50,
+     80
+    ]
+   },
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "range": [
+     25,
+     40
+    ]
+   }
+  ],
+  "effect": "widowmaker",
+  "effect_text": "Deal 50% more damage to enemies with no other enemy nearby"
+ },
+ {
+  "id": "dead_mans_promise",
+  "name": "Dead Man's Promise",
+  "base": "flintlock",
+  "req_level": 3,
+  "flavor": "Paid in full, with interest.",
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "range": [
+     40,
+     60
+    ]
+   },
+   {
+    "stat": "added_fire",
+    "type": "flat",
+    "range": [
+     4,
+     8
+    ]
+   }
+  ],
+  "effect": "dead_mans_promise",
+  "effect_text": "Overkill damage on a killing hit explodes, dealing that damage to nearby enemies"
+ },
+ {
+  "id": "clockwork_choir",
+  "name": "The Clockwork Choir",
+  "base": "hunters_quiver",
+  "req_level": 4,
+  "flavor": "Twelve gears, one hymn.",
+  "mods": [
+   {
+    "stat": "turret_damage",
+    "type": "inc",
+    "range": [
+     30,
+     50
+    ]
+   },
+   {
+    "stat": "turret_speed",
+    "type": "inc",
+    "range": [
+     20,
+     30
+    ]
+   }
+  ],
+  "effect": "clockwork_choir",
+  "effect_text": "+1 maximum Turret. Turrets fire an additional bolt"
+ },
+ {
+  "id": "ashheart",
+  "name": "Ashheart",
+  "base": "oak_staff",
+  "req_level": 3,
+  "flavor": "Its warmth has never once been kind.",
+  "mods": [
+   {
+    "stat": "fire_damage",
+    "type": "inc",
+    "range": [
+     40,
+     60
+    ]
+   },
+   {
+    "stat": "ignite_chance",
+    "type": "flat",
+    "range": [
+     15,
+     25
+    ]
+   }
+  ],
+  "effect": "ashheart",
+  "effect_text": "Burning enemies explode in a burst of fire when they die"
+ },
+ {
+  "id": "stormglass",
+  "name": "Stormglass",
+  "base": "bone_wand",
+  "req_level": 4,
+  "flavor": "A storm, bottled and furious about it.",
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "range": [
+     40,
+     60
+    ]
+   },
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "range": [
+     8,
+     12
+    ]
+   }
+  ],
+  "effect": "stormglass",
+  "effect_text": "Lightning spells chain 2 additional times"
+ },
+ {
+  "id": "gravetender",
+  "name": "Gravetender",
+  "base": "tome",
+  "req_level": 3,
+  "flavor": "The pages are warm. The readers are not.",
+  "mods": [
+   {
+    "stat": "minion_damage",
+    "type": "inc",
+    "range": [
+     30,
+     45
+    ]
+   },
+   {
+    "stat": "minion_life",
+    "type": "inc",
+    "range": [
+     30,
+     45
+    ]
+   }
+  ],
+  "effect": "gravetender",
+  "effect_text": "+2 maximum Skeletons. Minions heal 10% of their life when you kill an enemy"
+ },
+ {
+  "id": "hollow_crown",
+  "name": "The Hollow Crown",
+  "base": "scholar_hood",
+  "req_level": 5,
+  "flavor": "Heavy is the head that is empty.",
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "range": [
+     35,
+     50
+    ]
+   },
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "range": [
+     30,
+     45
+    ]
+   },
+   {
+    "stat": "max_life",
+    "type": "more",
+    "value": -20
+   }
+  ],
+  "effect": "hollow_crown",
+  "effect_text": "20% less maximum Life. Spells cost no mana while you are above 90% mana"
+ },
+ {
+  "id": "ember_heart",
+  "name": "Emberheart",
+  "base": "ember_charm",
+  "req_level": 14,
+  "flavor": "It still beats, faintly warm.",
+  "mods": [
+   {
+    "stat": "fire_damage",
+    "type": "inc",
+    "range": [
+     15,
+     25
+    ]
+   },
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "range": [
+     10,
+     15
+    ]
+   }
+  ],
+  "effect": "ember_heart",
+  "effect_text": "Your ignites spread to one nearby enemy when they are applied",
+  "stage4": true
+ },
+ {
+  "id": "wolfmother",
+  "name": "Wolfmother's Fang",
+  "base": "wolf_charm",
+  "req_level": 10,
+  "flavor": "Run with the pack, or be run down.",
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "range": [
+     6,
+     10
+    ]
+   },
+   {
+    "stat": "minion_speed",
+    "type": "inc",
+    "range": [
+     15,
+     25
+    ]
+   }
+  ],
+  "effect": "pack_leader",
+  "effect_text": "Minions deal 1% more damage for each 1% increased movement speed you have (up to 40%)",
+  "stage4": true
+ },
+ {
+  "id": "tyrants_signet",
+  "name": "Tyrant's Signet",
+  "base": "crown_charm",
+  "req_level": 40,
+  "flavor": "Kneel.",
+  "mods": [
+   {
+    "stat": "damage",
+    "type": "inc",
+    "range": [
+     12,
+     18
+    ]
+   },
+   {
+    "stat": "skill_level",
+    "type": "flat",
+    "range": [
+     1,
+     1
+    ]
+   }
+  ],
+  "effect": "tyrant",
+  "effect_text": "Enemies near you are intimidated (take 10% increased damage)",
+  "stage4": true
+ },
+ {
+  "id": "glacial_crest",
+  "name": "Glacial Crest",
+  "base": "sapphire_ring",
+  "req_level": 16,
+  "flavor": "Cold enough to burn.",
+  "mods": [
+   {
+    "stat": "cold_damage",
+    "type": "inc",
+    "range": [
+     20,
+     30
+    ]
+   },
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "range": [
+     15,
+     25
+    ]
+   }
+  ],
+  "effect": "shatter",
+  "effect_text": "Enemies that die while chilled or frozen shatter, chilling enemies around them",
+  "stage4": true
+ },
+ {
+  "id": "thornmail",
+  "name": "The Thornwarden",
+  "base": "plate_cuirass",
+  "req_level": 12,
+  "flavor": "Every blow returns.",
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "range": [
+     40,
+     70
+    ]
+   },
+   {
+    "stat": "max_life",
+    "type": "flat",
+    "range": [
+     30,
+     50
+    ]
+   }
+  ],
+  "effect": "thorns",
+  "effect_text": "Melee attackers take physical damage equal to 30% of your armour",
+  "stage4": true
+ },
+ {
+  "id": "phantom_treads",
+  "name": "Phantom Treads",
+  "base": "leather_boots",
+  "req_level": 14,
+  "flavor": "No footprints. No footsteps.",
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "range": [
+     12,
+     18
+    ]
+   },
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "range": [
+     30,
+     50
+    ]
+   }
+  ],
+  "effect": "phantom_treads",
+  "effect_text": "Dodge roll has 40% reduced cooldown and grants 20% increased movement speed for 2 seconds",
+  "stage4": true
+ },
+ {
+  "id": "sigil_of_echoes",
+  "name": "Sigil of Echoes",
+  "base": "bone_amulet",
+  "req_level": 22,
+  "flavor": "Said once. Heard twice.",
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "range": [
+     15,
+     25
+    ]
+   },
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "range": [
+     20,
+     35
+    ]
+   }
+  ],
+  "effect": "echo",
+  "effect_text": "Spells have a 20% chance to be cast a second time",
+  "stage4": true
+ },
+ {
+  "id": "gunsmiths_pride",
+  "name": "Gunsmith's Pride",
+  "base": "rifle",
+  "req_level": 18,
+  "flavor": "Measure twice. Fire once. Then again.",
+  "mods": [
+   {
+    "stat": "firearm_damage",
+    "type": "inc",
+    "range": [
+     40,
+     60
+    ]
+   },
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "range": [
+     20,
+     30
+    ]
+   }
+  ],
+  "effect": "double_shot",
+  "effect_text": "Firearm attacks have a 25% chance to fire a second time",
+  "stage4": true
+ },
+ {
+  "id": "warlords_grip",
+  "name": "Warlord's Grip",
+  "base": "gauntlets",
+  "req_level": 20,
+  "flavor": "The hand that holds the line.",
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "range": [
+     8,
+     12
+    ]
+   },
+   {
+    "stat": "str",
+    "type": "flat",
+    "range": [
+     15,
+     25
+    ]
+   }
+  ],
+  "effect": "warlords_grip",
+  "effect_text": "Melee hits have a 15% chance to stun",
+  "stage4": true
+ },
+ {
+  "id": "starfall_staff",
+  "name": "Starfall",
+  "base": "oak_staff_t3",
+  "req_level": 34,
+  "flavor": "Wish upon it. Then run.",
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "range": [
+     60,
+     90
+    ]
+   },
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "range": [
+     10,
+     15
+    ]
+   }
+  ],
+  "effect": "starfall",
+  "effect_text": "Every fifth spell you cast calls down a falling star on your target",
+  "stage4": true
+ }
+]

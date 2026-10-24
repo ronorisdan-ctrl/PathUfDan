@@ -1,0 +1,74 @@
+[
+ {
+  "id": "frenzied",
+  "name": "Frenzied",
+  "desc": "Moves and attacks faster",
+  "color": "#ff6040",
+  "speed_mult": 1.35,
+  "attack_speed_mult": 1.35
+ },
+ {
+  "id": "armoured",
+  "name": "Armoured",
+  "desc": "Takes 35% less damage",
+  "color": "#a0a8b8",
+  "damage_taken_mult": 0.65
+ },
+ {
+  "id": "vampiric",
+  "name": "Vampiric",
+  "desc": "Heals for damage dealt",
+  "color": "#c02040",
+  "leech": 0.6
+ },
+ {
+  "id": "explosive",
+  "name": "Explosive",
+  "desc": "Explodes after death",
+  "color": "#ffa030",
+  "death_explode": true
+ },
+ {
+  "id": "frostbound",
+  "name": "Frostbound",
+  "desc": "Hits chill and deal ice damage",
+  "color": "#80d0ff",
+  "convert": "cold",
+  "on_hit_status": "chill"
+ },
+ {
+  "id": "regenerating",
+  "name": "Regenerating",
+  "desc": "Regenerates 3% life per second unless recently hit",
+  "color": "#60e070",
+  "regen": 0.03
+ },
+ {
+  "id": "mighty",
+  "name": "Mighty",
+  "desc": "Deals 40% more damage",
+  "color": "#ffd040",
+  "damage_mult": 1.4
+ },
+ {
+  "id": "shielded",
+  "name": "Shielded",
+  "desc": "Absorbs damage with a regenerating shield",
+  "color": "#80a0ff",
+  "shield": 0.4
+ },
+ {
+  "id": "summoner",
+  "name": "Summoner",
+  "desc": "Periodically calls minions",
+  "color": "#a0e080",
+  "summons": "plague_rat"
+ },
+ {
+  "id": "blinking",
+  "name": "Blinking",
+  "desc": "Teleports beside its target",
+  "color": "#d080ff",
+  "blink": true
+ }
+]

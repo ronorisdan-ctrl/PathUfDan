@@ -1,0 +1,160 @@
+{
+ "skeleton_warrior": {
+  "name": "Skeleton Warrior",
+  "sprite": "skeleton",
+  "life": 40,
+  "life_per_level": 9,
+  "damage": [
+   3,
+   6
+  ],
+  "damage_per_level": 0.13,
+  "dmg_type": "physical",
+  "speed": 115,
+  "attack_range": 18,
+  "attack_time": 0.9,
+  "radius": 6,
+  "armour": 10
+ },
+ "turret": {
+  "name": "Ballista",
+  "sprite": "turret",
+  "proj": "bolt",
+  "proj_speed": 420
+ },
+ "mine": {
+  "name": "Explosive Mine",
+  "sprite": "mine",
+  "arm_time": 0.6
+ },
+ "skeleton_archer": {
+  "name": "Skeleton Archer",
+  "sprite": "skeleton_archer",
+  "tint": "#d0e0ff",
+  "life": 28,
+  "life_per_level": 6,
+  "damage": [
+   3,
+   5
+  ],
+  "damage_per_level": 0.13,
+  "dmg_type": "physical",
+  "speed": 105,
+  "attack_range": 170,
+  "attack_time": 1.1,
+  "radius": 6,
+  "armour": 0,
+  "ranged": true,
+  "proj": "arrow",
+  "proj_speed": 340
+ },
+ "fire_elemental": {
+  "name": "Fire Elemental",
+  "sprite": "cultist",
+  "tint": "#ff7020",
+  "sprite_scale": 1.2,
+  "life": 70,
+  "life_per_level": 12,
+  "damage": [
+   6,
+   10
+  ],
+  "damage_per_level": 0.14,
+  "dmg_type": "fire",
+  "speed": 95,
+  "attack_range": 150,
+  "attack_time": 1.2,
+  "radius": 7,
+  "armour": 20,
+  "ranged": true,
+  "proj": "fire",
+  "proj_speed": 260,
+  "status": {
+   "type": "ignite",
+   "chance": 30
+  }
+ },
+ "storm_wisp": {
+  "name": "Storm Wisp",
+  "sprite": "bat",
+  "tint": "#f0f080",
+  "life": 22,
+  "life_per_level": 5,
+  "damage": [
+   2,
+   9
+  ],
+  "damage_per_level": 0.14,
+  "dmg_type": "lightning",
+  "speed": 150,
+  "attack_range": 130,
+  "attack_time": 0.7,
+  "radius": 4,
+  "armour": 0,
+  "ranged": true,
+  "proj": "orb",
+  "proj_speed": 360,
+  "status": {
+   "type": "shock",
+   "chance": 20
+  }
+ },
+ "bone_golem": {
+  "name": "Bone Golem",
+  "sprite": "brute",
+  "tint": "#e0d8c0",
+  "sprite_scale": 1.1,
+  "life": 160,
+  "life_per_level": 28,
+  "damage": [
+   7,
+   12
+  ],
+  "damage_per_level": 0.13,
+  "dmg_type": "physical",
+  "speed": 80,
+  "attack_range": 22,
+  "attack_time": 1.3,
+  "radius": 10,
+  "armour": 80
+ },
+ "shadow_wraith": {
+  "name": "Shadow Wraith",
+  "sprite": "assassin",
+  "tint": "#8060c0",
+  "life": 18,
+  "life_per_level": 4,
+  "damage": [
+   9,
+   15
+  ],
+  "damage_per_level": 0.15,
+  "dmg_type": "void",
+  "speed": 140,
+  "attack_range": 16,
+  "attack_time": 0.6,
+  "radius": 5,
+  "armour": 0
+ },
+ "clockwork_drone": {
+  "name": "Clockwork Drone",
+  "sprite": "turret",
+  "tint": "#d0b070",
+  "life": 30,
+  "life_per_level": 6,
+  "damage": [
+   3,
+   6
+  ],
+  "damage_per_level": 0.14,
+  "dmg_type": "physical",
+  "speed": 130,
+  "attack_range": 160,
+  "attack_time": 0.6,
+  "radius": 5,
+  "armour": 30,
+  "ranged": true,
+  "proj": "bolt",
+  "proj_speed": 420
+ }
+}

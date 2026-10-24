@@ -1,0 +1,42 @@
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, ground_slam, piercing_thrust
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, piercing_thrust, ground_slam
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] PASSIVE h_mw5 (Battle Scholar) value 0.0583
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] PASSIVE c_w1 (Endurance) value 0.0390
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] PASSIVE c_w2 (Grit) value 0.0603
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] BUY uncommon Vampiric Reaver Greataxe of Slaughter for 72 gold (expected score +0.071)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] EQUIP main_hand <- uncommon Vampiric Reaver Greataxe of Slaughter (ilvl 4, 0 sockets) replacing Hooked Spear, score +0.071
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] CRAFT Upgrade Base on Vampiric Reaver Greataxe of Slaughter (main_hand) cost 27 gold, 2 Scrap, 1 Iron Fragment, score +0.077
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] GEM socket bloodstone:0 into amulet socket 1 (score +0.029)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] BAG sold 1 (+8 gold), salvaged 0, kept 0
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] KIT {"dps_est":76,"ehp_est":356,"equipment":{"amulet":"uncommon Jade Amulet of Precision ilvl1 sockets=1 gems=[\"bloodstone:0\"]","belt":"common Leather Belt ilvl4 sockets=0 gems=[]","boots":"epic Wrath Song ilvl4 sockets=0 gems=[]","charm":"epic Rune Brand ilvl4 sockets=0 gems=[]","chest":"uncommon Padded Vest of the Phoenix ilvl4 sockets=0 gems=[]","gloves":"uncommon Emberforged Iron Gauntlets of Strength ilvl2 sockets=0 gems=[]","helmet":"common Iron Helm ilvl2 sockets=0 gems=[]","main_hand":"uncommon Vampiric Reaver Greataxe of Slaughter ilvl4 sockets=0 gems=[]","ring1":"rare Shadow Veil ilvl1 sockets=0 gems=[]","ring2":"uncommon Iron Ring of the Scholar ilvl1 sockets=0 gems=[]"},"gold":54,"hotbar":["heavy_strike","cleave","iron_guard","shield_charge","quick_slash","piercing_thrust","ground_slam"],"keystones":[],"level":4,"life":264,"passives":4,"pouch":{},"runes":{},"spec":"","spec_nodes":[]}
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] RUN start forgotten_depths L4 mods=[] monster_level=4 hotbar=["heavy_strike", "cleave", "iron_guard", "shield_charge", "quick_slash", "piercing_thrust", "ground_slam"]
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    8.13] DODGE roll Rotting Ghoul:melee (hit in 0.10s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    9.30] DODGE roll Rotting Ghoul:melee (hit in 0.10s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   22.33] BOSS spawned
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   27.33] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   29.43] DODGE roll Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   37.32] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   41.10] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   41.10] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.40s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   41.10] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.75s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   42.62] DODGE move Sir Morcant, the Drowned Warden:eruption (hit in 0.40s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   42.62] DODGE move Sir Morcant, the Drowned Warden:eruption (hit in 0.75s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   45.90] DODGE roll Sir Morcant, the Drowned Warden:cleave (hit in 0.37s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   47.90] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   49.42] DODGE move Sir Morcant, the Drowned Warden:eruption (hit in 0.75s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   50.93] DODGE roll Sir Morcant, the Drowned Warden:ring (hit in 0.40s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   53.60] BOSS killed
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   53.60] PASSIVE c_w3 (Endurance) value 0.0529
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   53.60] PASSIVE c_core (Heart of the Web) value 0.0923
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   53.60] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, piercing_thrust, whirlwind
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0   53.92] RUN end boss_killed in 53.9s, damage taken 249, dodges 14 (rolls 9), avoided 12, potions 0
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] BAG sold 2 (+18 gold), salvaged 1, kept 1
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] BUY uncommon Conjurer's Chain Coif for 84 gold (expected score +0.057)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] EQUIP helmet <- uncommon Conjurer's Chain Coif (ilvl 5, 1 sockets) replacing Iron Helm, score +0.057
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] CRAFT Upgrade Base on Vampiric Reaver Greataxe of Slaughter (main_hand) cost 39 gold, 3 Scrap, 2 Iron Fragment, score +0.072
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] CRAFT Upgrade Base on Padded Vest of the Phoenix (chest) cost 27 gold, 2 Scrap, 1 Iron Fragment, score +0.004
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] CRAFT Upgrade Base on Conjurer's Chain Coif (helmet) cost 30 gold, 2 Scrap, 1 Iron Fragment, score +0.003
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] CRAFT Upgrade Base on Emberforged Iron Gauntlets of Strength (gloves) cost 21 gold, 2 Scrap, 1 Iron Fragment, score +0.001
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] GEM socket bloodstone:0 into helmet socket 1 (score +0.007)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] BAG sold 1 (+6 gold), salvaged 0, kept 1
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c2-r0    0.00] RUNE haste -> heavy_strike

@@ -1,0 +1,64 @@
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, ground_slam, piercing_thrust
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, piercing_thrust, ground_slam
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] PASSIVE h_mw5 (Battle Scholar) value 0.0616
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] PASSIVE c_w1 (Endurance) value 0.0399
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] PASSIVE c_w2 (Grit) value 0.0605
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] CRAFT Upgrade Base on Rimecut Executioner Greatsword of Precision (main_hand) cost 24 gold, 2 Scrap, 1 Iron Fragment, score +0.075
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] CRAFT Upgrade Base on Hale Plate Cuirass (chest) cost 21 gold, 2 Scrap, 1 Iron Fragment, score +0.006
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] GEM socket sapphire:0 into main_hand socket 1 (score +0.105)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] KIT {"dps_est":77,"ehp_est":336,"equipment":{"amulet":"common Jade Amulet ilvl3 sockets=1 gems=[\"\"]","belt":"common Leather Belt ilvl4 sockets=0 gems=[]","boots":"uncommon Hale Iron Greaves ilvl3 sockets=0 gems=[]","charm":"uncommon Vicious Bone Charm ilvl2 sockets=0 gems=[]","chest":"uncommon Hale Plate Cuirass ilvl2 sockets=1 gems=[\"\"]","gloves":"uncommon Elusive Iron Gauntlets of Intellect ilvl1 sockets=0 gems=[]","helmet":"common Chain Coif ilvl1 sockets=0 gems=[]","main_hand":"uncommon Rimecut Executioner Greatsword of Precision ilvl3 sockets=2 gems=[\"sapphire:0\", \"\"]","ring1":"uncommon Hale Garnet Ring of the Salamander ilvl1 sockets=0 gems=[]","ring2":"uncommon Sapphire Ring of the Salamander ilvl1 sockets=1 gems=[\"\"]"},"gold":100,"hotbar":["heavy_strike","cleave","iron_guard","shield_charge","quick_slash","piercing_thrust","ground_slam"],"keystones":[],"level":4,"life":256,"passives":4,"pouch":{},"runes":{},"spec":"","spec_nodes":[]}
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] RUN start forgotten_depths L4 mods=[] monster_level=4 hotbar=["heavy_strike", "cleave", "iron_guard", "shield_charge", "quick_slash", "piercing_thrust", "ground_slam"]
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    1.67] DODGE roll Bone Archer:projectile (hit in 0.00s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    4.33] DODGE roll Grave Brute:aoe (hit in 0.57s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    4.48] DODGE move Grave Brute:aoe (hit in 0.57s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    6.02] DODGE move Grave Brute:aoe (hit in 0.57s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    8.30] DODGE roll death_explosion (hit in 0.58s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    8.83] DODGE move death_explosion (hit in 0.33s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   14.08] DODGE roll Bilious Bloater:aoe (hit in 0.43s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   15.80] DODGE roll Bilious Bloater:aoe (hit in 0.43s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   17.08] DODGE move Bilious Bloater:aoe (hit in 0.42s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   27.55] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   29.75] PASSIVE c_w3 (Endurance) value 0.0573
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   29.75] HOTBAR heavy_strike, cleave, iron_guard, shield_charge, quick_slash, piercing_thrust, whirlwind
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   34.45] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   35.55] DODGE roll Rotting Ghoul:melee (hit in 0.07s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   37.02] MIDRUN equip 1 item(s): Jagged Topaz Ring
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   39.88] BOSS spawned
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   40.85] DODGE roll Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   42.87] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   44.88] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   47.10] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   49.12] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   51.13] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.48s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   53.27] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   54.82] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   56.27] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.37s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   57.27] DODGE roll Rotting Ghoul:melee (hit in 0.08s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   61.72] DODGE roll Sir Morcant, the Drowned Warden:cleave (hit in 0.37s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   63.53] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   63.53] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.75s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   65.05] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.05s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   65.05] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.40s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   65.05] DODGE roll Sir Morcant, the Drowned Warden:eruption (hit in 0.75s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   68.38] DODGE roll Sir Morcant, the Drowned Warden:cleave (hit in 0.37s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   70.35] DODGE move Sir Morcant, the Drowned Warden:cleave (hit in 0.37s) -> safe
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   72.25] BOSS killed
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0   72.57] RUN end boss_killed in 72.6s, damage taken 185, dodges 30 (rolls 16), avoided 28, potions 0
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] PASSIVE c_core (Heart of the Web) value 0.0995
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] BAG sold 5 (+51 gold), salvaged 2, kept 0
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] BUY rare Dusk Hymn for 168 gold (expected score +0.109)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] EQUIP gloves <- rare Dusk Hymn (ilvl 5, 0 sockets) replacing Elusive Iron Gauntlets of Intellect, score +0.109
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] BUY uncommon Bone Amulet of the Bear for 84 gold (expected score +0.064)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] EQUIP amulet <- uncommon Bone Amulet of the Bear (ilvl 5, 1 sockets) replacing Jade Amulet, score +0.064
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] BUY uncommon Stalwart Chain Coif of the Phoenix for 84 gold (expected score +0.039)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] EQUIP helmet <- uncommon Stalwart Chain Coif of the Phoenix (ilvl 5, 0 sockets) replacing Chain Coif, score +0.039
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] CRAFT Upgrade Base on Rimecut Executioner Greatsword of Precision (main_hand) cost 33 gold, 3 Scrap, 2 Iron Fragment, score +0.056
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] CRAFT Upgrade Base on Hale Plate Cuirass (chest) cost 27 gold, 3 Scrap, 2 Iron Fragment, score +0.008
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] CRAFT Upgrade Base on Stalwart Chain Coif of the Phoenix (helmet) cost 30 gold, 2 Scrap, 1 Iron Fragment, score +0.003
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] CRAFT Upgrade Base on Dusk Hymn (gloves) cost 30 gold, 2 Scrap, 1 Iron Fragment, score +0.001
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] CRAFT Add Affix on Hale Plate Cuirass of Intellect (chest) cost 33 gold, 1 Rare Catalyst, 1 Arcane Dust, score +0.000
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] GEM socket ruby:0 into main_hand socket 2 (score +0.073)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] GEM socket diamond:0 into chest socket 1 (score +0.010)
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] BAG sold 2 (+13 gold), salvaged 1, kept 0
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] RUNE efficiency -> heavy_strike
+[warrior-balanced-Competent-T1-L4-s1-fresh-none-ts1-c3-r0    0.00] RUNE efficiency -> iron_guard

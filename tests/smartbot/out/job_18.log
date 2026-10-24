@@ -1,0 +1,31 @@
+ARGS: ["--headless", "--fixed-fps", "60", "--path", "W:/AI game/PathofDan/Pathof Dan/", "res://tests/smartbot/smartbot.tscn", "--", "--class=mage", "--tier=1", "--runs=10", "--seed=700", "--profile=Competent", "--jobs=10", "--out=res://tests/smartbot/out/val2.csv"]
+
+Godot Engine v4.0.stable.official.92bee43ad - https://godotengine.org
+ 
+ROW mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c8-r0,smartbot-1.0,mage,balanced,Competent,1,forgotten_depths,fresh,8,0,700,1489904514,4,5,boss_killed,,15.4,52.7,0.0,0,0,3,2,3,0,32,21,0,3,19,0,106,55,202,153,,5,,onyx:0,chain_lightning|spark|summon_skeletons|blink|firebolt|frostbolt|frost_nova,,summon_skeletons:14|firebolt:4|spark:6|chain_lightning:33|frost_nova:1|frostbolt:5,,4,,3,0,none,1,60,
+UNIT mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c8-r0 exit=0
+ROW mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c0-r0,smartbot-1.0,mage,balanced,Competent,1,forgotten_depths,fresh,0,0,700,173374585,4,5,boss_killed,,18.2,61.9,0.0,0,0,1,1,1,0,29,23,0,3,11,0,141,93,211,175,,5,,emerald:0,firebolt|chain_lightning|summon_skeletons|blink|frostbolt|spark|frost_nova,,summon_skeletons:16|firebolt:11|chain_lightning:39|spark:3|frostbolt:2|frost_nova:2,,4,,2,0,none,1,60,
+UNIT mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c0-r0 exit=0
+ROW mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c4-r0,smartbot-1.0,mage,balanced,Competent,1,forgotten_depths,fresh,4,0,700,583952642,4,5,boss_killed,,25.6,65.8,0.0,0,0,3,2,3,0,40,29,0,4,24,0,106,51,216,162,,5,,diamond:0,chain_lightning|spark|summon_skeletons|blink|firebolt|frostbolt|frost_nova,,summon_skeletons:18|firebolt:6|chain_lightning:41|spark:4|frostbolt:2|frost_nova:3,,4,,3,1,none,1,60,
+UNIT mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c4-r0 exit=0
+ROW mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c3-r0,smartbot-1.0,mage,balanced,Competent,1,forgotten_depths,fresh,3,0,700,1755842427,4,5,boss_killed,,26.7,66.1,0.0,0,0,5,2,5,0,47,28,0,3,31,0,117,58,233,190,,5,,topaz:0,chain_lightning|spark|summon_skeletons|blink|firebolt|frostbolt|frost_nova,,summon_skeletons:18|spark:4|chain_lightning:38|frostbolt:9|firebolt:4|frost_nova:3,,4,,3,0,none,1,60,
+UNIT mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c3-r0 exit=0
+ROW mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c5-r0,smartbot-1.0,mage,balanced,Competent,1,forgotten_depths,fresh,5,0,700,1984807666,4,5,boss_killed,,28.8,76.2,0.0,0,0,1,1,1,0,48,26,0,3,22,0,151,103,219,172,,5,,emerald:0,firebolt|chain_lightning|summon_skeletons|blink|frostbolt|spark|frost_nova,,summon_skeletons:22|chain_lightning:16|spark:8|firebolt:37|frostbolt:7|frost_nova:1,,4,,5,0,none,1,60,
+UNIT mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c5-r0 exit=0
+ROW mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c9-r0,smartbot-1.0,mage,balanced,Competent,1,forgotten_depths,fresh,9,0,700,89310109,4,6,boss_killed,,41.2,79.6,0.0,18,1,3,0,3,0,56,33,0,5,37,0,134,56,313,259,,6,,,firebolt|spark|summon_skeletons|blink|frostbolt|fireball|chain_lightning,,summon_skeletons:21|firebolt:4|chain_lightning:53|frost_nova:5|spark:7|frostbolt:3,,4,Grave Brute (elite):aoe=18,5,0,none,1,60,
+UNIT mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c9-r0 exit=0
+ROW mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c1-r0,smartbot-1.0,mage,balanced,Competent,1,forgotten_depths,fresh,1,0,700,872802868,4,6,boss_killed,,50.5,78.6,0.0,0,0,3,2,3,0,47,29,0,4,42,0,126,67,237,169,,4,,bloodstone:0,frostbolt|spark|summon_skeletons|blink|firebolt|chain_lightning|frost_nova,,summon_skeletons:16|chain_lightning:58|frostbolt:8|firebolt:7|spark:3|frost_nova:3,,4,,12,1,none,1,60,
+UNIT mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c1-r0 exit=0
+ROW mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c6-r0,smartbot-1.0,mage,balanced,Competent,1,forgotten_depths,fresh,6,0,700,779306205,4,5,boss_killed,,41.6,94.2,0.0,74,3,7,5,7,0,58,34,0,3,31,0,106,54,206,178,,5,,topaz:0,chain_lightning|spark|summon_skeletons|blink|firebolt|frostbolt|frost_nova,,summon_skeletons:18|frostbolt:33|firebolt:7|chain_lightning:40|spark:11|frost_nova:1,,4,"Sir Morcant, the Drowned Warden:eruption=44|Sir Morcant, the Drowned Warden:charge=30",8,0,none,1,60,
+UNIT mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c6-r0 exit=0
+ROW mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c2-r0,smartbot-1.0,mage,balanced,Competent,1,forgotten_depths,fresh,2,0,700,1072449548,4,5,boss_killed,,46.6,83.2,0.0,0,0,5,2,5,0,59,30,0,3,35,0,137,99,189,171,,4,,ruby:0,firebolt|chain_lightning|summon_skeletons|blink|spark|frostbolt|frost_nova,,summon_skeletons:20|firebolt:10|spark:10|chain_lightning:42|frostbolt:2|frost_nova:6,,4,,6,0,none,1,60,
+UNIT mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c2-r0 exit=0
+ROW mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c7-r0,smartbot-1.0,mage,balanced,Competent,1,forgotten_depths,fresh,7,0,700,199662099,4,5,boss_killed,,34.5,105.5,0.0,0,0,5,1,5,0,88,47,0,5,30,0,107,53,214,177,,5,,,firebolt|spark|summon_skeletons|blink|frostbolt|chain_lightning|frost_nova,,summon_skeletons:33|firebolt:11|chain_lightning:39|frostbolt:11|spark:9|frost_nova:4,,4,,3,1,none,1,60,
+UNIT mage-balanced-Competent-T1-L4-s700-fresh-none-ts1-c7-r0 exit=0
+SMARTBOT DONE
+ERROR: Condition "_first != nullptr" is true.
+   at: ~List (./core/templates/self_list.h:106)
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+     at: cleanup (core/object/object.cpp:1982)
+ERROR: Resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:489)

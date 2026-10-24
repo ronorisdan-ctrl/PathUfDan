@@ -1,0 +1,285 @@
+{
+ "tiers": [
+  {
+   "name": "Chipped",
+   "req": 1,
+   "mult": 1.0
+  },
+  {
+   "name": "Flawed",
+   "req": 12,
+   "mult": 1.8
+  },
+  {
+   "name": "Polished",
+   "req": 24,
+   "mult": 2.7
+  },
+  {
+   "name": "Flawless",
+   "req": 36,
+   "mult": 3.8
+  }
+ ],
+ "combine_gold": [
+  40,
+  120,
+  300
+ ],
+ "unsocket_gold": [
+  10,
+  25,
+  60,
+  120
+ ],
+ "gems": [
+  {
+   "id": "ruby",
+   "name": "Ruby",
+   "color": "#e8483c",
+   "weapon": [
+    {
+     "stat": "fire_damage",
+     "type": "inc",
+     "value": 6
+    },
+    {
+     "stat": "added_fire",
+     "type": "flat",
+     "value": 2
+    }
+   ],
+   "armour": [
+    {
+     "stat": "max_life",
+     "type": "flat",
+     "value": 8
+    }
+   ],
+   "jewelry": [
+    {
+     "stat": "res_fire",
+     "type": "flat",
+     "value": 5
+    }
+   ]
+  },
+  {
+   "id": "sapphire",
+   "name": "Sapphire",
+   "color": "#4a8af0",
+   "weapon": [
+    {
+     "stat": "cold_damage",
+     "type": "inc",
+     "value": 6
+    },
+    {
+     "stat": "added_cold",
+     "type": "flat",
+     "value": 2
+    }
+   ],
+   "armour": [
+    {
+     "stat": "max_mana",
+     "type": "flat",
+     "value": 8
+    }
+   ],
+   "jewelry": [
+    {
+     "stat": "res_cold",
+     "type": "flat",
+     "value": 5
+    }
+   ]
+  },
+  {
+   "id": "topaz",
+   "name": "Topaz",
+   "color": "#f0d040",
+   "weapon": [
+    {
+     "stat": "lightning_damage",
+     "type": "inc",
+     "value": 6
+    },
+    {
+     "stat": "added_lightning",
+     "type": "flat",
+     "value": 2
+    }
+   ],
+   "armour": [
+    {
+     "stat": "evasion",
+     "type": "inc",
+     "value": 6
+    }
+   ],
+   "jewelry": [
+    {
+     "stat": "res_lightning",
+     "type": "flat",
+     "value": 5
+    }
+   ]
+  },
+  {
+   "id": "onyx",
+   "name": "Onyx",
+   "color": "#9a9aa8",
+   "weapon": [
+    {
+     "stat": "physical_damage",
+     "type": "inc",
+     "value": 6
+    },
+    {
+     "stat": "added_physical",
+     "type": "flat",
+     "value": 1
+    }
+   ],
+   "armour": [
+    {
+     "stat": "armour",
+     "type": "inc",
+     "value": 6
+    }
+   ],
+   "jewelry": [
+    {
+     "stat": "str",
+     "type": "flat",
+     "value": 3
+    }
+   ]
+  },
+  {
+   "id": "emerald",
+   "name": "Emerald",
+   "color": "#40d070",
+   "weapon": [
+    {
+     "stat": "attack_speed",
+     "type": "inc",
+     "value": 3
+    },
+    {
+     "stat": "cast_speed",
+     "type": "inc",
+     "value": 3
+    }
+   ],
+   "armour": [
+    {
+     "stat": "move_speed",
+     "type": "inc",
+     "value": 1.5
+    }
+   ],
+   "jewelry": [
+    {
+     "stat": "dex",
+     "type": "flat",
+     "value": 3
+    }
+   ]
+  },
+  {
+   "id": "amethyst",
+   "name": "Amethyst",
+   "color": "#b060f0",
+   "weapon": [
+    {
+     "stat": "void_damage",
+     "type": "inc",
+     "value": 6
+    },
+    {
+     "stat": "arcane_damage",
+     "type": "inc",
+     "value": 6
+    }
+   ],
+   "armour": [
+    {
+     "stat": "res_void",
+     "type": "flat",
+     "value": 5
+    }
+   ],
+   "jewelry": [
+    {
+     "stat": "int",
+     "type": "flat",
+     "value": 3
+    }
+   ]
+  },
+  {
+   "id": "diamond",
+   "name": "Diamond",
+   "color": "#e8f4ff",
+   "weapon": [
+    {
+     "stat": "crit_chance",
+     "type": "inc",
+     "value": 6
+    }
+   ],
+   "armour": [
+    {
+     "stat": "res_fire",
+     "type": "flat",
+     "value": 2
+    },
+    {
+     "stat": "res_cold",
+     "type": "flat",
+     "value": 2
+    },
+    {
+     "stat": "res_lightning",
+     "type": "flat",
+     "value": 2
+    }
+   ],
+   "jewelry": [
+    {
+     "stat": "item_rarity",
+     "type": "inc",
+     "value": 4
+    }
+   ]
+  },
+  {
+   "id": "bloodstone",
+   "name": "Bloodstone",
+   "color": "#a0182a",
+   "weapon": [
+    {
+     "stat": "life_on_hit",
+     "type": "flat",
+     "value": 1
+    }
+   ],
+   "armour": [
+    {
+     "stat": "life_regen",
+     "type": "flat",
+     "value": 0.6
+    }
+   ],
+   "jewelry": [
+    {
+     "stat": "vit",
+     "type": "flat",
+     "value": 3
+    }
+   ]
+  }
+ ]
+}
