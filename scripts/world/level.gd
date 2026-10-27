@@ -35,6 +35,7 @@ var walls: StaticBody2D
 var player = null
 var pet = null          # cosmetic loot pet; never a target, never collides, never takes damage
 var enemies := []
+var training_active := false   # hub only: true while Training Grounds dummies exist (summon/deploy/buff skills work)
 var allies := []
 var loot := []
 var interactables := []   # {pos, name, kind, radius}

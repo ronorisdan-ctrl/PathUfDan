@@ -283,7 +283,7 @@ func try_use_slot(i: int) -> bool:
 			msg_cd = 1.0
 			Events.message.emit(why, Color("#ff8080"))
 		return false
-	if sk.get("behavior") in ["summon", "deploy", "buff"] and level != null and not level.allow_combat:
+	if sk.get("behavior") in ["summon", "deploy", "buff"] and level != null and not level.allow_combat and not level.training_active:
 		if msg_cd <= 0:
 			msg_cd = 1.0
 			Events.message.emit("You cannot do that in town", Color("#ff8080"))
@@ -303,6 +303,7 @@ func try_use_slot(i: int) -> bool:
 	swing_dur = current_use_time
 	swing_kind = sk.get("behavior", "")
 	facing = signf(aim_pos.x - global_position.x) if absf(aim_pos.x - global_position.x) > 1 else facing
+	Combat.cast_serial += 1   # packets built during this cast carry the number (Training Grounds: targets hit per cast)
 	exec.execute(self, sk, aim_pos)
 	_on_skill_used(sk)
 	var b: String = sk.get("behavior", "")

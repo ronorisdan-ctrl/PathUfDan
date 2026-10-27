@@ -24,6 +24,7 @@ const MAX_NUMBERS := 60
 
 var rng := RandomNumberGenerator.new()
 var _numbers := 0
+var cast_serial := 0   # +1 per player skill use (player.try_use_slot); packets carry it as "cast" (Training Grounds only reads it)
 
 func _ready() -> void:
 	rng.randomize()
@@ -121,7 +122,7 @@ func player_packet(ch, skill: Dictionary, extra_more: float = 1.0) -> Dictionary
 			statuses.append({"type": "bleed", "chance": bc})
 	return {
 		"dmg": dmg, "crit_chance": crit_chance, "crit_mult": crit_mult, "kind": kind, "tags": tags,
-		"status": statuses, "is_attack": kind == "attack", "faction": "player", "skill": skill["id"],
+		"status": statuses, "is_attack": kind == "attack", "faction": "player", "skill": skill["id"], "cast": cast_serial,
 		"elite_inc": sb.inc("damage_vs_elite"), "flags": sb.flags.duplicate(),
 		"dot_mult": maxf(0.0, 1.0 + sb.inc("dot_damage") / 100.0) * sb.more("dot_damage"),
 		"status_dur": maxf(0.1, 1.0 + sb.inc("status_duration") / 100.0),
@@ -279,6 +280,7 @@ func apply_status(target, s: Dictionary, rolled: Dictionary, p: Dictionary) -> v
 							best = o
 				if best != null:
 					best.add_status("ignite", 3.0 * dur_mult, {"dps": base * 0.5 * dot_mult, "dtype": "fire"})
+					_tag_source(best, "ignite", p)
 		"bleed":
 			var base2: float = rolled.get("physical", _sum(rolled))
 			var cd_m := 1.6 if p.get("flags", {}).has("crimson_dance") else 1.0
@@ -308,6 +310,21 @@ func apply_status(target, s: Dictionary, rolled: Dictionary, p: Dictionary) -> v
 			target.add_status("intimidate", (d if d > 0 else 4.0) * dur_mult, {})
 		_:
 			target.add_status(typ, 2.0 * dur_mult, {})
+	_tag_source(target, typ, p)
+
+## Remembers who applied a status (skill id + skill kind) so the Training Grounds can credit
+## its DoT ticks. Data only: nothing in the game reads these two keys.
+func _tag_source(target, typ: String, p: Dictionary) -> void:
+	if p.get("faction") != "player":
+		return
+	var st = target.statuses.get(typ)
+	if st == null:
+		return
+	var sk: String = str(p.get("src_skill", ""))
+	if sk == "":
+		sk = str(p.get("skill", ""))
+	st["src_skill"] = sk
+	st["src_kind"] = str(p.get("kind", ""))
 
 func _sum(d: Dictionary) -> float:
 	var t := 0.0

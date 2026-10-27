@@ -12,8 +12,8 @@
   "defaults": {"type": "single", "duration": 10, "counting": "all", "profile": "none", "spacing": "tight"},
   "profiles": {
     "none":      {"label": "No defences"},
-    "t3_normal": {"label": "T3 normal enemy", "tier": 3, "kind": "normal", "enemy": "ghoul"},
-    "t6_boss":   {"label": "T6 boss", "tier": 6, "kind": "boss", "enemy": "", "poise": true}
+    "t3_normal": {"label": "T3 normal enemy", "tier": 3, "kind": "normal"},
+    "t6_boss":   {"label": "T6 boss", "tier": 6, "kind": "boss", "poise": true}
   },
   "labels": {
     "types": {"single": "Single target", "aoe": "AoE (3 targets)"},

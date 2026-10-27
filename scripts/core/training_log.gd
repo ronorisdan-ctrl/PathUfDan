@@ -16,6 +16,7 @@ var run := {}               # the running (or finished) test; {} when no dummies
 var last_result := {}       # latest finished result, shown on the Result tab
 var history_by_slot := {}   # save slot (int) -> Array of entries, newest first
 var _names := {}            # skill id -> display name (built lazily)
+var _warned := {}           # unattributed sources already named in the debug log
 
 func _ready() -> void:
 	reset_settings()
@@ -146,6 +147,18 @@ func delta_for(result: Dictionary) -> Dictionary:
 			skip = i + 1
 			break
 	return Rules.delta_vs_history(result, h, skip)
+
+## Lines drawn above dummy `idx` (1-based), top line first.
+func head_lines(idx: int) -> Array:
+	return Rules.head_lines(run, last_result, idx, cfg())
+
+## Damage that no skill could be credited for goes into the "Other" row; each distinct
+## source is named once in the debug log so attribution gaps are easy to find.
+func note_unattributed(what: String) -> void:
+	if _warned.has(what):
+		return
+	_warned[what] = true
+	print("[Training] damage credited to 'Other': ", what)
 
 func session_time() -> float:
 	return Time.get_ticks_msec() / 1000.0

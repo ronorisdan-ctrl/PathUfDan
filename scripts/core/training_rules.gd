@@ -451,3 +451,149 @@ static func settings_text(s: Dictionary, cfg: Dictionary, dev: bool = false) -> 
 	if dev:
 		parts.append(str(lab.get("dev", "DEV")))
 	return " · ".join(parts)
+
+# ------------------------------------------------------------------ defence profiles
+## Armour, resistances and (for bosses) the life used for poise, computed with the same
+## scaling as enemy.gd / dungeon.gd so balance changes carry over:
+##   armour = def.armour * (1 + 0.12 * (lvl - 1)),  life = def.life * (1 + 0.28 * (lvl - 1)) * dungeon.life_mult
+##   resist[el] = def.resist[el] + dungeon.resist_bonus   (fire, cold, lightning, void)
+## The level is the dungeon's monster level for this character: clamp(max(char level, min), min, max),
+## +1 for the boss. "normal" averages the dungeon's non-boss pool, "boss" uses the dungeon's boss.
+## Returns {armour, resist, life, level, poise}. A profile without "tier" has no defences.
+static func profile_defence(profile: Dictionary, dungeons: Array, enemies: Dictionary, ch_level: int) -> Dictionary:
+	var out := {"armour": 0.0, "resist": {}, "life": 0.0, "level": 0, "poise": bool(profile.get("poise", false))}
+	if not profile.has("tier"):
+		return out
+	var dg := {}
+	for d in dungeons:
+		if int(d.get("tier", 0)) == int(profile["tier"]):
+			dg = d
+			break
+	if dg.is_empty():
+		return out
+	var lo := int(dg.get("min_level", 1))
+	var hi := int(dg.get("max_level", 10))
+	var lvl := clampi(maxi(ch_level, lo), lo, hi)
+	# (enemy definition, spawn weight). A pool entry is {"id": ..., "w": ...} in dungeons.json;
+	# a bare id counts as weight 1. The normal profile averages the non-boss pool by spawn weight.
+	var defs := []
+	if profile.get("kind", "normal") == "boss":
+		lvl += 1
+		var bd: Dictionary = enemies.get(str(dg.get("boss", "")), {})
+		if not bd.is_empty():
+			defs.append([bd, 1.0])
+	else:
+		for entry in dg.get("pool", []):
+			var id: String = str(entry.get("id", "")) if typeof(entry) == TYPE_DICTIONARY else str(entry)
+			var w: float = float(entry.get("w", 1.0)) if typeof(entry) == TYPE_DICTIONARY else 1.0
+			var e: Dictionary = enemies.get(id, {})
+			if not e.is_empty() and w > 0.0 and not e.get("boss", false) and not e.get("miniboss", false):
+				defs.append([e, w])
+	if defs.is_empty():
+		return out
+	var arm := 0.0
+	var life := 0.0
+	var wsum := 0.0
+	var res := {"fire": 0.0, "cold": 0.0, "lightning": 0.0, "void": 0.0}
+	for pair in defs:
+		var e: Dictionary = pair[0]
+		var w: float = pair[1]
+		wsum += w
+		arm += float(e.get("armour", 0)) * w
+		life += float(e.get("life", 1)) * w
+		for el in res:
+			res[el] += float(e.get("resist", {}).get(el, 0)) * w
+	var rb := float(dg.get("resist_bonus", 0))
+	out["level"] = lvl
+	out["armour"] = arm / wsum * (1.0 + 0.12 * float(lvl - 1))
+	out["life"] = life / wsum * (1.0 + 0.28 * float(lvl - 1)) * float(dg.get("life_mult", 1.0))
+	for el in res:
+		out["resist"][el] = res[el] / wsum + rb
+	return out
+
+## Damage a defender with `armour` and `resist` takes from rolled damage {type: amount}.
+## Same maths as enemy.gd receive_hit (armour reduction for physical, clamped resistances,
+## frailty -20 resist, taken multiplier). `reduction` is Combat.armour_reduction as a Callable.
+static func mitigate(rolled: Dictionary, armour: float, resist: Dictionary, frailty: bool, taken_mult: float, reduction: Callable) -> float:
+	var total := 0.0
+	var shift := -20.0 if frailty else 0.0
+	for t in rolled:
+		var v: float = rolled[t]
+		if t == "physical":
+			v *= 1.0 - float(reduction.call(armour, v))
+		else:
+			v *= 1.0 - clampf(float(resist.get(t, 0)) + shift, -100.0, 90.0) / 100.0
+		total += v
+	return total * taken_mult
+
+# ------------------------------------------------------------------ text for the head label and panel
+static func _pct(v: float) -> String:
+	return "%d%%" % int(round(v))
+
+static func top_rows_text(rows: Array, n: int) -> String:
+	var parts := []
+	for r in top_rows(rows, n):
+		parts.append("%s %s" % [r["label"], _pct(r["share"])])
+	return " · ".join(parts)
+
+## Lines drawn above dummy `idx` (1-based), top line first. `result` is the finished
+## result ({} while idle or counting).
+static func head_lines(run: Dictionary, result: Dictionary, idx: int, cfg: Dictionary) -> Array:
+	if run.is_empty():
+		return []
+	if not run.get("started", false):
+		return ["Hit me"]
+	if not run.get("finished", false) or result.is_empty():
+		return ["%.1f" % maxf(0.0, float(run["duration"]) - float(run["elapsed"]))]
+	var st: Dictionary = result["settings"]
+	var rows_n := int(cfg.get("breakdown_rows_above_head", 3))
+	var line1 := "%s DPS   peak %s (%.1f s)" % [fmt_num(result["avg_dps"]), fmt_num(result["peak_dps"]), float(result["peak_start"])]
+	var sett := settings_text(st, cfg, bool(result.get("dev", false)))
+	var top := top_rows_text(result["breakdown"], rows_n)
+	if st.get("type", "single") != "aoe":
+		return [line1, sett, top]
+	var own := ""
+	for r in result.get("per_dummy", []):
+		if int(r["dummy"]) == idx:
+			own = "%s DPS · %s" % [fmt_num(r["dps"]), _pct(r["share"])]
+	if idx != 1:
+		return [own]
+	var total_line := "Total across %d targets: %s DPS · peak %s (%.1f s)" % [int(run.get("dummies", 3)), fmt_num(result["avg_dps"]), fmt_num(result["peak_dps"]), float(result["peak_start"])]
+	return [total_line, sett, top, own]
+
+## BBCode for the Result tab. `delta` comes from delta_vs_history (or {}).
+static func result_text(res: Dictionary, cfg: Dictionary, delta: Dictionary) -> String:
+	if res.is_empty():
+		return "[color=#8a8494]No result yet. Spawn dummies, then hit one: the first hit starts the timer.[/color]"
+	var st: Dictionary = res["settings"]
+	var lines := []
+	lines.append("[color=#c8a060]%s[/color]" % settings_text(st, cfg, bool(res.get("dev", false))))
+	if st.get("type", "single") == "aoe":
+		lines.append("[color=#ffd080]AoE results are not comparable with single-target results.[/color]")
+	if res.get("dev", false):
+		lines.append("[color=#ff8080]DEV: a damage-affecting developer flag was active during this test.[/color]")
+	lines.append("")
+	lines.append("[font_size=18]Average DPS  [color=#ffe080]%s[/color][/font_size]" % fmt_num(res["avg_dps"]))
+	lines.append("Peak second  [color=#ffe080]%s[/color] DPS, starting at %.1f s" % [fmt_num(res["peak_dps"]), float(res["peak_start"])])
+	if delta.size() > 0:
+		lines.append("vs previous: [color=%s]%s[/color]" % ["#80e080" if delta.get("comparable", false) and float(delta["pct"]) >= 0.0 else "#ff9090" if delta.get("comparable", false) else "#8a8494", fmt_delta(delta)])
+	lines.append("Total damage %s   Direct hits %s   Crit rate %s" % [fmt_num(res["total"]), fmt_num(res["hits"]), _pct(float(res["crit_rate"]) * 100.0)])
+	lines.append("Average hit %s   Biggest hit %s" % [fmt_num(res["avg_hit"]), fmt_num(res["biggest_hit"])])
+	if cfg.get("profiles", {}).get(st.get("profile", "none"), {}).get("poise", false):
+		lines.append("Poise breaks %d" % int(res.get("poise_breaks", 0)))
+	if st.get("type", "single") == "aoe":
+		var tpc := float(res.get("targets_per_cast", -1.0))
+		lines.append("Average targets hit per cast  %s" % ("%.2f" % tpc if tpc >= 0.0 else "[color=#8a8494]unavailable[/color]"))
+		lines.append("")
+		lines.append("[table=4][cell][b]Dummy[/b]  [/cell][cell][b]DPS[/b]  [/cell][cell][b]Share[/b]  [/cell][cell][b]Hits[/b][/cell]")
+		for r in res.get("per_dummy", []):
+			lines.append("[cell]%d  [/cell][cell]%s  [/cell][cell]%s  [/cell][cell]%d[/cell]" % [int(r["dummy"]), fmt_num(r["dps"]), _pct(r["share"]), int(r["hits"])])
+		lines.append("[/table]")
+	lines.append("")
+	lines.append("[b]Damage by source[/b]")
+	var tbl := ["[table=5][cell][b]Source[/b]  [/cell][cell][b]Damage[/b]  [/cell][cell][b]Share[/b]  [/cell][cell][b]DPS[/b]  [/cell][cell][b]Hits[/b][/cell]"]
+	for r in res["breakdown"]:
+		tbl.append("[cell]%s  [/cell][cell]%s  [/cell][cell]%.1f%%  [/cell][cell]%s  [/cell][cell]%s[/cell]" % [r["label"], fmt_num(r["damage"]), float(r["share_text"]), fmt_num(r["dps"]), fmt_num(r["hits"])])
+	tbl.append("[/table]")
+	lines.append("".join(tbl))
+	return "\n".join(lines)

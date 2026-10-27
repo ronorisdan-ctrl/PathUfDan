@@ -34,6 +34,8 @@ func frames(n: int) -> void:
 		await get_tree().physics_frame
 
 func _ready() -> void:
+	if has_meta("no_auto"):
+		return   # tests/train_only.gd drives single groups itself
 	Game.testing = true
 	Loot.set_seed(12345)
 	await get_tree().process_frame
@@ -59,6 +61,7 @@ func _ready() -> void:
 	await test_boss_and_death()
 	await test_dev_tools()
 	test_training()
+	await test_training_world()
 	test_save_load()
 	test_save_slots()
 	await test_ui()
@@ -2801,3 +2804,243 @@ func test_training() -> void:
 	TrainingLog.discard()
 	TrainingLog.reset_settings()
 	Game.training_in_tests = false
+
+
+# ------------------------------------------------------------------ training grounds: hub, dummy, attribution
+const EnemyT = preload("res://scripts/entities/enemy.gd")
+
+func _tpk(skill: String, kind: String = "spell", dmg: float = 100.0, extra: Dictionary = {}) -> Dictionary:
+	var pk := {"dmg": {"fire": [dmg, dmg]}, "crit_chance": 0.0, "crit_mult": 1.0, "faction": "player", "status": [], "tags": [], "flags": {}, "skill": skill, "kind": kind, "cast": Combat.cast_serial}
+	for k in extra:
+		pk[k] = extra[k]
+	return pk
+
+func _tevs(kind: String = "", skill: String = "") -> Array:
+	var out := []
+	for e in TrainingLog.run.get("events", []):
+		if (kind == "" or e["kind"] == kind) and (skill == "" or e["skill_id"] == skill):
+			out.append(e)
+	return out
+
+func _tready(p) -> void:
+	p.busy = 0
+	p.mana = 999
+	p.cooldowns.clear()
+
+func test_training_world() -> void:
+	print("\n--- training grounds (hub, dummy, attribution)")
+	_log("--- training grounds (hub, dummy, attribution)")
+	Game.training_in_tests = false
+	TrainingLog.discard()
+	TrainingLog.reset_settings()
+	Game.new_character("mage")
+	main.start_game()
+	await frames(3)
+	var hub = Game.level
+	var p = hub.player
+	var ch = Game.ch
+	check(hub.has_method("training_spawn") and hub.training_dummies.is_empty() and not hub.training_active, "training world: the hub starts with no dummies")
+	# ---- off under tests
+	var why: String = hub.training_spawn()
+	check(why != "" and hub.training_dummies.is_empty() and not hub.training_active, "training world: Spawn is refused under Game.testing without the opt-in flag")
+	Game.training_in_tests = true
+	# ---- summon is refused in the hub until dummies exist
+	ch.loadout[2] = "summon_skeletons"
+	_tready(p)
+	check(not p.try_use_slot(2) and p.minions.is_empty(), "training world: summoning in the hub is refused while no dummies exist")
+	why = hub.training_spawn()
+	check(why == "" and hub.training_dummies.size() == 1 and hub.training_active, "training world: Spawn creates one dummy and switches the hub rule on", why)
+	var d = hub.training_dummies[0]
+	check(hub.enemies.has(d) and d.is_in_group("training_dummy") and d.faction == "enemy", "training world: the dummy is a normal hostile target (level.enemies) in the training_dummy group")
+	_tready(p)
+	check(p.try_use_slot(2), "training world: summoning is allowed in the hub while dummies exist")
+	await frames(3)
+	check(p.minions.size() > 0, "training world: the summoned minions exist")
+	for m in p.minions.duplicate():
+		if is_instance_valid(m):
+			m.die(null)
+	p.minions.clear()
+	# ---- basic hit path
+	TrainingLog.reset_run()
+	var pos0: Vector2 = d.global_position
+	var pk := _tpk("fireball", "spell", 100.0)
+	Combat.deal(pk, p, d)
+	var evs := _tevs("hit", "fireball")
+	check(evs.size() == 1 and absf(float(evs[0]["amount"]) - 100.0) < 0.5 and evs[0]["dummy"] == 1, "training world: a hit is recorded once with its skill and the damage after mitigation (no defences = 100)", str(evs))
+	check(TrainingLog.is_running(), "training world: the first hit starts the test")
+	Combat.deal(_tpk("fireball", "spell", 1.0e12), p, d)
+	check(d.alive and d.life == d.max_life, "training world: the dummy cannot die")
+	d.die(null)
+	check(d.alive, "training world: kill-all style die() calls do nothing")
+	d.knock = Vector2(900, 0)
+	await frames(10)
+	check(d.global_position.distance_to(pos0) < 0.01, "training world: knockback does not move the dummy")
+	# enemy damage is not counted
+	var n0: int = TrainingLog.run["events"].size()
+	d.receive_hit({"fire": 500.0}, {"faction": "enemy"}, null, false)
+	check(TrainingLog.run["events"].size() == n0, "training world: only player damage is counted")
+	# ---- ignite is credited to the skill that applied it
+	TrainingLog.reset_run()
+	d.statuses.clear()
+	Combat.deal(_tpk("fire_nova", "spell", 100.0, {"status": [{"type": "ignite", "chance": 100.0}]}), p, d)
+	await frames(75)
+	var ticks := _tevs("dot", "fire_nova")
+	check(d.statuses.has("ignite") or ticks.size() > 0, "training world: a normal ignite is applied to the dummy")
+	check(ticks.size() >= 1 and ticks[0]["status_id"] == "ignite", "training world: ignite ticks are credited to the skill that applied them", str(TrainingLog.run["events"]))
+	# statuses end with the window
+	TrainingLog.tick(100.0)
+	check(not TrainingLog.last_result.is_empty() and d.statuses.is_empty(), "training world: the test ends and the dummy's statuses are cleared")
+	var total_end: float = float(TrainingLog.last_result.get("total", -1.0))
+	await frames(40)
+	check(is_equal_approx(float(TrainingLog.last_result.get("total", -2.0)), total_end), "training world: nothing is added to the result after it ended")
+	# ---- Player-only counting (a trap's ignite is dropped)
+	TrainingLog.set_option("counting", "player")
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	Combat.deal(_tpk("fireball", "spell", 100.0), p, d)
+	Combat.deal(_tpk("explosive_mine", "trap", 100.0), p, d)
+	check(_tevs("hit", "fireball").size() == 1 and _tevs("deployable").size() == 0, "training world: Player only does not count a trap's damage")
+	TrainingLog.set_option("counting", "all")
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	Combat.deal(_tpk("explosive_mine", "trap", 100.0), p, d)
+	check(_tevs("deployable", "explosive_mine").size() == 1, "training world: All sources counts a trap's damage under the trap's skill")
+
+	# ---- profiles: defences match a real enemy built the same way
+	var dg := {"tier": 3, "min_level": 1, "max_level": 10, "pool": [{"id": "ghoul", "w": 40}], "resist_bonus": 10, "life_mult": 1.5, "boss": ""}
+	var prof: Dictionary = Data.training_cfg["profiles"]["t3_normal"]
+	var def_all: Dictionary = TrainingRulesT.profile_defence(prof, [dg], {"ghoul": Data.enemies["ghoul"]}, 7)
+	var real = EnemyT.new()
+	real.setup(Data.enemies["ghoul"], 7, [], {"life": 1.5, "resist": 10.0})
+	var same := is_equal_approx(def_all["armour"], real.armour) and is_equal_approx(def_all["life"], real.max_life)
+	for el in ["fire", "cold", "lightning", "void"]:
+		same = same and is_equal_approx(float(def_all["resist"][el]), float(real.resist.get(el, 0.0)))
+	check(same, "training world: a profile's armour, resist and life match a real enemy.gd setup", "%s vs %s/%s/%s" % [str(def_all), real.armour, real.max_life, str(real.resist)])
+	real.free()
+	var dg2 := {"tier": 3, "min_level": 1, "max_level": 10, "pool": [{"id": "ghoul", "w": 3}, {"id": "bloater", "w": 1}], "resist_bonus": 0, "life_mult": 1.0, "boss": ""}
+	var en2 := {"ghoul": Data.enemies["ghoul"], "bloater": Data.enemies["bloater"]}
+	var d2: Dictionary = TrainingRulesT.profile_defence(prof, [dg2], en2, 4)
+	var arm2: float = (3.0 * float(Data.enemies["ghoul"].get("armour", 0)) + float(Data.enemies["bloater"].get("armour", 0))) / 4.0 * (1.0 + 0.12 * 3.0)
+	check(is_equal_approx(d2["armour"], arm2) and d2["level"] == 4, "training world: the normal profile averages the dungeon pool by spawn weight")
+	var bprof: Dictionary = Data.training_cfg["profiles"]["t6_boss"]
+	var db: Dictionary = TrainingRulesT.profile_defence(bprof, Data.dungeon_list, Data.enemies, 1)
+	check(db["life"] > 0.0 and db["level"] == 39 and db["poise"], "training world: the boss profile uses the tier's boss, one level above the dungeon's floor", str(db))
+	TrainingLog.set_option("profile", "t3_normal")
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	var t3: Dictionary = TrainingRulesT.profile_defence(prof, Data.dungeon_list, Data.enemies, ch.level)
+	check(d.armour > 0.0 and is_equal_approx(d.armour, t3["armour"]) and not d.poise_on, "training world: the T3 dummy carries the profile's armour and no poise bar", "dummy armour=%s profile=%s poise=%s" % [d.armour, str(t3), d.poise_on])
+	TrainingLog.set_option("profile", "t6_boss")
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	check(d.poise_on and d.is_boss, "training world: the T6 boss dummy has poise")
+	for i in 40:
+		Combat.deal(_tpk("fireball", "spell", 5.0e6), p, d)
+	check(int(TrainingLog.run["poise_breaks"]) >= 1, "training world: poise breaks on the boss dummy are counted", str(TrainingLog.run["poise_breaks"]))
+	TrainingLog.set_option("profile", "none")
+
+	# ---- spawn replaces; remove discards a running test
+	hub.training_spawn()
+	hub.training_spawn()
+	await frames(2)
+	var live := 0
+	for e in hub.enemies:
+		if is_instance_valid(e) and e.is_in_group("training_dummy"):
+			live += 1
+	check(hub.training_dummies.size() == 1 and live == 1 and get_tree().get_nodes_in_group("training_dummy").size() == 1, "training world: Spawn replaces the old dummy instead of adding another", "live=%d" % live)
+	d = hub.training_dummies[0]
+	var hist0: int = TrainingLog.history().size()
+	Combat.deal(_tpk("fireball"), p, d)
+	check(TrainingLog.is_running(), "training world: a test is running before Remove")
+	hub.training_remove()
+	await frames(2)
+	check(not TrainingLog.is_running() and TrainingLog.history().size() == hist0 and hub.training_dummies.is_empty() and not hub.training_active and get_tree().get_nodes_in_group("training_dummy").is_empty(), "training world: Remove discards a running test and leaves history alone")
+	_tready(p)
+	check(not p.try_use_slot(2), "training world: summoning is refused again once the dummies are gone")
+
+	# ---- AoE cluster
+	TrainingLog.set_option("type", "aoe")
+	TrainingLog.set_option("spacing", "tight")
+	why = hub.training_spawn()
+	check(why == "" and hub.training_dummies.size() == 3, "training world: AoE spawns three dummies", why)
+	if hub.training_dummies.size() == 3:
+		var a = hub.training_dummies[0]
+		var b = hub.training_dummies[1]
+		var c = hub.training_dummies[2]
+		var tight: float = float(Data.training_cfg["cluster_spacing"]["tight"])
+		check(absf(a.global_position.distance_to(b.global_position) - tight) < 0.5 and absf(b.global_position.distance_to(c.global_position) - tight) < 0.5 and absf(a.global_position.distance_to(c.global_position) - tight) < 0.5, "training world: tight cluster spacing comes from data")
+		Combat.cast_serial += 1
+		Combat.deal(_tpk("fireball", "spell", 100.0), p, b)
+		Combat.deal(_tpk("fireball", "spell", 100.0), p, c)
+		var dums := {}
+		for e in TrainingLog.run["events"]:
+			dums[e["dummy"]] = true
+		check(dums.has(2) and dums.has(3) and TrainingLog.is_running() and TrainingLog.run["events"][0]["t"] == 0.0, "training world: hits on different dummies share one window")
+		TrainingLog.tick(100.0)
+		var lr: Dictionary = TrainingLog.last_result
+		check(lr.has("per_dummy") and lr["settings"]["type"] == "aoe" and absf(float(lr["total"]) - 200.0) < 1.0, "training world: the AoE result sums all dummies", str(lr.get("total")))
+		check(is_equal_approx(float(lr.get("targets_per_cast", -9.0)), 2.0), "training world: the AoE result reports distinct dummies hit per cast", str(lr.get("targets_per_cast")))
+	TrainingLog.set_option("spacing", "spread")
+	why = hub.training_spawn()
+	if hub.training_dummies.size() == 3:
+		var sp: float = float(Data.training_cfg["cluster_spacing"]["spread"])
+		check(absf(hub.training_dummies[0].global_position.distance_to(hub.training_dummies[1].global_position) - sp) < 0.5, "training world: spread cluster spacing comes from data")
+	else:
+		check(false, "training world: the spread cluster fits in the hub", why)
+	TrainingLog.set_option("type", "single")
+
+	# ---- minion damage is credited to the summoning skill
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	var sk: Dictionary = ch.resolved_skill("summon_skeletons")
+	var m = p.spawn_minion(sk.get("minion", "skeleton_warrior"), 1, d.global_position + Vector2(-14, 0), sk)
+	await frames(240)
+	var mev := _tevs("minion")
+	check(m != null and mev.size() > 0 and mev[0]["skill_id"] == "summon_skeletons", "training world: minion damage is credited to the summoning skill", str(mev.slice(0, 2)))
+	hub.training_remove()
+	for mm in p.minions.duplicate():
+		if is_instance_valid(mm):
+			mm.die(null)
+	p.minions.clear()
+
+	# ---- history survives a dungeon trip; a running test does not
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	Combat.deal(_tpk("fireball"), p, d)
+	TrainingLog.tick(100.0)
+	check(TrainingLog.history().size() >= 1, "training world: a finished test is stored in this character's history")
+	var hn: int = TrainingLog.history().size()
+	Combat.deal(_tpk("fireball"), p, d)
+	TrainingLog.tick(0.01)
+	main.enter_dungeon("forgotten_depths", 31)
+	await frames(3)
+	check(not TrainingLog.has_run() or not TrainingLog.is_running(), "training world: leaving the hub drops a running test")
+	main.go_hub(false)
+	await frames(3)
+	check(TrainingLog.history().size() == hn and Game.level.training_dummies.is_empty(), "training world: history survives a dungeon trip and the new hub starts without dummies")
+	TrainingLog.clear_history()
+	TrainingLog.discard()
+
+	# ---- ranger: turret and mine damage is credited to the deploying skill
+	Game.new_character("ranger")
+	main.start_game()
+	await frames(3)
+	hub = Game.level
+	p = hub.player
+	ch = Game.ch
+	ch.loadout[2] = "ballista_turret"
+	_tready(p)
+	check(not p.try_use_slot(2) and p.deployables.is_empty(), "training world: deploying in the hub is refused while no dummies exist")
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	p.global_position = d.global_position + Vector2(-50, 0)
+	p.auto_aim_override = p.global_position + Vector2(10, 0)
+	_tready(p)
+	check(p.try_use_slot(2), "training world: deploying a turret works in the hub while dummies exist")
+	await frames(300)
+	var tev := _tevs("deployable", "ballista_turret")
+	check(tev.size() > 0, "training world: turret damage is credited to the deploying skill", str(TrainingLog.run["events"].slice(0, 3)))
+	hub.training_remove()
+	Game.training_in_tests = false
+	TrainingLog.discard()
+	TrainingLog.reset_settings()
