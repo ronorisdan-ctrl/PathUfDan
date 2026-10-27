@@ -240,6 +240,15 @@ func tick(dt: float) -> void:
 		bot.trace("D2 %s life=%.2f crng=%d lrng=%d %s" % [str(p.global_position), p.life, Combat.rng.state, Loot.rng.state, ee])
 	if bot.A.has("debug") and int(t * 60.0) % 300 == 0:
 		bot.trace("DBG t=%.1f pos=%s desired=%s goal=%s target=%s sealed=%d interactables=%s" % [t, str(lv.to_cell(p.global_position)), str(desired), goal_kind, target.display_name if _valid(target) else "-", lv.sealed_cells.size(), str(lv.interactables.map(func(i): return i["kind"]))])
+		var ws = lv.get("wave_state")
+		if typeof(ws) == TYPE_DICTIONARY and ws.get("active", false):
+			var wl := ""
+			var lost: Dictionary = ws.get("lost", {})
+			for we in ws.get("alive", []):
+				if is_instance_valid(we) and we.alive:
+					var wc: Vector2i = lv.to_cell(we.global_position)
+					wl += "%s@%s solid=%s flow=%d lost=%.1f st=%s; " % [we.display_name.substr(0, 6), str(wc), lv.is_solid(we.global_position), lv.flow_value(wc) if lv.has_method("flow_value") else -9, float(lost.get(we.get_instance_id(), 0.0)), we.state]
+			bot.trace("   WAVES wave=%d/%d altar=%s d_altar=%.0f pflow=%d :: %s" % [int(ws.get("wave", 0)), int(ws.get("total", 0)), str(lv.to_cell(ws["pos"])), p.global_position.distance_to(ws["pos"]), lv.flow_value(lv.to_cell(p.global_position)) if lv.has_method("flow_value") else -9, wl])
 		if _valid(target):
 			var sk0: Dictionary = p.skill_in_slot(0)
 			bot.trace("   d=%.0f los=%s tcell=%s solid=%s block0=%s val0=%s uses=%s busy=%.2f state=%s" % [target.global_position.distance_to(p.global_position), lv.has_los(p.global_position, target.global_position), str(lv.to_cell(target.global_position)), lv.is_solid(target.global_position), p.use_block_reason(sk0), str(_skill_value(sk0)), str(st["skill_uses"]), p.busy, target.state])
@@ -382,6 +391,7 @@ func _movement() -> Vector2:
 			prog_t = t
 		elif t - prog_t > 10.0 and not target.is_boss:
 			ignore[prog_target_id] = t + 8.0
+			prog_target_id = 0     # fresh progress clock when this target comes back
 			bot.trace("NO PROGRESS on %s, switching target" % target.display_name)
 			target = null
 			return Vector2.ZERO
@@ -455,6 +465,20 @@ func _goal():
 		var og = _objective_goal()
 		if og != null:
 			return og
+	# Blood Altar running: go back to the remaining wave enemies (the objective text shows
+	# the wave is not over; the arena stays sealed until they are dead)
+	if lv.sealed_cells.size() > 0 and lv.wave_state.get("active", false):
+		var wbest = null
+		var wd := INF
+		for we in lv.wave_state.get("alive", []):
+			if _valid(we):
+				var dd: float = pp.distance_to(we.global_position)
+				if dd < wd:
+					wd = dd
+					wbest = we
+		if wbest != null:
+			goal_kind = "waves"
+			return wbest.global_position
 	var lg = _loot_goal(160.0)
 	if lg != null:
 		return lg
@@ -537,6 +561,7 @@ func _path_dir(goal: Vector2) -> Vector2:
 	var best := _dist(c)
 	if best < 0 and gc == dist_origin and goal_kind == "target" and _valid(target) and not target.is_boss:
 		ignore[target.get_instance_id()] = t + 8.0     # unreachable from here
+		prog_target_id = 0
 		bot.trace("UNREACHABLE target %s at %s" % [target.display_name, str(gc)])
 		st["unreachable"] = int(st.get("unreachable", 0)) + 1
 		target = null
@@ -630,6 +655,7 @@ func _stuck(dt: float) -> void:
 			bot.trace("   nearest %s d=%.0f state=%s aggro=%s los=%s; active threats %d; desired %s" % [ne.display_name, nd, ne.state, ne.aggro, lv.has_los(p.global_position, ne.global_position), threat.active.size(), str(desired)])
 		if _valid(target) and not target.is_boss:
 			ignore[target.get_instance_id()] = t + 20.0
+			prog_target_id = 0
 			target = null
 		dist_origin = Vector2i(-999, -999)
 		unstick_dir = Vector2.RIGHT.rotated(rng.randf() * TAU)

@@ -49,6 +49,7 @@ var attack_dir := Vector2.RIGHT
 var attack_kind := ""
 var think_t := 0.0
 var moving := false
+var windup_aoes := []     # telegraphs of the current windup; removed if the attack is interrupted
 
 ## run: multipliers from the dungeon tier and run modifiers
 ## (life, damage, speed, attack_speed, armour, resist, regen, explode, added_fire)
@@ -144,6 +145,12 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if not alive or level == null:
 		return
+	if Dev.freeze_ai():
+		# developer tools: stand still, never think or attack (statuses and visuals still tick)
+		tick_statuses(delta)
+		update_visual(delta, false)
+		queue_redraw()
+		return
 	if def.get("dummy", false):
 		recently_hit -= delta
 		statuses.clear()
@@ -181,6 +188,7 @@ func _physics_process(delta: float) -> void:
 				vel = _chase()
 			"windup":
 				if state_t <= 0:
+					windup_aoes.clear()
 					_perform_attack()
 					state = "recover"
 					state_t = float(def.get("recover", 0.8))
@@ -285,14 +293,15 @@ func _start_attack(dir: Vector2) -> void:
 	var wu := float(def.get("windup", 0.5))
 	state_t = wu
 	attack_kind = def.get("attack", "melee")
+	windup_aoes.clear()
 	match attack_kind:
 		"slam":
 			var at: Vector2 = global_position + dir * float(def.get("attack_range", 30)) * 0.7
-			_spawn_aoe(at, float(def.get("slam_radius", 36)), wu / attack_speed_mult, "slam", Color("#ff5030"))
+			windup_aoes.append(_spawn_aoe(at, float(def.get("slam_radius", 36)), wu / attack_speed_mult, "slam", Color("#ff5030")))
 		"explode":
-			_spawn_aoe(global_position, float(def.get("slam_radius", 40)), wu / attack_speed_mult, "explosion", Color("#a0e040"))
+			windup_aoes.append(_spawn_aoe(global_position, float(def.get("slam_radius", 40)), wu / attack_speed_mult, "explosion", Color("#a0e040")))
 		"nova":
-			_spawn_aoe(global_position, float(def.get("slam_radius", 50)), wu / attack_speed_mult, "slam", Combat.TYPE_COLORS.get(def.get("dmg_type", "physical"), Color.WHITE))
+			windup_aoes.append(_spawn_aoe(global_position, float(def.get("slam_radius", 50)), wu / attack_speed_mult, "slam", Combat.TYPE_COLORS.get(def.get("dmg_type", "physical"), Color.WHITE)))
 
 func _spawn_aoe(at: Vector2, r: float, delay: float, style: String, col: Color, mult: float = 1.0):
 	var a = AoE.new()
@@ -456,7 +465,29 @@ func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float
 		life = minf(life, max_life)
 		return total
 	apply_damage(total, source, crit, Combat.dominant_type(rolled))
+	if alive and total > 0 and not is_boss:
+		_try_hit_stun(total)
 	return total
+
+## Armour/health stun for normal and elite enemies (bosses use poise in boss.gd).
+func _try_hit_stun(dmg: float) -> void:
+	if Data.stun_cfg.is_empty():
+		return
+	var kind := "elite" if (is_elite or is_miniboss) else "normal"
+	if try_hit_stun(dmg, kind) > 0.0 and Data.stun_cfg["kinds"][kind].get("interrupts_windup", true):
+		interrupt_windup()
+
+## Cancels a telegraphed attack: its warning circles are removed and the attack never lands.
+func interrupt_windup() -> bool:
+	if state != "windup":
+		return false
+	for a in windup_aoes:
+		if is_instance_valid(a):
+			a.queue_free()
+	windup_aoes.clear()
+	state = "recover"
+	state_t = float(def.get("recover", 0.8)) * 0.5
+	return true
 
 func dot_resist(dtype: String) -> float:
 	return (1.0 - clampf(float(resist.get(dtype, 0)), -100, 90) / 100.0) * taken_mult() * elite_taken

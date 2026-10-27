@@ -50,11 +50,18 @@ func _ready() -> void:
 	await test_stage4()
 	await test_tiers()
 	await test_bosses()
+	await test_stun()
+	await test_pets()
+	await test_stash()
+	await test_loot_filter()
+	test_vendor_legendary_rate()
 	await test_crafting()
 	await test_boss_and_death()
+	await test_dev_tools()
 	test_save_load()
 	test_save_slots()
 	await test_ui()
+	await test_stash_ui()
 	var summary := "==== %d passed, %d failed ====" % [passes, fails]
 	print("\n" + summary)
 	_log(summary)
@@ -108,6 +115,26 @@ func test_passive_tree_data() -> void:
 		types[n["type"]] = types.get(n["type"], 0) + 1
 	check(types.get("keystone", 0) >= 6, "tree has 6+ keystones", str(types))
 	check(types.get("greater", 0) >= 9, "tree has 9+ greater nodes", str(types))
+
+func test_vendor_legendary_rate() -> void:
+	var li: int = Data.rarity_list.size() - 1
+	check(Data.rarity_list[li]["id"] == "legendary", "vendor odds: legendary is the last rarity")
+	# vendor: 8 items per stock, +60 rarity bonus, legendary weight override from loot.json
+	var vw := float(Data.loot.get("vendor_legendary_weight", -1.0))
+	check(vw >= 0.0, "vendor odds: vendor_legendary_weight is set in loot.json")
+	var w: Array = Loot.rarity_weights(60.0, vw)
+	var total := 0.0
+	for x in w:
+		total += float(x)
+	var p_item: float = float(w[li]) / total
+	var p_stock: float = 1.0 - pow(1.0 - p_item, 8.0)
+	check(p_stock > 1.0 / 550.0 and p_stock < 1.0 / 450.0, "vendor odds: about 1 legendary per 500 stock rerolls", "1 in %.1f" % (1.0 / p_stock))
+	# monster drops are untouched: same weights as before for trash, elite and boss bonuses
+	for bonus in [0.0, 150.0, 400.0]:
+		var d: Array = Loot.rarity_weights(bonus)
+		var expect: float = float(Data.rarity_list[li]["weight"]) * (1.0 + bonus / 100.0)
+		check(is_equal_approx(float(d[li]), expect), "drop odds unchanged at bonus %d" % int(bonus))
+	check(is_equal_approx(float(Loot.rarity_weights(60.0)[li]), float(Data.rarity_list[li]["weight"]) * 1.6), "default roll_rarity ignores the vendor override")
 
 func test_item_generation() -> void:
 	var bad := 0
@@ -936,6 +963,123 @@ func test_bosses() -> void:
 		check(not is_instance_valid(b) or b.phase_idx >= 1, "boss %s reaches later phase" % bid)
 		check(p.life < 1.0e7, "boss %s can damage the player" % bid)
 
+# ------------------------------------------------------------------ stun (data/stun.json)
+const StunRules = preload("res://scripts/combat/stun.gd")
+
+func _near(a: float, b: float, eps: float = 0.001) -> bool:
+	return absf(a - b) <= eps
+
+func test_stun() -> void:
+	print("\n--- stun")
+	_log("--- stun")
+	var cfg: Dictionary = Data.stun_cfg
+	check(not cfg.is_empty() and cfg.get("enabled", false), "stun config loaded and enabled")
+	if cfg.is_empty():
+		return
+	# pure rules
+	check(StunRules.stun_chance(cfg, "normal", 10.0, 100.0) == 0.0, "stun: no chance at the threshold")
+	check(_near(StunRules.stun_chance(cfg, "normal", 30.0, 100.0), 0.55), "stun: chance ramps linearly", str(StunRules.stun_chance(cfg, "normal", 30.0, 100.0)))
+	check(StunRules.stun_chance(cfg, "normal", 50.0, 100.0) == 1.0, "stun: guaranteed at 50% of max life")
+	check(StunRules.stun_chance(cfg, "player", 50.0, 100.0, 5.0) == 1.0, "stun: high threshold stat never blocks a 50% hit")
+	check(StunRules.stun_chance(cfg, "player", 25.0, 100.0, 2.0) == 0.0, "stun: threshold stat raises the threshold")
+	check(StunRules.stun_chance(cfg, "normal", 3.0, 100.0, 0.0) > 0.0, "stun: threshold stat is floored at min_threshold_mult")
+	check(_near(StunRules.stun_duration(cfg, "normal", 10.0, 100.0), 0.4) and _near(StunRules.stun_duration(cfg, "normal", 90.0, 100.0), 0.8), "stun: duration from min to max (capped)")
+	check(StunRules.try_stun(cfg, "elite", 30.0, 100.0, 0.99) == 0.0 and StunRules.try_stun(cfg, "elite", 30.0, 100.0, 0.01) > 0.0, "stun: roll uses the supplied rng value")
+	var off := cfg.duplicate(true)
+	off["enabled"] = false
+	check(StunRules.stun_chance(off, "normal", 90.0, 100.0) == 0.0, "stun: disabled config never stuns")
+	var ps := StunRules.new_poise()
+	var hits := []
+	for i in 3:
+		hits.append(StunRules.poise_hit(cfg, ps, 60.0, 1000.0))
+	check(hits == [false, false, true], "poise: three 6% hits stagger a boss", str(hits))
+	check(not StunRules.poise_hit(cfg, ps, 600.0, 1000.0) and ps["poise"] == 0.0, "poise: immune during and after stagger")
+	StunRules.poise_tick(cfg, ps, 9.5)
+	check(ps["immune"] == 0.0 and ps["stagger"] == 0.0, "poise: immunity ends after stagger + 8 s")
+	StunRules.poise_hit(cfg, ps, 30.0, 1000.0)
+	var p0: float = ps["poise"]
+	StunRules.poise_tick(cfg, ps, 2.0)
+	var p1: float = ps["poise"]
+	StunRules.poise_tick(cfg, ps, 2.0)
+	check(p1 == p0 and ps["poise"] < p0, "poise: regenerates only after the regen delay", "%f %f %f" % [p0, p1, ps["poise"]])
+	check(_near(StunRules.poise_multiplier(cfg, 0.05), 1.0) and _near(StunRules.poise_multiplier(cfg, 0.15), 1.75) and _near(StunRules.poise_multiplier(cfg, 0.10), 1.375), "poise: big-hit bonus ramps without a cliff")
+	# in game
+	Game.new_character("warrior")
+	Game.ch.level = 20
+	Game.ch.recalc()
+	main.start_game()
+	await frames(2)
+	main.enter_dungeon("forgotten_depths", 77)
+	await frames(2)
+	var lv = Game.level
+	var p = lv.player
+	var br: Dictionary = lv.rooms[lv.layout["boss"]]
+	var pos: Vector2 = lv.cell_center(br["anchor"])
+	var pk := {"flags": {}, "is_attack": false}
+	# normal enemy: big hit stuns, small hit does not, immunity blocks a second stun
+	var e = lv.spawn_enemy(Data.enemies["grave_brute"], 10, [], pos + Vector2(40, 0))
+	await frames(1)
+	e.armour = 0.0
+	e.resist = {}
+	e.receive_hit({"arcane": e.max_life * 0.05}, pk, p, false)
+	check(not e.has_status("stun"), "stun: a 5% hit does not stun a normal enemy")
+	e.life = e.max_life
+	e.state = "chase"
+	e._start_attack(Vector2.RIGHT)
+	var tele: Array = e.windup_aoes.duplicate()
+	check(e.state == "windup" and tele.size() == 1, "stun: slam windup records its telegraph")
+	e.receive_hit({"arcane": e.max_life * 0.6}, pk, p, false)
+	check(e.has_status("stun"), "stun: a 60% hit always stuns a normal enemy")
+	check(e.state == "recover" and (tele.is_empty() or not is_instance_valid(tele[0]) or tele[0].is_queued_for_deletion()), "stun: interrupts the windup and removes its telegraph")
+	check(e.stun_immune_t > 0.0 and e.try_hit_stun(e.max_life * 0.6, "normal") == 0.0, "stun: immunity after a stun")
+	# armour reduces stuns: same raw hit, heavy armour -> less life lost -> lower chance
+	check(StunRules.stun_chance(cfg, "normal", e.max_life * 0.3 * (1.0 - Combat.armour_reduction(500.0, e.max_life * 0.3)), e.max_life) < StunRules.stun_chance(cfg, "normal", e.max_life * 0.3, e.max_life), "stun: armour lowers stun chance")
+	# boss poise
+	var b = lv.spawn_enemy(Data.enemies["warden"], 20, [], pos)
+	await frames(1)
+	b.max_life = 2000.0
+	b.life = 2000.0
+	b.armour = 0.0
+	b.resist = {}
+	b.receive_hit({"arcane": 120.0}, pk, p, false)
+	b.receive_hit({"arcane": 120.0}, pk, p, false)
+	check(not b.has_status("stun") and b.poise_state["poise"] > 0.0, "poise: boss is not stunned by single hits", str(b.poise_state))
+	b.receive_hit({"arcane": 120.0}, pk, p, false)
+	check(b.has_status("stun") and b.poise_state["stagger"] > 0.0, "poise: boss staggers when poise fills", str(b.poise_state))
+	b.receive_hit({"arcane": 120.0}, pk, p, false)
+	check(b.poise_state["poise"] == 0.0 and b.poise_state["immune"] > 8.0, "poise: no poise gain while immune")
+	for x in [b, e]:
+		lv.enemies.erase(x)
+		x.queue_free()
+	# player: a 60% hit stuns and cancels the cast; dodge breaks it after 0.15 s
+	p.global_position = pos + Vector2(-120, 0)
+	p.max_life = 1000.0
+	p.life = 1000.0
+	p.stun_immune_t = 0.0
+	p.ch.final["block_chance"] = 0.0
+	p.ch.final["res_arcane"] = 0.0
+	p.ch.final["damage_reduction"] = 0.0
+	p.busy = 0.5
+	p.pending.append({"t": 0.3, "fn": func(): pass})
+	p.receive_hit({"arcane": 600.0}, pk, null, false)
+	check(p.alive and p.has_status("stun"), "stun: big hit stuns the player", str(p.life))
+	check(p.busy <= 0.0 and p.pending.is_empty(), "stun: player cast is cancelled")
+	check(not p.can_dodge_out_of_stun(), "stun: dodge cannot break the stun at once")
+	await frames(12)
+	check(not p.has_status("stun") or p.can_dodge_out_of_stun(), "stun: dodge can break the stun after 0.15 s")
+	p.dodge_cd = 0.0
+	if p.has_status("stun"):
+		p.start_dodge()
+		check(not p.has_status("stun") and p.dodge_t > 0.0, "stun: dodging out of stun works")
+	await frames(30)
+	p.statuses.erase("stun")
+	p.life = p.max_life
+	p.stun_immune_t = 0.0
+	p.ch.stats.add("stun_threshold", "inc", 150.0, "test")
+	p.receive_hit({"arcane": 400.0}, pk, null, false)
+	check(p.life < p.max_life and not p.has_status("stun"), "stun: stun threshold stat protects against a 40% hit", str(p.life))
+	Game.ch.recalc()
+
 func test_hazards_and_mods() -> void:
 	pass
 
@@ -1048,7 +1192,475 @@ func test_save_load() -> void:
 			eq_ok = false
 	check(eq_ok, "save/load restores equipment")
 	check(absf(ch2.final["max_life"] - ch.final["max_life"]) < 0.01, "save/load restores stats", "%s vs %s" % [ch.final["max_life"], ch2.final["max_life"]])
-	check(int(d1["version"]) == 1, "save is versioned")
+	check(int(d1["version"]) == ch.SAVE_VERSION and ch.SAVE_VERSION >= 2, "save is versioned")
+
+# ------------------------------------------------------------------ pets
+const PetRulesT = preload("res://scripts/core/pet_rules.gd")
+
+## A floor point `dist` px from `from` with a clear straight line, or null.
+func _open_point(lv, from: Vector2, dist: float, avoid := []):
+	for k in 16:
+		var dir := Vector2.RIGHT.rotated(k * TAU / 16.0)
+		var to: Vector2 = from + dir * dist
+		if lv.is_solid(to) or not lv.has_los(from, to):
+			continue
+		var ok := true
+		for a in avoid:
+			if to.distance_to(a) < 24:
+				ok = false
+		if ok and lv.clamp_to_floor(from, to).distance_to(to) < 1.0:
+			return to
+	return null
+
+func _drop_item(lv, rarity: String, pos: Vector2):
+	var it: Dictionary = Loot.make_item("rusty_sword" if Data.item_bases.has("rusty_sword") else Data.item_base_list[0]["id"], rarity, 5)
+	lv.spawn_drop({"kind": "item", "item": it}, pos)
+	var n = lv.loot.back()
+	n.t = 1.0
+	n.position = pos
+	return n
+
+func _bag_uid_count(ch, uid: int) -> int:
+	var c := 0
+	for it in ch.inventory:
+		if it != null and int(it.get("uid", -1)) == uid:
+			c += 1
+	return c
+
+func _set_pet_tier(lv, ch, id: String, tier: int):
+	ch.pets[id]["tier"] = tier
+	Events.pet_changed.emit()
+	return lv.pet
+
+func _wait_until(cond: Callable, max_frames: int = 240) -> bool:
+	for i in max_frames:
+		if cond.call():
+			return true
+		await get_tree().physics_frame
+	return cond.call()
+
+func test_loot_filter() -> void:
+	print("\n--- loot filter")
+	_log("--- loot filter")
+	var LF = load("res://scripts/core/loot_filter.gd")
+	# ---- the engine's own acceptance tests
+	var eng = load("res://tests/test_loot_filter.gd").new()
+	var r: Dictionary = eng.run()
+	check(int(r["failed"]) == 0 and int(r["passed"]) > 40, "loot filter: engine tests (%d passed)" % int(r["passed"]), str(r["log"]))
+	eng.free()
+	check(LootFilter != null and LootFilter.PRESET_NAMES.size() == 4, "loot filter: autoload present with four presets")
+	# ---- every real base maps to a valid filter slot and kind
+	var map_ok := true
+	var bad := ""
+	for base_id in Data.item_bases:
+		var it: Dictionary = Loot.make_item(base_id, "rare", 20)
+		if it.is_empty():
+			continue
+		var d: Dictionary = LootFilter.describe(it)
+		if not (str(d["slot"]) in LF.SLOTS) or not (str(d["kind"]) in LF.KINDS):
+			map_ok = false
+			bad = "%s -> %s/%s" % [base_id, d["slot"], d["kind"]]
+	check(map_ok, "loot filter: every item base maps to a known slot and kind", bad)
+	var two_h := ""
+	var one_h := ""
+	for base_id in Data.item_bases:
+		var b: Dictionary = Data.item_bases[base_id]
+		if b.get("slot", "") == "main_hand":
+			if b.get("two_handed", false) and two_h == "":
+				two_h = base_id
+			if not b.get("two_handed", false) and one_h == "":
+				one_h = base_id
+	check(LootFilter.describe(Loot.make_item(two_h, "common", 5))["slot"] == "weapon_2h" and LootFilter.describe(Loot.make_item(one_h, "common", 5))["slot"] == "weapon_1h", "loot filter: one-handed and two-handed weapons map to the right slots")
+	# ---- drops obey the filter (the filter is bypassed under Game.testing unless switched on)
+	var LootDropS = load("res://scripts/entities/loot_drop.gd")
+	var common: Dictionary = Loot.make_item(one_h, "common", 5)
+	var legend: Dictionary = Loot.make_item(one_h, "legendary", 5)
+	var drop_c = LootDropS.new()
+	drop_c.setup_item(common)
+	add_child(drop_c)
+	check(drop_c.visible and not drop_c.filtered_now(), "loot filter: bots and tests are unaffected (filter bypassed while testing)")
+	drop_c.queue_free()
+	Game.filter_in_tests = true
+	LootFilter.set_character("test_runner")
+	LootFilter.load_filter("strict")
+	var dc = LootDropS.new()
+	dc.setup_item(common)
+	add_child(dc)
+	var dl = LootDropS.new()
+	dl.setup_item(legend)
+	add_child(dl)
+	check(not dc.visible and dc.hidden_by_filter and dc.filtered_now(), "loot filter: Strict hides a common drop (not drawn)")
+	check(dl.visible and not dl.filtered_now(), "loot filter: a legendary is never hidden (safety net)")
+	LootFilter.reveal_hidden = true
+	LootFilter.emit_signal("reveal_changed", true)
+	check(dc.visible and not dc.hidden_by_filter, "loot filter: holding Alt reveals the hidden drop")
+	LootFilter.reveal_hidden = false
+	LootFilter.emit_signal("reveal_changed", false)
+	check(not dc.visible, "loot filter: releasing Alt hides it again")
+	LootFilter.load_filter("show_all")
+	check(dc.visible, "loot filter: switching filter updates drops already on the floor")
+	LootFilter.load_filter("rare_plus")
+	var dr = LootDropS.new()
+	dr.setup_item(Loot.make_item(one_h, "rare", 5))
+	add_child(dr)
+	check(dr.visible and dr.fres.get("color") != null, "loot filter: Rare+ shows a rare with a custom label colour")
+	check(dr.fs >= 6 and dr.fs <= 14, "loot filter: label size stays in the readable range", str(dr.fs))
+	for n in [dc, dl, dr]:
+		n.queue_free()
+	Game.filter_in_tests = false
+	# ---- sounds named by the presets exist
+	var snd_ok := true
+	for pn in LF.PRESET_NAMES:
+		var txt := FileAccess.get_file_as_string("res://data/loot_filters/%s.json" % pn)
+		var pd = JSON.parse_string(txt)
+		check(typeof(pd) == TYPE_DICTIONARY and LootFilter.validate(LootFilter.normalize(pd)).filter(func(m): return m.begins_with("ERROR")).is_empty(), "loot filter: preset %s validates" % pn)
+		for rule in pd.get("rules", []):
+			var s: String = str(rule.get("actions", {}).get("sound", ""))
+			if s != "" and s != "none" and not Sfx.streams.has(s):
+				snd_ok = false
+	check(snd_ok, "loot filter: every sound id used by the presets exists in Sfx")
+	# ---- per-character folders follow the save slot
+	LootFilter.set_character("test_runner")
+	var err: int = LootFilter.save_filter("mine", {"name": "Mine", "rules": []})
+	check(err == OK, "loot filter: custom filter saves for the current character")
+	LootFilter.set_character("test_runner_b")
+	check(not ("mine" in LootFilter.list_filters()), "loot filter: another character does not see it")
+	for n in ["test_runner", "test_runner_b"]:
+		var dir: String = LF.USER_ROOT + n + "/"
+		for f in ["mine.json", "mine.json.bak", "_active.txt"]:
+			DirAccess.remove_absolute(dir + f)
+		DirAccess.remove_absolute(dir)
+	# ---- the in-game editor builds, opens and shows the active filter's rules
+	var pnl = load("res://scripts/ui/loot_filter_panel.gd").new()
+	add_child(pnl)
+	LootFilter.set_character("default")
+	LootFilter.load_filter("default")
+	pnl.open()
+	await frames(2)
+	check(pnl.visible and pnl._filter["rules"].size() == LootFilter.filter["rules"].size() and pnl._filter["rules"].size() > 0, "loot filter: editor opens and lists the active filter's rules")
+	pnl.close()
+	check(not pnl.visible, "loot filter: editor closes")
+	pnl.queue_free()
+	await frames(1)
+
+func test_pets() -> void:
+	print("\n--- pets")
+	_log("--- pets")
+	# ---- data and rules
+	check(Data.pet_list.size() >= 16, "pets: roster loaded", str(Data.pet_list.size()))
+	var data_ok := true
+	for pd in Data.pet_list:
+		if not Art.SPRITES.has(pd.get("sprite", "")) or int(pd.get("price", 0)) <= 0 or float(pd.get("upgrade_cost_mult", 0)) <= 0:
+			data_ok = false
+	check(data_ok, "pets: every pet has a sprite, a price and a cost multiplier")
+	check(PetRulesT.max_tier() == 5, "pets: six-step tier track (0-5)")
+	check(PetRulesT.required_tier("gold") == 0 and PetRulesT.required_tier("material") == 0, "pets: gold and materials from tier 0")
+	check(PetRulesT.required_tier("item", "common") == 1 and PetRulesT.required_tier("item", "rare") == 3 and PetRulesT.required_tier("item", "legendary") == 5, "pets: each tier unlocks one rarity")
+	var costs_rise := true
+	var prev := 0
+	for t in 5:
+		var tot := 0
+		for k in PetRulesT.upgrade_cost("dog", t):
+			tot += int(PetRulesT.upgrade_cost("dog", t)[k])
+		if tot <= prev:
+			costs_rise = false
+		prev = tot
+	check(costs_rise and PetRulesT.upgrade_cost("dog", 5).is_empty(), "pets: upgrade costs rise steeply and stop at max tier")
+	check(PetRulesT.total_cost("mimic") > PetRulesT.total_cost("dog") * 3, "pets: cost multiplier scales the whole track", "%d vs %d" % [PetRulesT.total_cost("mimic"), PetRulesT.total_cost("dog")])
+	check(PetRulesT.stats("ghost", 3)["wall_pass"] and not PetRulesT.stats("dog", 3)["wall_pass"], "pets: signature tweaks apply (ghost passes walls early)")
+	check(PetRulesT.stats("dog", 5)["fetch_cd"] < PetRulesT.stats("dog", 1)["fetch_cd"] and PetRulesT.stats("dog", 5)["speed"] > PetRulesT.stats("dog", 0)["speed"], "pets: higher tiers are faster with shorter cooldowns")
+	# ---- buying, upgrading, swapping (state only)
+	Game.new_character("ranger")
+	var ch = Game.ch
+	ch.gold = 100
+	check(ch.buy_pet("dog") == "Not enough gold" and not ch.owns_pet("dog"), "pets: buying needs gold")
+	ch.gold = 100000
+	check(ch.buy_pet("dog") == "" and ch.gold == 100000 - int(Data.pets["dog"]["price"]), "pets: buy a dog with gold")
+	check(ch.active_pet == "dog", "pets: the first pet bought starts following")
+	check(ch.buy_pet("dog") != "", "pets: cannot buy the same pet twice")
+	ch.buy_pet("cat")
+	check(ch.active_pet == "dog" and ch.owns_pet("cat"), "pets: buying another pet does not swap")
+	check(ch.upgrade_pet("dog") == "Not enough materials", "pets: upgrades cost materials")
+	for k in Data.materials:
+		ch.materials[k] = 1000000
+	var scrap0 := int(ch.materials["scrap"])
+	check(ch.upgrade_pet("dog") == "" and ch.upgrade_pet("dog") == "" and ch.pet_tier("dog") == 2, "pets: upgrade the dog to tier 2")
+	check(int(ch.materials["scrap"]) < scrap0, "pets: upgrading spends materials")
+	check(ch.pet_tier("cat") == 0, "pets: upgrades do not carry over to other pets")
+	check(ch.set_active_pet("cat") and ch.active_pet == "cat" and ch.pet_tier("dog") == 2, "pets: swap to the cat, the dog keeps its tier")
+	check(ch.set_active_pet("dog") and ch.pet_tier("dog") == 2 and ch.pet_tier("cat") == 0, "pets: swap back, nothing lost or refunded")
+	check(not ch.set_active_pet("mimic"), "pets: cannot summon a pet you don't own")
+	ch.rename_pet("dog", "  Sir Barks [x]  ")
+	check(ch.pet_name("dog") == "Sir Barks (x)", "pets: rename is trimmed and sanitised", ch.pet_name("dog"))
+	ch.rename_pet("cat", "   ")
+	check(ch.pet_name("cat") == "Cat", "pets: blank name falls back to the species")
+	var d2 = JSON.parse_string(JSON.stringify(ch.to_dict()))
+	Game.load_from_dict(d2)
+	ch = Game.ch
+	check(ch.owns_pet("dog") and ch.owns_pet("cat") and ch.pet_tier("dog") == 2 and ch.active_pet == "dog" and ch.pet_name("dog") == "Sir Barks (x)", "pets: save/load round trip keeps pets, tiers, names and the active pet")
+	var bad := {"pets": {"dog": {"tier": 99, "name": "A"}, "nonsense": {"tier": 1}}, "active_pet": "nonsense"}
+	var d3: Dictionary = ch.to_dict()
+	d3.merge(bad, true)
+	Game.load_from_dict(JSON.parse_string(JSON.stringify(d3)))
+	check(Game.ch.pet_tier("dog") == PetRulesT.max_tier() and not Game.ch.owns_pet("nonsense") and Game.ch.active_pet == "", "pets: bad save data is clamped and unknown pets dropped")
+	Game.load_from_dict(d2)
+	ch = Game.ch
+	# ---- in the world
+	Game.pets_in_tests = true
+	main.start_game()
+	await frames(2)
+	check(Game.level.pet != null, "pets: the active pet follows you in town")
+	main.enter_dungeon("forgotten_depths", 4242)
+	await frames(3)
+	var lv = Game.level
+	var p = lv.player
+	for e in lv.enemies:
+		e.set_physics_process(false)
+		e.set_process(false)
+	var pet = lv.pet
+	check(pet != null and is_instance_valid(pet) and pet.pet_id == "dog" and pet.tier == 2, "pets: the pet enters the dungeon with you")
+	if pet == null:
+		Game.pets_in_tests = false
+		return
+	# never in the way
+	var no_body := true
+	for c in pet.find_children("*", "", true, false):
+		if c is CollisionObject2D or c is CollisionShape2D:
+			no_body = false
+	check(no_body and not (pet is CollisionObject2D), "pets: no collision shape or hurtbox")
+	check(not pet.has_method("take_damage") and not pet.has_method("receive_hit") and not ("life" in pet), "pets: no life and no damage method")
+	check(not lv.allies.has(pet) and not lv.enemies.has(pet) and not lv.hostiles_of("enemy").has(pet) and not lv.hostiles_of("player").has(pet), "pets: never in a targetable list")
+	var tgt_ok := true
+	for e in lv.enemies.slice(0, 10):
+		var tg = lv.nearest_hostile(pet.global_position, "enemy", 9999.0)
+		if tg == pet:
+			tgt_ok = false
+	check(tgt_ok, "pets: enemies never pick the pet as a target")
+	# a hostile projectile flies straight through the pet
+	p.global_position = lv.cell_center(lv.rooms[lv.layout["start"]]["anchor"]) if lv.layout.has("start") else p.global_position
+	await frames(2)
+	pet.teleport_to_player()
+	var lane = _open_point(lv, pet.global_position, 60.0)
+	if lane != null:
+		var away: Vector2 = pet.global_position - (lane - pet.global_position)
+		var spot = _open_point(lv, pet.global_position, 90.0, [lane, away])
+		var keep_player: Vector2 = p.global_position
+		if spot != null:
+			p.global_position = spot
+		pet.set_physics_process(false)
+		var pr = load("res://scripts/entities/projectile.gd").new()
+		pr.level = lv
+		pr.faction = "enemy"
+		pr.packet = {"dmg": {"physical": [5.0, 5.0]}, "crit_chance": 0.0, "crit_mult": 1.0, "faction": "enemy", "status": [], "tags": [], "flags": {}}
+		pr.radius = 4.0
+		pr.max_dist = 200.0
+		pr.vel = (lane - pet.global_position).normalized() * 240.0
+		pr.position = pet.global_position - pr.vel.normalized() * 20.0
+		lv.projectile_layer.add_child(pr)
+		await frames(8)
+		check(is_instance_valid(pr) and pr.traveled > 25.0 and pr.hit_ids.is_empty(), "pets: projectiles pass through the pet", str(pr.traveled) if is_instance_valid(pr) else "freed")
+		if is_instance_valid(pr):
+			pr.queue_free()
+		pet.set_physics_process(true)
+		p.global_position = keep_player
+		pet.teleport_to_player()
+	else:
+		check(false, "pets: projectile lane found")
+	await frames(2)
+	# ---- F routing
+	Game.settings["loot_filter"] = 0
+	ch.inventory = ch._fix_list([], ch.BAG_SIZE)
+	pet = _set_pet_tier(lv, ch, "dog", 1)
+	await frames(2)
+	pet.teleport_to_player()
+	var near_pos = _open_point(lv, p.global_position, 40.0)
+	var n_near = _drop_item(lv, "common", near_pos)
+	var uid_near := int(n_near.item["uid"])
+	lv.interact(p, n_near.label_rect().get_center())
+	check(_bag_uid_count(ch, uid_near) == 1 and pet.fetches == 0, "pets: F on a reachable item picks it up yourself")
+	var far_pos = _open_point(lv, pet.global_position, 150.0)
+	check(far_pos != null, "pets: test found open floor for a fetch")
+	if far_pos == null:
+		Game.pets_in_tests = false
+		return
+	var n_far = _drop_item(lv, "rare", far_pos)
+	lv.interact(p, n_far.label_rect().get_center())
+	check(pet.last_refusal == "Too heavy" and is_instance_valid(n_far) and not n_far.picked, "pets: F on a distant item above the pet's tier is refused (too heavy)")
+	n_far.picked = true
+	lv.loot.erase(n_far)
+	n_far.queue_free()
+	var n_c = _drop_item(lv, "common", far_pos)
+	var uid_c := int(n_c.item["uid"])
+	check(lv.drop_at_cursor(n_c.label_rect().get_center() + Vector2(0, 30)) == n_c, "pets: F targets the nearest label within the cursor radius")
+	lv.interact(p, n_c.label_rect().get_center())
+	check(pet.fetches == 1 and pet.state == "fetch" and n_c.claimed_by == pet, "pets: F on a distant item sends the pet")
+	check(not lv.pickup(n_c), "pets: a claimed drop cannot be taken by a second collector")
+	var n_c2 = _drop_item(lv, "common", far_pos + Vector2(0, 10))
+	check(pet.request_fetch(n_c2) == "Busy", "pets: busy while already fetching")
+	n_c2.picked = true
+	lv.loot.erase(n_c2)
+	n_c2.queue_free()
+	var got: bool = await _wait_until(func(): return _bag_uid_count(ch, uid_c) == 1, 300)
+	check(got and not is_instance_valid(n_c) or (is_instance_valid(n_c) and n_c.picked), "pets: the pet collects on touch, exactly one copy", str(_bag_uid_count(ch, uid_c)))
+	var n_r = _drop_item(lv, "common", far_pos)
+	check(pet.request_fetch(n_r) == "Resting" or pet.fetch_cd <= 0.0, "pets: resting while the cooldown runs", pet.last_refusal)
+	# out of range
+	pet.teleport_to_player()
+	await frames(1)
+	var long_pos = _open_point(lv, pet.global_position, float(pet.st["fetch_range"]) + 40.0)
+	if long_pos != null and pet.in_view(long_pos):
+		var n_long = _drop_item(lv, "common", long_pos)
+		pet.fetch_cd = 0.0
+		check(pet.request_fetch(n_long) == "Can't reach", "pets: out of fetch range is refused")
+		n_long.picked = true
+		lv.loot.erase(n_long)
+		n_long.queue_free()
+	else:
+		check(true, "pets: out of fetch range is refused (no lane on this map)")
+	# walls: find a floor spot without line of sight
+	var hidden_spot = null
+	var pc: Vector2i = lv.to_cell(pet.global_position)
+	for dy in range(-10, 11):
+		for dx in range(-14, 15):
+			var c := Vector2i(pc.x + dx, pc.y + dy)
+			if lv.cell(c.x, c.y) != lv.FLOOR:
+				continue
+			var cp: Vector2 = lv.cell_center(c)
+			var dd: float = cp.distance_to(pet.global_position)
+			if dd > 60 and dd < float(pet.st["fetch_range"]) - 10 and pet.in_view(cp) and not lv.has_los(pet.global_position, cp):
+				hidden_spot = cp
+				break
+		if hidden_spot != null:
+			break
+	if hidden_spot != null:
+		var n_w = _drop_item(lv, "common", hidden_spot)
+		pet.fetch_cd = 0.0
+		check(pet.request_fetch(n_w) == "Can't reach", "pets: a wall in the way is refused for early tiers")
+		pet = _set_pet_tier(lv, ch, "dog", 4)
+		await frames(2)
+		pet.teleport_to_player()
+		check(pet.request_fetch(n_w) == "", "pets: wall-pass and blink tiers ignore walls")
+		var gotw: bool = await _wait_until(func(): return not is_instance_valid(n_w) or n_w.picked, 120)
+		check(gotw, "pets: blink fetch through a wall completes")
+		pet = _set_pet_tier(lv, ch, "dog", 1)
+		await frames(2)
+	else:
+		check(true, "pets: wall check (no hidden floor near the start on this map)")
+	n_r.picked = true
+	lv.loot.erase(n_r)
+	n_r.queue_free()
+	# filter at the moment of collection
+	pet = lv.pet
+	pet.teleport_to_player()
+	await frames(1)
+	var n_f = _drop_item(lv, "common", far_pos)
+	pet.fetch_cd = 0.0
+	check(pet.request_fetch(n_f) == "", "pets: fetch a common item")
+	Game.filter_in_tests = true
+	LootFilter.load_filter("strict")
+	lv.refresh_loot_filter()
+	check(lv.drop_at_cursor(n_f.label_rect().get_center()) == null, "pets: items hidden by the loot filter cannot be targeted")
+	await _wait_until(func(): return pet.state != "fetch", 300)
+	check(is_instance_valid(n_f) and not n_f.picked and n_f.claimed_by == null, "pets: the filter is re-checked at collection (hidden item stays, claim released)")
+	Game.filter_in_tests = false
+	LootFilter.load_filter("default")
+	lv.refresh_loot_filter()
+	# bag full
+	pet.teleport_to_player()
+	await _wait_until(func(): return pet.fetch_cd <= 0.0 and pet.state == "follow", 300)
+	for i in ch.inventory.size():
+		if ch.inventory[i] == null:
+			ch.inventory[i] = Loot.make_item(Data.item_base_list[0]["id"], "common", 1)
+	check(pet.request_fetch(n_f) == "", "pets: fetch with a full bag starts")
+	await _wait_until(func(): return pet.state != "fetch", 300)
+	check(is_instance_valid(n_f) and not n_f.picked and n_f.claimed_by == null, "pets: a full bag leaves the item on the floor")
+	ch.inventory = ch._fix_list([], ch.BAG_SIZE)
+	# gem-socketed item keeps its gems
+	pet.teleport_to_player()
+	await _wait_until(func(): return pet.fetch_cd <= 0.0 and pet.state == "follow", 300)
+	n_f.item["sockets"] = 2
+	n_f.item["gems"] = ["ruby:1", ""] if Loot.gem_valid("ruby:1") else ["", ""]
+	var gems_before: Array = n_f.item["gems"].duplicate()
+	var uid_f := int(n_f.item["uid"])
+	check(pet.request_fetch(n_f) == "", "pets: fetch a socketed item")
+	await _wait_until(func(): return _bag_uid_count(ch, uid_f) == 1, 300)
+	var gem_ok := false
+	for it in ch.inventory:
+		if it != null and int(it.get("uid", -1)) == uid_f:
+			gem_ok = it.get("gems", []) == gems_before
+	check(gem_ok, "pets: a socketed item keeps its gems")
+	# auto-loot gold and materials, totals match
+	pet.teleport_to_player()
+	await frames(2)
+	var g0: int = ch.gold
+	var m0 := int(ch.materials.get("scrap", 0))
+	var gpos = _open_point(lv, p.global_position, 70.0)
+	lv.spawn_drop({"kind": "gold", "amount": 37}, gpos)
+	lv.loot.back().position = gpos
+	lv.spawn_drop({"kind": "material", "id": "scrap", "amount": 3}, gpos + Vector2(0, 6))
+	lv.loot.back().position = gpos + Vector2(0, 6)
+	var auto_ok: bool = await _wait_until(func(): return ch.gold == g0 + 37 and int(ch.materials.get("scrap", 0)) == m0 + 3, 300)
+	check(auto_ok, "pets: auto-loot collects gold and materials with exact totals", "%d/%d" % [ch.gold - g0, int(ch.materials.get("scrap", 0)) - m0])
+	# auto-loot never starves F
+	pet.teleport_to_player()
+	await _wait_until(func(): return pet.fetch_cd <= 0.0 and pet.state == "follow", 300)
+	var g2pos = _open_point(lv, p.global_position, 60.0)
+	lv.spawn_drop({"kind": "gold", "amount": 5}, g2pos)
+	var gn = lv.loot.back()
+	gn.position = g2pos
+	gn.t = 1.0
+	pet.auto_cd = 0.0
+	await frames(2)
+	var n_s = _drop_item(lv, "common", far_pos)
+	var started_auto: bool = pet.state == "fetch" and pet.target_is_auto
+	check(pet.request_fetch(n_s) == "" and not pet.target_is_auto and (not started_auto or gn.claimed_by != pet), "pets: F pre-empts an auto-loot run")
+	# swapping cancels the fetch and releases the claim
+	ch.set_active_pet("cat")
+	await frames(2)
+	check(lv.pet != null and lv.pet.pet_id == "cat" and is_instance_valid(n_s) and n_s.is_claimed_by_other(lv.pet) == false, "pets: swapping cancels the fetch and releases the drop")
+	ch.set_active_pet("dog")
+	await frames(2)
+	pet = lv.pet
+	check(pet.pet_id == "dog" and pet.tier == 1, "pets: switching back restores the same pet and tier")
+	n_s.picked = true
+	lv.loot.erase(n_s)
+	n_s.queue_free()
+	# magnet cap
+	pet = _set_pet_tier(lv, ch, "dog", 4)
+	await frames(2)
+	pet.teleport_to_player()
+	pet.set_physics_process(false)
+	var piles := []
+	for i in 10:
+		var pp: Vector2 = pet.global_position + Vector2(20 + 3 * i, 0).rotated(i * 0.6)
+		if lv.is_solid(pp):
+			pp = pet.global_position + Vector2(0, -12)
+		lv.spawn_drop({"kind": "gold", "amount": 1}, pp)
+		lv.loot.back().position = pp
+		lv.loot.back().t = 1.0
+		piles.append(lv.loot.back())
+	pet._magnet(1.0 / 60.0)
+	check(pet.magnet_moved_last <= int(PetRulesT.setting("magnet_max_per_frame", 4)) and pet.magnet_moved_last > 0, "pets: magnet moves at most the per-frame cap", str(pet.magnet_moved_last))
+	pet.set_physics_process(true)
+	var mag_ok: bool = await _wait_until(func():
+		for pl in piles:
+			if is_instance_valid(pl) and not pl.picked:
+				return false
+		return true, 300)
+	check(mag_ok, "pets: magnet collects the whole pile over the next frames")
+	# catch-up teleport
+	var far_player = _open_point(lv, p.global_position, 120.0)
+	p.global_position = p.global_position + Vector2(5000, 0) if far_player == null else far_player
+	pet.global_position = p.global_position + Vector2(600, 0)
+	await frames(3)
+	check(pet.global_position.distance_to(p.global_position) < 60.0, "pets: the pet teleports back when it falls far behind")
+	# pets are off in normal test and bot runs
+	Game.pets_in_tests = false
+	Events.pet_changed.emit()
+	check(lv.pet == null, "pets: no pet while Game.testing (bot determinism)")
+	Game.settings["loot_filter"] = 0
+	main.go_hub(false)
+	await frames(2)
 
 # --------------------------------------------------------------- save slots
 func test_save_slots() -> void:
@@ -1127,3 +1739,792 @@ func test_ui() -> void:
 	check(tip.length() > 20, "passive tooltip renders")
 	ui.close_all()
 	await frames(2)
+
+# ------------------------------------------------------------------ stash tabs + shared stash
+const StashRulesT = preload("res://scripts/core/stash_rules.gd")
+const STASH_TEST_PATH := "user://test_shared_stash.json"
+
+func _stash_test_item(rarity: String = "rare", ilvl: int = 5) -> Dictionary:
+	var base: String = "rusty_sword" if Data.item_bases.has("rusty_sword") else Data.item_base_list[0]["id"]
+	return Loot.make_item(base, rarity, ilvl)
+
+func _stash_clean_files() -> void:
+	for p in [STASH_TEST_PATH, STASH_TEST_PATH + ".bak", STASH_TEST_PATH + ".tmp"]:
+		if FileAccess.file_exists(p):
+			DirAccess.remove_absolute(p)
+
+func _slot_has_uid(slots: Array, uid: int) -> bool:
+	for it in slots:
+		if it != null and int(it.get("uid", -1)) == uid:
+			return true
+	return false
+
+func test_stash() -> void:
+	print("\n--- stash tabs and shared stash")
+	_log("--- stash tabs and shared stash")
+	var cfg: Dictionary = Data.stash_cfg
+	var R = StashRulesT
+	# ---- data and pure rules
+	check(Data.load_errors.is_empty() and not cfg.is_empty(), "stash: data/stash.json loads")
+	check(R.slots_per_tab(cfg) == 56 and R.columns(cfg) == 8, "stash: a tab is 8x7 = 56 slots")
+	var seq := [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200]
+	var seq_ok := true
+	for i in seq.size():
+		if R.tab_cost(cfg, i) != seq[i]:
+			seq_ok = false
+	check(seq_ok, "stash: tab prices start at 100g and double each time (up to 51,200g)")
+	check(R.max_extra(cfg) == 10 and R.total_cost(cfg, 10) == 102300, "stash: ten extra tabs, 102,300g in total", str(R.total_cost(cfg, 10)))
+	check(R.tab_range(cfg, 0) == Vector2i(0, 56) and R.tab_range(cfg, 2) == Vector2i(112, 168), "stash: tab ranges are consecutive blocks of 56")
+	check(R.buy_refusal(cfg, 0, 99) == "Not enough gold" and R.buy_refusal(cfg, 0, 100) == "", "stash: first tab needs exactly 100g")
+	check(R.buy_refusal(cfg, 10, 999999999) == "Maximum tabs reached", "stash: no tab beyond the cap, whatever the gold")
+	var arr := []
+	arr.resize(56)
+	arr[7] = {"base": "x"}
+	R.ensure_slots(cfg, arr, 2)
+	check(arr.size() == 112 and arr[7] != null, "stash: a new tab adds exactly 56 slots and keeps old items")
+	R.ensure_slots(cfg, arr, 1)
+	check(arr.size() == 112, "stash: slot arrays never shrink")
+	check(R.free_slot_in_tab(cfg, arr, 0) == 0 and R.free_slot_in_tab(cfg, arr, 1) == 56, "stash: free slot is found per tab")
+	var legacy := []
+	legacy.resize(60)
+	legacy[57] = {"base": "hidden"}
+	legacy[3] = {"base": "kept"}
+	var mg: Dictionary = R.migrate_legacy(cfg, legacy)
+	check(mg["slots"].size() == 56 and mg["extra_added"] == 0 and R.count_items(mg["slots"]) == 2, "stash: legacy hidden slots are rescued into free space")
+	var full := []
+	full.resize(60)
+	for i in 56:
+		full[i] = {"base": "f%d" % i}
+	full[58] = {"base": "hidden"}
+	var mg2: Dictionary = R.migrate_legacy(cfg, full)
+	check(mg2["extra_added"] == 1 and mg2["slots"].size() == 112 and R.count_items(mg2["slots"]) == 57, "stash: a full legacy stash keeps its hidden item by granting a tab")
+
+	# ---- character: buying personal tabs
+	var old_ch = Game.ch
+	Game.new_character("warrior")
+	var ch = Game.ch
+	check(ch.stash.size() == 56 and ch.stash_extra_tabs == 0 and ch.stash_tab_count() == 1, "stash: a new character has one 56-slot tab")
+	var keep = _stash_test_item()
+	ch.stash[10] = keep
+	ch.gold = 99
+	check(ch.buy_stash_tab() == "Not enough gold" and ch.gold == 99 and ch.stash.size() == 56 and ch.stash_extra_tabs == 0, "stash: refused purchase changes nothing")
+	ch.gold = 1000
+	check(ch.buy_stash_tab() == "" and ch.gold == 900, "stash: first tab costs 100g, charged once")
+	check(ch.stash.size() == 112 and ch.stash_extra_tabs == 1 and ch.stash[10] == keep, "stash: bought tab appends 56 slots, old item stays put")
+	check(ch.stash_next_cost() == 200 and ch.buy_stash_tab() == "" and ch.gold == 700 and ch.stash_next_cost() == 400, "stash: second tab costs 200g, third 400g")
+	ch.gold = 10000000
+	var bought := 2
+	while ch.buy_stash_tab() == "":
+		bought += 1
+	check(bought == 10 and ch.stash_tab_count() == 11 and ch.stash.size() == 11 * 56, "stash: capped at 10 extra tabs (11 tabs)", "%d %d" % [bought, ch.stash.size()])
+	check(10000000 - ch.gold == R.total_cost(cfg, 10) - R.total_cost(cfg, 2), "stash: tabs 3 to 10 cost 400g up to 51,200g", str(10000000 - ch.gold))
+	# save / load
+	var deep = _stash_test_item("epic", 12)
+	ch.stash[3 * 56 + 5] = deep
+	var d1: Dictionary = ch.to_dict()
+	check(int(d1["version"]) == 3 and int(d1["stash_extra_tabs"]) == 10, "stash: save is version 3 and records the bought tabs")
+	var d2 = JSON.parse_string(JSON.stringify(d1))
+	Game.load_from_dict(d2)
+	var ch2 = Game.ch
+	check(ch2.stash_extra_tabs == 10 and ch2.stash.size() == 11 * 56, "stash: save/load restores the tab count")
+	check(ch2.stash[3 * 56 + 5] != null and ch2.stash[3 * 56 + 5]["name"] == deep["name"] and ch2.stash[10]["name"] == keep["name"], "stash: items in later tabs survive save/load")
+	# old saves
+	var v2 := {"version": 2, "name": "Old", "class": "warrior", "level": 5, "stash": [], "inventory": [], "gold": 5}
+	var arr60 := []
+	arr60.resize(60)
+	arr60[4] = ch._fix_item(_stash_test_item())
+	arr60[58] = ch._fix_item(_stash_test_item("uncommon"))
+	v2["stash"] = arr60
+	var d3 = JSON.parse_string(JSON.stringify(v2))
+	Game.load_from_dict(d3)
+	check(Game.ch.stash_extra_tabs == 0 and Game.ch.stash.size() == 56, "stash: a v2 save loads with 0 extra tabs and one tab")
+	check(R.count_items(Game.ch.stash) == 2, "stash: v2 hidden-slot item is rescued")
+	var v3 := {"version": 3, "name": "Cfg", "class": "warrior", "level": 5, "stash_extra_tabs": 0, "stash": [], "inventory": []}
+	var arr120 := []
+	arr120.resize(120)
+	arr120[100] = ch._fix_item(_stash_test_item())
+	v3["stash"] = arr120
+	Game.load_from_dict(JSON.parse_string(JSON.stringify(v3)))
+	check(Game.ch.stash_extra_tabs >= 1 and Game.ch.stash[100] != null, "stash: a save with items beyond its tab count never drops them")
+
+	# ---- shared stash
+	var SS = SharedStash
+	var old_path: String = SS.path
+	SS.path = STASH_TEST_PATH
+	_stash_clean_files()
+	SS.reset()
+	Game.new_character("warrior")
+	ch = Game.ch
+	check(SS.slots.size() == 56 and SS.extra_tabs == 0 and SS.tab_total() == 1 and SS.next_cost() == 100, "shared: starts with one 56-slot tab, next tab 100g")
+	ch.stash_extra_tabs = 3
+	ch.gold = 50
+	check(SS.buy_tab(ch) == "Not enough gold" and ch.gold == 50 and SS.extra_tabs == 0 and SS.slots.size() == 56, "shared: refused purchase changes nothing")
+	ch.gold = 1000
+	check(SS.buy_tab(ch) == "" and ch.gold == 900 and SS.extra_tabs == 1 and SS.slots.size() == 112, "shared: first tab costs 100g even if the stash has 3 extra tabs")
+	check(ch.stash_extra_tabs == 3 and SS.next_cost() == 200, "shared: personal and shared tab counts are independent")
+	ch.gold = 100000000
+	var sb := 1
+	while SS.buy_tab(ch) == "":
+		sb += 1
+	check(sb == 10 and SS.tab_total() == 11 and SS.slots.size() == 11 * 56, "shared: capped at 10 extra tabs", "%d %d" % [sb, SS.slots.size()])
+	SS.reset()
+	_stash_clean_files()
+	# deposits and withdrawals
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var a = _stash_test_item("legendary", 20)
+	a["uid"] = ch.take_uid()
+	var b = _stash_test_item("rare", 9)
+	b["uid"] = ch.take_uid()
+	ch.inventory[0] = a
+	ch.inventory[1] = b
+	var r1: Dictionary = SS.deposit(ch, 0, 0)
+	check(r1["err"] == "" and ch.inventory[0] == null and SS.item_count() == 1 and SS.slots[0] == a, "shared: deposit moves the item out of the bag")
+	check(FileAccess.file_exists(STASH_TEST_PATH), "shared: deposit writes the shared file")
+	var r2: Dictionary = SS.deposit(ch, 1, 0)
+	check(r2["err"] == "" and SS.item_count() == 2, "shared: second deposit")
+	ch.inventory[39] = null
+	var rbad: Dictionary = SS.deposit(ch, 39, 0)
+	check(rbad["err"] != "" and SS.item_count() == 2, "shared: depositing an empty bag slot is refused")
+	var gem_like := {"gem_type": "ruby", "grade": 1}
+	ch.inventory[2] = gem_like
+	var rgem: Dictionary = SS.deposit(ch, 2, 0)
+	check(rgem["err"] == "Shared stash holds items only" and ch.inventory[2] == gem_like and SS.item_count() == 2, "shared: only real items are accepted (gems, runes, materials are refused)")
+	ch.inventory[2] = null
+	# reload from disk
+	SS.extra_tabs = 0
+	SS.slots = []
+	SS.load_file()
+	check(SS.item_count() == 2 and SS.slots[0] != null and SS.slots[0]["name"] == a["name"] and not SS.loaded_from_backup, "shared: file round-trip restores items")
+	# corrupt main file falls back to the backup
+	var f := FileAccess.open(STASH_TEST_PATH, FileAccess.WRITE)
+	f.store_string("{not json")
+	f.close()
+	SS.load_file()
+	check(SS.loaded_from_backup and SS.item_count() == 1 and SS.slots[0]["name"] == a["name"], "shared: a corrupt file falls back to the .bak", "items=%d backup=%s" % [SS.item_count(), str(SS.loaded_from_backup)])
+	SS.reset()
+	_stash_clean_files()
+	# a second character sees the items
+	ch.inventory[0] = a
+	SS.deposit(ch, 0, 0)
+	Game.new_character("mage")
+	var ch3 = Game.ch
+	var got: String = SS.withdraw(ch3, 0)
+	var taken = null
+	for it in ch3.inventory:
+		if it != null and it.get("name", "") == a["name"]:
+			taken = it
+	check(got == "" and taken != null and SS.item_count() == 0, "shared: another character can take the item")
+	var uid_n := 0
+	for it in ch3.inventory:
+		if it != null and taken != null and int(it.get("uid", -1)) == int(taken["uid"]):
+			uid_n += 1
+	check(taken != null and int(taken["uid"]) != 0 and ch3.next_uid >= int(taken["uid"]) and uid_n == 1, "shared: withdrawn item gets a fresh, unique uid from the new character")
+	check(SS.withdraw(ch3, 0) == "Nothing to take", "shared: taking from an empty slot is refused")
+	# full bag
+	for i in ch3.inventory.size():
+		if ch3.inventory[i] == null:
+			ch3.inventory[i] = _stash_test_item()
+	SS.slots[4] = _stash_test_item("epic", 7)
+	check(SS.withdraw(ch3, 4) == "Inventory full" and SS.slots[4] != null, "shared: full bag refuses and the item stays in the shared stash")
+	SS.reset()
+	# tab preference and fallback
+	Game.new_character("ranger")
+	ch = Game.ch
+	for i in 56:
+		SS.slots[i] = _stash_test_item("common", 1)
+	ch.inventory[0] = _stash_test_item()
+	check(SS.deposit(ch, 0, 0)["err"] == "Shared stash is full" and ch.inventory[0] != null, "shared: full stash refuses and keeps the item in the bag")
+	ch.gold = 500
+	SS.buy_tab(ch)
+	var rt: Dictionary = SS.deposit(ch, 0, 0)
+	check(rt["err"] == "" and rt["tab"] == 1 and SS.slots[56] != null, "shared: a full tab falls back to the next tab with room")
+	ch.inventory[0] = _stash_test_item()
+	var rt2: Dictionary = SS.deposit(ch, 0, 1)
+	check(rt2["tab"] == 1 and SS.slots[57] != null, "shared: the open tab is preferred")
+	SS.reset()
+	_stash_clean_files()
+
+	# ---- crash safety: the character is saved before the shared file changes
+	var old_dir: String = Game.save_dir
+	var old_slot: int = Game.current_slot
+	Game.save_dir = "user://test_saves"
+	for s in range(0, Game.SLOT_COUNT + 1):
+		Game.delete_slot(s)
+	Game.new_character("warrior")
+	ch = Game.ch
+	Game.current_slot = 4
+	Game.testing = false
+	var dep = _stash_test_item("epic", 15)
+	dep["uid"] = ch.take_uid()
+	ch.inventory[3] = dep
+	check(Game.save_game(4), "shared: (setup) character saved with the item in the bag")
+	var dres: Dictionary = SS.deposit(ch, 3, 0)
+	var disk_ch: Dictionary = Game.read_slot(4)
+	var in_bag := false
+	for it in disk_ch.get("inventory", []):
+		if it != null and int(it.get("uid", -1)) == int(dep["uid"]):
+			in_bag = true
+	check(dres["err"] == "" and not in_bag, "shared: deposit saves the character without the item (reloading cannot duplicate it)")
+	var auto_bag := false
+	for it in Game.read_slot(Game.AUTOSAVE_SLOT).get("inventory", []):
+		if it != null and int(it.get("uid", -1)) == int(dep["uid"]):
+			auto_bag = true
+	check(not auto_bag, "shared: the autosave is updated as well")
+	check(SS.withdraw(ch, 0) == "", "shared: withdraw works")
+	var back := false
+	for it in Game.read_slot(4).get("inventory", []):
+		if it != null and it.get("name", "") == dep["name"]:
+			back = true
+	check(back, "shared: withdraw saves the character holding the item")
+	ch.gold = 400
+	check(SS.buy_tab(ch) == "" and int(Game.read_slot(4).get("gold", 0)) == 300, "shared: buying a tab saves the gold spend immediately")
+	for s in range(0, Game.SLOT_COUNT + 1):
+		Game.delete_slot(s)
+	Game.testing = true
+	Game.save_dir = old_dir
+	Game.current_slot = old_slot
+	SS.reset()
+	_stash_clean_files()
+
+	# ---- tests never touch the real file
+	SS.path = SS.REAL_PATH
+	var existed := FileAccess.file_exists(SS.REAL_PATH)
+	var mtime := FileAccess.get_modified_time(SS.REAL_PATH) if existed else 0
+	SS.slots[0] = _stash_test_item()
+	check(SS.save_file() and FileAccess.file_exists(SS.REAL_PATH) == existed and (not existed or FileAccess.get_modified_time(SS.REAL_PATH) == mtime), "shared: the real shared file is never written while testing")
+	SS.path = old_path
+	SS.reset()
+	Game.ch = old_ch
+
+func test_stash_ui() -> void:
+	print("\n--- stash panel")
+	_log("--- stash panel")
+	if main.ui == null:   # normally test_ui has started the game already
+		main.start_game()
+		await frames(2)
+	var ui = main.ui
+	var SS = SharedStash
+	var old_path: String = SS.path
+	SS.path = STASH_TEST_PATH
+	_stash_clean_files()
+	SS.reset()
+	Game.new_character("warrior")
+	var ch = Game.ch
+	ui.open("inventory")
+	ui.open("stash")
+	await frames(2)
+	var p = ui.panels["stash"]
+	check(p.slots.size() == 56 and p.grid.columns == 8, "stash ui: 8x7 grid")
+	check(p.tab_row.get_child_count() == 2, "stash ui: one tab button plus the buy button")
+	ch.gold = 0
+	Events.currency_changed.emit()
+	var buy = p.tab_row.get_child(p.tab_row.get_child_count() - 1)
+	check(buy.disabled and buy.tooltip_text == "Not enough gold" and buy.text.contains("100"), "stash ui: buy button shows the price and is disabled without gold")
+	ch.gold = 1000
+	Events.currency_changed.emit()
+	buy = p.tab_row.get_child(p.tab_row.get_child_count() - 1)
+	check(not buy.disabled, "stash ui: buy button enables once you can afford it")
+	p._do_buy()
+	await frames(1)
+	check(ch.stash_extra_tabs == 1 and ch.gold == 900 and p.tab_row.get_child_count() == 3 and p.tab["stash"] == 1, "stash ui: buying adds a tab, charges once and opens it")
+	# deposit lands in the open tab
+	var it = _stash_test_item()
+	ch.inventory[0] = it
+	p.deposit(0)
+	check(ch.stash[56] == it, "stash ui: deposit goes to the open tab")
+	# shared mode
+	p._set_mode("shared")
+	await frames(1)
+	check(p.is_shared() and p.title_label.text == "Shared Stash" and p.tab_row.get_child_count() == 2, "stash ui: Shared Stash mode shows its own tabs")
+	var it2 = _stash_test_item("epic", 9)
+	ch.inventory[0] = it2
+	p.deposit(0)
+	await frames(1)
+	check(SS.slots[0] == it2 and p.slots[0].item == it2, "stash ui: deposit in shared mode fills the shared tab")
+	check(ui.panels["inventory"].info_label.text.contains("shared stash"), "stash ui: the bag hint names the shared stash")
+	p._on_click(p.slots[0], MOUSE_BUTTON_LEFT, false)
+	check(SS.item_count() == 0 and ch.inventory[0] != null and ch.inventory[0]["name"] == it2["name"], "stash ui: clicking a shared item takes it into the bag")
+	ch.gold = 150
+	p._on_buy_pressed()
+	check(ui.confirm.visible and ui.confirm_text.text.contains("100"), "stash ui: buying asks for confirmation and shows the price")
+	check(SS.extra_tabs == 0 and ch.gold == 150, "stash ui: nothing is charged before confirming")
+	ui._on_confirm()
+	check(SS.extra_tabs == 1 and ch.gold == 50 and p.tab["shared"] == 1, "stash ui: shared tab purchase works from the panel")
+	p._set_mode("stash")
+	check(ch.stash_extra_tabs == 1, "stash ui: personal tabs are unaffected by shared purchases")
+	ui.close_all()
+	await frames(2)
+	SS.path = old_path
+	SS.reset()
+	_stash_clean_files()
+
+# ------------------------------------------------------------------ developer tools
+const DevRulesT = preload("res://scripts/core/dev_rules.gd")
+const CharDataT = preload("res://scripts/core/character_data.gd")
+
+func _dev_on() -> void:
+	Game.dev_in_tests = true
+	Game.settings["dev_tools"] = true
+
+func _skill_levels(ch) -> Dictionary:
+	var d := {}
+	for s in Data.skills_for_class(ch.class_id):
+		d[s["id"]] = ch.skill_level(s["id"])
+	return d
+
+func test_dev_tools() -> void:
+	print("\n--- developer tools")
+	_log("--- developer tools")
+	var old_ch = Game.ch
+	var R = DevRulesT
+	# ---- setting and gating
+	check(Game.DEFAULT_SETTINGS.get("dev_tools", true) == false, "dev: the Developer tools setting defaults to off")
+	check(Data.load_errors.is_empty() and not Data.dev_cfg.is_empty(), "dev: data/dev_tools.json loads")
+	check(Dev.flags == R.default_flags(), "dev: every flag starts at its default")
+	check(Game.ACTIONS.has("dev_panel") and Game.ACTIONS["dev_panel"] == [KEY_F1], "dev: F1 is registered for the panel")
+	var f1_free := true
+	for a in Game.ACTIONS:
+		if not String(a).begins_with("dev_") and Game.ACTIONS[a].has(KEY_F1):
+			f1_free = false
+	check(f1_free, "dev: F1 is not used by any other action")
+	Game.new_character("mage")
+	var ch = Game.ch
+	Game.settings["dev_tools"] = false
+	Game.dev_in_tests = true
+	var g0: int = ch.gold
+	check(not Dev.enabled() and not Dev.add_gold(1000)["ok"] and ch.gold == g0, "dev: actions do nothing while the setting is off")
+	Game.settings["dev_tools"] = true
+	Game.dev_in_tests = false
+	check(not Dev.enabled() and not Dev.add_gold(1000)["ok"] and ch.gold == g0, "dev: actions do nothing under Game.testing without dev_in_tests")
+	Dev.flags["god"] = true
+	Dev.flags["damage_mult"] = 5.0
+	Dev.flags["loot_luck"] = 20.0
+	Dev.flags["freeze_ai"] = true
+	check(not Dev.god() and Dev.hit_mult() == 1.0 and Dev.loot_luck() == 1.0 and not Dev.freeze_ai(), "dev: game hooks stay neutral in bots and tests, even with flags set")
+	Dev.flags = R.default_flags()
+	check(not ch.dev_used, "dev: refused actions do not mark the character")
+	_dev_on()
+	check(Dev.enabled(), "dev: setting on + dev_in_tests enables the tools")
+	for fl in ["god", "one_hit", "infinite_mana", "no_cooldowns", "infinite_flasks", "freeze_ai", "reveal_hidden", "overlay", "hitboxes"]:
+		Dev.set_flag(fl, true)
+	Dev.set_flag("damage_mult", 10)
+	Dev.set_flag("move_mult", 2)
+	Dev.set_flag("loot_luck", 5)
+	Dev.set_flag("time_scale", 0.5)
+	check(Dev.god() and Dev.hit_mult() == 10.0 * float(Data.dev_cfg["one_hit_mult"]) and Dev.move_mult() == 2.0 and Dev.loot_luck() == 5.0, "dev: flags take effect while on")
+	check(is_equal_approx(Engine.time_scale, 0.5) and is_equal_approx(Game.base_time_scale, 0.5), "dev: time scale sets the engine speed")
+	Dev.set_flag("time_scale", 99.0)
+	check(is_equal_approx(Game.base_time_scale, float(Data.dev_cfg["time_scale"]["max"])), "dev: time scale is clamped to the preset range")
+	Dev.set_enabled(false)
+	check(Dev.flags == R.default_flags() and is_equal_approx(Engine.time_scale, 1.0) and not get_tree().debug_collisions_hint, "dev: switching the setting off resets every flag (time scale 1, hitboxes off)")
+	Dev.set_enabled(true)
+	check(Dev.flags == R.default_flags() and Dev.enabled(), "dev: switching back on starts from defaults")
+	check(ch.dev_used, "dev: switching on god mode marks the character")
+	Game.new_character("mage")
+	ch = Game.ch
+	Dev.set_flag("overlay", true)
+	Dev.set_flag("time_scale", 2.0)
+	Dev.set_flag("hitboxes", true)
+	check(not ch.dev_used, "dev: overlay, hitboxes and time scale do not mark the character")
+	Dev.reset_flags()
+
+	# ---- pure rules
+	var xf := func(l): return CharDataT.xp_for_level(l)
+	check(R.xp_to_reach(1, 0, 2, xf) == CharDataT.xp_for_level(1) and R.xp_to_reach(5, 10, 5, xf) == 0, "dev rules: xp to reach a level uses the game's own XP curve")
+	check(R.add_amount(Data.dev_cfg, 50, -100) == 0 and R.set_amount(Data.dev_cfg, -5) == 0 and R.add_amount(Data.dev_cfg, 2000000000, 5) == 2000000000, "dev rules: amounts never go negative or past the cap")
+	check(R.lucky_rarity(40.0, 1.0) == 40.0 and R.lucky_rarity(0.0, 5.0) == 400.0, "dev rules: loot luck multiplies the effective rarity")
+	check(R.spawn_refusal(Data.dev_cfg, Data.item_bases, Data.rarities, "nope", "rare", 5, 0, 2) != "" and R.spawn_refusal(Data.dev_cfg, Data.item_bases, Data.rarities, Data.item_base_list[0]["id"], "rare", 5, 3, 2) != "", "dev rules: bad bases and too many sockets are refused")
+
+	# ---- A. levels: same result as levelling naturally
+	Game.new_character("ranger")
+	var nat = Game.ch
+	var guard := 0
+	while nat.level < 14 and guard < 100000:
+		nat.add_xp(37)
+		guard += 1
+	Game.new_character("ranger")
+	ch = Game.ch
+	var r: Dictionary = Dev.set_level(14)
+	check(r["ok"] and ch.level == 14 and ch.xp == 0, "dev: set level 14 through the real level-up", r["msg"])
+	check(ch.total_passive_points() == nat.total_passive_points() and ch.available_passive_points() == nat.available_passive_points(), "dev: set level gives the same passive points as levelling naturally", "%d vs %d" % [ch.total_passive_points(), nat.total_passive_points()])
+	var su: Array = ch.unlocked_skills.duplicate()
+	var nu: Array = nat.unlocked_skills.duplicate()
+	su.sort()
+	nu.sort()
+	check(su == nu and _skill_levels(ch) == _skill_levels(nat) and ch.spec_points_total() == nat.spec_points_total(), "dev: set level gives the same skills, skill levels and spec points as levelling naturally")
+	check(ch.dev_used and not nat.dev_used, "dev: progress actions mark the character dev_used")
+	check(not Dev.set_level(3)["ok"] and ch.level == 14, "dev: levels never go down")
+	Dev.add_levels(5)
+	check(ch.level == 19, "dev: +5 levels")
+	Dev.set_max_level()
+	check(ch.level == R.max_level(Data.dev_cfg) and ch.level == CharDataT.MAX_LEVEL, "dev: max level", str(ch.level))
+	Game.new_character("warrior")
+	ch = Game.ch
+	var xp0: int = ch.xp
+	Dev.add_xp(10)
+	check(ch.xp == xp0 + 10 and ch.level == 1, "dev: add XP adds exactly")
+	var bp: int = ch.bonus_passive_points
+	Dev.grant_passive_points(5)
+	check(ch.bonus_passive_points == bp + 5, "dev: grant passive points")
+	Dev.unlock_all_skills()
+	check(ch.unlocked_skills.size() == Data.skills_for_class("warrior").size(), "dev: unlock all skills")
+	Dev.set_level(10)
+	var any := ""
+	for n in Data.passive_list:
+		if ch.can_allocate(n["id"]) == "":
+			any = n["id"]
+			break
+	if any != "":
+		ch.allocate(any)
+	var gold_before: int = ch.gold
+	Dev.respec_passives()
+	check(ch.allocated.size() == 1 and ch.gold == gold_before and ch.available_passive_points() == ch.total_passive_points(), "dev: free respec refunds every passive at no cost")
+
+	# ---- C. economy
+	ch.gold = 0
+	Dev.add_gold(1000)
+	Dev.add_gold(1000000)
+	check(ch.gold == 1001000, "dev: gold adds exactly", str(ch.gold))
+	Dev.set_gold(42)
+	check(ch.gold == 42, "dev: set gold")
+	Dev.add_gold(-1000)
+	check(ch.gold == 0, "dev: gold never goes negative")
+	Dev.set_gold(-5)
+	check(ch.gold == 0, "dev: set gold never goes negative")
+	var mats_ok := true
+	for id in Data.materials:
+		var m0 := int(ch.materials.get(id, 0))
+		Dev.add_material(id, 100)
+		if int(ch.materials.get(id, 0)) != m0 + 100:
+			mats_ok = false
+	check(mats_ok, "dev: each material adds exactly 100")
+	var before_all := {}
+	for id in Data.materials:
+		before_all[id] = int(ch.materials.get(id, 0))
+	Dev.add_all_materials(1000)
+	var all_ok := true
+	for id in Data.materials:
+		if int(ch.materials[id]) != before_all[id] + 1000:
+			all_ok = false
+	check(all_ok, "dev: +1,000 of every material")
+	check(not Dev.add_material("not_a_material", 5)["ok"] and not ch.materials.has("not_a_material"), "dev: unknown material is refused")
+	var gid: String = Loot.gem_id(Data.gem_list[0]["id"], 2)
+	Dev.add_gem(gid, 3)
+	check(int(ch.gems.get(gid, 0)) == 3, "dev: add 3 gems of a type and grade")
+	Dev.add_all_gems(1)
+	var gems_ok: bool = Dev.gem_ids().size() == Data.gem_list.size() * Data.gem_cfg["tiers"].size() and Dev.gem_ids().size() == 32
+	for g in Dev.gem_ids():
+		if int(ch.gems.get(g, 0)) != (4 if g == gid else 1):
+			gems_ok = false
+	check(gems_ok, "dev: one of every gem (8 types x 4 grades)")
+	Dev.add_all_runes(1)
+	var runes_ok := true
+	for rr in Data.skill_rune_list:
+		if int(ch.runes.get(rr["id"], 0)) != 1:
+			runes_ok = false
+	check(runes_ok, "dev: one of every skill rune")
+
+	# ---- C. stash tabs through the real purchase
+	ch.gold = 500
+	r = Dev.free_stash_tab(false)
+	check(r["ok"] and ch.stash_extra_tabs == 1 and ch.stash.size() == 112 and ch.gold == 500, "dev: free personal tab through buy_stash_tab, gold unchanged")
+	Dev.all_stash_tabs(false)
+	check(ch.stash_extra_tabs == StashRulesT.max_extra(Data.stash_cfg) and ch.gold == 500 and ch.stash.size() == ch.stash_tab_count() * 56, "dev: all personal tabs, capped like a purchase", str(ch.stash_extra_tabs))
+	check(not Dev.free_stash_tab(false)["ok"] and ch.gold == 500, "dev: no free tab past the cap, gold untouched")
+	var SS = SharedStash
+	var old_path: String = SS.path
+	SS.path = STASH_TEST_PATH
+	_stash_clean_files()
+	SS.reset()
+	r = Dev.free_stash_tab(true)
+	check(r["ok"] and SS.extra_tabs == 1 and ch.gold == 500, "dev: free shared tab through SharedStash.buy_tab", r["msg"])
+	SS.reset()
+	_stash_clean_files()
+	SS.path = old_path
+	SS.reset()
+	var legacy := []
+	legacy.resize(60)
+	legacy[57] = {"base": "hidden"}
+	var mg: Dictionary = StashRulesT.migrate_legacy(Data.stash_cfg, legacy)
+	check(mg["slots"].size() == 56 and StashRulesT.count_items(mg["slots"]) == 1, "dev: stash migrate_legacy still rescues hidden slots")
+
+	# ---- D. items
+	var base_id := ""
+	for b in Data.item_base_list:
+		if b.get("slot", "") == "chest":
+			base_id = b["id"]
+	r = Dev.spawn_item(base_id, "rare", 20, 3, false)
+	var it: Dictionary = r.get("item", {})
+	check(r["ok"] and it.get("base") == base_id and it.get("rarity") == "rare" and int(it.get("ilvl", 0)) == 20 and int(it.get("sockets", 0)) == 3 and it.get("gems", []).size() == 3, "dev: spawned item has the requested base, rarity, ilvl and sockets", str(r["msg"]))
+	check(ch.inventory.has(it) and ch._fix_item(it.duplicate(true)) != null and int(it.get("uid", 0)) > 0, "dev: spawned item is in the bag and passes the load validity check")
+	var nrare: int = it.get("affixes", []).size()
+	check(nrare >= 3 and nrare <= 4, "dev: rare affix count matches a dropped rare", str(nrare))
+	check(not Dev.spawn_item(base_id, "rare", 20, 9)["ok"] and not Dev.spawn_item("no_such_base", "rare", 20, 0)["ok"] and not Dev.spawn_item(base_id, "mythic", 20, 0)["ok"], "dev: invalid spawn requests are refused")
+	r = Dev.spawn_item(base_id, "epic", 40, 0, true)
+	var maxed := true
+	for a in r["item"].get("affixes", []):
+		var tiers: Array = Data.affixes[a["id"]]["tiers"]
+		var best: Array = R.max_affix_roll(tiers, 40)
+		if float(a["value"]) != float(best[1]) or int(a["tier"]) != int(best[0]) + 1:
+			maxed = false
+	check(maxed and r["item"].get("affixes", []).size() > 0, "dev: max-roll affixes use the best tier and top value")
+	var uid: String = Data.unique_list[0]["id"]
+	r = Dev.spawn_legendary(uid)
+	check(r["ok"] and r["item"].get("unique") == uid and r["item"].get("rarity") == "legendary" and ch._fix_item(r["item"].duplicate(true)) != null, "dev: spawn legendary by id")
+	var charm_bases := 0
+	for b in Data.item_base_list:
+		if b.get("slot", "") == "charm":
+			charm_bases += 1
+	var bag0: int = ch.BAG_SIZE - ch.bag_free_count()
+	Dev.add_all_charms()
+	check(ch.BAG_SIZE - ch.bag_free_count() == bag0 + charm_bases, "dev: one of every charm", "%d charm bases" % charm_bases)
+	Dev.clear_bag()
+	check(ch.bag_free_count() == ch.BAG_SIZE, "dev: clear bag")
+	# ---- in the world
+	main.start_game()
+	await frames(2)
+	var lv = Game.level
+	var p = lv.player
+	check(not Dev.spawn_enemy("ghoul")["ok"], "dev: no enemy spawns in town")
+	main.enter_dungeon("forgotten_depths", 777)
+	await frames(3)
+	lv = Game.level
+	p = lv.player
+	# bag full -> drop at feet
+	for i in ch.inventory.size():
+		ch.inventory[i] = Loot.make_item(base_id, "common", 1)
+	var loot0: int = lv.loot.size()
+	r = Dev.spawn_item(base_id, "uncommon", 5, 0)
+	check(r["ok"] and lv.loot.size() == loot0 + 1 and r["msg"].contains("feet"), "dev: a full bag drops the spawned item at your feet")
+	Dev.clear_bag()
+	var loot1: int = lv.loot.size()
+	r = Dev.drop_random(5, "epic")
+	var epic_ok := true
+	for n in lv.loot.slice(loot1):
+		if not is_instance_valid(n) or n.kind != "item" or n.item.get("rarity") != "epic":
+			epic_ok = false
+	check(r["ok"] and lv.loot.size() == loot1 + 5 and epic_ok, "dev: drop 5 epic items through the real drop path")
+	Game.filter_in_tests = true
+	r = Dev.filter_rule_at(lv.loot[lv.loot.size() - 1].global_position)
+	Game.filter_in_tests = false
+	check(r["ok"] and r.has("rule"), "dev: loot filter rule lookup for the item at the cursor", r["msg"])
+	r = Dev.decent_kit()
+	var equipped := 0
+	for s in ch.EQUIP_SLOTS:
+		if ch.equipment.get(s) != null and ch.equipment[s].get("rarity") == "rare":
+			equipped += 1
+	check(r["ok"] and equipped >= 6, "dev: decent kit equips rare gear", str(equipped))
+	# ---- loot luck
+	Loot.set_seed(99)
+	var base_items := 0
+	for i in 400:
+		for d in Loot.roll_drops(10, 1.0, false, false, "warrior", 0.0):
+			if d["kind"] == "item":
+				base_items += 1
+	Dev.set_flag("loot_luck", 5)
+	Loot.set_seed(99)
+	var lucky_items := 0
+	for i in 400:
+		for d in Loot.roll_drops(10, 1.0, false, false, "warrior", 0.0):
+			if d["kind"] == "item":
+				lucky_items += 1
+	Dev.set_flag("loot_luck", 1)
+	check(lucky_items > base_items * 3, "dev: loot luck x5 multiplies drops at runtime", "%d vs %d" % [lucky_items, base_items])
+	check(float(Data.loot["item_drop_chance"]) == 0.16, "dev: loot.json is never edited in memory")
+
+	# ---- B. god mode
+	ch.recalc()
+	p.max_life = 1000.0
+	p.life = 1000.0
+	Dev.set_flag("god", true)
+	var dealt: float = p.receive_hit({"physical": 300.0}, {"is_attack": false}, null, false)
+	p.add_status("stun", 2.0, {})
+	p.add_status("poison", 2.0, {"dps": 50.0, "dtype": "void"})
+	p.take_dot(200.0, "fire")
+	check(dealt == 0.0 and p.life == 1000.0, "dev: god mode blocks hit damage")
+	check(p.statuses.is_empty(), "dev: god mode blocks stun and status application")
+	check(not Dev.stun_self()["ok"], "dev: stun self is refused under god mode")
+	Dev.set_flag("god", false)
+	var hurt := false
+	for i in 10:
+		if p.receive_hit({"physical": 50.0}, {"is_attack": false}, null, false) > 0.0:
+			hurt = true
+			break
+	check(hurt and p.life < 1000.0, "dev: turning god mode off restores normal damage")
+	r = Dev.stun_self()
+	check(r["ok"] and p.has_status("stun"), "dev: stun yourself through the real stun roll", r["msg"])
+	Dev.full_heal()
+	check(p.life == p.max_life and p.statuses.is_empty(), "dev: full heal clears statuses")
+	# ---- B. damage, one-hit, freeze, kill all
+	var at: Vector2 = p.global_position + Vector2(30, 0)
+	r = Dev.spawn_enemy("grave_brute", ["armoured"], 1, at)
+	var e = r["enemies"][0]
+	check(r["ok"] and is_instance_valid(e) and e.is_elite and e.elite_mods.size() == 1, "dev: spawn an elite enemy with chosen mods")
+	var pk := {"dmg": {"physical": [10.0, 10.0]}, "crit_chance": 0.0, "crit_mult": 1.0, "faction": "player", "status": [], "tags": [], "flags": {}}
+	e.life = e.max_life
+	var d1: float = Combat.deal(pk, p, e)
+	Dev.set_flag("damage_mult", 10)
+	e.life = e.max_life
+	var d10: float = Combat.deal(pk, p, e)
+	Dev.set_flag("damage_mult", 1)
+	check(d1 > 0.0 and d10 > d1 * 5.0, "dev: damage multiplier scales your hits", "%.1f vs %.1f" % [d1, d10])
+	Dev.set_flag("one_hit", true)
+	Combat.deal(pk, p, e)
+	Dev.set_flag("one_hit", false)
+	await frames(1)
+	check(not is_instance_valid(e) or not e.alive, "dev: one-hit kills")
+	Dev.set_flag("freeze_ai", true)
+	p.max_life = 1.0e6
+	p.life = 1.0e6
+	r = Dev.spawn_enemy("ghoul", [], 3, p.global_position + Vector2(14, 0))
+	var pos0: Vector2 = r["enemies"][0].global_position
+	await frames(60)
+	check(is_instance_valid(r["enemies"][0]) and r["enemies"][0].global_position.distance_to(pos0) < 2.0 and p.life == 1.0e6, "dev: frozen enemies stand still and never attack")
+	Dev.set_flag("freeze_ai", false)
+	var xp_k: int = ch.xp + ch.level * 1000000
+	r = Dev.kill_all_enemies()
+	await frames(1)
+	var left := 0
+	for en in lv.enemies:
+		if is_instance_valid(en) and en.alive:
+			left += 1
+	check(r["ok"] and left == 0 and ch.xp + ch.level * 1000000 > xp_k, "dev: kill all enemies counts as real kills (XP)", r["msg"])
+	# infinite mana / no cooldowns / infinite flasks
+	Dev.set_flag("infinite_mana", true)
+	Dev.set_flag("no_cooldowns", true)
+	Dev.set_flag("infinite_flasks", true)
+	var sk: Dictionary = p.skill_in_slot(0)
+	check(p.mana_cost(sk) == 0.0, "dev: infinite mana makes skills free")
+	ch.flask_charges[0] = 0.0
+	p.use_flask(0)
+	check(ch.flask_charges[0] == 0.0 and Dev.infinite_flasks(), "dev: infinite flasks drink without charges")
+	Dev.reset_flags()
+	check(p.mana_cost(sk) == float(sk.get("cost", 0)) * ch.final.get("mana_cost_mult", 1.0) or ch.stats.has_flag("hollow_crown"), "dev: mana costs return when the flag is off")
+
+	# ---- E. objectives and the boss arena
+	ch.progress["highest_tier"] = 1
+	Dev.unlock_all_tiers()
+	check(int(ch.progress["highest_tier"]) == 6, "dev: unlock all tiers")
+	r = Dev.start_run("dread_sanctums", ["hasted", "nonsense"], 1)
+	await frames(3)
+	lv = Game.level
+	check(r["ok"] and lv.def["id"] == "dread_sanctums" and lv.mods.size() == 1 and lv.mods[0]["id"] == "hasted", "dev: start a run in any tier with chosen modifiers", r["msg"])
+	check(not lv.sealed_cells.is_empty(), "dev: the boss arena starts sealed")
+	r = Dev.complete_objective()
+	check(r["ok"] and lv.objectives[0]["done"] and lv.objectives[0]["type"] == "relics", "dev: complete the relic objective", r["msg"])
+	r = Dev.complete_objective()
+	check(r["ok"] and lv.objectives[1]["done"] and not lv.wave_state.get("active", false), "dev: complete the Blood Altar waves", r["msg"])
+	check(lv.sealed_cells.is_empty() and lv.seal_node == null, "dev: completing the objectives unseals the arena")
+	r = Dev.complete_objective()
+	await frames(2)
+	var exitp := false
+	for itx in lv.interactables:
+		if itx["kind"] == "exit_portal":
+			exitp = true
+	check(r["ok"] and lv.boss_dead and exitp, "dev: complete the boss objective (real boss death, exit portal)", r["msg"])
+	r = Dev.teleport_to_exit()
+	check(r["ok"] and Game.level.player.global_position.distance_to(lv.player.global_position) < 1.0, "dev: teleport to the exit portal")
+	r = Dev.start_run("nightmare_vaults", [], 1)
+	await frames(3)
+	lv = Game.level
+	r = Dev.teleport_to_boss()
+	await frames(2)
+	var br: Dictionary = lv.rooms[lv.layout["boss"]]
+	check(r["ok"] and lv.sealed_cells.is_empty() and lv.boss_spawned and lv.current_room == br["id"], "dev: teleport to boss completes guardian + mechanisms and enters the open arena", r["msg"])
+	check(lv.objectives[0]["done"] and lv.objectives[1]["done"] and not lv.boss_dead, "dev: teleport to boss leaves the boss alive and the level valid")
+	r = Dev.break_boss_poise()
+	check(r["ok"] and lv.boss.has_status("stun") and lv.boss.poise_state["stagger"] > 0.0, "dev: break boss poise staggers the boss", r["msg"])
+	# abyss records are not set by tainted characters
+	ch.progress["abyss_best"] = 0
+	r = Dev.set_abyss_depth(3)
+	await frames(3)
+	lv = Game.level
+	check(r["ok"] and lv.def.get("endless", false) and lv.depth == 3, "dev: set Abyss depth", r["msg"])
+	guard = 0
+	while not lv.boss_dead and guard < 6:
+		guard += 1
+		Dev.complete_objective()
+	await frames(2)
+	check(lv.boss_dead and int(ch.progress.get("abyss_best", 0)) == 0, "dev: a dev-tainted character never records an Abyss depth")
+	r = Dev.teleport_to(lv.player.global_position + Vector2(10, 0))
+	check(r["ok"], "dev: teleport to a point")
+	r = Dev.return_to_hub()
+	await frames(2)
+	check(r["ok"] and Game.level.is_town, "dev: return to town")
+
+	# ---- F. pets
+	ch.gold = 123
+	r = Dev.unlock_all_pets()
+	check(r["ok"] and ch.pets.size() == Data.pet_list.size() and ch.gold == 123, "dev: unlock all pets through the real purchase, gold unchanged", r["msg"])
+	r = Dev.set_pet_tier(5)
+	check(r["ok"] and ch.pet_tier(ch.active_pet) == 5, "dev: set the active pet's tier")
+	Dev.rename_pet("Bitey")
+	check(ch.pet_name(ch.active_pet) == "Bitey", "dev: free pet rename")
+
+	# ---- G. seed, diagnostics
+	r = Dev.set_seed(4242)
+	check(r["ok"] and Dev.pending_seed == 4242 and Combat.rng.seed == Dev.mix([4242, "combat"]), "dev: set seed seeds the RNGs like the smartbot")
+	Dev.start_run("forgotten_depths")
+	await frames(3)
+	check(Dev.current_seed() == 4242 and Dev.pending_seed == 0, "dev: the next run uses the chosen seed")
+	var diag: String = Dev.diagnostics()
+	check(diag.contains("class: ") and diag.contains("seed: 4242") and diag.contains("flags"), "dev: diagnostic info", diag)
+	check(Dev.overlay_lines().size() >= 4, "dev: debug overlay lines")
+	main.go_hub(false)
+	await frames(2)
+
+	# ---- save / load: dev_used persists, no flag leaks, old saves load
+	Dev.set_flag("god", true)
+	var sd: Dictionary = JSON.parse_string(JSON.stringify(ch.to_dict()))
+	var leak := false
+	for k in R.default_flags():
+		if sd.has(k):
+			leak = true
+	check(sd.get("dev_used", false) == true and not leak, "dev: the save holds dev_used and no dev flag")
+	Game.load_from_dict(sd)
+	check(Game.ch.dev_used, "dev: dev_used survives a save/load round trip")
+	sd.erase("dev_used")
+	Game.load_from_dict(sd)
+	check(not Game.ch.dev_used and Game.ch.level == ch.level, "dev: an old save without dev_used loads cleanly")
+	Game.new_character("mage")
+	check(not Game.ch.to_dict().has("dev_used"), "dev: untouched characters save exactly as before")
+	var old_dir: String = Game.save_dir
+	var old_slot: int = Game.current_slot
+	Game.save_dir = "user://test_dev_saves"
+	Game.testing = false
+	Game.ch.dev_used = true
+	Game.save_game(2)
+	var info: Dictionary = Game.slot_info(2)
+	Game.delete_slot(2)
+	Game.testing = true
+	Game.save_dir = old_dir
+	Game.current_slot = old_slot
+	check(info["summary"].ends_with("(dev)"), "dev: the load menu shows (dev)", info["summary"])
+	# ---- UI: panel, pause button, HUD tag
+	var ui = main.ui
+	ui.open("dev")
+	await frames(2)
+	check(ui.is_open("dev") and ui.panels["dev"].tabs.visible and ui.panels["dev"].tabs.get_tab_count() == 7, "dev: the panel opens with seven tabs")
+	var pr: Vector2 = ui.panels["dev"].size
+	check(pr.x <= 1280 and pr.y <= 720, "dev: the panel fits the 1280x720 screen", str(pr))
+	ui.close("dev")
+	ui.open("pause")
+	await frames(1)
+	check(ui.panels["pause"].dev_btn.visible, "dev: the pause menu shows the Developer tools button")
+	ui.close("pause")
+	# ---- off again
+	Dev.set_enabled(false)
+	check(Dev.flags == R.default_flags() and not Dev.god(), "dev: switching off resets god mode and every flag")
+	ui.open("dev")
+	await frames(1)
+	check(not ui.panels["dev"].tabs.visible and ui.panels["dev"].off_label.visible, "dev: the panel shows only a hint while the tools are off")
+	ui.close_all()
+	ui.open("pause")
+	await frames(1)
+	check(not ui.panels["pause"].dev_btn.visible, "dev: no pause menu button while off")
+	ui.close_all()
+	Game.dev_in_tests = false
+	Game.settings["dev_tools"] = false
+	Dev.reset_flags()
+	Game.ch = old_ch

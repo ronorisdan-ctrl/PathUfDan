@@ -1,6 +1,32 @@
-2026-10-25T05:06:27  jobs=5 parallel=1 cpus=16  ALL DONE
-job 0 [done] exit=0 secs=48.397 errors=2 :: --class=ranger --tier=2 --runs=10 --seed=7 --profile=Expert --jobs=10 --out=res://tests/smartbot/out/det3_a.csv
-job 1 [done] exit=0 secs=48.474 errors=2 :: --class=ranger --tier=2 --runs=10 --seed=7 --profile=Expert --jobs=10 --out=res://tests/smartbot/out/det3_b.csv
-job 2 [done] exit=0 secs=43.865 errors=2 :: --class=mage --tier=2 --runs=5 --mode=carry --carry=2 --seed=7 --profile=Competent --jobs=5 --out=res://tests/smartbot/out/det3_carry_a.csv
-job 3 [done] exit=0 secs=43.878 errors=2 :: --class=mage --tier=2 --runs=5 --mode=carry --carry=2 --seed=7 --profile=Competent --jobs=5 --out=res://tests/smartbot/out/det3_carry_b.csv
-job 4 [done] exit=1 secs=316.878 errors=0 :: realtime scene=res://tests/test_runner.tscn
+2026-10-25T15:01:40  jobs=31 parallel=1 cpus=16  ALL DONE
+job 0 [done] exit=0 secs=65.611 errors=2 :: --class=ranger --tier=2 --level=12 --runs=10 --seed=7 --profile=Expert --jobs=10 --out=res://tests/smartbot/out/rv2_det_a.csv
+job 1 [done] exit=0 secs=65.797 errors=2 :: --class=ranger --tier=2 --level=12 --runs=10 --seed=7 --profile=Expert --jobs=10 --out=res://tests/smartbot/out/rv2_det_b.csv
+job 2 [done] exit=0 secs=49.548 errors=2 :: --class=mage --tier=2 --level=12 --runs=5 --mode=carry --carry=2 --seed=7 --profile=Competent --jobs=5 --out=res://tests/smartbot/out/rv2_carry_a.csv
+job 3 [done] exit=0 secs=49.531 errors=2 :: --class=mage --tier=2 --level=12 --runs=5 --mode=carry --carry=2 --seed=7 --profile=Competent --jobs=5 --out=res://tests/smartbot/out/rv2_carry_b.csv
+job 4 [done] exit=0 secs=179.976 errors=2 :: --class=warrior --tier=2 --level=12 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 5 [done] exit=0 secs=89.326 errors=2 :: --class=warrior --tier=3 --level=20 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 6 [done] exit=0 secs=277.558 errors=2 :: --class=warrior --tier=4 --level=28 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 7 [done] exit=0 secs=185.629 errors=2 :: --class=warrior --tier=2 --level=12 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 8 [done] exit=0 secs=104.085 errors=2 :: --class=warrior --tier=3 --level=20 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 9 [done] exit=0 secs=199.942 errors=2 :: --class=warrior --tier=4 --level=28 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 10 [done] exit=0 secs=159.13 errors=2 :: --class=warrior --tier=2 --level=12 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 11 [done] exit=0 secs=118.326 errors=2 :: --class=warrior --tier=3 --level=20 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 12 [done] exit=0 secs=308.163 errors=2 :: --class=warrior --tier=4 --level=28 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 13 [done] exit=0 secs=79.641 errors=2 :: --class=ranger --tier=2 --level=12 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 14 [done] exit=0 secs=85.963 errors=2 :: --class=ranger --tier=3 --level=20 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 15 [done] exit=0 secs=162.306 errors=2 :: --class=ranger --tier=4 --level=28 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 16 [done] exit=0 secs=89.175 errors=2 :: --class=ranger --tier=2 --level=12 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 17 [done] exit=0 secs=97.448 errors=2 :: --class=ranger --tier=3 --level=20 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 18 [done] exit=0 secs=158.614 errors=2 :: --class=ranger --tier=4 --level=28 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 19 [done] exit=0 secs=107.022 errors=2 :: --class=ranger --tier=2 --level=12 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 20 [done] exit=0 secs=101.477 errors=2 :: --class=ranger --tier=3 --level=20 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 21 [done] exit=0 secs=192.3 errors=2 :: --class=ranger --tier=4 --level=28 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 22 [done] exit=0 secs=69.167 errors=2 :: --class=mage --tier=2 --level=12 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 23 [done] exit=0 secs=117.306 errors=2 :: --class=mage --tier=3 --level=20 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 24 [done] exit=0 secs=167.41 errors=2 :: --class=mage --tier=4 --level=28 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 25 [done] exit=0 secs=72.713 errors=2 :: --class=mage --tier=2 --level=12 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 26 [done] exit=0 secs=122.653 errors=2 :: --class=mage --tier=3 --level=20 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 27 [done] exit=0 secs=192.602 errors=2 :: --class=mage --tier=4 --level=28 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 28 [done] exit=0 secs=72.983 errors=2 :: --class=mage --tier=2 --level=12 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 29 [done] exit=0 secs=125.215 errors=2 :: --class=mage --tier=3 --level=20 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+job 30 [done] exit=0 secs=254.544 errors=2 :: --class=mage --tier=4 --level=28 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv

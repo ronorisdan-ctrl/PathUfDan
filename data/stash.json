@@ -1,0 +1,9 @@
+{
+	"columns": 8,
+	"rows": 7,
+	"stash_free_tabs": 1,
+	"shared_free_tabs": 1,
+	"base_cost": 100,
+	"growth": 2.0,
+	"max_extra_tabs": 10
+}

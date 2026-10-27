@@ -7,6 +7,8 @@ const Player = preload("res://scripts/entities/player.gd")
 const Enemy = preload("res://scripts/entities/enemy.gd")
 const Boss = preload("res://scripts/entities/boss.gd")
 const LootDrop = preload("res://scripts/entities/loot_drop.gd")
+const Pet = preload("res://scripts/entities/pet.gd")
+const PetRules = preload("res://scripts/core/pet_rules.gd")
 const AoE = preload("res://scripts/entities/aoe.gd")
 const VFX = preload("res://scripts/fx/vfx.gd")
 
@@ -20,6 +22,7 @@ var grid := PackedByteArray()
 var palette := "crypt"
 var level_name := ""
 var allow_combat := true
+var is_town := false
 var ambient := Color(0.42, 0.40, 0.50)
 
 var floor_layer: Node2D
@@ -30,6 +33,7 @@ var tile_drawer: Node2D
 var walls: StaticBody2D
 
 var player = null
+var pet = null          # cosmetic loot pet; never a target, never collides, never takes damage
 var enemies := []
 var allies := []
 var loot := []
@@ -177,7 +181,32 @@ func spawn_player(ch, pos: Vector2):
 	player.position = pos
 	allies.append(player)
 	entity_layer.add_child(player)
+	if not Events.pet_changed.is_connected(respawn_pet):
+		Events.pet_changed.connect(respawn_pet)
+	respawn_pet()
 	return player
+
+# ------------------------------------------------------------------ pet
+## Pets are off in tests and bot runs (Game.testing) so results stay deterministic;
+## pet tests switch them on with Game.pets_in_tests.
+func pets_allowed() -> bool:
+	return not Game.testing or Game.pets_in_tests
+
+## (Re)creates the active pet next to the player. Called on spawn and whenever the
+## active pet is swapped, upgraded or renamed. Any in-flight fetch is cancelled.
+func respawn_pet() -> void:
+	if pet != null and is_instance_valid(pet):
+		pet.despawn()
+	pet = null
+	if player == null or not is_instance_valid(player) or not pets_allowed():
+		return
+	var id: String = player.ch.active_pet
+	if id == "" or not player.ch.owns_pet(id):
+		return
+	pet = Pet.new()
+	pet.setup(self, player, id)
+	pet.position = player.global_position + Vector2(-14, 6)
+	entity_layer.add_child(pet)
 
 ## enemy_run holds the tier / run-modifier multipliers applied to every spawn
 var enemy_run := {}
@@ -281,17 +310,49 @@ func unstick(a) -> void:
 				if d < bd:
 					bd = d
 					best = n
+	if best.x < 0:
+		best = nearest_floor(c)   # deep in rock or outside the grid: search wider
 	if best.x >= 0:
-		a.global_position = cell_center(best)
+		# small spread so that two actors stuck together are not dropped on the same point
+		# (overlapping bodies push each other back through the wall strip, over and over)
+		_unstick_n += 1
+		a.global_position = cell_center(best) + Vector2.RIGHT.rotated(_unstick_n * 2.39996) * 4.0
+
+var _unstick_n := 0
+
+## Nearest FLOOR cell to c by expanding square rings (c may lie outside the grid).
+## Returns (-1, -1) only if the map has no floor at all.
+func nearest_floor(c: Vector2i) -> Vector2i:
+	var cx := clampi(c.x, 0, gw - 1)
+	var cy := clampi(c.y, 0, gh - 1)
+	for r in range(0, maxi(gw, gh)):
+		var best := Vector2i(-1, -1)
+		var bd := 1 << 30
+		for y in range(cy - r, cy + r + 1):
+			for x in range(cx - r, cx + r + 1):
+				if maxi(absi(x - cx), absi(y - cy)) != r:
+					continue
+				if cell(x, y) == FLOOR:
+					var d := (x - c.x) * (x - c.x) + (y - c.y) * (y - c.y)
+					if d < bd:
+						bd = d
+						best = Vector2i(x, y)
+		if best.x >= 0:
+			return best
+	return Vector2i(-1, -1)
 
 var _used_spawn := {}
 
 func random_floor_near(c: Vector2i, rad: int) -> Vector2:
+	var anchor_ok := cell(c.x, c.y) == FLOOR
 	for i in 40:
 		var x := c.x + rng.randi_range(-rad, rad)
 		var y := c.y + rng.randi_range(-rad, rad)
 		var key := Vector2i(x, y)
 		if _used_spawn.has(key) and i < 30:
+			continue
+		# a straight floor line from the anchor keeps spawns on the anchor's side of thin walls
+		if anchor_ok and key != c and not has_los(cell_center(c), cell_center(key)):
 			continue
 		if cell(x, y) == FLOOR and cell(x + 1, y) == FLOOR and cell(x, y + 1) == FLOOR and cell(x - 1, y) == FLOOR and cell(x, y - 1) == FLOOR:
 			_used_spawn[key] = true
@@ -495,8 +556,25 @@ func _process(delta: float) -> void:
 		if n.kind != "item" and n.t > 0.3 and n.global_position.distance_to(player.global_position) < 18:
 			pickup(n)
 
-func pickup(n) -> bool:
-	if n.picked:
+## Why `collector` may not collect drop `n` right now ("" = it may). This is the
+## single gate for manual pickup, walk-over, pet fetch and pet magnet, and it is
+## re-checked at the moment of collection.
+func collect_block(n, collector = null) -> String:
+	if n == null or not is_instance_valid(n) or n.picked:
+		return "gone"
+	if n.is_claimed_by_other(collector if collector != null else player):
+		return "claimed"
+	if collector != null and collector != player and "is_pet" in collector:
+		if n.filtered_now():
+			return "hidden"
+		if collector.tier < PetRules.required_tier(n.kind, n.item.get("rarity", "common") if n.kind == "item" else "common"):
+			return "too_heavy"
+	return ""
+
+## The one pickup path: manual F/click, walking over gold, and the pet all call this.
+## Only a successful collection frees the drop, so nothing can be duplicated or lost.
+func pickup(n, collector = null) -> bool:
+	if collect_block(n, collector) != "":
 		return false
 	var ch = player.ch
 	match n.kind:
@@ -519,11 +597,14 @@ func pickup(n) -> bool:
 		"item":
 			if not ch.add_to_bag(n.item):
 				Events.message.emit("Inventory full", Color("#ff8080"))
+				n.release(collector if collector != null else player)
 				return false
 			Sfx.play("pickup")
 			Events.item_picked.emit(n.item)
 	n.picked = true
 	loot.erase(n)
+	if collector != null and collector != player and is_instance_valid(collector) and collector.has_method("on_collected"):
+		collector.on_collected(n)
 	n.queue_free()
 	return true
 
@@ -541,7 +622,7 @@ func nearest_item(pos: Vector2, maxd: float):
 func try_click_pickup(mouse: Vector2, p) -> bool:
 	for n in loot:
 		if is_instance_valid(n) and not n.hidden_by_filter and n.label_rect().has_point(mouse):
-			if n.global_position.distance_to(p.global_position) < 70:
+			if n.global_position.distance_to(p.global_position) < float(PetRules.setting("manual_pickup_reach", 70)):
 				pickup(n)
 			else:
 				Events.message.emit("Too far away", Color("#ff8080"))
@@ -567,7 +648,45 @@ func nearest_interactable(pos: Vector2):
 			best = it
 	return best
 
-func interact(p) -> void:
+## The drop whose label is under the cursor, else the nearest label within
+## label_pick_radius of it. Overlaps resolve to the higher rarity. Hidden drops
+## have no label, so they can never be targeted.
+func drop_at_cursor(mouse: Vector2):
+	var best = null
+	var best_d := INF
+	var best_r := -99
+	var radius := float(PetRules.setting("label_pick_radius", 40))
+	for n in loot:
+		if not is_instance_valid(n) or n.picked or n.hidden_by_filter or not n.visible:
+			continue
+		var r: Rect2 = n.label_rect()
+		var d := 0.0
+		if not r.has_point(mouse):
+			var cp := Vector2(clampf(mouse.x, r.position.x, r.end.x), clampf(mouse.y, r.position.y, r.end.y))
+			d = cp.distance_to(mouse)
+			if d > radius:
+				continue
+		var ri: int = n.rarity_idx()
+		if d < best_d - 0.01 or (absf(d - best_d) <= 0.01 and ri > best_r):
+			best = n
+			best_d = d
+			best_r = ri
+	return best
+
+## F: the drop at the cursor is collected by you if it is within reach, otherwise
+## your pet is sent for it. With nothing near the cursor, F works as before
+## (nearest interactable, then the nearest item at your feet).
+func interact(p, mouse = null) -> void:
+	if mouse != null:
+		var target = drop_at_cursor(mouse)
+		if target != null:
+			if target.global_position.distance_to(p.global_position) <= float(PetRules.setting("manual_pickup_reach", 70)):
+				pickup(target)
+			elif pet != null and is_instance_valid(pet):
+				pet.request_fetch(target)
+			else:
+				Events.message.emit("Too far away", Color("#ff8080"))
+			return
 	var it = nearest_interactable(p.global_position)
 	if it != null:
 		on_interact(it)
@@ -580,5 +699,10 @@ func on_interact(_it: Dictionary) -> void:
 	pass
 
 func cleanup() -> void:
+	if Events.pet_changed.is_connected(respawn_pet):
+		Events.pet_changed.disconnect(respawn_pet)
+	if pet != null and is_instance_valid(pet):
+		pet.despawn()
+	pet = null
 	if Events.enemy_killed.is_connected(_on_enemy_killed):
 		Events.enemy_killed.disconnect(_on_enemy_killed)

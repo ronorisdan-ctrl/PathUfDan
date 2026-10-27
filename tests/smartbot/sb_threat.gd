@@ -162,6 +162,13 @@ func _scan_enemy(e, pp: Vector2) -> void:
 	var pos: Vector2 = e.global_position
 	var asm: float = maxf(0.05, e.attack_speed_mult)
 	var w := _weight(e)
+	# a stunned / frozen enemy holds its wind-up (enemy.gd freezes state_t): the hit comes
+	# only after the status ends
+	var held := 0.0
+	if e.speed_mult() <= 0.0:
+		for sn in ["stun", "freeze"]:
+			if e.statuses.has(sn):
+				held = maxf(held, float(e.statuses[sn].get("t", 0.0)))
 	if e.is_boss:
 		if e.charge_t > 0:
 			var spd := float(e.current.get("speed", 420))
@@ -170,7 +177,7 @@ func _scan_enemy(e, pp: Vector2) -> void:
 			return
 		if st != "windup" or e.attack_kind != "pattern":
 			return
-		var t0: float = now + maxf(0.0, e.state_t) / asm
+		var t0: float = now + held + maxf(0.0, e.state_t) / asm
 		match e.current.get("type", ""):
 			"cleave":
 				var arc := deg_to_rad(float(e.current.get("arc", 140))) / 2.0 + 0.15
@@ -189,7 +196,7 @@ func _scan_enemy(e, pp: Vector2) -> void:
 		return
 	if st != "windup":
 		return
-	var t1: float = now + maxf(0.0, e.state_t) / asm
+	var t1: float = now + held + maxf(0.0, e.state_t) / asm
 	match e.attack_kind:
 		"melee":
 			_register(key, {"kind": "arc", "c": pos, "r": float(e.def.get("attack_range", 16)) + PR + 6.0, "dir": e.attack_dir, "cos": 0.2,

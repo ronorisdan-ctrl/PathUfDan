@@ -90,7 +90,7 @@ func refresh() -> void:
 	elif ui.is_open("jeweller"):
 		hint = "LMB: select for socketing   RMB: actions"
 	elif ui.is_open("stash"):
-		hint = "LMB: move to stash   RMB: actions"
+		hint = "LMB: move to %s   RMB: actions" % ui.panels["stash"].target_name()
 	info_label.text = hint
 
 func _is_selected(it) -> bool:
@@ -154,7 +154,7 @@ func _context_bag(idx: int, it: Dictionary) -> void:
 		opts.append(["Select for crafting", func(): ui.panels["blacksmith"].select(it)])
 		opts.append(["Salvage", func(): salvage(idx)])
 	if ui.is_open("stash"):
-		opts.append(["Move to stash", func(): ui.panels["stash"].deposit(idx)])
+		opts.append(["Move to " + ui.panels["stash"].target_name(), func(): ui.panels["stash"].deposit(idx)])
 	opts.append(["Destroy", func(): _destroy(idx)])
 	ui.show_context(opts)
 
@@ -210,7 +210,7 @@ func sell(idx: int) -> void:
 		Events.inventory_changed.emit()
 		Events.currency_changed.emit()
 		ui.refresh_open()
-	if _valuable(it):
+	if it.get("rarity") == "legendary":
 		ui.ask("Sell [color=#%s]%s[/color] for %d gold?" % [Data.rarity_color(it["rarity"]).to_html(false), it["name"], Loot.sell_value(it)], do_sell)
 	else:
 		do_sell.call()

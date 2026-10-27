@@ -12,30 +12,51 @@ var op_box: VBoxContainer
 var preview: RichTextLabel
 var confirm_btn: Button
 var mats: RichTextLabel
+var scroll: ScrollContainer
 
 func _init() -> void:
 	place = "left"
-	build("Blacksmith Oren", Vector2(440, 560))
-	body.add_child(UIKit.label("Select an item in your inventory or equipment.", 12, UIKit.MUTED))
-	var sc := ScrollContainer.new()
-	sc.custom_minimum_size = Vector2(420, 130)
-	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	body.add_child(sc)
-	item_text = UIKit.rich("", 400)
-	sc.add_child(item_text)
-	body.add_child(UIKit.label("Affixes (choose one for reroll / remove)", 13, UIKit.GOLD))
+	build("Blacksmith Oren", Vector2(440, 0))
+	# Everything except the Craft button and the materials line lives in one
+	# scroll area, so a long affix / operation list can never push Craft off
+	# the screen. The scroll height is set in reposition() from the viewport.
+	scroll = ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(420, 300)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	body.add_child(scroll)
+	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 6)
+	scroll.add_child(content)
+	content.add_child(UIKit.label("Select an item in your inventory or equipment.", 12, UIKit.MUTED))
+	item_text = UIKit.rich("", 390)
+	content.add_child(item_text)
+	content.add_child(UIKit.label("Affixes (choose one for reroll / remove)", 13, UIKit.GOLD))
 	affix_box = VBoxContainer.new()
-	body.add_child(affix_box)
-	body.add_child(UIKit.label("Operation", 13, UIKit.GOLD))
+	content.add_child(affix_box)
+	content.add_child(UIKit.label("Operation", 13, UIKit.GOLD))
 	op_box = VBoxContainer.new()
-	body.add_child(op_box)
-	preview = UIKit.rich("", 420)
-	body.add_child(preview)
+	content.add_child(op_box)
+	preview = UIKit.rich("", 390)
+	content.add_child(preview)
+	# Pinned below the scroll area: always visible.
 	confirm_btn = UIKit.button("Craft", _craft)
 	body.add_child(confirm_btn)
 	mats = UIKit.rich("", 420)
 	body.add_child(mats)
 	Events.currency_changed.connect(refresh)
+
+## Fit the scroll area to the window: viewport height minus the title bar,
+## Craft button, materials line and the panel's own padding.
+func reposition() -> void:
+	var vh := get_viewport_rect().size.y
+	scroll.custom_minimum_size.y = clampf(vh - 240.0, 200.0, 620.0)
+	super.reposition()
+
+func _show_preview() -> void:
+	await get_tree().process_frame
+	if visible and is_instance_valid(scroll) and is_instance_valid(preview):
+		scroll.ensure_control_visible(preview)
 
 func on_close() -> void:
 	selected = null
@@ -44,6 +65,7 @@ func on_close() -> void:
 func select(it) -> void:
 	selected = it if (it != null and not it.is_empty()) else null
 	affix_index = -1
+	scroll.scroll_vertical = 0
 	refresh()
 	ui.panels["inventory"].refresh()
 
@@ -105,6 +127,7 @@ func _pick_affix(i: int) -> void:
 func _pick_op(o: String) -> void:
 	op = o
 	refresh()
+	_show_preview()
 
 func _craft() -> void:
 	var ch = Game.ch

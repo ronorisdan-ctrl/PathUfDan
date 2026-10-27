@@ -12,10 +12,15 @@ const SETTINGS_PATH := "user://pathofdan_settings.json"
 var ch = null
 var main = null
 var level = null
-var settings := {"loot_filter": 0, "screen_shake": 1.0, "volume": 0.7, "fullscreen": false, "hit_stop": true}
+const DEFAULT_SETTINGS := {"loot_filter": 0, "screen_shake": 1.0, "volume": 0.7, "fullscreen": false, "hit_stop": true, "dev_tools": false}
+var settings := DEFAULT_SETTINGS.duplicate()
 var carried_minions := 0
 var vendor_stock := []
 var testing := false
+var filter_in_tests := false   # loot filter tests turn the filter on while testing
+var pets_in_tests := false   # pet tests turn pets on while testing
+var dev_in_tests := false    # developer tools tests turn dev tools on while testing
+var base_time_scale := 1.0   # world speed outside hit-stop (developer tools time scale)
 var save_dir := SAVE_DIR   # tests point this at a scratch folder
 var current_slot := 1
 
@@ -26,6 +31,8 @@ const ACTIONS := {
 	"dodge": [KEY_SPACE], "flask_1": [KEY_1], "flask_2": [KEY_2], "interact": [KEY_F],
 	"toggle_inventory": [KEY_I, KEY_B], "toggle_character": [KEY_C], "toggle_passives": [KEY_P],
 	"toggle_skills": [KEY_K], "toggle_map": [KEY_TAB], "toggle_loot_filter": [KEY_Z], "pause": [KEY_ESCAPE],
+	# developer tools (only react while Settings > Developer tools is on)
+	"dev_panel": [KEY_F1], "dev_teleport": [KEY_F2], "dev_spawn": [KEY_F3],
 }
 
 func _ready() -> void:
@@ -65,13 +72,21 @@ func hitstop(sec: float) -> void:
 
 func end_hitstop() -> void:
 	_hs_end_ms = 0
-	Engine.time_scale = 1.0
+	Engine.time_scale = base_time_scale
+
+## Sets the normal world speed (developer tools). Hit-stop still freezes on top of it
+## and always returns to this value, so the two never fight over Engine.time_scale.
+func set_base_time_scale(v: float) -> void:
+	base_time_scale = v
+	if _hs_end_ms == 0:
+		Engine.time_scale = v
 
 func _process(_delta: float) -> void:
 	if _hs_end_ms > 0 and (Time.get_ticks_msec() >= _hs_end_ms or get_tree().paused or not hitstop_allowed()):
 		end_hitstop()
 
 func _exit_tree() -> void:
+	base_time_scale = 1.0
 	Engine.time_scale = 1.0
 
 func _setup_input() -> void:
@@ -167,6 +182,16 @@ func save_game(slot: int = -1) -> bool:
 	current_slot = slot
 	return _write_atomic(slot_path(slot), _save_text())
 
+## Writes the current character to its manual slot and the autosave right now.
+## Shared-stash transfers use this so a reload can never bring back an item that
+## was just moved (the character is saved before the shared file is touched).
+func save_now() -> bool:
+	if ch == null or testing:
+		return false
+	var ok := save_game()
+	autosave()
+	return ok
+
 ## Rolling autosave into its own file; never touches the manual slots.
 func autosave() -> bool:
 	if ch == null or testing or not valid_slot(current_slot):
@@ -200,7 +225,16 @@ func load_game(slot: int = -1) -> bool:
 		current_slot = origin if valid_slot(origin) else maxi(first_empty_slot(), 1)
 	else:
 		current_slot = slot
+	select_filter_character()
 	return true
+
+## Loot filters are saved per character: one folder per save slot.
+func select_filter_character(fresh: bool = false) -> void:
+	if testing:
+		return
+	LootFilter.set_character(str(current_slot))
+	if fresh:
+		LootFilter.load_filter("default")
 
 func load_from_dict(d: Dictionary) -> bool:
 	ch = CharacterData.new()
@@ -226,6 +260,9 @@ func slot_info(slot: int) -> Dictionary:
 		return info
 	var cd: Dictionary = Data.classes.get(d.get("class", ""), {})
 	info["summary"] = "%s - Level %d %s" % [d.get("name", "Dan"), int(d.get("level", 1)), cd.get("name", "?")]
+	if bool(d.get("dev_used", false)):
+		info["summary"] += " (dev)"
+	info["dev_used"] = bool(d.get("dev_used", false))
 	info["saved_at"] = int(d.get("saved_at", 0))
 	if info["saved_at"] > 0:
 		info["date"] = Time.get_datetime_string_from_unix_time(info["saved_at"], true)
@@ -339,7 +376,9 @@ func refresh_vendor() -> void:
 	vendor_stock.clear()
 	if ch == null:
 		return
+	# Vendor-only legendary weight (data/loot.json). Monster drops are not affected.
+	var leg_w := float(Data.loot.get("vendor_legendary_weight", -1.0))
 	for i in 8:
-		var it := Loot.roll_item(maxi(1, ch.level), 60.0, ch.class_id)
+		var it := Loot.roll_item(maxi(1, ch.level), 60.0, ch.class_id, "", leg_w)
 		it["uid"] = ch.take_uid()
 		vendor_stock.append(it)

@@ -19,3 +19,4 @@ signal message(text, color)
 signal item_picked(item)
 signal level_ready(level)
 signal ui_panel_toggled(name, open)
+signal pet_changed           # active pet swapped, upgraded or renamed

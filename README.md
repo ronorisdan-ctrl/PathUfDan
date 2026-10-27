@@ -25,7 +25,7 @@ No assets need importing: all pixel art is generated from palette grids in
 | LMB / RMB / Q / E / R / T / G | Skills 1-7 (hold to repeat) |
 | Space | Dodge roll (brief invulnerability) |
 | 1 / 2 | Life / mana flask |
-| F | Interact / pick up nearest item (LMB on an item label also picks it up) |
+| F | Interact / pick up. With the cursor on (or within 40 px of) an item label: pick it up if it is within reach, otherwise send your pet to fetch it. LMB on an item label also picks it up |
 | I (or B) | Inventory |
 | C | Character sheet |
 | P | Passive skill tree |
@@ -57,6 +57,22 @@ From Tier 2, every run rolls **modifiers** (13 types, e.g. Hastened Horde,
 Burning Blood, Volatile Dead, Tempest, Grim Healing, Glass Pact) shown at the
 Dungeon Gate before you enter; each adds item quantity, rarity and experience.
 Rooms can contain **hazards** (spike traps, fire vents, miasma pools).
+
+### Pets
+
+Buy pets with gold from the **Pet Keeper** in town (16 pets: dog, cat, frog, slime,
+robot, goblin, fox, bunny, hedgehog, baby dragon, axolotl, tiny ghost, owl,
+mushroom buddy, bat, mimic). The active pet follows you, collects gold and
+crafting materials on its own, and fetches a far item when you press F on its
+label. Each pet has its own upgrade tier (0-5, paid in crafting materials): every
+tier unlocks one more rarity for F plus a capability (speed, shorter cooldown,
+blink, wall-pass and magnet, full camera range). Switching pets is free at any
+time (pause menu > Pets) and each pet keeps its upgrades. Pets are cosmetic only:
+no collision, no health, never targeted, and their quirks use their own RNG.
+All numbers are in `data/pets.json`. Every pickup (yours and the pet's) goes
+through `level.pickup()`, which re-checks the loot filter, the pet's rarity cap,
+bag space and the single-claim rule at the moment of collection. Pets are off
+under `Game.testing` (tests and bots) unless `Game.pets_in_tests` is set.
 
 ## Architecture
 

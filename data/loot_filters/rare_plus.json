@@ -1,0 +1,148 @@
+{
+ "version": 1,
+ "name": "Rare and better",
+ "description": "Hides common and uncommon gear unless it is an upgrade; keeps gems, runes and materials.",
+ "default": "show",
+ "safety": {
+  "never_hide_min_rarity": "legendary"
+ },
+ "rules": [
+  {
+   "name": "Legendary",
+   "enabled": true,
+   "conditions": {
+    "rarity_min": "legendary"
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#ff8c1a",
+    "size": "huge",
+    "beam": "#ff8c1a",
+    "sound": "drop_legendary",
+    "minimap": {
+     "shape": "star",
+     "color": "#ff8c1a"
+    }
+   }
+  },
+  {
+   "name": "Epic",
+   "enabled": true,
+   "conditions": {
+    "rarity_min": "epic"
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#b45cff",
+    "size": "large",
+    "beam": "#b45cff",
+    "sound": "drop_epic",
+    "minimap": {
+     "shape": "diamond",
+     "color": "#b45cff"
+    }
+   }
+  },
+  {
+   "name": "Rare",
+   "enabled": true,
+   "conditions": {
+    "rarity_min": "rare"
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#ffd84a",
+    "size": "large",
+    "sound": "drop_rare"
+   }
+  },
+  {
+   "name": "Gems",
+   "enabled": true,
+   "conditions": {
+    "kind": [
+     "gem"
+    ]
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#4dd9e6",
+    "size": "normal"
+   }
+  },
+  {
+   "name": "Runes",
+   "enabled": true,
+   "conditions": {
+    "kind": [
+     "rune"
+    ]
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#ff6ad5",
+    "size": "normal"
+   }
+  },
+  {
+   "name": "Materials",
+   "enabled": true,
+   "conditions": {
+    "kind": [
+     "material"
+    ]
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#8a8a8a",
+    "size": "small"
+   }
+  },
+  {
+   "name": "Upgrades",
+   "enabled": true,
+   "conditions": {
+    "rarity_min": "uncommon",
+    "is_upgrade": true
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#4be36b",
+    "size": "large"
+   }
+  },
+  {
+   "name": "Hide old uncommon/common",
+   "enabled": true,
+   "conditions": {
+    "rarity_max": "uncommon",
+    "ilvl_vs_player_max": -6
+   },
+   "actions": {
+    "visibility": "hide"
+   }
+  },
+  {
+   "name": "Hide common",
+   "enabled": true,
+   "conditions": {
+    "rarity_max": "common"
+   },
+   "actions": {
+    "visibility": "hide"
+   }
+  },
+  {
+   "name": "Uncommon",
+   "enabled": true,
+   "conditions": {
+    "rarity_min": "uncommon"
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#6aa8ff",
+    "size": "normal"
+   }
+  }
+ ]
+}

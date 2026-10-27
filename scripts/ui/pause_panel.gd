@@ -5,12 +5,14 @@ var vol: HSlider
 var shake: HSlider
 var fs: CheckBox
 var hs: CheckBox
+var dev: CheckBox
+var dev_btn: Button
 var saved: Label
 var slot_pick: OptionButton
 
 func _init() -> void:
 	place = "center"
-	build("Paused", Vector2(380, 510))
+	build("Paused", Vector2(380, 600))
 	body.add_child(UIKit.button("Resume", func(): ui.close("pause")))
 	body.add_child(UIKit.button("Save Game", _save))
 	var sa := HBoxContainer.new()
@@ -48,7 +50,26 @@ func _init() -> void:
 		Game.settings["fullscreen"] = on
 		Game.apply_settings())
 	body.add_child(fs)
+	dev = CheckBox.new()
+	dev.text = "Developer tools"
+	dev.tooltip_text = "Testing cheats: F1 opens the Developer panel. Characters that use them are marked (dev)."
+	dev.toggled.connect(func(on):
+		if on != bool(Game.settings.get("dev_tools", false)):
+			Dev.set_enabled(on)
+		dev_btn.visible = Dev.enabled())
+	body.add_child(dev)
 	body.add_child(UIKit.button("Cycle loot filter (Z)", func(): ui.cycle_loot_filter()))
+	body.add_child(UIKit.button("Loot filter editor", func():
+		ui.close("pause")
+		ui.open_filter_editor()))
+	body.add_child(UIKit.button("Pets (switch your companion)", func():
+		ui.close("pause")
+		ui.toggle("pets")))
+	dev_btn = UIKit.button("Developer tools (F1)", func():
+		ui.close("pause")
+		ui.open("dev"))
+	dev_btn.tooltip_text = "Open the Developer panel"
+	body.add_child(dev_btn)
 	body.add_child(HSeparator.new())
 	body.add_child(UIKit.button("Save and return to Main Menu", _menu))
 	body.add_child(UIKit.button("Save and Quit", _quit))
@@ -58,6 +79,8 @@ func on_open() -> void:
 	shake.value = float(Game.settings.get("screen_shake", 1.0))
 	fs.button_pressed = bool(Game.settings.get("fullscreen", false))
 	hs.button_pressed = bool(Game.settings.get("hit_stop", true))
+	dev.button_pressed = bool(Game.settings.get("dev_tools", false))
+	dev_btn.visible = Dev.enabled()
 	saved.text = ""
 	_fill_slots()
 
@@ -89,6 +112,10 @@ func _save_to_selected() -> void:
 		_do_save_to(slot)
 		dlg.queue_free())
 	dlg.canceled.connect(dlg.queue_free)
+	dlg.window_input.connect(func(e):
+		if e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_SPACE:
+			dlg.set_input_as_handled()
+			dlg.get_ok_button().emit_signal("pressed"))
 	add_child(dlg)
 	dlg.popup_centered()
 

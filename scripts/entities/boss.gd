@@ -27,12 +27,14 @@ var spiral_waves := 0
 var spiral_t := 0.0
 var extra_summons := 0
 var patterns_used := {}   # for tests / telemetry
+var poise_state := {}     # boss poise (data/stun.json): poise, since_hit, immune, stagger
 
 func _ready() -> void:
 	super._ready()
 	is_boss = true
 	aggro = true
 	patterns = def.get("patterns", {})
+	poise_state = Stun.new_poise()
 	extra_summons = 2 if level != null and level.enemy_run.get("boss_summons", false) else 0
 
 func active_patterns() -> Array:
@@ -44,6 +46,11 @@ func active_patterns() -> Array:
 func _physics_process(delta: float) -> void:
 	if not alive or level == null:
 		return
+	if Dev.freeze_ai():
+		super._physics_process(delta)   # the enemy freeze path: no patterns, charges or phases
+		return
+	if not Data.stun_cfg.is_empty() and not poise_state.is_empty():
+		Stun.poise_tick(Data.stun_cfg, poise_state, delta)
 	_check_phase()
 	for k in cds.keys():
 		cds[k] -= delta
@@ -160,14 +167,15 @@ func _start_pattern(n: String) -> void:
 	var delay := wu / attack_speed_mult
 	var mult := float(current.get("mult", 1.0))
 	var col := Color(current.get("color", "#ff5030"))
+	windup_aoes.clear()
 	match current.get("type", ""):
 		"ring":
-			_spawn_aoe(global_position, float(current.get("radius", 80)), delay, "slam", col, mult)
+			windup_aoes.append(_spawn_aoe(global_position, float(current.get("radius", 80)), delay, "slam", col, mult))
 		"eruption":
 			if _target_ok():
 				for i in int(current.get("count", 3)):
 					var off := Vector2(randf_range(-36, 36), randf_range(-36, 36)) if i > 0 else Vector2.ZERO
-					_spawn_aoe(level.clamp_to_floor(global_position, target.global_position + off), float(current.get("radius", 34)), delay + 0.35 * i, "slam", col, mult)
+					windup_aoes.append(_spawn_aoe(level.clamp_to_floor(global_position, target.global_position + off), float(current.get("radius", 34)), delay + 0.35 * i, "slam", col, mult))
 		"mortar":
 			if _target_ok():
 				for i in int(current.get("count", 6)):
@@ -178,7 +186,7 @@ func _start_pattern(n: String) -> void:
 					var at: Vector2 = c + off2
 					if level.is_solid(at):
 						at = c
-					_spawn_aoe(at, float(current.get("radius", 36)), delay + float(current.get("interval", 0.25)) * i + 0.5, "explosion", col, mult)
+					windup_aoes.append(_spawn_aoe(at, float(current.get("radius", 36)), delay + float(current.get("interval", 0.25)) * i + 0.5, "explosion", col, mult))
 
 func _target_ok() -> bool:
 	return target != null and is_instance_valid(target) and target.alive
@@ -342,7 +350,27 @@ func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float
 	if vent_t > 0:
 		for k in rolled:
 			rolled[k] *= 1.5
-	return super.receive_hit(rolled, p, source, crit)
+	var dealt: float = super.receive_hit(rolled, p, source, crit)
+	if alive and dealt > 0 and not Data.stun_cfg.is_empty() and not poise_state.is_empty():
+		if Stun.poise_hit(Data.stun_cfg, poise_state, dealt, max_life):
+			_stagger()
+	return dealt
+
+## Poise broken: a short stagger that interrupts the current telegraph (and a charge).
+func _stagger() -> void:
+	var pc: Dictionary = Data.stun_cfg["poise"]
+	var dur := float(pc.get("stagger_duration", 1.0))
+	add_status("stun", dur, {})
+	statuses["stun"]["dur"] = statuses["stun"]["t"]
+	if pc.get("interrupts_windup", true):
+		interrupt_windup()
+		if charge_t > 0:
+			charge_t = 0.0
+			state = "recover"
+			state_t = 0.5
+	Combat.number(level, global_position + Vector2(0, -14), "Staggered!", Color("#ffe070"), true)
+	Events.message.emit("%s is staggered!" % display_name, Color("#ffe070"))
+	level.shake(2.5)
 
 func _draw() -> void:
 	if not alive:

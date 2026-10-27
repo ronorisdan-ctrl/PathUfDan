@@ -6,6 +6,7 @@ const LAYER_WALL := 1
 const LAYER_PLAYER := 2
 const LAYER_ENEMY := 4
 const LAYER_MINION := 8
+const Stun = preload("res://scripts/combat/stun.gd")
 
 var level = null            # the Level node this actor lives in
 var faction := "enemy"
@@ -25,6 +26,7 @@ var facing := 1.0
 var anim_t := 0.0
 var knock := Vector2.ZERO
 var recently_hit := 0.0
+var stun_immune_t := 0.0     # no new armour/health stun while > 0 (data/stun.json)
 
 func setup_body(r: float, layer: int, mask: int) -> void:
 	radius = r
@@ -92,6 +94,7 @@ func speed_mult() -> float:
 	return 1.0
 
 func tick_statuses(delta: float) -> void:
+	stun_immune_t = maxf(0.0, stun_immune_t - delta)
 	var expired := []
 	for k in statuses:
 		var s: Dictionary = statuses[k]
@@ -120,6 +123,34 @@ func take_dot(amount: float, dtype: String) -> void:
 
 func dot_resist(_dtype: String) -> float:
 	return 1.0
+
+# ------------------------------------------------------------- hit stun (data/stun.json)
+## Rolls the armour/health stun for a hit. `dmg` is the life actually lost (after
+## armour, resistances, DR and shields), so armour reduces stuns without double dipping.
+## kind: "player", "normal" or "elite". Returns the stun duration (0 = no stun).
+func try_hit_stun(dmg: float, kind: String, thr_mult: float = 1.0) -> float:
+	var cfg: Dictionary = Data.stun_cfg
+	if not alive or stun_immune_t > 0.0 or cfg.is_empty() or not cfg.get("enabled", false):
+		return 0.0
+	var chance: float = Stun.stun_chance(cfg, kind, dmg, max_life, thr_mult)
+	if chance <= 0.0:
+		return 0.0
+	if chance < 1.0 and Combat.rng.randf() > chance:   # seeded RNG keeps the smartbot deterministic
+		return 0.0
+	var dur: float = Stun.stun_duration(cfg, kind, dmg, max_life, thr_mult)
+	stun_immune_t = dur + float(cfg.get("immunity_after_stun", 0.0))
+	add_status("stun", dur, {})
+	statuses["stun"]["dur"] = statuses["stun"]["t"]
+	if level != null:
+		Combat.number(level, global_position + Vector2(0, -10), "Stunned", Color("#ffe070"))
+	return dur
+
+## Seconds since the current stun started (0 when not stunned).
+func stun_elapsed() -> float:
+	var s = statuses.get("stun")
+	if s == null:
+		return 0.0
+	return float(s.get("dur", s["t"])) - float(s["t"])
 
 # ------------------------------------------------------------- damage hooks
 ## Override in subclasses. rolled = {type: amount}. Returns damage actually dealt.
@@ -173,6 +204,8 @@ func update_visual(delta: float, moving: bool) -> void:
 			c = Color(0.7, 1.2, 0.6)
 		elif statuses.has("frailty") or statuses.has("marked"):
 			c = Color(1.2, 0.7, 1.2)
+		if statuses.has("stun"):
+			c = Color(1.35, 1.3, 0.75) if int(anim_t * 10.0) % 2 == 0 else Color(1.0, 1.0, 0.85)
 		if statuses.has("chill"):
 			c = Color(0.6, 0.85, 1.3)
 		if statuses.has("ignite"):

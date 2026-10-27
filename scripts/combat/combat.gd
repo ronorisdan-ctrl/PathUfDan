@@ -189,6 +189,7 @@ func deal(p: Dictionary, source, target, origin: Vector2 = Vector2.INF) -> float
 		m *= float(p.get("crit_mult", 1.5))
 	if p.get("faction") == "player":
 		m *= _conditional(p, target, origin)
+		m *= Dev.hit_mult()   # developer damage multiplier / one-hit kills (1.0 unless dev tools are on)
 	for t in p["dmg"]:
 		var r: Array = p["dmg"][t]
 		rolled[t] = rng.randf_range(r[0], r[1]) * m
