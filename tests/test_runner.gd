@@ -66,6 +66,8 @@ func _ready() -> void:
 	test_save_slots()
 	await test_ui()
 	await test_stash_ui()
+	await test_destroy_by_rarity()
+	await test_item_lock()
 	var summary := "==== %d passed, %d failed ====" % [passes, fails]
 	print("\n" + summary)
 	_log(summary)
@@ -2062,6 +2064,222 @@ func test_stash_ui() -> void:
 	SS.path = old_path
 	SS.reset()
 	_stash_clean_files()
+
+# ------------------------------------------------------------------ destroy by rarity
+func test_destroy_by_rarity() -> void:
+	print("\n--- destroy bag items by rarity")
+	_log("--- destroy bag items by rarity")
+	if main.ui == null:
+		Game.new_character("warrior")   # start_game needs a character
+		main.start_game()
+		await frames(2)
+	var ui = main.ui
+	Game.new_character("warrior")
+	var ch = Game.ch
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var ids := []
+	for r in Data.rarity_list:
+		ids.append(r["id"])
+	# two of every rarity
+	for rid in ids:
+		for n in 2:
+			ch.add_to_bag(_stash_test_item(rid, 5))
+	var total: int = ids.size() * 2
+	check(ch.bag_slots_up_to("common").size() == 2, "destroy: 'common' counts only common items")
+	check(ch.bag_slots_up_to("rare").size() == 6, "destroy: 'rare' counts common, uncommon and rare")
+	check(ch.bag_slots_up_to("legendary").size() == total, "destroy: top rarity counts the whole bag")
+	# equipped gear is never in the bag, so it is never touched
+	var worn = _stash_test_item("common", 5)
+	ch.equipment["main_hand"] = worn
+	# upgraded count + socketed gem return
+	var up = ch.inventory[ch.bag_slots_up_to("common")[0]]
+	up["upgrade"] = 2
+	check(ch.bag_upgraded_up_to("common") == 1 and ch.bag_upgraded_up_to("rare") == 1, "destroy: upgraded items are counted for the warning")
+	var gem_id := "ruby:1"
+	var had_gem := false
+	if Loot.gem_valid(gem_id):
+		up["sockets"] = 1
+		up["gems"] = [gem_id]
+		had_gem = true
+		var before: int = int(ch.gems.get(gem_id, 0))
+		var gone: int = ch.destroy_bag_up_to("common")
+		check(gone == 2, "destroy: common sweep removes both common items")
+		check(int(ch.gems.get(gem_id, 0)) == before + 1, "destroy: socketed gems return to the pouch")
+	else:
+		var gone2: int = ch.destroy_bag_up_to("common")
+		check(gone2 == 2, "destroy: common sweep removes both common items")
+	check(ch.bag_slots_up_to("legendary").size() == total - 2, "destroy: higher rarities are untouched by a common sweep")
+	var left_ok := true
+	for it in ch.inventory:
+		if it != null and it.get("rarity") == "common":
+			left_ok = false
+	check(left_ok, "destroy: no common item is left")
+	check(ch.equipment.get("main_hand") == worn, "destroy: equipped items survive")
+	check(ch.destroy_bag_up_to("common") == 0, "destroy: running the same sweep twice destroys nothing")
+	# up to epic: leaves only legendary
+	var n_epic: int = ch.destroy_bag_up_to("epic")
+	check(n_epic == 6, "destroy: epic sweep removes the remaining uncommon, rare and epic items")
+	var only_leg := true
+	var legs := 0
+	for it in ch.inventory:
+		if it != null:
+			legs += 1
+			if it.get("rarity") != "legendary":
+				only_leg = false
+	check(only_leg and legs == 2, "destroy: only the legendaries remain")
+	# unknown / odd rarity strings fall back safely (index 0 = common)
+	check(ch.bag_slots_up_to("not_a_rarity").size() == 0, "destroy: unknown rarity id only matches common-or-lower items (none left)")
+	# UI: menu entries and confirm dialog
+	for rid in ids:
+		for n in 2:
+			ch.add_to_bag(_stash_test_item(rid, 5))
+	ui.open("inventory")
+	await frames(2)
+	var p = ui.panels["inventory"]
+	check(p.destroy_btn != null and p.destroy_btn.text.begins_with("Destroy"), "destroy ui: the inventory has a Destroy button")
+	p._open_destroy_menu()
+	var menu: VBoxContainer = ui.context.get_child(0)
+	await frames(1)
+	check(menu.get_child_count() >= ids.size(), "destroy ui: one menu entry per rarity")
+	var count_before: int = ch.bag_slots_up_to("legendary").size()
+	p._confirm_destroy_up_to("uncommon")
+	check(ui.confirm.visible and ui.confirm_text.text.contains("4 items"), "destroy ui: asks first and states the item count")
+	check(ch.bag_slots_up_to("legendary").size() == count_before, "destroy ui: nothing is destroyed before confirming")
+	ui._on_cancel()
+	check(ch.bag_slots_up_to("legendary").size() == count_before, "destroy ui: cancelling keeps every item")
+	p._confirm_destroy_up_to("uncommon")
+	ui._on_confirm()
+	check(ch.bag_slots_up_to("legendary").size() == count_before - 4, "destroy ui: confirming removes the items")
+	ui.close_all()
+	await frames(2)
+	ch.equipment["main_hand"] = null
+
+# ------------------------------------------------------------------ item lock
+func test_item_lock() -> void:
+	print("\n--- item lock")
+	_log("--- item lock")
+	if main.ui == null:
+		Game.new_character("warrior")   # start_game needs a character
+		main.start_game()
+		await frames(2)
+	var ui = main.ui
+	Game.new_character("warrior")
+	var ch = Game.ch
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var CD = CharDataT
+	# ---- rules
+	var a = _stash_test_item("common", 5)
+	var b = _stash_test_item("common", 5)
+	var c = _stash_test_item("rare", 5)
+	var d = _stash_test_item("legendary", 5)
+	ch.add_to_bag(a)
+	ch.add_to_bag(b)
+	ch.add_to_bag(c)
+	ch.add_to_bag(d)
+	check(not CD.is_locked(a) and not CD.is_locked(null), "lock: items start unlocked and null is never locked")
+	ch.set_item_locked(a, true)
+	check(CD.is_locked(a) and a.get("locked") == true, "lock: set_item_locked(true) marks the item")
+	ch.set_item_locked(c, true)
+	check(ch.bag_slots_up_to("common").size() == 1, "lock: a locked common is skipped by the common sweep")
+	check(ch.bag_slots_up_to("legendary").size() == 2, "lock: sweep candidates exclude locked items (4 items, 2 locked)")
+	check(ch.bag_locked_up_to("common") == 1 and ch.bag_locked_up_to("rare") == 2 and ch.bag_locked_up_to("legendary") == 2, "lock: locked items are counted per rarity cap")
+	var gone: int = ch.destroy_bag_up_to("legendary")
+	check(gone == 2, "lock: a full sweep destroys only the unlocked items")
+	check(ch.inventory.has(a) and ch.inventory.has(c) and not ch.inventory.has(b) and not ch.inventory.has(d), "lock: locked items are still in the bag, unlocked ones are gone")
+	ch.set_item_locked(a, false)
+	check(not CD.is_locked(a) and not a.has("locked"), "lock: unlocking removes the flag entirely (saves stay unchanged)")
+	check(ch.bag_slots_up_to("common").size() == 1, "lock: an unlocked item is swept again")
+	ch.set_item_locked(a, true)
+	# ---- survives saving
+	var sd = JSON.parse_string(JSON.stringify(ch.to_dict()))
+	Game.load_from_dict(sd)
+	ch = Game.ch
+	var locked_after := 0
+	var unlocked_after := 0
+	for it in ch.inventory:
+		if it != null:
+			if CD.is_locked(it):
+				locked_after += 1
+			else:
+				unlocked_after += 1
+	check(locked_after == 2 and unlocked_after == 0, "lock: the lock survives a save and load")
+	# ---- UI: nothing locked can be sold, salvaged or destroyed
+	ui.open("inventory")
+	ui.open("vendor")
+	await frames(2)
+	var p = ui.panels["inventory"]
+	var idx_a := -1
+	var idx_c := -1
+	for i in ch.inventory.size():
+		var it = ch.inventory[i]
+		if it != null and it.get("rarity") == "common":
+			idx_a = i
+		elif it != null and it.get("rarity") == "rare":
+			idx_c = i
+	check(idx_a >= 0 and idx_c >= 0, "lock ui: both locked items are in the bag after loading")
+	var gold0: int = ch.gold
+	var mats0 := JSON.stringify(ch.materials)
+	p.sell(idx_a)
+	check(ch.inventory[idx_a] != null and ch.gold == gold0, "lock ui: a locked item cannot be sold")
+	p.salvage(idx_a)
+	check(ch.inventory[idx_a] != null and JSON.stringify(ch.materials) == mats0, "lock ui: a locked item cannot be salvaged")
+	ui.confirm.visible = false
+	p._destroy(idx_a)
+	check(not ui.confirm.visible and ch.inventory[idx_a] != null, "lock ui: a locked item cannot be destroyed (no dialog either)")
+	# context menu: lock toggle present, sell/destroy greyed out
+	p._context_bag(idx_a, ch.inventory[idx_a])
+	await frames(1)
+	var menu: VBoxContainer = ui.context.get_child(0)
+	var unlock_btn: Button = null
+	var sell_btn: Button = null
+	var destroy_btn: Button = null
+	for ch2 in menu.get_children():
+		if ch2 is Button and not ch2.is_queued_for_deletion():
+			if ch2.text == "Unlock item":
+				unlock_btn = ch2
+			elif ch2.text.begins_with("Sell for"):
+				sell_btn = ch2
+			elif ch2.text == "Destroy":
+				destroy_btn = ch2
+	check(unlock_btn != null and not unlock_btn.disabled, "lock ui: right-click menu offers 'Unlock item' for a locked item")
+	check(sell_btn != null and sell_btn.disabled, "lock ui: Sell is greyed out for a locked item")
+	check(destroy_btn != null and destroy_btn.disabled, "lock ui: Destroy is greyed out for a locked item")
+	# tooltip names the lock
+	ui.item_tooltip(ch.inventory[idx_a], false)
+	check(ui.tooltip_text.text.contains("Locked"), "lock ui: the tooltip says the item is locked")
+	ui.hide_tooltip()
+	# the menu button actually toggles
+	unlock_btn.pressed.emit()
+	await frames(1)
+	check(not CD.is_locked(ch.inventory[idx_a]), "lock ui: pressing Unlock removes the lock")
+	p._context_bag(idx_a, ch.inventory[idx_a])
+	await frames(1)
+	menu = ui.context.get_child(0)
+	var lock_btn: Button = null
+	for ch3 in menu.get_children():
+		if ch3 is Button and not ch3.is_queued_for_deletion() and ch3.text == "Lock item":
+			lock_btn = ch3
+	check(lock_btn != null, "lock ui: an unlocked item offers 'Lock item'")
+	lock_btn.pressed.emit()
+	await frames(1)
+	check(CD.is_locked(ch.inventory[idx_a]), "lock ui: pressing Lock sets the lock")
+	# the Destroy... sweep dialog mentions the locked item that stays
+	p._confirm_destroy_up_to("rare")
+	check(ui.confirm.visible == false, "lock ui: with only locked items left the sweep has nothing to confirm")
+	ch.add_to_bag(_stash_test_item("uncommon", 5))
+	p._confirm_destroy_up_to("rare")
+	check(ui.confirm.visible and ui.confirm_text.text.contains("1 item") and ui.confirm_text.text.contains("2 locked items will be kept"), "lock ui: the sweep dialog says how many locked items are kept")
+	ui._on_confirm()
+	check(ch.inventory[idx_a] != null and ch.inventory[idx_c] != null, "lock ui: the confirmed sweep still leaves the locked items")
+	# unlocked rare can be sold again
+	ch.set_item_locked(ch.inventory[idx_c], false)
+	var g1: int = ch.gold
+	p.sell(idx_c)
+	check(ch.inventory[idx_c] == null and ch.gold > g1, "lock ui: after unlocking, the item can be sold")
+	ui.close_all()
+	await frames(2)
 
 # ------------------------------------------------------------------ developer tools
 const DevRulesT = preload("res://scripts/core/dev_rules.gd")

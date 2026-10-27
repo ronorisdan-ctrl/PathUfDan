@@ -1,0 +1,27 @@
+==== 25 passed, 0 failed ====
+--- item lock
+PASS  lock: items start unlocked and null is never locked
+PASS  lock: set_item_locked(true) marks the item
+PASS  lock: a locked common is skipped by the common sweep
+PASS  lock: sweep candidates exclude locked items (4 items, 2 locked)
+PASS  lock: locked items are counted per rarity cap
+PASS  lock: a full sweep destroys only the unlocked items
+PASS  lock: locked items are still in the bag, unlocked ones are gone
+PASS  lock: unlocking removes the flag entirely (saves stay unchanged)
+PASS  lock: an unlocked item is swept again
+PASS  lock: the lock survives a save and load
+PASS  lock ui: both locked items are in the bag after loading
+PASS  lock ui: a locked item cannot be sold
+PASS  lock ui: a locked item cannot be salvaged
+PASS  lock ui: a locked item cannot be destroyed (no dialog either)
+PASS  lock ui: right-click menu offers 'Unlock item' for a locked item
+PASS  lock ui: Sell is greyed out for a locked item
+PASS  lock ui: Destroy is greyed out for a locked item
+PASS  lock ui: the tooltip says the item is locked
+PASS  lock ui: pressing Unlock removes the lock
+PASS  lock ui: an unlocked item offers 'Lock item'
+PASS  lock ui: pressing Lock sets the lock
+PASS  lock ui: with only locked items left the sweep has nothing to confirm
+PASS  lock ui: the sweep dialog says how many locked items are kept
+PASS  lock ui: the confirmed sweep still leaves the locked items
+PASS  lock ui: after unlocking, the item can be sold

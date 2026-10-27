@@ -301,6 +301,8 @@ func _place_tooltips() -> void:
 func item_tooltip(it: Dictionary, compare: bool) -> void:
 	var ch = Game.ch
 	var main := Loot.tooltip(it, ch)
+	if bool(it.get("locked", false)):
+		main += "\n[color=#ffd060]Locked: cannot be sold, salvaged or destroyed[/color]"
 	var other := ""
 	if compare:
 		var slot: String = ch.slot_for(it)
