@@ -3021,6 +3021,40 @@ func test_training_world() -> void:
 	TrainingLog.clear_history()
 	TrainingLog.discard()
 
+	# ---- the panel (Setup and Result tabs)
+	hub = Game.level
+	p = hub.player
+	var ui = main.ui
+	ui.open_station("training")
+	await frames(2)
+	var tp = ui.panels["training"]
+	check(ui.is_open("training") and tp.visible, "training panel: Rook opens the panel")
+	check(tp.choice_btns["type"].has("aoe") and not tp.spacing_row.visible, "training panel: cluster spacing is hidden for a single-target test")
+	tp.choice_btns["type"]["aoe"].pressed.emit()
+	check(TrainingLog.settings["type"] == "aoe" and tp.spacing_row.visible, "training panel: choosing AoE shows the spacing row")
+	tp.choice_btns["duration"][30].pressed.emit()
+	tp.choice_btns["profile"]["t3_normal"].pressed.emit()
+	check(int(TrainingLog.settings["duration"]) == 30 and TrainingLog.settings["profile"] == "t3_normal", "training panel: option buttons set the test options")
+	check(tp.reset_btn.disabled and tp.remove_btn.disabled, "training panel: Reset and Remove wait until dummies exist")
+	tp._spawn()
+	var hub2 = Game.level
+	check(hub2.training_dummies.size() == 3 and not tp.reset_btn.disabled and not tp.remove_btn.disabled, "training panel: Spawn creates the AoE cluster and enables Reset/Remove", tp.msg_label.text)
+	d = hub2.training_dummies[0]
+	Combat.deal(_tpk("fireball", "spell", 250.0), p, d)
+	tp._show_tab("result")
+	await frames(2)
+	check(tp.result_label.text.contains("running"), "training panel: the Result tab says a test is running")
+	TrainingLog.tick(100.0)
+	await frames(2)
+	check(tp.result_label.text.contains("250") or tp.result_label.text.contains("Fireball") or tp.result_label.text.contains("fireball"), "training panel: the Result tab shows the finished result", tp.result_label.text.substr(0, 200))
+	check(tp.size.y <= 720.0 and tp.size.x <= 640.0, "training panel: fits a 1280x720 window", str(tp.size))
+	tp._reset()
+	check(TrainingLog.last_result.is_empty() and not TrainingLog.is_running(), "training panel: Reset clears the result")
+	tp._remove()
+	check(hub2.training_dummies.is_empty() and tp.reset_btn.disabled, "training panel: Remove clears the dummies")
+	ui.close_all()
+	TrainingLog.reset_settings()
+
 	# ---- ranger: turret and mine damage is credited to the deploying skill
 	Game.new_character("ranger")
 	main.start_game()
