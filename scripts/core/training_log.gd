@@ -96,7 +96,7 @@ func tick(delta: float) -> void:
 		run["recorded"] = true
 		var res := Rules.build_result(run, skill_names(), cfg())
 		res["when"] = session_time()
-		res["snapshot"] = {}
+		res["snapshot"] = build_snapshot()
 		last_result = res
 		_add_to_history(res)
 		emit_signal("result_ready", res)
@@ -110,15 +110,29 @@ func check_dev() -> void:
 	if not active.is_empty():
 		run["dev"] = true
 
-## Result fields can be refreshed after the fact (the build snapshot is attached by the
-## caller, which can see the character).
-func attach_snapshot(snapshot: Dictionary) -> void:
-	if last_result.is_empty():
-		return
-	last_result["snapshot"] = snapshot
-	var h := history()
-	if not h.is_empty() and h[0].get("when") == last_result.get("when"):
-		h[0]["snapshot"] = snapshot
+## What the character looked like when a test finished, for the History tab: name, class,
+## level, specialisation, main/off-hand item names, the hotbar (ids and names) and the
+## number of allocated passives. Plain values only, so it stays valid after gear changes.
+func build_snapshot() -> Dictionary:
+	var ch = Game.ch
+	if ch == null:
+		return {}
+	var spec := ""
+	if str(ch.spec_id) != "":
+		spec = str(Data.specs.get(ch.spec_id, {}).get("name", ch.spec_id))
+	var ids := []
+	var names := []
+	for sid in ch.loadout:
+		ids.append(str(sid))
+		names.append(str(Data.skills.get(sid, {}).get("name", sid)) if str(sid) != "" else "")
+	return {"name": str(ch.char_name), "class": str(ch.class_id), "level": int(ch.level), "spec": spec,
+		"main_hand": _item_name(ch.equipment.get("main_hand")), "off_hand": _item_name(ch.equipment.get("off_hand")),
+		"hotbar": ids, "hotbar_names": names, "passives": ch.allocated.size()}
+
+func _item_name(it) -> String:
+	if typeof(it) == TYPE_DICTIONARY:
+		return str(it.get("name", ""))
+	return ""
 
 # ------------------------------------------------------------------ history (per save slot)
 func _slot_key() -> int:

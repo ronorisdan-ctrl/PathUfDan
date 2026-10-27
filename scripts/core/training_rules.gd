@@ -412,6 +412,13 @@ static func delta_vs_history(result: Dictionary, history: Array, skip: int = 0) 
 			return {"comparable": true, "pct": (float(result["avg_dps"]) - prev) / prev * 100.0, "prev_dps": prev}
 	return {"comparable": false, "pct": 0.0, "prev_dps": 0.0}
 
+## The most recent entry after `skip` that is comparable with `result`, or {}.
+static func previous_comparable(result: Dictionary, history: Array, skip: int = 0) -> Dictionary:
+	for i in range(skip, history.size()):
+		if comparable(result, history[i]):
+			return history[i]
+	return {}
+
 ## New list with `entry` first, capped at `size`; the oldest entry drops off.
 static func push_history(history: Array, entry: Dictionary, size: int) -> Array:
 	var out := [entry]
@@ -458,7 +465,7 @@ static func settings_text(s: Dictionary, cfg: Dictionary, dev: bool = false) -> 
 ##   armour = def.armour * (1 + 0.12 * (lvl - 1)),  life = def.life * (1 + 0.28 * (lvl - 1)) * dungeon.life_mult
 ##   resist[el] = def.resist[el] + dungeon.resist_bonus   (fire, cold, lightning, void)
 ## The level is the dungeon's monster level for this character: clamp(max(char level, min), min, max),
-## +1 for the boss. "normal" averages the dungeon's non-boss pool, "boss" uses the dungeon's boss.
+## +1 for the boss. "normal" averages the dungeon's non-boss pool weighted by spawn weight, "boss" uses the dungeon's boss.
 ## Returns {armour, resist, life, level, poise}. A profile without "tier" has no defences.
 static func profile_defence(profile: Dictionary, dungeons: Array, enemies: Dictionary, ch_level: int) -> Dictionary:
 	var out := {"armour": 0.0, "resist": {}, "life": 0.0, "level": 0, "poise": bool(profile.get("poise", false))}
@@ -549,9 +556,11 @@ static func head_lines(run: Dictionary, result: Dictionary, idx: int, cfg: Dicti
 	var rows_n := int(cfg.get("breakdown_rows_above_head", 3))
 	var line1 := "%s DPS   peak %s (%.1f s)" % [fmt_num(result["avg_dps"]), fmt_num(result["peak_dps"]), float(result["peak_start"])]
 	var sett := settings_text(st, cfg, bool(result.get("dev", false)))
-	var top := top_rows_text(result["breakdown"], rows_n)
+	var top := []   # one short line per breakdown row keeps the label narrow
+	for r in top_rows(result["breakdown"], rows_n):
+		top.append("%s %s" % [r["label"], _pct(r["share"])])
 	if st.get("type", "single") != "aoe":
-		return [line1, sett, top]
+		return [line1, sett] + top
 	var own := ""
 	for r in result.get("per_dummy", []):
 		if int(r["dummy"]) == idx:
@@ -559,7 +568,7 @@ static func head_lines(run: Dictionary, result: Dictionary, idx: int, cfg: Dicti
 	if idx != 1:
 		return [own]
 	var total_line := "Total across %d targets: %s DPS · peak %s (%.1f s)" % [int(run.get("dummies", 3)), fmt_num(result["avg_dps"]), fmt_num(result["peak_dps"]), float(result["peak_start"])]
-	return [total_line, sett, top, own]
+	return [total_line, sett] + top + [own]
 
 ## BBCode for the Result tab. `delta` comes from delta_vs_history (or {}).
 static func result_text(res: Dictionary, cfg: Dictionary, delta: Dictionary) -> String:
@@ -597,3 +606,86 @@ static func result_text(res: Dictionary, cfg: Dictionary, delta: Dictionary) -> 
 	tbl.append("[/table]")
 	lines.append("".join(tbl))
 	return "\n".join(lines)
+
+# ------------------------------------------------------------------ build snapshot and history rows
+## "just now", "45 s ago", "12 min ago", "1 h 5 min ago" (game session time, not wall-clock dates).
+static func fmt_ago(when: float, now: float) -> String:
+	var s := int(maxf(0.0, now - when))
+	if s < 5:
+		return "just now"
+	if s < 60:
+		return "%d s ago" % s
+	var mins := int(floor(float(s) / 60.0))
+	if mins < 60:
+		return "%d min ago" % mins
+	return "%d h %d min ago" % [int(floor(float(mins) / 60.0)), mins % 60]
+
+static func _or_none(v) -> String:
+	var t := str(v)
+	return t if t != "" else "none"
+
+## Plain-text lines describing the build a result was made with. `snap` is what
+## TrainingLog.build_snapshot() stored; an empty snapshot gives no lines.
+static func snapshot_lines(snap: Dictionary) -> Array:
+	if snap.is_empty():
+		return []
+	var who := "%s, level %d %s" % [str(snap.get("name", "?")), int(snap.get("level", 1)), str(snap.get("class", "")).capitalize()]
+	if str(snap.get("spec", "")) != "":
+		who += ", " + str(snap["spec"])
+	var bar := []
+	for n in snap.get("hotbar_names", []):
+		if str(n) != "":
+			bar.append(str(n))
+	return [who,
+		"Main hand: %s   Off hand: %s" % [_or_none(snap.get("main_hand", "")), _or_none(snap.get("off_hand", ""))],
+		"Hotbar: " + (", ".join(bar) if not bar.is_empty() else "empty"),
+		"Allocated passives: %d" % int(snap.get("passives", 0))]
+
+## What differs between a newer snapshot `a` and an older one `b`, as short phrases.
+## Empty when either has no snapshot or nothing changed.
+static func snapshot_changes(a: Dictionary, b: Dictionary) -> Array:
+	var out := []
+	if a.is_empty() or b.is_empty():
+		return out
+	if int(a.get("level", 0)) != int(b.get("level", 0)):
+		out.append("level %d to %d" % [int(b.get("level", 0)), int(a.get("level", 0))])
+	if str(a.get("spec", "")) != str(b.get("spec", "")):
+		out.append("specialisation %s to %s" % [_or_none(b.get("spec", "")), _or_none(a.get("spec", ""))])
+	if str(a.get("main_hand", "")) != str(b.get("main_hand", "")):
+		out.append("main hand %s to %s" % [_or_none(b.get("main_hand", "")), _or_none(a.get("main_hand", ""))])
+	if str(a.get("off_hand", "")) != str(b.get("off_hand", "")):
+		out.append("off hand %s to %s" % [_or_none(b.get("off_hand", "")), _or_none(a.get("off_hand", ""))])
+	var ha: Array = a.get("hotbar_names", [])
+	var hb: Array = b.get("hotbar_names", [])
+	for i in maxi(ha.size(), hb.size()):
+		var x := str(ha[i]) if i < ha.size() else ""
+		var y := str(hb[i]) if i < hb.size() else ""
+		if x != y:
+			out.append("slot %d %s to %s" % [i + 1, _or_none(y), _or_none(x)])
+	if int(a.get("passives", 0)) != int(b.get("passives", 0)):
+		out.append("passives %d to %d" % [int(b.get("passives", 0)), int(a.get("passives", 0))])
+	return out
+
+## One History row, as two lines: [when, test type, average and peak DPS, change vs the
+## previous comparable entry] and the settings text (duration, counting, profile, spacing, DEV).
+static func history_row_lines(entry: Dictionary, delta: Dictionary, now: float, cfg: Dictionary) -> Array:
+	var st: Dictionary = entry["settings"]
+	var kind := "AoE" if st.get("type", "single") == "aoe" else "Single"
+	var parts := [fmt_ago(float(entry.get("when", 0.0)), now), kind,
+			"%s DPS" % fmt_num(entry["avg_dps"]), "peak %s" % fmt_num(entry["peak_dps"])]
+	if delta.size() > 0:
+		parts.append(fmt_delta(delta))
+	return [" · ".join(parts), settings_text(st, cfg, bool(entry.get("dev", false)))]
+
+## BBCode shown when a History row is expanded: the full result, the build it was made
+## with and what changed since the previous comparable entry.
+static func history_detail_text(entry: Dictionary, delta: Dictionary, prev_snapshot: Dictionary, cfg: Dictionary) -> String:
+	var out := result_text(entry, cfg, delta)
+	var snap: Dictionary = entry.get("snapshot", {})
+	var lines := snapshot_lines(snap)
+	if not lines.is_empty():
+		out += "\n\n[b]Build when tested[/b]\n" + "\n".join(lines)
+		var ch := snapshot_changes(snap, prev_snapshot)
+		if not ch.is_empty():
+			out += "\n[color=#ffd080]Changed since the previous comparable test: " + "; ".join(ch) + "[/color]"
+	return out

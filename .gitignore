@@ -3,3 +3,4 @@
 tests/last_results.txt
 tests/train_only_results.txt
 tests/smartbot/out/tg_*
+tests/screens_out_training/

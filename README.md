@@ -74,6 +74,23 @@ through `level.pickup()`, which re-checks the loot filter, the pet's rarity cap,
 bag space and the single-claim rule at the moment of collection. Pets are off
 under `Game.testing` (tests and bots) unless `Game.pets_in_tests` is set.
 
+### Training Grounds
+
+Talk to **Drillmaster Rook** in the hub (Setup tab) to spawn a test dummy, or a cluster of three for an
+AoE test. Choose the duration (10 s / 30 s), whether All sources or Player only count (Player only drops
+minions, turrets and traps), a defence profile (none, a Tier 3 normal enemy, a Tier 6 boss with a poise
+bar) and, for AoE, Tight or Spread. The first counted hit starts the timer; when it ends the dummy shows
+average DPS, peak second, the settings and the top damage sources above its head, and the Result tab
+shows the full breakdown (damage, share, DPS and hits per skill; per-dummy table and average targets per
+cast for AoE). The History tab keeps the last 5 tests for each character (this session only): click a
+row to see its breakdown, the build it was made with (gear, hotbar, level, passives) and what changed
+since the previous comparable test. "Clear history" asks first. Tests are only comparable if type,
+duration, counting, profile (and spacing for AoE) match and both are, or are not, marked DEV (a
+damage-changing Developer-tools flag was on). Summons, deployables and buffs work in the hub only while
+dummies exist. All numbers and wording are in `data/training.json`. The dummy cannot die, move or be
+stunned, takes damage through the normal combat path and changes nothing about how combat works;
+training is off under `Game.testing` unless `Game.training_in_tests` is set.
+
 ## Architecture
 
 ```
@@ -84,6 +101,8 @@ scripts/core/         Autoloads and state
   events.gd           Global signal bus                         (autoload Events)
   game.gd             Character, settings, input map, save/load (autoload Game)
   loot.gd             Item generation, affixes, drops, crafting (autoload Loot)
+  training_rules.gd   Pure Training Grounds maths: window, DPS, breakdown, history, text
+  training_log.gd     Training session, results and per-character history (autoload TrainingLog)
   stat_block.gd       Modifier aggregation: flat / increased / more, with sources
   character_data.gd   Level, passives, inventory, equipment, stat resolution, save format
 scripts/combat/
@@ -117,6 +136,8 @@ xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_tiers.tsc
 xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens.tscn -- ranger /tmp/shots
 xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_s3.tscn   # skills, runes, specialisations
 xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_s4.tscn   # passive web, jeweller, charms
+godot --headless --fixed-fps 60 --path . res://tests/train_only.tscn -- world    # Training Grounds checks only (~160, about 1 minute)
+godot --path . res://tests/screens_training.tscn -- /tmp/training                 # Training Grounds screenshots (needs a display)
 ```
 
 ## Implemented in this slice
@@ -140,9 +161,11 @@ xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_s4.tscn  
 * Statuses: ignite, chill, freeze, shock (scaling magnitude), bleed, poison, stun, intimidate, frailty, marked, snare, agony; execute and range-based damage conditions.
 * Elite modifiers (10) including damage shields, summoners and blinkers.
 * Combat feedback: damage numbers, crits, hit flash, screen shake, telegraphs, status tints (ignite, chill, shock, bleed, stun).
+* Training Grounds: Drillmaster Rook, single-target and three-dummy AoE DPS tests (10 s / 30 s, All sources or Player only, three defence profiles, Tight or Spread), per-skill attribution (statuses, minions, turrets and traps are credited to the skill that caused them), Result and History tabs with comparable-result deltas and build snapshots. Nothing in it changes gameplay or the save format.
 
 ## Known limitations / next steps
 
+* Training Grounds history is kept in memory for the session only (lost when the game closes); a per-character file is a possible later addition. The T3/T6 defence profiles use the tier's dungeon data (a spawn-weighted average of its normal enemies, or its boss) at your character's level, not a specific enemy. Passive and item procs that carry no skill are listed under "Other". There is no mortal-mode dummy and no damage-taken or movement measurement yet.
 * Higher tiers are tuned with the autoplay bot (which never dodges); expect to refine numbers after real play.
 * Skill catalogue is 80 of ~146 listed skills. New skills are mostly JSON entries using existing behaviours; channelled and transform skills need new behaviours.
 * Sound effects are procedural; no music yet; no controller bindings yet (all input goes through the input map, so adding a pad is a binding change).

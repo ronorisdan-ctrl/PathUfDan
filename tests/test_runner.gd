@@ -2798,6 +2798,32 @@ func test_training() -> void:
 	Game.current_slot = 92
 	check(TrainingLog.history().is_empty(), "training: Clear history only clears the current character")
 	Game.current_slot = old_slot
+	# ---- history rows, build snapshots and what changed
+	check(R.fmt_ago(100.0, 102.0) == "just now" and R.fmt_ago(100.0, 145.0) == "45 s ago" and R.fmt_ago(0.0, 750.0) == "12 min ago" and R.fmt_ago(0.0, 3900.0) == "1 h 5 min ago", "training: 'ago' text reads just now / s / min / h")
+	var snap_a := {"name": "Dan", "class": "mage", "level": 12, "spec": "", "main_hand": "Oak Staff", "off_hand": "", "hotbar": ["firebolt", "frost_nova", "", "", "", "", ""], "hotbar_names": ["Firebolt", "Frost Nova", "", "", "", "", ""], "passives": 7}
+	var snap_b := snap_a.duplicate(true)
+	snap_b["level"] = 13
+	snap_b["main_hand"] = "Yew Staff"
+	snap_b["hotbar_names"][2] = "Meteor"
+	snap_b["passives"] = 9
+	var sl: Array = R.snapshot_lines(snap_a)
+	check(sl.size() == 4 and sl[0] == "Dan, level 12 Mage" and "Oak Staff" in sl[1] and "none" in sl[1] and sl[2] == "Hotbar: Firebolt, Frost Nova" and sl[3] == "Allocated passives: 7", "training: snapshot lines name the character, gear, hotbar and passives", str(sl))
+	check(R.snapshot_lines({}).is_empty(), "training: an empty snapshot gives no lines")
+	var chg: Array = R.snapshot_changes(snap_b, snap_a)
+	check(chg.size() == 4 and R.snapshot_changes(snap_a, snap_a).is_empty() and R.snapshot_changes({}, snap_a).is_empty(), "training: snapshot changes list level, main hand, hotbar slot and passives", str(chg))
+	var e_old := {"settings": {"type": "single", "duration": 10, "counting": "all", "profile": "none", "spacing": "tight"}, "avg_dps": 1000.0, "peak_dps": 1500.0, "dev": false, "when": 10.0, "snapshot": snap_a, "breakdown": [], "total": 10000.0, "hits": 10, "crit_rate": 0.0, "avg_hit": 1000.0, "biggest_hit": 1000.0, "duration": 10.0, "peak_start": 1.0}
+	var e_new := e_old.duplicate(true)
+	e_new["avg_dps"] = 1100.0
+	e_new["when"] = 70.0
+	e_new["snapshot"] = snap_b
+	var e_other := e_old.duplicate(true)
+	e_other["settings"]["duration"] = 30
+	var hist_l := [e_new, e_other, e_old]
+	check(R.previous_comparable(e_new, hist_l, 1) == e_old and R.previous_comparable(e_old, hist_l, 3).is_empty(), "training: the previous comparable entry skips entries with other settings")
+	var rl: Array = R.history_row_lines(e_new, R.delta_vs_history(e_new, hist_l, 1), 130.0, cfg)
+	check(rl.size() == 2 and "1 min ago" in rl[0] and "Single" in rl[0] and "1,100 DPS" in rl[0] and "peak 1,500" in rl[0] and "+10%" in rl[0] and "10 s" in rl[1], "training: a History row shows when, type, DPS, peak and the change", str(rl))
+	var dt: String = R.history_detail_text(e_new, R.delta_vs_history(e_new, hist_l, 1), snap_a, cfg)
+	check("Build when tested" in dt and "Changed since the previous comparable test" in dt and "main hand Oak Staff to Yew Staff" in dt, "training: a History detail shows the build and the changes", dt.substr(max(0, dt.length() - 240)))
 	TrainingLog.clear_history()
 	TrainingLog.history_by_slot.erase(91)
 	TrainingLog.history_by_slot.erase(92)
@@ -2937,7 +2963,35 @@ func test_training_world() -> void:
 	for i in 40:
 		Combat.deal(_tpk("fireball", "spell", 5.0e6), p, d)
 	check(int(TrainingLog.run["poise_breaks"]) >= 1, "training world: poise breaks on the boss dummy are counted", str(TrainingLog.run["poise_breaks"]))
+	var bpos: Vector2 = d.global_position
+	var pcfg: Dictionary = Data.stun_cfg["poise"]
+	await frames(int((float(pcfg["stagger_duration"]) + float(pcfg["immunity_after_stagger"]) + 1.0) * 60.0))
+	check(d.global_position.distance_to(bpos) < 0.01 and d.alive, "training world: the boss dummy does not move or stagger away after a poise break")
+	var part: float = d.poise_life * float(pcfg["fill_fraction"]) * 0.5
+	Combat.deal(_tpk("fireball", "spell", part), p, d)
+	var poise_up: float = float(d.poise_state["poise"])
+	await frames(int((float(pcfg["regen_delay"]) + 100.0 / float(pcfg["regen_per_sec"]) + 1.0) * 60.0))
+	check(poise_up > 10.0 and float(d.poise_state["poise"]) < 0.01, "training world: poise fills from hits and drains back to empty", "%s -> %s" % [poise_up, d.poise_state["poise"]])
 	TrainingLog.set_option("profile", "none")
+	# ---- pausing stops the countdown
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	Combat.deal(_tpk("fireball"), p, d)
+	var el0: float = float(TrainingLog.run["elapsed"])
+	get_tree().paused = true
+	await frames(30)
+	var el_paused: float = float(TrainingLog.run["elapsed"])
+	get_tree().paused = false
+	await frames(30)
+	var el_run: float = float(TrainingLog.run["elapsed"])
+	check(is_equal_approx(el_paused, el0) and el_run > el_paused + 0.3, "training world: pausing stops the countdown and it resumes afterwards", "%s %s %s" % [el0, el_paused, el_run])
+	Engine.time_scale = 2.0
+	var ts0: float = float(TrainingLog.run["elapsed"])
+	await frames(60)
+	var ts1: float = float(TrainingLog.run["elapsed"])
+	Engine.time_scale = 1.0
+	check(ts1 - ts0 > 0.9, "training world: game time still advances per physics frame with a Dev time scale", "%s" % (ts1 - ts0))
+	hub.training_remove()
 
 	# ---- spawn replaces; remove discards a running test
 	hub.training_spawn()
@@ -3048,6 +3102,51 @@ func test_training_world() -> void:
 	await frames(2)
 	check(tp.result_label.text.contains("250") or tp.result_label.text.contains("Fireball") or tp.result_label.text.contains("fireball"), "training panel: the Result tab shows the finished result", tp.result_label.text.substr(0, 200))
 	check(tp.size.y <= 720.0 and tp.size.x <= 640.0, "training panel: fits a 1280x720 window", str(tp.size))
+	# ---- build snapshot and the History tab
+	var hist: Array = TrainingLog.history()
+	var snap: Dictionary = hist[0].get("snapshot", {}) if hist.size() > 0 else {}
+	var mh = ch.equipment.get("main_hand")
+	check(snap.get("name") == ch.char_name and snap.get("class") == "mage" and int(snap.get("level", 0)) == ch.level and snap.get("hotbar", []).size() == 7 and snap.get("main_hand") == (mh["name"] if mh != null else "") and int(snap.get("passives", -1)) == ch.allocated.size(), "training history: a finished test stores the build snapshot", str(snap))
+	ch.loadout[3] = "frost_nova"
+	tp._remove()
+	tp._spawn()
+	var d3 = Game.level.training_dummies[0]
+	Combat.deal(_tpk("fireball", "spell", 500.0), p, d3)
+	TrainingLog.tick(100.0)
+	check(TrainingLog.history().size() == 2 and TrainingLog.history()[0]["snapshot"]["hotbar"][3] == "frost_nova" and TrainingLog.history()[1]["snapshot"]["hotbar"][3] != "frost_nova", "training history: the second test is stored first with its own snapshot")
+	tp._show_tab("history")
+	await frames(2)
+	var rows := 0
+	var first_btn: Button = null
+	for c in tp.history_list.get_children():
+		if c is Button:
+			rows += 1
+			if first_btn == null:
+				first_btn = c
+	check(rows == 2 and not tp.clear_btn.disabled, "training history: the History tab lists one row per test")
+	first_btn.pressed.emit()
+	await frames(2)
+	var detail := ""
+	for c in tp.history_list.get_children():
+		if c is RichTextLabel:
+			detail = c.text
+	check(tp.open_row == 0 and detail.contains("Build when tested") and detail.contains("Changed since the previous comparable test") and detail.contains("slot 4"), "training history: clicking a row shows its build and what changed", detail.substr(max(0, detail.length() - 260)))
+	for c in tp.history_list.get_children():   # the list is rebuilt on every refresh: find the button again
+		if c is Button:
+			first_btn = c
+			break
+	first_btn.pressed.emit()
+	await frames(2)
+	check(tp.open_row == -1, "training history: clicking the row again collapses it")
+	tp._ask_clear()
+	check(ui.confirm.visible, "training history: Clear history asks for confirmation")
+	ui._on_cancel()
+	check(TrainingLog.history().size() == 2, "training history: cancelling keeps the history")
+	tp._ask_clear()
+	ui._on_confirm()
+	await frames(2)
+	check(TrainingLog.history().is_empty() and tp.clear_btn.disabled, "training history: confirming clears this character's history")
+	tp._show_tab("result")
 	tp._reset()
 	check(TrainingLog.last_result.is_empty() and not TrainingLog.is_running(), "training panel: Reset clears the result")
 	tp._remove()

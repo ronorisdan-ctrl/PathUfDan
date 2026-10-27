@@ -157,9 +157,22 @@ func _draw() -> void:
 		draw_rect(Rect2(-w / 2.0 + 0.5, 5.5, (w - 1.0) * frac, 2.0), Color("#fff0a0") if _poise_flash > 0.0 else Color("#e8c050"))
 	if count > 1:
 		var nt := str(idx)
-		draw_string(f, Vector2(-2.0, 17.0), nt, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color(1, 1, 1, 0.55))
+		draw_string(f, Vector2(9.0, 4.0), nt, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color(1, 1, 1, 0.55))
 	var lines: Array = TrainingLog.head_lines(idx)
-	var y := -24.0
+	# AoE result: dummies 2 and 3 show only their own "DPS . share" line, under their feet so it
+	# never lands on dummy 1's label stack (the cluster is only 24 units across when tight).
+	if count > 1 and idx != 1 and bool(TrainingLog.run.get("finished", false)) and not TrainingLog.last_result.is_empty() and lines.size() == 1:
+		var own: String = lines[0]
+		var ow := f.get_string_size(own, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
+		var ox := -ow / 2.0
+		if idx == 2:        # the lower-right dummy: text runs to the right
+			ox = -6.0
+		elif idx == 3:      # the lower-left dummy: text runs to the left, so the two never overlap
+			ox = 6.0 - ow
+		draw_string_outline(f, Vector2(ox, 24.0), own, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, 3, Color(0, 0, 0, 0.9))
+		draw_string(f, Vector2(ox, 24.0), own, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("#ffe080"))
+		return
+	var y := -44.0   # clears the station labels (Rook's name) next to the dummy
 	for i in range(lines.size() - 1, -1, -1):
 		var fs := 8
 		var col := Color("#e0d8c8")

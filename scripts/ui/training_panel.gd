@@ -17,6 +17,11 @@ var choice_btns := {}     # option key -> {value: Button}
 var spawn_btn: Button
 var reset_btn: Button
 var remove_btn: Button
+var history_box: VBoxContainer
+var history_list: VBoxContainer
+var clear_btn: Button
+var history_note: Label
+var open_row := -1        # History row that is expanded (-1 = none)
 
 func _init() -> void:
 	place = "left"
@@ -24,7 +29,7 @@ func _init() -> void:
 	body.add_child(UIKit.label("\"Hit the dummy. The clock starts on your first blow.\"", 12, UIKit.MUTED))
 	var tabs := HBoxContainer.new()
 	body.add_child(tabs)
-	for t in [["setup", "Setup"], ["result", "Result"]]:
+	for t in [["setup", "Setup"], ["result", "Result"], ["history", "History"]]:
 		var b := UIKit.button(t[1], _show_tab.bind(t[0]), 90)
 		tabs.add_child(b)
 		tab_btns[t[0]] = b
@@ -77,6 +82,23 @@ func _init() -> void:
 	result_box.add_child(sc)
 	result_label = UIKit.rich("", 450)
 	sc.add_child(result_label)
+	# ---- History tab
+	history_box = VBoxContainer.new()
+	body.add_child(history_box)
+	var hsc := ScrollContainer.new()
+	hsc.custom_minimum_size = Vector2(470, 300)
+	hsc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	history_box.add_child(hsc)
+	history_list = VBoxContainer.new()
+	history_list.custom_minimum_size = Vector2(450, 0)
+	history_list.add_theme_constant_override("separation", 4)
+	hsc.add_child(history_list)
+	var hfoot := HBoxContainer.new()
+	clear_btn = UIKit.button("Clear history", _ask_clear, 120)
+	hfoot.add_child(clear_btn)
+	history_note = UIKit.label("", 12, UIKit.MUTED)
+	hfoot.add_child(history_note)
+	history_box.add_child(hfoot)
 	TrainingLog.result_ready.connect(func(_r): refresh())
 
 func _choice_row(title: String, key: String, choices: Array) -> HBoxContainer:
@@ -121,6 +143,7 @@ func refresh() -> void:
 		return
 	setup_box.visible = tab == "setup"
 	result_box.visible = tab == "result"
+	history_box.visible = tab == "history"
 	for t in tab_btns:
 		tab_btns[t].disabled = t == tab
 	var s: Dictionary = TrainingLog.settings
@@ -135,7 +158,64 @@ func refresh() -> void:
 	if not TrainingLog.available():
 		note_label.text = "Training is switched off while the game is under test."
 	_refresh_result()
+	if tab == "history":
+		_refresh_history()
 	reposition()
+
+var _live_t := 0.0
+
+## While a test runs, keep the countdown on the Result tab current (five times a second).
+func _process(delta: float) -> void:
+	if not visible or tab != "result" or not TrainingLog.is_running():
+		return
+	_live_t -= delta
+	if _live_t <= 0.0:
+		_live_t = 0.2
+		_refresh_result()
+
+func _refresh_history() -> void:
+	for c in history_list.get_children():
+		history_list.remove_child(c)
+		c.queue_free()
+	var cfg: Dictionary = Data.training_cfg
+	var h: Array = TrainingLog.history()
+	clear_btn.disabled = h.is_empty()
+	history_note.text = "  Last %d tests for this character, this session." % int(cfg.get("history_size", 5))
+	if h.is_empty():
+		history_list.add_child(UIKit.label("No tests yet. Finished tests are listed here, newest first.", 12, UIKit.MUTED))
+		return
+	if open_row >= h.size():
+		open_row = -1
+	var now := TrainingLog.session_time()
+	for i in h.size():
+		var e: Dictionary = h[i]
+		var delta := TrainingRules.delta_vs_history(e, h, i + 1)
+		var lines := TrainingRules.history_row_lines(e, delta, now, cfg)
+		var b := Button.new()
+		b.text = ("v  " if i == open_row else ">  ") + str(lines[0])
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.clip_text = true
+		b.custom_minimum_size = Vector2(440, 0)
+		b.add_theme_font_size_override("font_size", 12)
+		b.pressed.connect(_toggle_row.bind(i))
+		history_list.add_child(b)
+		history_list.add_child(UIKit.label("     " + str(lines[1]), 11, UIKit.MUTED))
+		if i == open_row:
+			var prev := TrainingRules.previous_comparable(e, h, i + 1)
+			var rt := UIKit.rich(TrainingRules.history_detail_text(e, delta, prev.get("snapshot", {}), cfg), 430)
+			history_list.add_child(rt)
+
+func _toggle_row(i: int) -> void:
+	open_row = -1 if open_row == i else i
+	refresh()
+
+func _ask_clear() -> void:
+	ui.ask("Clear this character's training history?", Callable(self, "_do_clear"))
+
+func _do_clear() -> void:
+	TrainingLog.clear_history()
+	open_row = -1
+	refresh()
 
 func _refresh_result() -> void:
 	var cfg: Dictionary = Data.training_cfg
