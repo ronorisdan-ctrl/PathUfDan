@@ -20,6 +20,7 @@ var testing := false
 var filter_in_tests := false   # loot filter tests turn the filter on while testing
 var pets_in_tests := false   # pet tests turn pets on while testing
 var dev_in_tests := false    # developer tools tests turn dev tools on while testing
+var training_in_tests := false   # training tests turn the Training Grounds on while testing
 var base_time_scale := 1.0   # world speed outside hit-stop (developer tools time scale)
 var save_dir := SAVE_DIR   # tests point this at a scratch folder
 var current_slot := 1

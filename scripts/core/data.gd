@@ -44,6 +44,7 @@ var pet_list := []
 var pets := {}
 var stash_cfg := {}   # data/stash.json: tab size, tab price curve, tab cap
 var dev_cfg := {}     # data/dev_tools.json: developer tools presets
+var training_cfg := {}  # data/training.json: Training Grounds tuning
 var load_errors := []
 
 func _ready() -> void:
@@ -84,6 +85,7 @@ func load_all() -> void:
 	pets = _index(pet_list)
 	stash_cfg = _load("stash")
 	dev_cfg = _load("dev_tools")
+	training_cfg = _load("training")
 	if load_errors.size() > 0:
 		push_error("Data load errors: " + str(load_errors))
 

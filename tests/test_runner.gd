@@ -58,6 +58,7 @@ func _ready() -> void:
 	await test_crafting()
 	await test_boss_and_death()
 	await test_dev_tools()
+	test_training()
 	test_save_load()
 	test_save_slots()
 	await test_ui()
@@ -2528,3 +2529,275 @@ func test_dev_tools() -> void:
 	Game.settings["dev_tools"] = false
 	Dev.reset_flags()
 	Game.ch = old_ch
+
+
+# ------------------------------------------------------------------ training grounds
+const TrainingRulesT = preload("res://scripts/core/training_rules.gd")
+
+func _tev(kind: String, amount: float, skill: String = "fireball", status: String = "", crit: bool = false, dummy: int = 1, cast: int = -1) -> Dictionary:
+	return {"kind": kind, "amount": amount, "skill_id": skill, "status_id": status, "crit": crit, "dummy": dummy, "cast_id": cast}
+
+func _trun(counting: String = "all", dur: int = 10, type: String = "single") -> Dictionary:
+	var s: Dictionary = TrainingRulesT.default_settings(Data.training_cfg)
+	s["counting"] = counting
+	s["duration"] = dur
+	s["type"] = type
+	return TrainingRulesT.new_run(s, 3 if type == "aoe" else 1)
+
+func test_training() -> void:
+	print("\n--- training grounds (rules and history)")
+	_log("--- training grounds (rules and history)")
+	var R = TrainingRulesT
+	var cfg: Dictionary = Data.training_cfg
+	check(Data.load_errors.is_empty() and not cfg.is_empty(), "training: data/training.json loads")
+	var durs: Array = cfg.get("durations", [])
+	check(durs.size() == 2 and int(durs[0]) == 10 and int(durs[1]) == 30 and int(cfg.get("history_size", 0)) == 5, "training: durations 10/30 and history size 5 come from data")
+	check(cfg["profiles"].has("none") and cfg["profiles"].has("t3_normal") and cfg["profiles"].has("t6_boss"), "training: the three defence profiles exist")
+	# ---- window start
+	var run := _trun()
+	check(R.record(run, _tev("dot", 50.0, "fireball", "ignite")) == "ignored_idle" and not run["started"], "training: a DoT tick alone never starts the window")
+	check(R.record(run, _tev("hit", 100.0)) == "counted" and run["started"] and run["events"][0]["t"] == 0.0, "training: the first direct hit starts the window and counts at t=0")
+	R.tick(run, 1.0, 2.0)
+	check(R.record(run, _tev("dot", 30.0, "fireball", "ignite")) == "counted" and is_equal_approx(run["events"][1]["t"], 1.0), "training: DoT ticks count once the window runs (t = game time since start)")
+	var pr := _trun("player")
+	check(R.record(pr, _tev("minion", 80.0, "summon_skeleton")) == "ignored_source" and not pr["started"], "training: Player only - a minion hit neither counts nor starts the window")
+	check(R.record(pr, _tev("deployable", 80.0, "fire_trap")) == "ignored_source" and not pr["started"], "training: Player only - a trap/turret hit neither counts nor starts the window")
+	check(R.record(pr, _tev("dot", 20.0, "fireball", "ignite")) == "ignored_idle", "training: Player only - a DoT tick before the first hit is ignored")
+	check(R.record(pr, _tev("hit", 10.0)) == "counted" and pr["started"], "training: Player only - the player's own hit starts the window")
+	var ar := _trun("all")
+	check(R.record(ar, _tev("minion", 5.0, "summon_skeleton")) == "counted" and ar["started"], "training: All sources - a minion hit starts the window")
+	var ar2 := _trun("all")
+	check(R.record(ar2, _tev("minion", 5.0, "summon_skeleton", "ignite")) == "ignored_idle", "training: a minion-applied ignite tick is a tick, so it cannot start the window")
+	check(not R.event_is_direct(_tev("deployable", 5.0, "fire_trap", "ignite")) and R.event_is_direct(_tev("deployable", 5.0, "fire_trap")), "training: status ticks are never direct hits, whoever applied them")
+	# ---- window end (half-open [0, duration))
+	var er := _trun("all", 10)
+	R.record(er, _tev("hit", 10.0))
+	for i in 99:
+		R.tick(er, 0.1, 2.0)
+	check(R.is_running(er) and R.record(er, _tev("hit", 5.0)) == "counted", "training: a hit just before the end counts")
+	R.tick(er, 0.1, 2.0)
+	check(er["finished"] and is_equal_approx(er["elapsed"], 10.0), "training: the window ends after exactly the chosen duration")
+	check(R.record(er, _tev("hit", 99.0)) == "ignored_ended" and R.total_damage(er["events"]) == 15.0, "training: a hit at exactly the end time and later is ignored (window is [0, duration))")
+	check(not R.can_start(er), "training: the restart grace blocks a new test right after the result")
+	R.tick(er, 1.0, 2.0)
+	check(not R.can_start(er), "training: still blocked after 1 s of a 2 s grace")
+	R.tick(er, 1.5, 2.0)
+	check(R.can_start(er), "training: a new test may start once the grace is over")
+	var pz := _trun()
+	R.record(pz, _tev("hit", 1.0))
+	R.tick(pz, 0.0, 2.0)
+	check(is_equal_approx(pz["elapsed"], 0.0), "training: no game time passing (pause) means no countdown")
+	# ---- averages and peak
+	var ev30 := []
+	ev30.append({"t": 0.0, "amount": 3000.0, "kind": "hit", "skill_id": "a", "status_id": "", "crit": false, "dummy": 1})
+	check(is_equal_approx(R.average_dps(ev30, 10.0), 300.0) and is_equal_approx(R.average_dps(ev30, 30.0), 100.0), "training: average DPS = total / full duration (10 s and 30 s)")
+	var burst := [
+		{"t": 0.2, "amount": 100.0, "kind": "hit", "skill_id": "a", "status_id": ""},
+		{"t": 0.9, "amount": 400.0, "kind": "hit", "skill_id": "a", "status_id": ""},
+		{"t": 1.1, "amount": 400.0, "kind": "hit", "skill_id": "a", "status_id": ""},
+		{"t": 5.0, "amount": 700.0, "kind": "hit", "skill_id": "a", "status_id": ""},
+	]
+	var pk: Dictionary = R.peak_window(burst, 1.0)
+	check(is_equal_approx(pk["dps"], 900.0) and is_equal_approx(pk["start"], 0.2), "training: a burst crossing a whole-second boundary is one window (900 from t=0.2)", str(pk))
+	var pk2: Dictionary = R.peak_window([{"t": 0.0, "amount": 500.0, "kind": "hit"}, {"t": 1.0, "amount": 500.0, "kind": "hit"}], 1.0)
+	check(is_equal_approx(pk2["dps"], 500.0), "training: events exactly 1.0 s apart are not in the same window", str(pk2))
+	var pk3: Dictionary = R.peak_window([], 1.0)
+	check(pk3["dps"] == 0.0, "training: peak second of an empty test is 0")
+	var late := [{"t": 1.0, "amount": 100.0, "kind": "hit"}, {"t": 6.0, "amount": 100.0, "kind": "hit"}]
+	check(is_equal_approx(R.peak_window(late, 1.0)["start"], 1.0), "training: ties keep the earliest peak second")
+	# ---- hit stats ignore ticks
+	var mix := [
+		_tev("hit", 100.0, "a", "", true), _tev("hit", 300.0, "a", "", false),
+		_tev("dot", 1000.0, "a", "ignite"), _tev("minion", 200.0, "m", "", false),
+	]
+	for i in mix.size():
+		mix[i]["t"] = float(i)
+	check(R.direct_hits(mix) == 3, "training: direct hits are hit/minion/deployable, DoT ticks are not hits")
+	check(is_equal_approx(R.crit_rate(mix), 1.0 / 3.0), "training: crit rate ignores DoT ticks")
+	check(is_equal_approx(R.average_hit(mix), 200.0) and is_equal_approx(R.biggest_hit(mix), 300.0), "training: average and biggest hit ignore DoT ticks")
+	# ---- breakdown and attribution
+	var names := {"fireball": "Fireball", "summon_skeleton": "Skeleton Warriors", "fire_trap": "Fire Trap"}
+	var brk := [
+		_tev("hit", 400.0, "fireball"), _tev("dot", 200.0, "fireball", "ignite"),
+		_tev("minion", 150.0, "summon_skeleton"), _tev("deployable", 100.0, "fire_trap"),
+		_tev("hit", 50.0, "passive"), _tev("hit", 100.0, ""),
+	]
+	for i in brk.size():
+		brk[i]["t"] = float(i) * 0.1
+	var rows: Array = R.breakdown(brk, 10.0, names, cfg)
+	check(rows.size() == 6 and rows[0]["label"] == "Fireball" and is_equal_approx(rows[0]["damage"], 400.0), "training: breakdown is sorted by damage, highest first")
+	var labels := []
+	for r in rows:
+		labels.append(r["label"])
+	check(labels.has("Ignite (from Fireball)"), "training: a DoT is credited to the skill that applied it (sub-row)", str(labels))
+	check(labels.has("Skeleton Warriors (minions)") and labels.has("Fire Trap (deployed)"), "training: minion and deployable rows carry their tags", str(labels))
+	check(labels.has("Passive and item effects") and labels.has("Other"), "training: passive effects and unknown sources get their own rows", str(labels))
+	var sum_exact := 0.0
+	var sum_text := 0.0
+	for r in rows:
+		sum_exact += r["share"]
+		sum_text += r["share_text"]
+	check(absf(sum_exact - 100.0) < 0.0001 and absf(sum_text - 100.0) < 0.0001, "training: breakdown shares sum to 100% (exact and rounded)", "%f %f" % [sum_exact, sum_text])
+	var thirds: Array = R.round_shares([100.0 / 3.0, 100.0 / 3.0, 100.0 / 3.0])
+	check(absf(thirds[0] + thirds[1] + thirds[2] - 100.0) < 0.0001, "training: thirds round to exactly 100.0 (largest remainder)", str(thirds))
+	check(is_equal_approx(rows[0]["dps"], 40.0), "training: row DPS = row damage / duration")
+	check(R.top_rows(rows, 3).size() == 3, "training: the head label shows the top 3 rows")
+	# a trap-applied ignite is excluded in Player only, a player-applied one is kept
+	var po := _trun("player")
+	R.record(po, _tev("hit", 10.0, "fireball"))
+	var r_trap: String = R.record(po, _tev("deployable", 5.0, "fire_trap", "ignite"))
+	var r_mine: String = R.record(po, _tev("dot", 5.0, "fireball", "ignite"))
+	check(r_trap == "ignored_source" and r_mine == "counted", "training: Player only drops a trap's ignite and keeps the player's own", r_trap + " " + r_mine)
+	# ---- full result
+	var fr := _trun("all", 10)
+	R.record(fr, _tev("hit", 1000.0, "fireball", "", true))
+	R.tick(fr, 0.5, 2.0)
+	R.record(fr, _tev("dot", 200.0, "fireball", "ignite"))
+	for i in 30:
+		R.tick(fr, 0.5, 2.0)
+	var res: Dictionary = R.build_result(fr, names, cfg)
+	check(fr["finished"] and is_equal_approx(res["total"], 1200.0) and is_equal_approx(res["avg_dps"], 120.0) and res["hits"] == 1, "training: build_result totals, average DPS and hit count", str(res))
+	check(is_equal_approx(res["peak_dps"], 1200.0) and is_equal_approx(res["peak_start"], 0.0), "training: build_result peak second", str(res))
+	# ---- poise breaks only count while running
+	var pb := _trun()
+	R.add_poise_break(pb)
+	check(pb["poise_breaks"] == 0, "training: poise breaks before the test starts are not counted")
+	R.record(pb, _tev("hit", 1.0))
+	R.add_poise_break(pb)
+	check(pb["poise_breaks"] == 1, "training: poise breaks inside the window are counted")
+	# ---- dev marking
+	var dr := _trun()
+	R.mark_dev(dr, ["one_hit"], cfg["dev_flags_that_mark"])
+	check(not dr["dev"], "training: no DEV mark before the window runs")
+	R.record(dr, _tev("hit", 1.0))
+	R.mark_dev(dr, ["god", "overlay"], cfg["dev_flags_that_mark"])
+	check(not dr["dev"], "training: flags that do not change damage do not mark the result")
+	R.mark_dev(dr, ["time_scale"], cfg["dev_flags_that_mark"])
+	check(dr["dev"], "training: a damage-affecting flag marks the result DEV")
+	var DevR = preload("res://scripts/core/dev_rules.gd")
+	var fl: Dictionary = DevR.default_flags()
+	check(R.marking_flags(fl, DevR.default_flags(), cfg["dev_flags_that_mark"], 0).is_empty(), "training: default Dev flags mark nothing")
+	fl["damage_mult"] = 5.0
+	fl["time_scale"] = 2.0
+	var mf: Array = R.marking_flags(fl, DevR.default_flags(), cfg["dev_flags_that_mark"], 10)
+	check(mf.has("damage_mult") and mf.has("time_scale") and mf.has("attr_bonus") and not mf.has("god"), "training: marking_flags reports the real Dev flag names", str(mf))
+	for f in cfg["dev_flags_that_mark"]:
+		check(f == "attr_bonus" or DevR.default_flags().has(f), "training: dev_flags_that_mark names a real Dev flag (%s)" % f)
+	# ---- comparisons and history
+	var base := {"settings": {"type": "single", "duration": 10, "counting": "all", "profile": "none", "spacing": "tight"}, "dev": false, "avg_dps": 1000.0}
+	var same := base.duplicate(true)
+	same["avg_dps"] = 1120.0
+	check(R.comparable(base, same), "training: identical settings are comparable")
+	var d30 := base.duplicate(true)
+	d30["settings"]["duration"] = 30
+	var dpo := base.duplicate(true)
+	dpo["settings"]["counting"] = "player"
+	var dpf := base.duplicate(true)
+	dpf["settings"]["profile"] = "t6_boss"
+	var ddev := base.duplicate(true)
+	ddev["dev"] = true
+	check(not R.comparable(base, d30) and not R.comparable(base, dpo) and not R.comparable(base, dpf) and not R.comparable(base, ddev), "training: duration, counting, profile and DEV differences make results not comparable")
+	var a1 := base.duplicate(true)
+	a1["settings"]["type"] = "aoe"
+	var a2 := a1.duplicate(true)
+	a2["settings"]["spacing"] = "spread"
+	var a3 := a1.duplicate(true)
+	a3["settings"]["spacing"] = "tight"
+	var s_aoe := base.duplicate(true)
+	s_aoe["settings"]["spacing"] = "spread"
+	check(not R.comparable(a1, a2) and R.comparable(a1, a3) and not R.comparable(base, a1), "training: AoE compares only with AoE of the same spacing; single vs AoE never")
+	check(R.comparable(base, s_aoe), "training: spacing is ignored for single-target results")
+	var dl: Dictionary = R.delta_vs_history(same, [base])
+	check(dl["comparable"] and is_equal_approx(dl["pct"], 12.0) and R.fmt_delta(dl) == "+12% vs previous", "training: delta is the % change in average DPS vs the latest comparable result", str(dl))
+	var dn: Dictionary = R.delta_vs_history(same, [d30, dpo])
+	check(not dn["comparable"] and R.fmt_delta(dn) == "not comparable", "training: no comparable result in history -> 'not comparable'")
+	var dskip: Dictionary = R.delta_vs_history(same, [d30, base])
+	check(dskip["comparable"] and is_equal_approx(dskip["prev_dps"], 1000.0), "training: the delta skips non-comparable entries to find the most recent comparable one")
+	var hist := []
+	for i in 7:
+		var e := base.duplicate(true)
+		e["avg_dps"] = float(i)
+		hist = R.push_history(hist, e, 5)
+	check(hist.size() == 5 and hist[0]["avg_dps"] == 6.0 and hist[4]["avg_dps"] == 2.0, "training: history keeps 5, newest first, and drops the oldest on the 6th")
+	check(R.fmt_num(6980.0) == "6,980" and R.fmt_num(1234567.0) == "1,234,567" and R.fmt_num(12.0) == "12" and R.fmt_num(999999.4) == "999,999", "training: numbers use thousands separators")
+	check(R.settings_text({"type": "single", "duration": 10, "counting": "all", "profile": "none"}, cfg) == "10 s · All sources · No defences", "training: settings text reads '10 s - All sources - No defences'")
+	# ---- AoE helpers
+	var aoe_ev := [
+		_tev("hit", 300.0, "nova", "", false, 1, 1), _tev("hit", 300.0, "nova", "", false, 2, 1), _tev("hit", 300.0, "nova", "", false, 3, 1),
+		_tev("hit", 100.0, "bolt", "", false, 1, 2),
+		_tev("dot", 100.0, "nova", "ignite", false, 2, 1),
+	]
+	var pd: Array = R.per_dummy(aoe_ev, 3, 10.0)
+	var pd_share := 0.0
+	var pd_dmg := 0.0
+	for r in pd:
+		pd_share += r["share"]
+		pd_dmg += r["damage"]
+	check(pd.size() == 3 and absf(pd_share - 100.0) < 0.0001 and is_equal_approx(pd_dmg, R.total_damage(aoe_ev)), "training: AoE total is the sum of the three dummies and per-dummy shares sum to 100%")
+	check(pd[0]["hits"] == 2 and pd[1]["hits"] == 1, "training: per-dummy hit counts ignore DoT ticks")
+	check(is_equal_approx(R.targets_per_cast(aoe_ev), 2.0), "training: average targets hit per cast = distinct dummies per cast id, averaged (3 and 1 -> 2)")
+	check(R.targets_per_cast([_tev("hit", 1.0)]) == -1.0, "training: targets per cast is unavailable (-1) when hits carry no cast id")
+	# ---- settings
+	var st: Dictionary = R.sanitize_settings(cfg, {"type": "aoe", "duration": 99, "counting": "nonsense", "profile": "t6_boss", "spacing": "spread"})
+	check(st["type"] == "aoe" and st["duration"] == 10 and st["counting"] == "all" and st["profile"] == "t6_boss" and st["spacing"] == "spread", "training: invalid Setup values fall back to the defaults, valid ones are kept", str(st))
+	# ---- TrainingLog (session and history, no scene)
+	var old_slot: int = Game.current_slot
+	Game.testing = true
+	Game.training_in_tests = false
+	check(not TrainingLog.available(), "training: unavailable under Game.testing without the opt-in flag")
+	Game.training_in_tests = true
+	check(TrainingLog.available(), "training: Game.training_in_tests turns it on for tests")
+	TrainingLog.reset_settings()
+	check(TrainingLog.settings == R.default_settings(cfg), "training: TrainingLog starts with the data defaults")
+	TrainingLog.set_option("duration", 30)
+	TrainingLog.set_option("counting", "player")
+	TrainingLog.set_option("duration", 77)
+	check(TrainingLog.settings["duration"] == 30 and TrainingLog.settings["counting"] == "player", "training: Setup choices are remembered and invalid values are refused")
+	TrainingLog.reset_settings()
+	Game.current_slot = 91
+	TrainingLog.clear_history()
+	TrainingLog.discard()
+	check(TrainingLog.report(_tev("hit", 5.0)) == "no_run", "training: damage with no dummies spawned is ignored")
+	TrainingLog.set_option("duration", 10)
+	TrainingLog.begin(1)
+	check(TrainingLog.has_run() and not TrainingLog.is_running(), "training: Spawn creates an idle test")
+	check(TrainingLog.report(_tev("hit", 500.0)) == "counted" and TrainingLog.is_running(), "training: the first hit starts the test")
+	for i in 100:
+		TrainingLog.tick(0.1)
+	check(not TrainingLog.is_running() and not TrainingLog.last_result.is_empty(), "training: the test ends after 10 s of game time and stores the result")
+	check(TrainingLog.history().size() == 1 and is_equal_approx(TrainingLog.history()[0]["avg_dps"], 50.0), "training: the result is added to history once")
+	TrainingLog.tick(0.1)
+	check(TrainingLog.history().size() == 1, "training: ticking after the result does not add it again")
+	check(TrainingLog.report(_tev("hit", 5.0)) == "ignored_grace", "training: a hit during the restart grace is ignored")
+	for i in 25:
+		TrainingLog.tick(0.1)
+	check(TrainingLog.report(_tev("dot", 5.0, "fireball", "ignite")) == "ignored_ended", "training: a DoT tick after the result never starts a new test")
+	check(TrainingLog.report(_tev("hit", 700.0)) == "counted" and TrainingLog.is_running() and TrainingLog.last_result.is_empty(), "training: after the grace a new direct hit starts a new test")
+	# Remove / leaving the hub discards a running test: it never reaches history
+	TrainingLog.discard()
+	for i in 120:
+		TrainingLog.tick(0.1)
+	check(TrainingLog.history().size() == 1 and not TrainingLog.has_run(), "training: a discarded running test is never added to history")
+	# Reset clears the result and returns to idle with the same dummies
+	TrainingLog.begin(3)
+	TrainingLog.report(_tev("hit", 10.0, "nova", "", false, 2, 1))
+	TrainingLog.reset_run()
+	check(TrainingLog.has_run() and not TrainingLog.is_running() and TrainingLog.run["dummies"] == 3 and TrainingLog.last_result.is_empty(), "training: Reset returns to idle and clears the result")
+	# per save slot and survival
+	TrainingLog.discard()
+	Game.current_slot = 92
+	check(TrainingLog.history().is_empty(), "training: a different save slot starts with an empty history")
+	Game.current_slot = 91
+	check(TrainingLog.history().size() == 1, "training: history is kept per save slot while switching characters")
+	var res_first: Dictionary = TrainingLog.history()[0]
+	check(TrainingLog.delta_for(res_first)["comparable"] == false, "training: the only entry has nothing to compare with")
+	TrainingLog.clear_history()
+	Game.current_slot = 92
+	check(TrainingLog.history().is_empty(), "training: Clear history only clears the current character")
+	Game.current_slot = old_slot
+	TrainingLog.clear_history()
+	TrainingLog.history_by_slot.erase(91)
+	TrainingLog.history_by_slot.erase(92)
+	TrainingLog.discard()
+	TrainingLog.reset_settings()
+	Game.training_in_tests = false

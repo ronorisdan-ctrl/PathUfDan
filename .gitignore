@@ -1,3 +1,4 @@
 # Godot 4+ specific ignores
 .godot/
 tests/last_results.txt
+tests/train_only_results.txt
