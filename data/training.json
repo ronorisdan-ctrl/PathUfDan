@@ -1,0 +1,32 @@
+{
+  "npc": {"name": "Drillmaster Rook", "cell": [14, 18], "sprite": "drillmaster", "color": "#e0a050"},
+  "spawn_cell": [18, 18],
+  "durations": [10, 30],
+  "default_duration": 10,
+  "restart_grace": 2.0,
+  "peak_window": 1.0,
+  "history_size": 5,
+  "breakdown_rows_above_head": 3,
+  "cluster_spacing": {"tight": 24, "spread": 56},
+  "dummy": {"sprite": "training_dummy", "max_life": 1000000000},
+  "defaults": {"type": "single", "duration": 10, "counting": "all", "profile": "none", "spacing": "tight"},
+  "profiles": {
+    "none":      {"label": "No defences"},
+    "t3_normal": {"label": "T3 normal enemy", "tier": 3, "kind": "normal"},
+    "t6_boss":   {"label": "T6 boss", "tier": 6, "kind": "boss", "poise": true}
+  },
+  "labels": {
+    "types": {"single": "Single target", "aoe": "AoE (3 targets)"},
+    "counting": {"all": "All sources", "player": "Player only"},
+    "other": "Other",
+    "passive": "Passive and item effects",
+    "minions_tag": "minions",
+    "deployed_tag": "deployed",
+    "dev": "DEV"
+  },
+  "status_names": {
+    "ignite": "Ignite", "bleed": "Bleed", "poison": "Poison", "agony": "Agony",
+    "chill": "Chill", "shock": "Shock", "freeze": "Freeze", "frailty": "Frailty", "marked": "Marked"
+  },
+  "dev_flags_that_mark": ["one_hit", "damage_mult", "infinite_mana", "no_cooldowns", "time_scale", "attr_bonus"]
+}

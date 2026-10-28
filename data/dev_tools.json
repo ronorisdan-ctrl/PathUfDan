@@ -1,0 +1,23 @@
+{
+	"max_level": 60,
+	"spec_level": 44,
+	"level_steps": [1, 5, 10],
+	"xp_steps": [1000, 10000, 100000],
+	"passive_point_steps": [1, 5, 20],
+	"gold_steps": [1000, 10000, 100000, 1000000],
+	"material_steps": [100, 1000, 10000],
+	"material_all": 1000,
+	"gem_steps": [1, 5, 20],
+	"attribute_step": 10,
+	"damage_mults": [1, 2, 5, 10, 100],
+	"one_hit_mult": 1000,
+	"move_mults": [1, 1.5, 2, 3],
+	"loot_luck": [1, 5, 20],
+	"drop_counts": [5, 10, 25],
+	"corruption_values": [0, 20, 40, 60, 80, 100],
+	"spawn_counts": [1, 5, 10],
+	"time_scale": {"min": 0.1, "max": 4.0, "step": 0.1},
+	"amount_cap": 2000000000,
+	"spawn_ilvl_max": 100,
+	"cursor_spawn_spread": 18
+}

@@ -6,6 +6,7 @@
     {"id": "epic", "name": "Epic", "color": "#c070ff", "affixes": [4, 6], "weight": 18, "value_mult": 8.0, "tier_bonus": 1},
     {"id": "legendary", "name": "Legendary", "color": "#ff8c2a", "affixes": [0, 0], "weight": 5, "value_mult": 15.0}
   ],
+  "vendor_legendary_weight": 0.448,
   "max_prefixes": 3,
   "max_suffixes": 3,
   "item_drop_chance": 0.16,

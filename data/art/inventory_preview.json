@@ -1,0 +1,36 @@
+{
+  "character": {"name": "Dan", "class": "Warrior", "title": "The Iron Oath", "level": 18, "gold": 12480},
+  "base_stats": {"damage": 54, "armour": 386, "strength": 58, "life": 840, "fire_res": 42},
+  "stat_names": {"damage": "Weapon damage", "armour": "Armour", "strength": "Strength", "life": "Maximum Life", "fire_res": "Fire resistance"},
+  "stat_suffix": {"fire_res": "%"},
+  "equipment_order": ["helmet", "amulet", "charm", "main_hand", "chest", "off_hand", "gloves", "belt", "boots", "ring1", "ring2"],
+  "slot_names": {"helmet": "Helmet", "amulet": "Amulet", "charm": "Charm", "main_hand": "Main hand", "chest": "Chest", "off_hand": "Off hand", "gloves": "Gloves", "belt": "Belt", "boots": "Boots", "ring1": "Ring I", "ring2": "Ring II"},
+  "placeholders": {"helmet": "helm", "amulet": "amulet", "charm": "charm", "main_hand": "sword", "chest": "plate", "off_hand": "shield", "gloves": "glove", "belt": "belt", "boots": "boot", "ring1": "ring", "ring2": "ring"},
+  "equipped": [
+    {"id": "eq_helm", "name": "Weathered Sallet", "slot": "helmet", "icon": "helm", "rarity": "uncommon", "level": 8, "stats": {"armour": 32}},
+    {"id": "eq_amulet", "name": "Oathkeeper's Locket", "slot": "amulet", "icon": "amulet", "rarity": "rare", "level": 12, "stats": {"life": 24}},
+    {"id": "eq_charm", "name": "Faded Reliquary", "slot": "charm", "icon": "charm", "rarity": "common", "level": 1, "stats": {"fire_res": 4}},
+    {"id": "eq_sword", "name": "Rusted Sword", "slot": "main_hand", "icon": "sword", "rarity": "rare", "level": 12, "stats": {"damage": 54, "strength": 8}},
+    {"id": "eq_chest", "name": "Ashen Cuirass", "slot": "chest", "icon": "plate", "rarity": "rare", "level": 14, "stats": {"armour": 108, "life": 40}},
+    {"id": "eq_shield", "name": "Blackened Bulwark", "slot": "off_hand", "icon": "shield", "rarity": "uncommon", "level": 9, "stats": {"armour": 48}},
+    {"id": "eq_glove", "name": "Worn Gauntlets", "slot": "gloves", "icon": "glove", "rarity": "common", "level": 1, "stats": {"armour": 16}},
+    {"id": "eq_belt", "name": "Cracked Leather Belt", "slot": "belt", "icon": "belt", "rarity": "common", "level": 1, "stats": {"life": 18}},
+    {"id": "eq_boot", "name": "Pilgrim's Treads", "slot": "boots", "icon": "boot", "rarity": "uncommon", "level": 10, "stats": {"armour": 22}},
+    {"id": "eq_ring1", "name": "Ember Signet", "slot": "ring", "icon": "ring", "rarity": "rare", "level": 10, "stats": {"strength": 4, "fire_res": 12}},
+    {"id": "eq_ring2", "name": "Pale Gold Band", "slot": "ring", "icon": "ring", "rarity": "uncommon", "level": 8, "stats": {"life": 20}}
+  ],
+  "bag": [
+    {"id": "bag_sword", "name": "The Flaking Edge", "slot": "main_hand", "icon": "sword", "rarity": "rare", "level": 16, "stats": {"damage": 68, "strength": 3}, "lore": "A master's work, lost beneath the rust."},
+    {"id": "bag_helm", "name": "Penitent's Sallet", "slot": "helmet", "icon": "helm", "rarity": "uncommon", "level": 14, "stats": {"armour": 46}},
+    {"id": "bag_ring", "name": "Vermilion Seal", "slot": "ring", "icon": "ring", "rarity": "rare", "level": 16, "stats": {"life": 36, "fire_res": 8}},
+    {"id": "bag_boot", "name": "Gravewalkers", "slot": "boots", "icon": "boot", "rarity": "uncommon", "level": 10, "stats": {"armour": 30}},
+    {"id": "bag_gem", "name": "Flawed Emerald", "slot": "material", "icon": "gem", "rarity": "uncommon", "level": 1, "stats": {}, "lore": "Socket material. Inspect only in this study."},
+    {"id": "bag_plate", "name": "Gilded Remnant", "slot": "chest", "icon": "plate", "rarity": "legendary", "level": 24, "stats": {"armour": 180, "life": 72}, "lore": "Gold leaf clings to a forgotten oath."},
+    {"id": "bag_shield", "name": "Splintered Ward", "slot": "off_hand", "icon": "shield", "rarity": "common", "level": 1, "stats": {"armour": 22}},
+    {"id": "bag_rune", "name": "Faded Rune", "slot": "material", "icon": "rune", "rarity": "rare", "level": 1, "stats": {}, "lore": "Skill rune. Inspect only in this study."},
+    {"id": "bag_amulet", "name": "Widow's Cameo", "slot": "amulet", "icon": "amulet", "rarity": "rare", "level": 16, "stats": {"life": 38, "strength": 5}},
+    {"id": "bag_glove", "name": "Sootbound Grasp", "slot": "gloves", "icon": "glove", "rarity": "uncommon", "level": 12, "stats": {"armour": 24, "strength": 2}},
+    {"id": "bag_belt", "name": "Mourner's Sash", "slot": "belt", "icon": "belt", "rarity": "rare", "level": 16, "stats": {"life": 32}},
+    {"id": "bag_charm", "name": "Fragment of Canvas", "slot": "charm", "icon": "charm", "rarity": "uncommon", "level": 12, "stats": {"fire_res": 10}, "lore": "The painted eye follows you."}
+  ]
+}

@@ -1,0 +1,330 @@
+==== 321 passed, 0 failed ====
+PASS  3000 random items are valid
+PASS  all five rarities generated
+PASS  unique worldsplitter builds
+PASS  unique last_bastion builds
+PASS  unique bloodletter builds
+PASS  unique widowmaker builds
+PASS  unique dead_mans_promise builds
+PASS  unique clockwork_choir builds
+PASS  unique ashheart builds
+PASS  unique stormglass builds
+PASS  unique gravetender builds
+PASS  unique hollow_crown builds
+PASS  unique ember_heart builds
+PASS  unique wolfmother builds
+PASS  unique tyrants_signet builds
+PASS  unique glacial_crest builds
+PASS  unique thornmail builds
+PASS  unique phantom_treads builds
+PASS  unique sigil_of_echoes builds
+PASS  unique gunsmiths_pride builds
+PASS  unique warlords_grip builds
+PASS  unique starfall_staff builds
+--- crafting
+PASS  reroll keeps item valid
+PASS  remove affix
+PASS  raise rarity
+PASS  legendary affixes locked
+PASS  salvage yields scrap
+--- item corruption rules
+PASS  corruption: data/corruption.json loads
+PASS  corruption: rules read chance and step from the data file; max 100, drop_start 0
+PASS  corruption: confirm_above is 60
+PASS  corruption: every Blacksmith craft is either rolling or exempt, never both or neither
+PASS  corruption: data lists only real craft ids
+PASS  corruption: add, reroll and raise rarity roll
+PASS  corruption: upgrade, remove and socket are exempt
+PASS  corruption: get_level is 0 without the field and for null
+PASS  corruption: get_level clamps above 100
+PASS  corruption: get_level clamps below 0
+PASS  corruption: set_level stores the value
+PASS  corruption: set_level(0) erases the key
+PASS  corruption: set_level clamps to 100
+PASS  corruption: set_level clamps negatives to 0 and erases
+PASS  corruption: events remaining are derived from the step (full, 40%, 100%)
+PASS  corruption: add is refused at 100%
+PASS  corruption: add is allowed at 80%
+PASS  corruption: reroll is refused at 100%
+PASS  corruption: reroll is allowed at 80%
+PASS  corruption: rarity is refused at 100%
+PASS  corruption: rarity is allowed at 80%
+PASS  corruption: upgrade is allowed at 100%
+PASS  corruption: remove is allowed at 100%
+PASS  corruption: socket is allowed at 100%
+PASS  corruption: refusal text
+PASS  corruption: exempt craft takes no random number and changes nothing
+PASS  corruption: a rolling craft takes exactly one random number
+PASS  corruption: roll reports before/after and adds the step on a hit
+PASS  corruption: a hit at 40% adds exactly one step
+PASS  corruption: a hit one step below the top gives exactly 100
+PASS  corruption: a further hit never exceeds 100
+PASS  corruption: a miss leaves the value unchanged
+PASS  corruption: an odd step still caps at 100
+PASS  corruption: risk text
+PASS  corruption: result text on a hit
+PASS  corruption: result text on a miss
+PASS  corruption: no result text for exempt crafts
+PASS  corruption: default drop_start leaves items clean
+PASS  corruption: drop_start from data is applied
+PASS  corruption: no item locks before its 4th rolling craft (min over 10,000 items)
+PASS  corruption: mean rolling crafts to lockout is within 0.2 of 6.67
+PASS  corruption: hit rate over 10,000 rolls is within 1.5 points of the configured chance
+PASS  corruption: rolls leave the global RNG alone
+PASS  corruption: rolls leave the Loot RNG alone
+--- item corruption crafting and persistence
+PASS  corruption craft: the Blacksmith owns its own RandomNumberGenerator
+PASS  corruption craft: add rolls for corruption
+PASS  corruption craft: add affix still applies in full
+PASS  corruption craft: rarity rolls for corruption
+PASS  corruption craft: raise rarity still applies in full
+PASS  corruption craft: upgrade does not roll for corruption
+PASS  corruption craft: upgrade leaves corruption untouched
+PASS  corruption craft: socket does not roll for corruption
+PASS  corruption craft: socket leaves corruption untouched
+PASS  corruption craft: a hit one step below the top reaches exactly 100
+PASS  corruption craft: the locking craft was applied
+PASS  corruption craft: add is refused at 100% with the clear message
+PASS  corruption craft: reroll is refused at 100% with the clear message
+PASS  corruption craft: rarity is refused at 100% with the clear message
+PASS  corruption craft: upgrade is not refused for corruption at 100%
+PASS  corruption craft: socket is not refused for corruption at 100%
+PASS  corruption craft: remove affix still works at 100%
+PASS  corruption craft: refused craft at 100% spends no gold or materials
+PASS  corruption craft: rolling takes nothing from the Loot RNG and the craft result is identical
+PASS  corruption craft: rolling takes nothing from the global RNG
+PASS  corruption persist: the value survives save and load as an integer
+PASS  corruption persist: a clean item gains no corruption key
+PASS  corruption persist: items without the field read as 0%
+PASS  corruption persist: SAVE_VERSION is unchanged (3)
+PASS  corruption persist: an equipped 100% item keeps its value after save and load
+PASS  corruption persist: personal stash keeps the value through save and load
+PASS  corruption persist: deposit into the shared stash keeps the value
+PASS  corruption persist: the shared stash file round-trip keeps the value as an integer
+PASS  corruption persist: withdrawing keeps the value
+PASS  corruption actions: a 100% item can be locked
+PASS  corruption actions: a 100% item can be salvaged
+PASS  corruption actions: the Destroy sweep removes an unlocked 100% item and keeps the locked one
+PASS  corruption actions: equipping a 100% item is not blocked by corruption
+PASS  corruption actions: equip refusal (if any) is not about corruption
+--- item corruption visuals and dev tools
+PASS  corruption ui: colour is grey at 0, amber at 50, red at 100
+PASS  corruption ui: colours between the stops are interpolated
+PASS  corruption ui: 80% sits between amber and red
+PASS  corruption ui: a clean item shows 'Corruption: 0%' and no lock line
+PASS  corruption ui: 40% shows the number in its own colour
+PASS  corruption ui: 100% shows the red 'Corrupted: cannot be crafted' line
+PASS  corruption ui: the tooltip line can be left out (Blacksmith has its own readout)
+PASS  corruption ui: legendaries show the line too
+PASS  corruption ui: tooltip bar is 10 blocks, part filled at 40%, all empty at 0 and all filled at 100
+PASS  corruption ui: the hover tooltip shows the line
+PASS  corruption ui: the equipped-item comparison tooltip shows its line
+PASS  corruption ui: the slot marker sits in the opposite corner and does not overlap the padlock
+PASS  corruption ui: the marker shows at 100% only
+PASS  corruption ui: Blacksmith bar shows the number
+PASS  corruption ui: remaining events are derived from the level
+PASS  corruption ui: the Blacksmith item text has no second corruption line
+PASS  corruption ui: Add Affix button carries the risk line
+PASS  corruption ui: Reroll Affix button carries the risk line
+PASS  corruption ui: Raise Rarity button carries the risk line
+PASS  corruption ui: Upgrade Base button has no risk line
+PASS  corruption ui: Remove Affix button has no risk line
+PASS  corruption ui: Add Socket button has no risk line
+PASS  corruption ui: the preview repeats the risk for a rolling craft
+PASS  corruption ui: an exempt craft's confirm dialog has no corruption text
+PASS  corruption ui: at 60% the confirm shows the risk but no warning (threshold is above 60)
+PASS  corruption ui: above 60% the confirm dialog adds a warning
+PASS  corruption ui: the bar refreshes right after a craft
+PASS  corruption ui: a result toast says whether corruption rose
+PASS  corruption ui: Add Affix is disabled at 100% with the refusal as tooltip
+PASS  corruption ui: Reroll Affix is disabled at 100% with the refusal as tooltip
+PASS  corruption ui: Raise Rarity is disabled at 100% with the refusal as tooltip
+PASS  corruption ui: Upgrade Base stays enabled at 100%
+PASS  corruption ui: the readout says the item is corrupted
+PASS  corruption ui: the Craft button is disabled for a refused craft
+PASS  corruption ui: readout text fits the 390 px bar
+PASS  corruption ui: risk line fits the Blacksmith width
+PASS  corruption dev: off unless Developer tools are on
+PASS  corruption dev: set to 60% marks the save as dev-used
+PASS  corruption dev: value 0 applied through set_level
+PASS  corruption dev: value 20 applied through set_level
+PASS  corruption dev: value 40 applied through set_level
+PASS  corruption dev: value 60 applied through set_level
+PASS  corruption dev: value 80 applied through set_level
+PASS  corruption dev: value 100 applied through set_level
+PASS  corruption dev: clear selected resets only that item
+PASS  corruption dev: clear all bag items resets every item and erases the key
+PASS  corruption dev: an empty slot or no selection is refused
+PASS  corruption dev: the panel lists the bag items
+PASS  corruption dev: the dev_used flag is written to the save
+--- item lock
+PASS  lock: items start unlocked and null is never locked
+PASS  lock: set_item_locked(true) marks the item
+PASS  lock: a locked common is skipped by the common sweep
+PASS  lock: sweep candidates exclude locked items (4 items, 2 locked)
+PASS  lock: locked items are counted per rarity cap
+PASS  lock: a full sweep destroys only the unlocked items
+PASS  lock: locked items are still in the bag, unlocked ones are gone
+PASS  lock: unlocking removes the flag entirely (saves stay unchanged)
+PASS  lock: an unlocked item is swept again
+PASS  lock: the lock survives a save and load
+PASS  lock ui: both locked items are in the bag after loading
+PASS  lock ui: a locked item cannot be sold
+PASS  lock ui: a locked item cannot be salvaged
+PASS  lock ui: a locked item cannot be destroyed (no dialog either)
+PASS  lock ui: right-click menu offers 'Unlock item' for a locked item
+PASS  lock ui: Sell is greyed out for a locked item
+PASS  lock ui: Destroy is greyed out for a locked item
+PASS  lock ui: the tooltip says the item is locked
+PASS  lock ui: pressing Unlock removes the lock
+PASS  lock ui: an unlocked item offers 'Lock item'
+PASS  lock ui: pressing Lock sets the lock
+PASS  lock ui: with only locked items left the sweep has nothing to confirm
+PASS  lock ui: the sweep dialog says how many locked items are kept
+PASS  lock ui: the confirmed sweep still leaves the locked items
+PASS  lock ui: after unlocking, the item can be sold
+--- destroy bag items by rarity
+PASS  destroy: 'common' counts only common items
+PASS  destroy: 'rare' counts common, uncommon and rare
+PASS  destroy: top rarity counts the whole bag
+PASS  destroy: upgraded items are counted for the warning
+PASS  destroy: common sweep removes both common items
+PASS  destroy: socketed gems return to the pouch
+PASS  destroy: higher rarities are untouched by a common sweep
+PASS  destroy: no common item is left
+PASS  destroy: equipped items survive
+PASS  destroy: running the same sweep twice destroys nothing
+PASS  destroy: epic sweep removes the remaining uncommon, rare and epic items
+PASS  destroy: only the legendaries remain
+PASS  destroy: unknown rarity id only matches common-or-lower items (none left)
+PASS  destroy ui: the inventory has a Destroy button
+PASS  destroy ui: one menu entry per rarity
+PASS  destroy ui: asks first and states the item count
+PASS  destroy ui: nothing is destroyed before confirming
+PASS  destroy ui: cancelling keeps every item
+PASS  destroy ui: confirming removes the items
+--- stash panel
+PASS  stash ui: 8x7 grid
+PASS  stash ui: one tab button plus the buy button
+PASS  stash ui: buy button shows the price and is disabled without gold
+PASS  stash ui: buy button enables once you can afford it
+PASS  stash ui: buying adds a tab, charges once and opens it
+PASS  stash ui: deposit goes to the open tab
+PASS  stash ui: Shared Stash mode shows its own tabs
+PASS  stash ui: deposit in shared mode fills the shared tab
+PASS  stash ui: the bag hint names the shared stash
+PASS  stash ui: clicking a shared item takes it into the bag
+PASS  stash ui: buying asks for confirmation and shows the price
+PASS  stash ui: nothing is charged before confirming
+PASS  stash ui: shared tab purchase works from the panel
+PASS  stash ui: personal tabs are unaffected by shared purchases
+--- developer tools
+PASS  dev: the Developer tools setting defaults to off
+PASS  dev: data/dev_tools.json loads
+PASS  dev: every flag starts at its default
+PASS  dev: F1 is registered for the panel
+PASS  dev: F1 is not used by any other action
+PASS  dev: actions do nothing while the setting is off
+PASS  dev: actions do nothing under Game.testing without dev_in_tests
+PASS  dev: game hooks stay neutral in bots and tests, even with flags set
+PASS  dev: refused actions do not mark the character
+PASS  dev: setting on + dev_in_tests enables the tools
+PASS  dev: flags take effect while on
+PASS  dev: time scale sets the engine speed
+PASS  dev: time scale is clamped to the preset range
+PASS  dev: switching the setting off resets every flag (time scale 1, hitboxes off)
+PASS  dev: switching back on starts from defaults
+PASS  dev: switching on god mode marks the character
+PASS  dev: overlay, hitboxes and time scale do not mark the character
+PASS  dev rules: xp to reach a level uses the game's own XP curve
+PASS  dev rules: amounts never go negative or past the cap
+PASS  dev rules: loot luck multiplies the effective rarity
+PASS  dev rules: bad bases and too many sockets are refused
+PASS  dev: set level 14 through the real level-up
+PASS  dev: set level gives the same passive points as levelling naturally
+PASS  dev: set level gives the same skills, skill levels and spec points as levelling naturally
+PASS  dev: progress actions mark the character dev_used
+PASS  dev: levels never go down
+PASS  dev: +5 levels
+PASS  dev: max level
+PASS  dev: add XP adds exactly
+PASS  dev: grant passive points
+PASS  dev: unlock all skills
+PASS  dev: free respec refunds every passive at no cost
+PASS  dev: gold adds exactly
+PASS  dev: set gold
+PASS  dev: gold never goes negative
+PASS  dev: set gold never goes negative
+PASS  dev: each material adds exactly 100
+PASS  dev: +1,000 of every material
+PASS  dev: unknown material is refused
+PASS  dev: add 3 gems of a type and grade
+PASS  dev: one of every gem (8 types x 4 grades)
+PASS  dev: one of every skill rune
+PASS  dev: free personal tab through buy_stash_tab, gold unchanged
+PASS  dev: all personal tabs, capped like a purchase
+PASS  dev: no free tab past the cap, gold untouched
+PASS  dev: free shared tab through SharedStash.buy_tab
+PASS  dev: stash migrate_legacy still rescues hidden slots
+PASS  dev: spawned item has the requested base, rarity, ilvl and sockets
+PASS  dev: spawned item is in the bag and passes the load validity check
+PASS  dev: rare affix count matches a dropped rare
+PASS  dev: invalid spawn requests are refused
+PASS  dev: max-roll affixes use the best tier and top value
+PASS  dev: spawn legendary by id
+PASS  dev: one of every charm
+PASS  dev: clear bag
+PASS  dev: no enemy spawns in town
+PASS  dev: a full bag drops the spawned item at your feet
+PASS  dev: drop 5 epic items through the real drop path
+PASS  dev: loot filter rule lookup for the item at the cursor
+PASS  dev: decent kit equips rare gear
+PASS  dev: loot luck x5 multiplies drops at runtime
+PASS  dev: loot.json is never edited in memory
+PASS  dev: god mode blocks hit damage
+PASS  dev: god mode blocks stun and status application
+PASS  dev: stun self is refused under god mode
+PASS  dev: turning god mode off restores normal damage
+PASS  dev: stun yourself through the real stun roll
+PASS  dev: full heal clears statuses
+PASS  dev: spawn an elite enemy with chosen mods
+PASS  dev: damage multiplier scales your hits
+PASS  dev: one-hit kills
+PASS  dev: frozen enemies stand still and never attack
+PASS  dev: kill all enemies counts as real kills (XP)
+PASS  dev: infinite mana makes skills free
+PASS  dev: infinite flasks drink without charges
+PASS  dev: mana costs return when the flag is off
+PASS  dev: unlock all tiers
+PASS  dev: start a run in any tier with chosen modifiers
+PASS  dev: the boss arena starts sealed
+PASS  dev: complete the relic objective
+PASS  dev: complete the Blood Altar waves
+PASS  dev: completing the objectives unseals the arena
+PASS  dev: complete the boss objective (real boss death, exit portal)
+PASS  dev: teleport to the exit portal
+PASS  dev: teleport to boss completes guardian + mechanisms and enters the open arena
+PASS  dev: teleport to boss leaves the boss alive and the level valid
+PASS  dev: break boss poise staggers the boss
+PASS  dev: set Abyss depth
+PASS  dev: a dev-tainted character never records an Abyss depth
+PASS  dev: teleport to a point
+PASS  dev: return to town
+PASS  dev: unlock all pets through the real purchase, gold unchanged
+PASS  dev: set the active pet's tier
+PASS  dev: free pet rename
+PASS  dev: set seed seeds the RNGs like the smartbot
+PASS  dev: the next run uses the chosen seed
+PASS  dev: diagnostic info
+PASS  dev: debug overlay lines
+PASS  dev: the save holds dev_used and no dev flag
+PASS  dev: dev_used survives a save/load round trip
+PASS  dev: an old save without dev_used loads cleanly
+PASS  dev: untouched characters save exactly as before
+PASS  dev: the load menu shows (dev)
+PASS  dev: the panel opens with seven tabs
+PASS  dev: the panel fits the 1280x720 screen
+PASS  dev: the Options menu shows the Developer tools button
+PASS  dev: switching off resets god mode and every flag
+PASS  dev: the panel shows only a hint while the tools are off
+PASS  dev: no Options menu button while off

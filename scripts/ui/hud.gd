@@ -3,6 +3,7 @@ extends Control
 ## buffs, minimap, zone/objective text, boss bar and interaction prompts.
 
 const UIKit = preload("res://scripts/ui/ui_kit.gd")
+const DevRules = preload("res://scripts/core/dev_rules.gd")
 
 var ui = null
 var boss = null
@@ -181,10 +182,49 @@ func _draw() -> void:
 		draw_rect(br2, Color("#2a0808"))
 		draw_rect(Rect2(br2.position, Vector2(bw * clampf(boss.life / boss.max_life, 0, 1), br2.size.y)), Color("#a01818") if boss.get("phase") != 2 else Color("#d03030"))
 		draw_rect(br2, UIKit.GOLD_DIM, false, 1.0)
+		var ps = boss.get("poise_state")
+		if ps is Dictionary and not ps.is_empty():
+			# poise bar: gold fills toward a stagger; grey shows the immunity that follows
+			var pr := Rect2(br2.position + Vector2(0, br2.size.y + 4), Vector2(bw, 4))
+			draw_rect(pr.grow(1), Color(0, 0, 0, 0.9))
+			var pcfg: Dictionary = Data.stun_cfg.get("poise", {})
+			if ps["stagger"] > 0.0:
+				draw_rect(pr, Color("#fff0a0"))
+			elif ps["immune"] > 0.0:
+				var full := float(pcfg.get("immunity_after_stagger", 8.0)) + float(pcfg.get("stagger_duration", 1.0))
+				draw_rect(Rect2(pr.position, Vector2(bw * clampf(ps["immune"] / full, 0, 1), pr.size.y)), Color("#606060"))
+			else:
+				draw_rect(Rect2(pr.position, Vector2(bw * clampf(ps["poise"] / 100.0, 0, 1), pr.size.y)), Color("#e0b040"))
 		var bn: String = boss.display_name
 		var bnw := f.get_string_size(bn, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x
 		draw_string_outline(f, Vector2(vs.x / 2 - bnw / 2, 18), bn, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, 4, Color.BLACK)
 		draw_string(f, Vector2(vs.x / 2 - bnw / 2, 18), bn, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#ffb090"))
+	# ---------------- developer tools
+	if Dev.enabled():
+		_dev_tag(f, vs)
+		if Dev.flags.get("overlay", false):
+			_dev_overlay(f, vs)
+
+## Small "DEV" tag above the life orb so the tools are never on by accident.
+func _dev_tag(f: Font, vs: Vector2) -> void:
+	var r := Rect2(14, vs.y - 160, 44, 18)
+	draw_rect(r, Color(0.5, 0.05, 0.4, 0.85))
+	draw_rect(r, Color("#ff80e0"), false, 1.0)
+	draw_string(f, r.position + Vector2(7, 14), "DEV", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color.WHITE)
+	var active: Array = DevRules.active_flags(Dev.flags)
+	if not active.is_empty():
+		var t := "  ".join(active)
+		draw_string_outline(f, r.position + Vector2(52, 14), t, HORIZONTAL_ALIGNMENT_LEFT, vs.x - 260, 11, 3, Color.BLACK)
+		draw_string(f, r.position + Vector2(52, 14), t, HORIZONTAL_ALIGNMENT_LEFT, vs.x - 260, 11, Color("#ffb0f0"))
+
+func _dev_overlay(f: Font, vs: Vector2) -> void:
+	var lines: Array = Dev.overlay_lines()
+	var x := vs.x - 300.0
+	var y := 186.0
+	draw_rect(Rect2(x - 6, y - 14, 292, 16 * lines.size() + 8), Color(0, 0, 0, 0.6))
+	for l in lines:
+		draw_string(f, Vector2(x, y), l, HORIZONTAL_ALIGNMENT_LEFT, 286, 12, Color("#c0ffc0"))
+		y += 16
 
 func _orb(c: Vector2, r: float, k: float, col: Color, dark: Color, text: String) -> void:
 	draw_circle(c, r + 4, Color(0, 0, 0, 0.9))
@@ -227,6 +267,25 @@ func _minimap(lv, p, vs: Vector2) -> void:
 		var ip: Vector2 = origin + it["pos"] / float(lv.T) * mscale
 		if mr.has_point(ip):
 			draw_circle(ip, 3, Color("#ffd060") if it["kind"] == "exit_portal" else Color("#6080ff"))
+	# loot filter minimap icons
+	for n in lv.loot:
+		if is_instance_valid(n) and not n.picked and n.visible and n.kind == "item":
+			var mm: Dictionary = n.fres.get("minimap", {})
+			if mm.is_empty():
+				continue
+			var lp: Vector2 = origin + n.global_position / float(lv.T) * mscale
+			if not mr.has_point(lp):
+				continue
+			var mc: Color = mm.get("color", Color.WHITE)
+			match str(mm.get("shape", "circle")):
+				"diamond":
+					draw_colored_polygon(PackedVector2Array([lp + Vector2(0, -4), lp + Vector2(3, 0), lp + Vector2(0, 4), lp + Vector2(-3, 0)]), mc)
+				"square":
+					draw_rect(Rect2(lp - Vector2(2.5, 2.5), Vector2(5, 5)), mc)
+				"star":
+					draw_string(ThemeDB.fallback_font, lp + Vector2(-4, 4), "*", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, mc)
+				_:
+					draw_circle(lp, 2.5, mc)
 	if lv.get("rooms") != null:
 		for r in lv.rooms:
 			if r["kind"] == "boss" and r["visited"]:

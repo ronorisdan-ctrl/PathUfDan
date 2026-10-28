@@ -1,0 +1,115 @@
+{
+ "version": 1,
+ "name": "Strict (epic+)",
+ "description": "Only epic and legendary gear, gems, runes and upgrades. Everything else hidden (hold Alt to reveal).",
+ "default": "show",
+ "safety": {
+  "never_hide_min_rarity": "legendary"
+ },
+ "rules": [
+  {
+   "name": "Legendary",
+   "enabled": true,
+   "conditions": {
+    "rarity_min": "legendary"
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#ff8c1a",
+    "size": "huge",
+    "beam": "#ff8c1a",
+    "sound": "drop_legendary",
+    "minimap": {
+     "shape": "star",
+     "color": "#ff8c1a"
+    }
+   }
+  },
+  {
+   "name": "Epic",
+   "enabled": true,
+   "conditions": {
+    "rarity_min": "epic"
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#b45cff",
+    "size": "large",
+    "beam": "#b45cff",
+    "sound": "drop_epic",
+    "minimap": {
+     "shape": "diamond",
+     "color": "#b45cff"
+    }
+   }
+  },
+  {
+   "name": "Gems",
+   "enabled": true,
+   "conditions": {
+    "kind": [
+     "gem"
+    ]
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#4dd9e6",
+    "size": "normal"
+   }
+  },
+  {
+   "name": "Runes",
+   "enabled": true,
+   "conditions": {
+    "kind": [
+     "rune"
+    ]
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#ff6ad5",
+    "size": "normal"
+   }
+  },
+  {
+   "name": "Upgrades",
+   "enabled": true,
+   "conditions": {
+    "rarity_min": "uncommon",
+    "is_upgrade": true
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#4be36b",
+    "size": "large"
+   }
+  },
+  {
+   "name": "Hide the rest of gear",
+   "enabled": true,
+   "conditions": {
+    "kind": [
+     "gear",
+     "charm"
+    ]
+   },
+   "actions": {
+    "visibility": "hide"
+   }
+  },
+  {
+   "name": "Materials",
+   "enabled": true,
+   "conditions": {
+    "kind": [
+     "material"
+    ]
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#8a8a8a",
+    "size": "small"
+   }
+  }
+ ]
+}

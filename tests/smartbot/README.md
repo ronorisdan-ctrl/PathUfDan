@@ -239,14 +239,23 @@ Stormcaller, `_6` capstone), defensive Cryomancer (Ice Armour).
 **Survival and objectives** - flasks by profile; mana flask below 15% in combat; retreat
 for 5 s when below 30% life with no life flask (re-engage at 60%). Objectives that unseal
 the boss arena: guardian (kill), mechanisms and the Blood Altar (walk up and `on_interact`,
-the same call `level.interact` makes), relics (walk over), waves (kill). Picks up items
+the same call `level.interact` makes), relics (walk over), waves (kill; while the waves are
+running it walks back to the remaining wave enemies instead of heading for the sealed arena). Picks up items
 (F-key equivalent `level.pickup`) and walks over gold / gems / runes / materials when no
 aggressive enemy is in sight; after the boss it loots for up to 15 s and leaves through the
 exit portal.
 
 **Stuck handling** - BFS path to the goal (recomputed when stale), sidestep after 2.5 s
 without progress, unreachable targets ignored for 8 s, targets that do not lose life for
-4 s are approached, after 10 s switched.
+4 s are approached, after 10 s switched. Every "ignore" also resets the progress clock, so a
+target that comes back gets a fresh 10 s (before 2026-10-25 a stale clock made the bot drop
+it again at once, forever, which caused timeouts).
+
+**Stuns (game feature added 2026-10-25)** - a stunned or frozen enemy holds its wind-up
+(`enemy.gd` freezes `state_t`); the threat model adds the remaining stun / freeze time to
+the hit time. Hit stun on the player is handled by the game (`start_dodge` breaks a stun
+after 0.15 s); the bot simply keeps issuing inputs. Pets are off for the bot
+(`Game.testing`), so pet pickups are not part of the bot's loot.
 
 ---------------------------------------------------------------------------------------------
 ## 5. Seeds, determinism and resuming
@@ -407,6 +416,36 @@ mode, default entry kit (T3 at `--level=15`, other tiers at `min_level + 3`).
   differ, because hits at a circle's edge are now attributed to the AoE instead of `contact`.
 - Summarise any CSV with `python tests/smartbot/summarize.py out/x.csv [--by=tier,class,profile,seed]`
   (stdlib only; Wilson 95% intervals).
+
+### 11b. Re-validation on the current game (2026-10-25: stuns, pets, softlock fix)
+The game changed after the validation above: stuns and boss poise (`stun.gd`, `data/stun.json`), pets
+(off for the bot), and the Blood Altar softlock fix in `level.gd` / `dungeon.gd`. Bot fixes made for this
+version:
+- **Stun hold:** a stunned or frozen enemy holds its wind-up, so the threat model now adds the remaining stun
+  time to the hit time (`sb_threat.gd`).
+- **Stale progress clock:** every target ignore now resets the progress clock (`sb_controller.gd`).
+- **Blood Altar waves:** while the waves are running, the bot goes back to the remaining wave enemies
+  (`sb_controller.gd`).
+- **Debug output:** `--debug` WAVES status lines.
+
+Results (PC, seed 700, balanced, at the study's start levels):
+- **Determinism:** `--class=ranger --tier=2 --level=12 --runs=10 --seed=7 --profile=Expert` twice -> 10/10
+  identical. Mage carry 5 x 2 twice -> 10/10 identical.
+- **Ordering** (`out/rv2_order.csv`, 30 runs per cell), win % NoDodge / Competent / Expert:
+
+| Tier (level) | warrior | ranger | mage |
+|---|---|---|---|
+| T2 (L12) | 63 / 80 / 100 | 57 / 93 / 93 | 87 / 100 / 100 |
+| T3 (L20) | 100 / 100 / 100 | 93 / 97 / 100 | 93 / 100 / 100 |
+| T4 (L28) | 80 / 90 / 100 | 37 / 93 / 90 | 37 / 97 / 93 |
+| pooled | 81 / 90 / 100 | 62 / 94 / 94 | 72 / 99 / 98 |
+
+- **Damage taken:** strictly ordered NoDodge > Competent > Expert in all 9 cells. Expert takes 20-80% less
+  than Competent.
+- **Win rate:** NoDodge is clearly below Competent. Competent vs Expert separates for warrior. For ranger and
+  mage, both sit at 93-100%, where win rate can no longer tell them apart, but damage taken still does.
+- **Timeouts:** 1 of 270 runs (T2 warrior, boss room never reached). Before the two bot fixes it was 4 of 270.
+- **Wall time per run** (single child process, `--jobs=15` runs 15 at once): T2 37 s, T3 39 s, T4 79 s.
 
 ## 12. Profile ordering
 

@@ -2,8 +2,12 @@ extends Control
 ## One inventory / equipment / stash / vendor cell.
 
 signal clicked(slot, button, shift)
+## Emitted (after `clicked`) on the second press of a left double-click.
+signal double_clicked(slot)
 signal hovered(slot)
 signal unhovered(slot)
+
+const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
 
 var item = null
 var placeholder := ""     # icon shown when empty (equipment slots)
@@ -25,7 +29,33 @@ func set_item(it) -> void:
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		clicked.emit(self, event.button_index, event.shift_pressed)
+		if event.button_index == MOUSE_BUTTON_LEFT and event.double_click:
+			double_clicked.emit(self)
 		accept_event()
+
+## Small padlock in the corner of a locked item (top-left of `at`, about 9x11 px).
+func _draw_padlock(at: Vector2) -> void:
+	var gold := Color("#ffd060")
+	draw_rect(Rect2(at + Vector2(-1, 3), Vector2(11, 8)), Color(0, 0, 0, 0.75))
+	draw_arc(at + Vector2(4.5, 3), 3.0, PI, TAU, 10, gold, 1.5)
+	draw_rect(Rect2(at + Vector2(0, 4), Vector2(9, 6)), gold)
+	draw_rect(Rect2(at + Vector2(4, 6), Vector2(1, 2)), Color(0.1, 0.08, 0.05))
+
+## Corner marker rectangles (also used by the tests to prove they never overlap).
+static func padlock_rect(slot_size: Vector2) -> Rect2:
+	return Rect2(Vector2(slot_size.x - 12, 3) + Vector2(-1, 0), Vector2(11, 11))
+
+static func corrupted_rect(slot_size: Vector2) -> Rect2:
+	return Rect2(Vector2(slot_size.x - 12, slot_size.y - 12), Vector2(10, 10))
+
+## Small red "dead base" marker in the bottom-right corner of a 100% corrupted item
+## (the padlock is top-right, the upgrade level top-left, a vendor price bottom-left).
+func _draw_corrupted(at: Vector2) -> void:
+	var red := Color("#d03030")
+	draw_rect(Rect2(at, Vector2(10, 10)), Color(0, 0, 0, 0.8))
+	draw_rect(Rect2(at, Vector2(10, 10)), red, false, 1.0)
+	draw_line(at + Vector2(2, 2), at + Vector2(8, 8), red, 1.5)
+	draw_line(at + Vector2(8, 2), at + Vector2(2, 8), red, 1.5)
 
 func _draw() -> void:
 	var r := Rect2(Vector2.ZERO, size)
@@ -41,6 +71,10 @@ func _draw() -> void:
 			draw_string(ThemeDB.fallback_font, Vector2(3, 12), "+%d" % int(item["upgrade"]), HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("#ffd060"))
 		if Game.ch != null and Game.ch.equip_restriction(item) != "":
 			draw_rect(Rect2(Vector2(1, 1), size - Vector2(2, 2)), Color(0.8, 0.1, 0.1, 0.18))
+		if bool(item.get("locked", false)):
+			_draw_padlock(Vector2(size.x - 12, 3))
+		if CorruptionRules.is_maxed(item):
+			_draw_corrupted(corrupted_rect(size).position)
 		if price >= 0:
 			draw_string(ThemeDB.fallback_font, Vector2(2, size.y - 3), str(price), HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("#e8c050"))
 	else:

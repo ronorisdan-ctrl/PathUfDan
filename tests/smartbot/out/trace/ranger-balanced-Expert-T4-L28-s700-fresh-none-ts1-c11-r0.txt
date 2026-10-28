@@ -1,0 +1,619 @@
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] HOTBAR cluster_bomb, sniper_round, deadeye, frost_turret, smoke_bomb, lightning_trap, marked_prey
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] HOTBAR quickdraw, sniper_round, deadeye, frost_turret, smoke_bomb, lightning_trap, marked_prey
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE r_prj1 (Fletching) value 0.0265
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE r_prj2 (Fletching) value 0.0557
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE r_gun (Powder Craft) value 0.0978
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE h_wr5 (Agile Strikes) value 0.0207
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE h_wr4 (Quick Hands) value 0.0453
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE h_wr3 (Relentless) value 0.0622
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE h_wr2 (Quick Hands) value 0.0244
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE h_wr1 (Agile Strikes) value 0.0151
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE h_rm1 (Charged Shafts) value 0.0150
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE h_rm2 (Elemental Edge) value 0.0157
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE h_rm3 (Storm Archer) value 0.0261
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_p01 (Prismatic Path) value 0.0098
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_p02 (Prismatic Path) value 0.0099
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE r_pspd (Swift Flight) value 0.0091
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE r_prj3 (Fletching) value 0.0235
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE r_deadeye (Deadeye Mastery) value 0.0290
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_p03 (Prismatic Path) value 0.0045
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_r4 (Prismatic Practice) value 0.0100
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_r5 (Prismatic Lore) value 0.0201
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_r6 (Hearthguard) value 0.0346
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_r7 (Prismatic Insight) value 0.0194
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_r0 (Elemental Warding) value 0.0431
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_r1 (Prismatic Study) value 0.0134
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_r2 (Storm Shell) value 0.0187
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xo2_6 (Wanderer's Road) value 0.0061
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xo2_5 (Wanderer's Road) value 0.0135
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] PASSIVE xp_r3 (Prismatic Focus) value 0.0051
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] SPEC chose deadeye
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] SPEC node deadeye_1
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] SPEC node deadeye_2
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] SPEC node deadeye_3
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Add Socket on Tempered Rifle (main_hand) cost 340 gold, 4 Iron Fragment, 1 Monster Core, score +0.000
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Upgrade Base on Tempered Rifle (main_hand) cost 90 gold, 2 Scrap, 1 Iron Fragment, score +0.095
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket sapphire:2 into main_hand socket 1 (score +0.168)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket topaz:1 into main_hand socket 2 (score +0.112)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket ruby:1 into main_hand socket 3 (score +0.086)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket diamond:2 into helmet socket 1 (score +0.031)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket bloodstone:2 into ring2 socket 1 (score +0.043)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] RUNE piercing -> quickdraw
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] RUNE volatile -> quickdraw
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] KIT {"dps_est":517,"ehp_est":791,"equipment":{"amulet":"uncommon Hale Bone Amulet ilvl26 sockets=0 gems=[]","belt":"rare Iron Veil ilvl25 sockets=0 gems=[]","boots":"common Tempered Boots ilvl27 sockets=0 gems=[]","charm":"common Blood Charm ilvl25 sockets=0 gems=[]","chest":"rare Blood Mark ilvl25 sockets=0 gems=[]","gloves":"uncommon Elusive Tempered Gloves ilvl25 sockets=0 gems=[]","helmet":"common Tempered Coif ilvl24 sockets=1 gems=[\"diamond:2\"]","main_hand":"common Tempered Rifle ilvl25 sockets=3 gems=[\"sapphire:2\", \"topaz:1\", \"ruby:1\"]","ring1":"uncommon Topaz Ring of the Scholar ilvl28 sockets=0 gems=[]","ring2":"epic Storm Spire ilvl28 sockets=1 gems=[\"bloodstone:2\"]"},"gold":435,"hotbar":["quickdraw","sniper_round","deadeye","frost_turret","smoke_bomb","lightning_trap","marked_prey"],"keystones":[],"level":28,"life":518,"passives":28,"pouch":{"amethyst:2":2,"bloodstone:1":2},"runes":{"quickdraw":["piercing","volatile"]},"spec":"deadeye","spec_nodes":["deadeye_1","deadeye_2","deadeye_3"]}
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] HOTBAR barrage, quickdraw, deadeye, frost_turret, smoke_bomb, lightning_trap, marked_prey
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] RUN start dread_sanctums L28 mods=["ironhide", "teeming"] monster_level=28 hotbar=["barrage", "quickdraw", "deadeye", "frost_turret", "smoke_bomb", "lightning_trap", "marked_prey"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    5.02] DBG t=5.0 pos=(19, 32) desired=(-1, -0) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    5.02]    d=78 los=true tcell=(24, 32) solid=false block0= val0=[261.044568643939, (381.7547, 517.9805)] uses={ "barrage": 1, "quickdraw": 5, "frost_turret": 2, "smoke_bomb": 1, "lightning_trap": 1 } busy=0.22 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    9.82] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    9.82] DODGE move Grave Brute:aoe (hit in 0.72s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.00] DBG t=10.0 pos=(21, 33) desired=(0.796178, -0.605063) goal=target target=Grave Caller sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.00]    d=216 los=true tcell=(35, 32) solid=false block0= val0=[2489.21143384438, (558.7537, 532.4948)] uses={ "barrage": 1, "quickdraw": 5, "frost_turret": 2, "smoke_bomb": 1, "lightning_trap": 3, "deadeye": 1, "marked_prey": 1 } busy=-1.35 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.07] STUCK at (22, 33), sidestepping (target Grave Caller, goal target)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.07]    pos (355.8991, 536.4989) vel (113.9744, 47.20974) dodge_cd -10.07 busy -1.42 dist_here 14 origin (35, 32) boss (67, 57) gw 134 gh 92 up_grid 1
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.07]      19  18  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.07]      ##  17  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.07]      17  16  15  14  13  12  11  10   9
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.07]      18  17  16  15  14  13  12  11  10
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.07]      19  18  17  16  15  14  13  12  11
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.07]      20  19  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.07]      ##  20  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.07]    nearest Grave Brute d=37 state=windup aggro=true los=true; active threats 2; desired (0.848193, -0.529687)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.52] DODGE move Plague Rat:melee (hit in 0.07s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   10.58] EVADE_FAIL Plague Rat:melee dmg 13 (life 505/518)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   11.87] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   11.87] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   15.00] DBG t=15.0 pos=(21, 33) desired=(0, 0) goal=target target=Grave Caller sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   15.00]    d=196 los=true tcell=(33, 31) solid=false block0= val0=[0, (539.3679, 506.4943)] uses={ "barrage": 1, "quickdraw": 8, "frost_turret": 2, "smoke_bomb": 1, "lightning_trap": 6, "deadeye": 1, "marked_prey": 1 } busy=-0.08 state=recover
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   20.00] DBG t=20.0 pos=(14, 33) desired=(-0.707107, 0.707107) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   20.00]    d=97 los=true tcell=(20, 32) solid=false block0= val0=[261.044568643939, (325.3946, 519.8604)] uses={ "barrage": 1, "quickdraw": 8, "frost_turret": 4, "smoke_bomb": 2, "lightning_trap": 10, "deadeye": 1, "marked_prey": 1 } busy=0.05 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   25.02] DBG t=25.0 pos=(17, 33) desired=(0.710031, 0.70417) goal=objective:relic_0 target=- sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.02] DBG t=30.0 pos=(29, 33) desired=(-1, -0) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.02]    d=114 los=true tcell=(36, 33) solid=false block0= val0=[339.357939237121, (584.9446, 531.953)] uses={ "barrage": 2, "quickdraw": 12, "frost_turret": 5, "smoke_bomb": 2, "lightning_trap": 21, "deadeye": 1, "marked_prey": 1 } busy=0.27 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.20] STUCK at (29, 33), sidestepping (target Bone Bulwark, goal target)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.20]    pos (472.1354, 536.0106) vel (-55.51425, 0) dodge_cd -30.20 busy 0.08 dist_here 14 origin (43, 33) boss (67, 57) gw 134 gh 92 up_grid 1
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.20]      ##  ##  ##  ##  ##  ##  ##  ##  13
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.20]      ##  ##  ##  ##  ##  ##  ##  ##  12
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.20]      19  18  17  16  15  14  13  12  11
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.20]      18  17  16  15  14  13  12  11  10
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.20]      19  18  17  16  15  14  13  12  11
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.20]      ##  ##  ##  ##  ##  ##  ##  ##  12
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.20]      ##  ##  ##  ##  ##  ##  ##  ##  13
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   30.20]    nearest Bone Bulwark d=99 state=chase aggro=true los=true; active threats 0; desired (-1, -0)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.02] DBG t=35.0 pos=(23, 34) desired=(0.999992, -0.004063) goal=objective:relic_0 target=- sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.23] STUCK at (25, 34), sidestepping (target -, goal objective:relic_0)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.23]    pos (401.7906, 551.9937) vel (145.365, 0) dodge_cd -35.23 busy -0.42 dist_here 64 origin (14, 55) boss (67, 57) gw 134 gh 92 up_grid 1
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.23]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.23]      70  69  68  67  66  65  64  63  62
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.23]      69  68  67  66  65  64  63  62  61
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.23]      68  67  66  65  64  63  62  61  60
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.23]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.23]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.23]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.23]    nearest Bone Bulwark d=31 state=chase aggro=true los=true; active threats 0; desired (1, 0.000569)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   35.58] DODGE move Bone Bulwark:melee (hit in 0.42s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   37.00] DODGE move Bone Bulwark:melee (hit in 0.42s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   40.02] DBG t=40.0 pos=(41, 40) desired=(0.335648, 0.941988) goal=target target=Grave Caller sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   40.02]    d=220 los=true tcell=(41, 54) solid=false block0= val0=[2297.19220406667, (645.6707, 847.3017)] uses={ "barrage": 3, "quickdraw": 14, "frost_turret": 6, "smoke_bomb": 3, "lightning_trap": 29, "deadeye": 1, "marked_prey": 1 } busy=0.45 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   41.10] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   41.10] DODGE move Ash Cultist:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   41.77] DODGE move Shade Assassin:dash (hit in 0.37s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   41.77] EVADE_FAIL Ash Cultist:projectile dmg 21 (life 497/518)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   45.02] DBG t=45.0 pos=(41, 32) desired=(0.382684, -0.923879) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   45.02]    d=113 los=true tcell=(41, 39) solid=false block0= val0=[495.984680423485, (663.5089, 614.3874)] uses={ "barrage": 3, "quickdraw": 17, "frost_turret": 7, "smoke_bomb": 4, "lightning_trap": 33, "deadeye": 1, "marked_prey": 2 } busy=0.15 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   50.02] DBG t=50.0 pos=(43, 30) desired=(-0.923885, 0.382669) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   50.02]    d=44 los=false tcell=(42, 32) solid=false block0= val0=[0, (681.2044, 517.6422)] uses={ "barrage": 4, "quickdraw": 19, "frost_turret": 8, "smoke_bomb": 4, "lightning_trap": 39, "deadeye": 1, "marked_prey": 2 } busy=0.13 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   52.80] DODGE move Bone Bulwark:melee (hit in 0.42s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   53.20] EVADE_FAIL Bone Bulwark:melee dmg 27 (life 491/518)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   55.02] DBG t=55.0 pos=(43, 34) desired=(-0.999829, 0.018511) goal=target target=Grave Caller sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   55.02]    d=42 los=false tcell=(42, 36) solid=false block0= val0=[0, (679.1136, 584.1665)] uses={ "barrage": 5, "quickdraw": 19, "frost_turret": 8, "smoke_bomb": 5, "lightning_trap": 48, "deadeye": 2, "marked_prey": 3 } busy=0.43 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   55.35] DODGE move Shade Assassin:dash (hit in 0.37s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   55.37] DODGE move Shade Assassin:dash (hit in 0.37s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   56.17] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   56.17] DODGE move Ash Cultist:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   56.48] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   56.50] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   56.62] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   56.92] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   57.23] EVADE_FAIL Rime Witch:projectile dmg 15 (life 503/518)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   58.98] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   58.98] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   59.10] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.02] DBG t=60.0 pos=(42, 32) desired=(-0.707107, -0.707107) goal=target target=Grave Caller sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.02]    d=167 los=true tcell=(53, 32) solid=false block0= val0=[0, (852.452, 516.2899)] uses={ "barrage": 5, "quickdraw": 24, "frost_turret": 10, "smoke_bomb": 5, "lightning_trap": 48, "deadeye": 2, "marked_prey": 4 } busy=0.38 state=windup
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.40] STUCK at (42, 31), sidestepping (target Grave Caller, goal target)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.40]    pos (673.8395, 508.9545) vel (-87.23223, -87.23222) dodge_cd -60.40 busy -0.00 dist_here 12 origin (53, 32) boss (67, 57) gw 134 gh 92 up_grid 1
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.40]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.40]      18  17  16  15  14  13  12  11  10
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.40]      17  16  15  14  13  12  11  10   9
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.40]      16  15  14  13  12  ##  10   9   8
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.40]      15  14  13  12  11  10   9   8   7
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.40]      16  15  14  13  12  11  10   9   8
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.40]      17  16  15  14  13  12  11  10   9
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   60.40]    nearest Plague Rat d=35 state=chase aggro=true los=true; active threats 0; desired (-0.707107, -0.707107)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   65.02] DBG t=65.0 pos=(33, 29) desired=(-0.92388, -0.382683) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   65.02]    d=34 los=true tcell=(35, 29) solid=false block0= val0=[724.134235300184, (562.7407, 474.8452)] uses={ "barrage": 5, "quickdraw": 24, "frost_turret": 10, "smoke_bomb": 5, "lightning_trap": 58, "deadeye": 2, "marked_prey": 5 } busy=0.28 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   65.47] DODGE move Bone Bulwark:melee (hit in 0.42s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   65.87] EVADE_FAIL Bone Bulwark:melee dmg 25 (life 493/518)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   67.22] DODGE move Bone Bulwark:melee (hit in 0.42s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   70.02] DBG t=70.0 pos=(23, 32) desired=(-1, -0) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   70.02]    d=86 los=true tcell=(28, 32) solid=false block0= val0=[339.357939237121, (448.5917, 518.0909)] uses={ "barrage": 5, "quickdraw": 25, "frost_turret": 10, "smoke_bomb": 6, "lightning_trap": 65, "deadeye": 2, "marked_prey": 6 } busy=0.03 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   75.02] DBG t=75.0 pos=(17, 34) desired=(0, 0) goal=target target=Rime Witch sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   75.02]    d=205 los=true tcell=(30, 34) solid=false block0= val0=[495.984680423485, (483.3272, 547.9642)] uses={ "barrage": 6, "quickdraw": 27, "frost_turret": 12, "smoke_bomb": 6, "lightning_trap": 70, "deadeye": 2, "marked_prey": 6 } busy=0.13 state=windup
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   80.02] DBG t=80.0 pos=(18, 34) desired=(0.957699, 0.287773) goal=target target=Grave Caller sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   80.02]    d=211 los=true tcell=(31, 34) solid=false block0= val0=[339.357939237121, (504.3763, 542.2513)] uses={ "barrage": 7, "quickdraw": 35, "frost_turret": 12, "smoke_bomb": 6, "lightning_trap": 70, "deadeye": 2, "marked_prey": 6 } busy=0.30 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   83.05] STUCK at (17, 34), sidestepping (target Grave Caller, goal target)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   83.05]    pos (281.604, 551.6562) vel (-61.6825, 0) dodge_cd -83.05 busy 0.22 dist_here 14 origin (31, 34) boss (67, 57) gw 134 gh 92 up_grid 1
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   83.05]      ##  20  19  18  17  ##  15  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   83.05]      20  19  18  17  16  15  14  13  12
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   83.05]      19  18  17  16  15  14  13  12  11
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   83.05]      18  17  16  15  14  13  12  11  10
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   83.05]      19  18  17  16  15  14  13  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   83.05]      ##  19  18  17  16  ##  14  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   83.05]      21  20  19  18  17  16  15  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   83.05]    nearest Grave Brute d=55 state=chase aggro=true los=true; active threats 0; desired (-1, -0)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   85.02] DBG t=85.0 pos=(12, 37) desired=(-0.92388, 0.382683) goal=target target=Grave Brute sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   85.02]    d=95 los=true tcell=(17, 35) solid=false block0= val0=[0, (280.5833, 565.9068)] uses={ "barrage": 12, "quickdraw": 37, "frost_turret": 12, "smoke_bomb": 7, "lightning_trap": 73, "deadeye": 2, "marked_prey": 7 } busy=0.08 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   86.62] DODGE move death_explosion (hit in 0.28s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   90.02] DBG t=90.0 pos=(38, 33) desired=(1, -0.00019) goal=target target=Grave Brute sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   90.02]    d=281 los=true tcell=(56, 33) solid=false block0= val0=[261.044568643939, (876.1938, 532.2078)] uses={ "barrage": 13, "quickdraw": 37, "frost_turret": 12, "smoke_bomb": 7, "lightning_trap": 76, "deadeye": 2, "marked_prey": 7 } busy=0.11 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.02] DBG t=95.0 pos=(40, 33) desired=(0, 0) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.02]    d=169 los=true tcell=(50, 33) solid=false block0= val0=[339.357939237121, (803.6801, 531.9998)] uses={ "barrage": 19, "quickdraw": 37, "frost_turret": 14, "smoke_bomb": 7, "lightning_trap": 80, "deadeye": 2, "marked_prey": 7 } busy=0.27 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.63] STUCK at (41, 33), sidestepping (target Abyssal Horror, goal target)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.63]    pos (662.741, 536.0024) vel (55.51425, 0) dodge_cd -95.63 busy 0.25 dist_here 14 origin (55, 33) boss (67, 57) gw 134 gh 92 up_grid 1
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.63]      21  20  19  18  17  16  15  14  13
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.63]      20  19  18  17  16  15  ##  13  12
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.63]      19  18  17  16  15  14  13  12  11
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.63]      18  17  16  15  14  13  12  11  10
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.63]      19  18  17  16  15  14  13  12  11
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.63]      20  19  18  17  16  15  ##  13  12
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.63]      21  20  19  18  17  16  15  14  13
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0   95.63]    nearest Abyssal Horror d=216 state=chase aggro=true los=true; active threats 0; desired (1, -0.000141)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  100.02] DBG t=100.0 pos=(49, 34) desired=(1, 0.000327) goal=objective:altar target=- sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.02] DBG t=105.0 pos=(60, 33) desired=(0, 0) goal=target target=Grave Brute sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.02]    d=123 los=true tcell=(68, 33) solid=false block0= val0=[261.044568643939, (1082.574, 531.9946)] uses={ "barrage": 25, "quickdraw": 44, "frost_turret": 15, "smoke_bomb": 7, "lightning_trap": 83, "deadeye": 2, "marked_prey": 7 } busy=0.17 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.70] STUCK at (59, 33), sidestepping (target Grave Brute, goal target)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.70]    pos (947.8156, 528.7455) vel (-61.6825, 0) dodge_cd -105.70 busy 0.17 dist_here 15 origin (73, 32) boss (67, 57) gw 134 gh 92 up_grid 1
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.70]      ##  ##  ##  ##  ##  ##  14  13  12
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.70]      ##  ##  ##  ##  ##  ##  13  12  11
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.70]      18  17  16  15  14  13  12  11  10
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.70]      19  18  17  16  15  14  13  12  11
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.70]      20  19  18  17  16  15  14  13  12
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.70]      ##  ##  ##  ##  ##  ##  15  14  13
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.70]      ##  ##  ##  ##  ##  ##  16  15  14
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  105.70]    nearest Grave Brute d=115 state=chase aggro=true los=true; active threats 0; desired (-1, -0)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  110.02] DBG t=110.0 pos=(71, 33) desired=(0, 0) goal=target target=Rime Witch sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  110.02]    d=205 los=true tcell=(84, 33) solid=false block0= val0=[730.92479220303, (1356.682, 534.5445)] uses={ "barrage": 29, "quickdraw": 46, "frost_turret": 16, "smoke_bomb": 7, "lightning_trap": 83, "deadeye": 2, "marked_prey": 7 } busy=0.35 state=windup
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  111.58] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  111.58] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  115.02] DBG t=115.0 pos=(78, 34) desired=(0, 0) goal=target target=Shade Assassin sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  115.02]    d=204 los=true tcell=(91, 34) solid=false block0= val0=[809.238162796212, (1464.028, 546.8151)] uses={ "barrage": 31, "quickdraw": 53, "frost_turret": 16, "smoke_bomb": 7, "lightning_trap": 83, "deadeye": 2, "marked_prey": 7 } busy=0.47 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  118.37] PASSIVE xp_p14 (Prismatic Path) value 0.0117
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  120.02] DBG t=120.0 pos=(76, 34) desired=(0, 0) goal=target target=Grave Brute sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  120.02]    d=122 los=true tcell=(84, 34) solid=false block0= val0=[674.809573119925, (1343.365, 547.9995)] uses={ "barrage": 31, "quickdraw": 58, "frost_turret": 17, "smoke_bomb": 7, "lightning_trap": 86, "deadeye": 2, "marked_prey": 7 } busy=0.47 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  125.02] DBG t=125.0 pos=(73, 34) desired=(-0.981942, 0.189181) goal=objective:altar target=- sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2", "altar"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  125.22] OBJECTIVE altar
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  125.42] DODGE move Grave Brute:aoe (hit in 0.75s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  125.42] DODGE move Abyssal Horror:aoe (hit in 0.70s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  125.42] DODGE move Shade Assassin:dash (hit in 0.37s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  125.42] DODGE move Shade Assassin:dash (hit in 0.37s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  125.42] DODGE move Shade Assassin:dash (hit in 0.37s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  125.42] DODGE move Shade Assassin:dash (hit in 0.37s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  125.47] DODGE move Shade Assassin:dash (hit in 0.32s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  125.50] DODGE move Shade Assassin:dash (hit in 0.28s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  128.48] DODGE move Shade Assassin:dash (hit in 0.08s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  130.02] DBG t=130.0 pos=(54, 33) desired=(-1, -0) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  130.02]    WAVES wave=1/3 altar=(70, 35) d_altar=252 pflow=0 :: Grave @(68, 33) solid=false flow=14 lost=0.0 st=chase; Grave @(72, 33) solid=false flow=18 lost=0.0 st=chase; Grave @(71, 33) solid=false flow=17 lost=0.0 st=chase; Bone B@(70, 33) solid=false flow=16 lost=0.0 st=chase; Grave @(67, 33) solid=false flow=13 lost=0.0 st=chase; Shade @(62, 31) solid=false flow=10 lost=0.0 st=windup; Abyssa@(65, 33) solid=false flow=11 lost=0.0 st=chase; Shade @(61, 31) solid=false flow=9 lost=0.0 st=windup; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  130.02]    d=171 los=true tcell=(65, 33) solid=false block0= val0=[889.727324262086, (1032.803, 531.8736)] uses={ "barrage": 32, "quickdraw": 64, "frost_turret": 18, "smoke_bomb": 8, "lightning_trap": 94, "deadeye": 3, "marked_prey": 8 } busy=0.14 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  135.02] DBG t=135.0 pos=(48, 33) desired=(0, 0) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  135.02]    WAVES wave=1/3 altar=(70, 35) d_altar=349 pflow=0 :: Bone B@(61, 33) solid=false flow=13 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  135.02]    d=207 los=true tcell=(61, 33) solid=false block0= val0=[269.92382924797, (975.4387, 531.9998)] uses={ "barrage": 32, "quickdraw": 66, "frost_turret": 19, "smoke_bomb": 8, "lightning_trap": 101, "deadeye": 3, "marked_prey": 8 } busy=0.20 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  140.00] DBG t=140.0 pos=(48, 33) desired=(0.998889, 0.047124) goal=target target=Grave Caller sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  140.00]    WAVES wave=2/3 altar=(70, 35) d_altar=346 pflow=0 :: Bone B@(72, 33) solid=false flow=24 lost=0.0 st=chase; Bone B@(77, 34) solid=false flow=30 lost=0.0 st=idle; Bone B@(72, 34) solid=false flow=25 lost=0.0 st=chase; Bone B@(71, 33) solid=false flow=23 lost=0.0 st=chase; Bone B@(71, 34) solid=false flow=24 lost=0.0 st=chase; Rime W@(66, 34) solid=false flow=19 lost=0.0 st=chase; Rime W@(67, 34) solid=false flow=20 lost=0.0 st=chase; Rime W@(68, 33) solid=false flow=20 lost=0.0 st=chase; Storm @(67, 33) solid=false flow=19 lost=0.0 st=chase; Bone B@(70, 33) solid=false flow=22 lost=0.0 st=chase; Shade @(62, 34) solid=false flow=15 lost=0.0 st=chase; Shade @(62, 34) solid=false flow=15 lost=0.0 st=chase; Shade @(60, 33) solid=false flow=12 lost=0.0 st=chase; Shade @(62, 33) solid=false flow=14 lost=0.0 st=chase; Shade @(63, 33) solid=false flow=15 lost=0.0 st=chase; Grave @(66, 32) solid=false flow=19 lost=0.0 st=chase; Grave @(68, 33) solid=false flow=20 lost=0.0 st=chase; Rime W@(67, 32) solid=false flow=20 lost=0.0 st=chase; Grave @(68, 33) solid=false flow=20 lost=0.0 st=chase; Rime W@(67, 30) solid=false flow=22 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  140.00]    d=308 los=true tcell=(68, 33) solid=false block0= val0=[0, (1061.17, 534.5269)] uses={ "barrage": 39, "quickdraw": 66, "frost_turret": 20, "smoke_bomb": 8, "lightning_trap": 104, "deadeye": 3, "marked_prey": 8 } busy=-0.33 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  141.12] DODGE move Shade Assassin (elite):dash (hit in 0.18s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  141.12] DODGE move Shade Assassin:dash (hit in 0.37s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  141.47] DODGE move Shade Assassin:dash (hit in 0.37s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  141.75] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  141.75] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  145.00] DBG t=145.0 pos=(56, 33) desired=(-1, -0) goal=target target=Grave Caller sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  145.00]    WAVES wave=2/3 altar=(70, 35) d_altar=233 pflow=0 :: Bone B@(55, 34) solid=false flow=2 lost=0.0 st=windup; Bone B@(67, 32) solid=false flow=12 lost=0.0 st=chase; Bone B@(66, 34) solid=false flow=11 lost=0.0 st=chase; Bone B@(64, 33) solid=false flow=8 lost=0.0 st=chase; Bone B@(62, 33) solid=false flow=6 lost=0.0 st=chase; Bone B@(62, 33) solid=false flow=6 lost=0.0 st=chase; Grave @(66, 33) solid=false flow=10 lost=0.0 st=recover; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  145.00]    d=169 los=true tcell=(66, 33) solid=false block0= val0=[755.786721894316, (1066.497, 531.0857)] uses={ "barrage": 40, "quickdraw": 73, "frost_turret": 20, "smoke_bomb": 9, "lightning_trap": 105, "deadeye": 3, "marked_prey": 9 } busy=0.20 state=recover
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  150.00] DBG t=150.0 pos=(41, 33) desired=(0, 0) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  150.00]    WAVES wave=2/3 altar=(70, 35) d_altar=462 pflow=0 :: Bone B@(48, 33) solid=false flow=7 lost=0.0 st=chase; Bone B@(54, 33) solid=false flow=13 lost=0.0 st=chase; Bone B@(55, 33) solid=false flow=14 lost=0.0 st=chase; Bone B@(53, 33) solid=false flow=12 lost=0.0 st=chase; Bone B@(51, 33) solid=false flow=10 lost=0.0 st=chase; Bone B@(52, 33) solid=false flow=11 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  150.00]    d=115 los=true tcell=(48, 33) solid=false block0= val0=[431.878126796752, (774.9131, 532.0049)] uses={ "barrage": 40, "quickdraw": 74, "frost_turret": 21, "smoke_bomb": 9, "lightning_trap": 113, "deadeye": 3, "marked_prey": 10 } busy=0.35 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  155.00] DBG t=155.0 pos=(40, 43) desired=(-0, 1) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  155.00]    WAVES wave=2/3 altar=(70, 35) d_altar=499 pflow=0 :: Bone B@(39, 39) solid=false flow=5 lost=0.0 st=chase; Bone B@(44, 36) solid=false flow=11 lost=0.0 st=chase; Bone B@(46, 35) solid=false flow=14 lost=0.0 st=chase; Bone B@(43, 37) solid=false flow=9 lost=0.0 st=chase; Bone B@(41, 37) solid=false flow=7 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  155.00]    d=71 los=true tcell=(39, 39) solid=false block0= val0=[350.900978022361, (635.3707, 624.5328)] uses={ "barrage": 40, "quickdraw": 74, "frost_turret": 22, "smoke_bomb": 10, "lightning_trap": 121, "deadeye": 3, "marked_prey": 11 } busy=0.12 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  160.00] DBG t=160.0 pos=(34, 58) desired=(-1, -0) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  160.00]    WAVES wave=2/3 altar=(70, 35) d_altar=688 pflow=0 :: Bone B@(38, 55) solid=false flow=7 lost=0.0 st=chase; Bone B@(39, 47) solid=false flow=16 lost=0.0 st=chase; Bone B@(39, 42) solid=false flow=21 lost=0.0 st=chase; Bone B@(39, 48) solid=false flow=15 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  160.00]    d=75 los=true tcell=(38, 55) solid=false block0= val0=[269.92382924797, (602.2969, 893.519)] uses={ "barrage": 40, "quickdraw": 74, "frost_turret": 22, "smoke_bomb": 10, "lightning_trap": 131, "deadeye": 3, "marked_prey": 12 } busy=0.00 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  162.10] DODGE move Shade Assassin:dash (hit in 0.37s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  163.83] DODGE move Bone Bulwark:melee (hit in 0.42s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  164.48] DODGE move Shade Assassin:dash (hit in 0.03s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  164.48] DODGE move Bone Bulwark (elite):melee (hit in 0.42s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  165.00] DBG t=165.0 pos=(32, 57) desired=(1, 0) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  165.00]    WAVES wave=2/3 altar=(70, 35) d_altar=699 pflow=0 :: Bone B@(36, 55) solid=false flow=6 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  165.00]    d=64 los=true tcell=(28, 57) solid=false block0= val0=[593.832424345534, (459.2803, 922.782)] uses={ "barrage": 40, "quickdraw": 74, "frost_turret": 23, "smoke_bomb": 10, "lightning_trap": 140, "deadeye": 3, "marked_prey": 13 } busy=0.02 state=recover
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  170.00] DBG t=170.0 pos=(44, 52) desired=(0.92388, -0.382683) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  170.00]    WAVES wave=2/3 altar=(70, 35) d_altar=493 pflow=0 :: Bone B@(41, 54) solid=false flow=5 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  170.00]    d=61 los=true tcell=(41, 54) solid=false block0= val0=[608.760800810901, (667.5991, 861.4826)] uses={ "barrage": 40, "quickdraw": 74, "frost_turret": 24, "smoke_bomb": 11, "lightning_trap": 149, "deadeye": 4, "marked_prey": 13 } busy=0.35 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  173.27] DODGE move Bone Bulwark:melee (hit in 0.42s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  173.67] EVADE_FAIL Bone Bulwark:melee dmg 36 (life 482/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  175.00] DBG t=175.0 pos=(44, 58) desired=(0.707107, 0.707107) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  175.00]    WAVES wave=3/3 altar=(70, 35) d_altar=554 pflow=0 :: Abyssa@(77, 34) solid=false flow=63 lost=0.0 st=idle; Abyssa@(76, 35) solid=false flow=63 lost=0.0 st=idle; Abyssa@(75, 33) solid=false flow=62 lost=0.0 st=idle; Shade @(59, 34) solid=false flow=45 lost=0.0 st=chase; Bone B@(70, 35) solid=false flow=57 lost=0.0 st=idle; Bone B@(68, 36) solid=false flow=56 lost=0.0 st=idle; Bone B@(71, 33) solid=false flow=58 lost=0.0 st=idle; Rime W@(61, 33) solid=false flow=48 lost=0.0 st=chase; Bone B@(73, 34) solid=false flow=59 lost=0.0 st=idle; Bone B@(61, 34) solid=false flow=47 lost=0.0 st=idle; Bone B@(71, 35) solid=false flow=58 lost=0.0 st=idle; Rime W@(51, 33) solid=false flow=38 lost=0.0 st=chase; Rime W@(50, 33) solid=false flow=37 lost=0.0 st=chase; Rime W@(52, 34) solid=false flow=38 lost=0.0 st=chase; Rime W@(51, 34) solid=false flow=37 lost=0.0 st=chase; Rime W@(53, 34) solid=false flow=39 lost=0.0 st=chase; Rime W@(51, 34) solid=false flow=37 lost=0.0 st=chase; Rime W@(50, 34) solid=false flow=36 lost=0.0 st=chase; Grave @(56, 34) solid=false flow=42 lost=0.0 st=chase; Abyssa@(65, 30) solid=false flow=55 lost=0.0 st=idle; Abyssa@(49, 34) solid=false flow=35 lost=0.0 st=chase; Abyssa@(67, 31) solid=false flow=56 lost=0.0 st=idle; Abyssa@(54, 34) solid=false flow=40 lost=0.0 st=chase; Abyssa@(67, 32) solid=false flow=55 lost=0.0 st=idle; Grave @(58, 34) solid=false flow=44 lost=0.0 st=chase; Grave @(60, 34) solid=false flow=46 lost=0.0 st=chase; Grave @(57, 34) solid=false flow=43 lost=0.0 st=chase; Grave @(56, 33) solid=false flow=43 lost=0.0 st=chase; Storm @(55, 34) solid=false flow=41 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  175.00]    d=68 los=true tcell=(42, 54) solid=false block0= val0=[1030.21058598768, (688.906, 878.1755)] uses={ "barrage": 41, "quickdraw": 79, "frost_turret": 24, "smoke_bomb": 11, "lightning_trap": 152, "deadeye": 4, "marked_prey": 14 } busy=0.32 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  176.27] DODGE roll Bone Bulwark:melee (hit in 0.03s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  176.27] DODGE roll Bone Bulwark:melee (hit in 0.42s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  176.67] EVADE_FAIL Bone Bulwark:melee dmg 32 (life 480/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  177.48] DODGE roll Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  177.48] DODGE roll Bone Bulwark:melee (hit in 0.23s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  177.80] EVADE_FAIL Rime Witch:projectile dmg 13 (life 472/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  179.10] DODGE roll Bone Bulwark:melee (hit in 0.03s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  179.10] DODGE roll Bone Bulwark:melee (hit in 0.42s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  179.50] EVADE_FAIL Bone Bulwark:melee dmg 34 (life 436/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  180.00] DBG t=180.0 pos=(44, 58) desired=(0.92388, 0.382683) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  180.00]    WAVES wave=3/3 altar=(70, 35) d_altar=555 pflow=0 :: Abyssa@(78, 35) solid=false flow=65 lost=0.0 st=idle; Abyssa@(74, 34) solid=false flow=60 lost=0.0 st=idle; Abyssa@(75, 33) solid=false flow=62 lost=0.0 st=idle; Shade @(41, 36) solid=false flow=25 lost=0.0 st=chase; Bone B@(67, 33) solid=false flow=54 lost=0.0 st=idle; Bone B@(68, 35) solid=false flow=55 lost=0.0 st=idle; Bone B@(71, 33) solid=false flow=58 lost=0.0 st=idle; Rime W@(45, 35) solid=false flow=30 lost=0.0 st=chase; Bone B@(72, 33) solid=false flow=59 lost=0.0 st=idle; Bone B@(66, 34) solid=false flow=52 lost=0.0 st=idle; Bone B@(70, 35) solid=false flow=57 lost=0.0 st=idle; Rime W@(41, 42) solid=false flow=19 lost=0.0 st=chase; Rime W@(41, 43) solid=false flow=18 lost=0.0 st=chase; Rime W@(41, 41) solid=false flow=20 lost=0.0 st=chase; Rime W@(41, 38) solid=false flow=23 lost=0.0 st=chase; Rime W@(41, 40) solid=false flow=21 lost=0.0 st=chase; Rime W@(41, 39) solid=false flow=22 lost=0.0 st=chase; Rime W@(41, 40) solid=false flow=21 lost=0.0 st=chase; Grave @(43, 36) solid=false flow=27 lost=0.0 st=chase; Abyssa@(67, 30) solid=false flow=57 lost=0.0 st=idle; Abyssa@(41, 44) solid=false flow=17 lost=0.0 st=chase; Abyssa@(67, 31) solid=false flow=56 lost=0.0 st=idle; Abyssa@(42, 37) solid=false flow=25 lost=0.0 st=chase; Abyssa@(66, 31) solid=false flow=55 lost=0.0 st=idle; Grave @(44, 37) solid=false flow=27 lost=0.0 st=chase; Grave @(44, 36) solid=false flow=28 lost=0.0 st=chase; Grave @(44, 36) solid=false flow=28 lost=0.0 st=chase; Grave @(42, 36) solid=false flow=26 lost=0.0 st=chase; Storm @(43, 37) solid=false flow=26 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  180.00]    d=22 los=true tcell=(44, 57) solid=false block0= val0=[917.741019443098, (704.1776, 915.5342)] uses={ "barrage": 41, "quickdraw": 84, "frost_turret": 25, "smoke_bomb": 12, "lightning_trap": 153, "deadeye": 4, "marked_prey": 16 } busy=0.15 state=windup
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  180.52] DODGE roll Bone Bulwark:melee (hit in 0.03s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  180.52] DODGE roll Bone Bulwark:melee (hit in 0.42s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  180.92] EVADE_FAIL Bone Bulwark:melee dmg 26 (life 413/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  181.73] DODGE roll Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  181.73] DODGE roll Bone Bulwark:melee (hit in 0.23s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  183.65] DODGE roll Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  183.65] DODGE roll Bone Bulwark:melee (hit in 0.12s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  184.00] EVADE_FAIL Rime Witch:projectile dmg 12 (life 379/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  184.37] DODGE move Grave Caller:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  184.38] DODGE move Shade Assassin:dash (hit in 0.37s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  185.00] DBG t=185.0 pos=(44, 58) desired=(0.92388, 0.382683) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  185.00]    WAVES wave=3/3 altar=(70, 35) d_altar=555 pflow=0 :: Abyssa@(77, 34) solid=false flow=63 lost=0.0 st=idle; Abyssa@(74, 34) solid=false flow=60 lost=0.0 st=idle; Abyssa@(73, 33) solid=false flow=60 lost=0.0 st=idle; Shade @(41, 47) solid=false flow=14 lost=0.0 st=chase; Bone B@(69, 35) solid=false flow=56 lost=0.0 st=idle; Bone B@(67, 36) solid=false flow=55 lost=0.0 st=idle; Bone B@(72, 33) solid=false flow=59 lost=0.0 st=idle; Rime W@(40, 45) solid=false flow=17 lost=0.0 st=chase; Bone B@(71, 34) solid=false flow=57 lost=0.0 st=idle; Bone B@(66, 35) solid=false flow=53 lost=0.0 st=idle; Bone B@(70, 35) solid=false flow=57 lost=0.0 st=idle; Rime W@(41, 49) solid=false flow=12 lost=0.0 st=chase; Rime W@(41, 50) solid=false flow=11 lost=0.0 st=windup; Rime W@(40, 48) solid=false flow=14 lost=0.0 st=recover; Rime W@(41, 47) solid=false flow=14 lost=0.0 st=chase; Rime W@(40, 48) solid=false flow=14 lost=0.0 st=windup; Rime W@(41, 47) solid=false flow=14 lost=0.0 st=chase; Rime W@(41, 48) solid=false flow=13 lost=0.0 st=chase; Grave @(41, 44) solid=false flow=17 lost=0.0 st=chase; Abyssa@(66, 30) solid=false flow=56 lost=0.0 st=idle; Abyssa@(43, 56) solid=false flow=3 lost=0.0 st=chase; Abyssa@(67, 30) solid=false flow=57 lost=0.0 st=idle; Abyssa@(41, 46) solid=false flow=15 lost=0.0 st=chase; Abyssa@(66, 32) solid=false flow=54 lost=0.0 st=idle; Grave @(40, 44) solid=false flow=18 lost=0.0 st=chase; Grave @(41, 43) solid=false flow=18 lost=0.0 st=chase; Grave @(40, 44) solid=false flow=18 lost=0.0 st=chase; Grave @(41, 45) solid=false flow=16 lost=0.0 st=chase; Storm @(41, 43) solid=false flow=18 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  185.00]    d=23 los=true tcell=(43, 57) solid=false block0= val0=[1160.67246576627, (703.7908, 915.1887)] uses={ "barrage": 41, "quickdraw": 91, "frost_turret": 26, "smoke_bomb": 12, "lightning_trap": 153, "deadeye": 4, "marked_prey": 17 } busy=0.30 state=recover
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  185.17] DODGE roll Bone Bulwark:melee (hit in 0.38s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  185.47] DODGE move Bone Bulwark:melee (hit in 0.23s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  185.47] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  185.47] DODGE move Bone Bulwark:melee (hit in 0.33s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  185.53] EVADE_FAIL Bone Bulwark:melee dmg 39 (life 325/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  185.68] EVADE_FAIL Bone Bulwark:melee dmg 30 (life 296/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  186.07] EVADE_FAIL Rime Witch:projectile dmg 15 (life 288/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  186.62] DODGE roll Shade Assassin:dash (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  186.62] DODGE roll Bone Bulwark:melee (hit in 0.35s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  188.07] DODGE move Abyssal Horror:aoe (hit in 0.27s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  188.07] DODGE move Shade Assassin:dash (hit in 0.33s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  188.90] DODGE roll Abyssal Horror (elite):aoe (hit in 0.38s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  189.15] DODGE move Bone Bulwark:melee (hit in 0.42s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  189.38] DODGE move Abyssal Horror:aoe (hit in 0.70s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  189.45] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  189.73] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  189.85] EVADE_FAIL Rime Witch:projectile dmg 11 (life 358/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  189.87] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  189.88] DODGE move Shade Assassin:dash (hit in 0.37s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  189.92] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  190.97] DODGE move Abyssal Horror (elite):aoe (hit in 0.13s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  190.97] DODGE move Bone Bulwark:melee (hit in 0.23s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  190.97] DODGE move Bone Bulwark:melee (hit in 0.42s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  191.30] DODGE move Abyssal Horror:aoe (hit in 0.70s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  191.52] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  191.72] DODGE move Shade Assassin:dash (hit in 0.37s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  191.77] DODGE move Abyssal Horror:aoe (hit in 0.70s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  191.93] DODGE move Bone Bulwark:melee (hit in 0.35s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  192.22] DODGE move Shade Assassin:dash (hit in 0.37s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  192.38] DODGE move Abyssal Horror (elite):aoe (hit in 0.70s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  192.82] DODGE move Grave Brute:aoe (hit in 0.75s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  192.95] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  192.95] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  192.97] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  192.97] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  193.72] DODGE move Abyssal Horror:aoe (hit in 0.28s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  194.08] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  194.08] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  194.13] DODGE move Shade Assassin:dash (hit in 0.37s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  194.20] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  194.38] DODGE move Abyssal Horror:aoe (hit in 0.70s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  194.85] DODGE roll Abyssal Horror:aoe (hit in 0.43s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.00] DBG t=195.0 pos=(41, 59) desired=(0.382683, 0.92388) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.00]    WAVES wave=3/3 altar=(70, 35) d_altar=602 pflow=0 :: Abyssa@(76, 33) solid=false flow=61 lost=0.0 st=idle; Abyssa@(74, 34) solid=false flow=58 lost=0.0 st=idle; Abyssa@(75, 33) solid=false flow=60 lost=0.0 st=idle; Shade @(41, 48) solid=false flow=11 lost=0.0 st=chase; Bone B@(70, 35) solid=false flow=55 lost=0.0 st=idle; Bone B@(67, 36) solid=false flow=53 lost=0.0 st=idle; Bone B@(71, 33) solid=false flow=56 lost=0.0 st=idle; Rime W@(40, 48) solid=false flow=12 lost=0.0 st=recover; Bone B@(72, 34) solid=false flow=56 lost=0.0 st=idle; Bone B@(67, 35) solid=false flow=52 lost=0.0 st=idle; Bone B@(71, 34) solid=false flow=55 lost=0.0 st=idle; Rime W@(41, 50) solid=false flow=9 lost=0.0 st=recover; Rime W@(41, 51) solid=false flow=8 lost=0.0 st=recover; Rime W@(40, 49) solid=false flow=11 lost=0.0 st=recover; Rime W@(40, 49) solid=false flow=11 lost=0.0 st=recover; Rime W@(40, 50) solid=false flow=10 lost=0.0 st=windup; Rime W@(41, 48) solid=false flow=11 lost=0.0 st=recover; Rime W@(41, 49) solid=false flow=10 lost=0.0 st=recover; Grave @(41, 45) solid=false flow=14 lost=0.0 st=chase; Abyssa@(66, 30) solid=false flow=54 lost=0.0 st=idle; Abyssa@(66, 31) solid=false flow=53 lost=0.0 st=idle; Abyssa@(41, 47) solid=false flow=12 lost=0.0 st=chase; Abyssa@(65, 32) solid=false flow=51 lost=0.0 st=idle; Grave @(40, 46) solid=false flow=14 lost=0.0 st=chase; Grave @(40, 45) solid=false flow=15 lost=0.0 st=chase; Grave @(40, 46) solid=false flow=14 lost=0.0 st=windup; Grave @(41, 46) solid=false flow=13 lost=0.0 st=chase; Storm @(41, 44) solid=false flow=15 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.00]    d=38 los=true tcell=(41, 57) solid=false block0= val0=[1727.51250718701, (662.159, 916.9184)] uses={ "barrage": 42, "quickdraw": 101, "frost_turret": 28, "smoke_bomb": 13, "lightning_trap": 155, "deadeye": 4, "marked_prey": 19 } busy=-0.15 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.02] DODGE move Abyssal Horror:aoe (hit in 0.60s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.02] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.27] EVADE_FAIL Abyssal Horror:aoe dmg 73 (life 355/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.65] EVADE_FAIL Rime Witch:projectile dmg 13 (life 291/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.93] DODGE move Abyssal Horror:aoe (hit in 0.22s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.93] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.93] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  195.95] DODGE roll Grave Caller:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.18] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.18] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.18] DODGE move Abyssal Horror (elite):aoe (hit in 0.68s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.18] DODGE move Bone Bulwark:melee (hit in 0.42s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.20] DODGE move Abyssal Horror:aoe (hit in 0.70s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.20] DODGE move Grave Brute:aoe (hit in 0.75s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.32] EVADE_FAIL Rime Witch:projectile dmg 17 (life 289/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.52] DODGE move Plague Rat:melee (hit in 0.07s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.57] DODGE move Plague Rat:melee (hit in 0.07s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.58] EVADE_FAIL Rime Witch:projectile dmg 5 (life 285/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.65] DODGE move Plague Rat:melee (hit in 0.07s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.72] EVADE_FAIL Plague Rat:melee dmg 8 (life 255/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.75] DODGE move Abyssal Horror:aoe (hit in 0.68s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.82] EVADE_FAIL Grave Caller:projectile dmg 36 (life 431/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.85] EVADE_FAIL Abyssal Horror (elite):aoe dmg 112 (life 319/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.88] EVADE_FAIL Abyssal Horror:aoe dmg 58 (life 261/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  196.93] EVADE_FAIL Grave Brute:aoe dmg 55 (life 207/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  197.20] DODGE roll Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  197.20] DODGE roll Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  197.47] EVADE_FAIL Abyssal Horror:aoe dmg 11 (life 395/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  197.53] EVADE_FAIL Rime Witch:projectile dmg 15 (life 380/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  197.58] EVADE_FAIL Rime Witch:projectile dmg 12 (life 369/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.00] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.00] DODGE move Abyssal Horror (elite):aoe (hit in 0.68s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.00] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.02] DODGE move death_explosion (hit in 0.70s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.08] EVADE_FAIL Rime Witch:projectile dmg 15 (life 297/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.13] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.22] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.22] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.55] EVADE_FAIL Rime Witch:projectile dmg 16 (life 283/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.58] DODGE move Abyssal Horror:aoe (hit in 0.65s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.67] EVADE_FAIL Abyssal Horror (elite):aoe dmg 119 (life 165/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  198.80] EVADE_FAIL Rime Witch:projectile dmg 20 (life 356/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  199.17] DODGE move Abyssal Horror:aoe (hit in 0.62s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  199.17] DODGE move Abyssal Horror:aoe (hit in 0.67s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  199.17] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  199.17] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  199.22] EVADE_FAIL Abyssal Horror:aoe dmg 64 (life 318/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  199.78] DODGE move Grave Brute:aoe (hit in 0.65s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  199.78] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  199.83] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.00] DBG t=200.0 pos=(40, 59) desired=(0.707107, -0.707107) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.00]    WAVES wave=3/3 altar=(70, 35) d_altar=609 pflow=0 :: Abyssa@(77, 34) solid=false flow=62 lost=0.0 st=idle; Abyssa@(76, 34) solid=false flow=61 lost=0.0 st=idle; Abyssa@(73, 33) solid=false flow=59 lost=0.0 st=idle; Shade @(41, 48) solid=false flow=12 lost=0.0 st=chase; Bone B@(70, 35) solid=false flow=56 lost=0.0 st=idle; Bone B@(69, 36) solid=false flow=56 lost=0.0 st=idle; Bone B@(72, 35) solid=false flow=58 lost=0.0 st=idle; Rime W@(40, 48) solid=false flow=11 lost=0.0 st=recover; Bone B@(73, 34) solid=false flow=58 lost=0.0 st=idle; Bone B@(68, 36) solid=false flow=55 lost=0.0 st=idle; Bone B@(69, 35) solid=false flow=55 lost=0.0 st=idle; Rime W@(41, 50) solid=false flow=10 lost=0.0 st=recover; Rime W@(41, 51) solid=false flow=9 lost=0.0 st=windup; Rime W@(40, 49) solid=false flow=10 lost=0.0 st=windup; Rime W@(40, 49) solid=false flow=10 lost=0.0 st=windup; Rime W@(40, 50) solid=false flow=9 lost=0.0 st=recover; Rime W@(41, 48) solid=false flow=12 lost=0.0 st=recover; Rime W@(41, 49) solid=false flow=11 lost=0.0 st=recover; Grave @(41, 45) solid=false flow=15 lost=0.0 st=chase; Abyssa@(66, 30) solid=false flow=55 lost=0.0 st=idle; Abyssa@(67, 31) solid=false flow=55 lost=0.0 st=idle; Abyssa@(41, 47) solid=false flow=13 lost=0.0 st=chase; Abyssa@(65, 33) solid=false flow=51 lost=0.0 st=idle; Grave @(39, 46) solid=false flow=14 lost=0.0 st=recover; Grave @(39, 46) solid=false flow=14 lost=0.0 st=chase; Grave @(40, 46) solid=false flow=13 lost=0.0 st=windup; Grave @(41, 46) solid=false flow=14 lost=0.0 st=chase; Storm @(41, 55) solid=false flow=5 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.00]    d=20 los=true tcell=(39, 58) solid=false block0= val0=[1565.55820963823, (635.2427, 936.8971)] uses={ "barrage": 42, "quickdraw": 103, "frost_turret": 28, "smoke_bomb": 13, "lightning_trap": 155, "deadeye": 4, "marked_prey": 20 } busy=-0.45 state=recover
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.17] EVADE_FAIL Rime Witch:projectile dmg 22 (life 394/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.27] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.27] DODGE move Bone Bulwark:melee (hit in 0.42s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.28] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.30] DODGE move Abyssal Horror (elite):aoe (hit in 0.47s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.32] DODGE move Abyssal Horror (elite):aoe (hit in 0.70s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.32] DODGE move Storm Acolyte:aoe (hit in 0.70s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  200.42] EVADE_FAIL Grave Brute:aoe dmg 80 (life 333/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  201.00] EVADE_FAIL Abyssal Horror (elite):aoe dmg 105 (life 216/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  201.22] DODGE move Abyssal Horror:aoe (hit in 0.38s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  201.22] DODGE move Abyssal Horror:aoe (hit in 0.43s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  201.22] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  201.22] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  201.28] DODGE move Grave Caller:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  201.58] EVADE_FAIL Abyssal Horror:aoe dmg 73 (life 357/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  201.67] DODGE move death_explosion (hit in 0.73s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  201.85] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  202.15] DODGE move Abyssal Horror:aoe (hit in 0.65s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  202.15] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  202.20] DODGE move Bone Bulwark:melee (hit in 0.42s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  202.20] DODGE move Plague Rat:melee (hit in 0.07s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  202.27] EVADE_FAIL Rime Witch:projectile dmg 10 (life 368/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  202.50] EVADE_FAIL Rime Witch:projectile dmg 15 (life 346/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  203.17] DODGE roll Storm Acolyte:aoe (hit in 0.23s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  203.17] DODGE roll Abyssal Horror:aoe (hit in 0.25s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  203.40] EVADE_FAIL Storm Acolyte:aoe dmg 62 (life 358/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  204.32] DODGE roll Grave Caller:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  204.32] DODGE roll Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  204.32] DODGE roll Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  204.33] DODGE move Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  204.72] EVADE_FAIL Rime Witch:projectile dmg 12 (life 287/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.00] DBG t=205.0 pos=(40, 59) desired=(0.707107, -0.707107) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.00]    WAVES wave=3/3 altar=(70, 35) d_altar=612 pflow=0 :: Abyssa@(77, 34) solid=false flow=62 lost=0.0 st=idle; Abyssa@(75, 35) solid=false flow=61 lost=0.0 st=idle; Abyssa@(74, 34) solid=false flow=59 lost=0.0 st=idle; Shade @(41, 48) solid=false flow=12 lost=0.0 st=chase; Bone B@(69, 36) solid=false flow=56 lost=0.0 st=idle; Bone B@(68, 35) solid=false flow=54 lost=0.0 st=idle; Bone B@(70, 33) solid=false flow=56 lost=0.0 st=idle; Rime W@(40, 48) solid=false flow=11 lost=0.0 st=windup; Bone B@(73, 33) solid=false flow=59 lost=0.0 st=idle; Bone B@(67, 35) solid=false flow=53 lost=0.0 st=idle; Bone B@(69, 34) solid=false flow=54 lost=0.0 st=idle; Rime W@(41, 50) solid=false flow=10 lost=0.0 st=windup; Rime W@(41, 51) solid=false flow=9 lost=0.0 st=recover; Rime W@(40, 49) solid=false flow=10 lost=0.0 st=recover; Rime W@(40, 49) solid=false flow=10 lost=0.0 st=recover; Rime W@(40, 50) solid=false flow=9 lost=0.0 st=recover; Rime W@(41, 48) solid=false flow=12 lost=0.0 st=windup; Rime W@(41, 49) solid=false flow=11 lost=0.0 st=windup; Grave @(41, 45) solid=false flow=15 lost=0.0 st=chase; Abyssa@(65, 30) solid=false flow=54 lost=0.0 st=idle; Abyssa@(67, 30) solid=false flow=56 lost=0.0 st=idle; Abyssa@(41, 47) solid=false flow=13 lost=0.0 st=chase; Abyssa@(66, 33) solid=false flow=52 lost=0.0 st=idle; Grave @(39, 46) solid=false flow=14 lost=0.0 st=recover; Grave @(39, 46) solid=false flow=14 lost=0.0 st=chase; Grave @(40, 46) solid=false flow=13 lost=0.0 st=windup; Grave @(41, 46) solid=false flow=14 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.00]    d=34 los=true tcell=(41, 57) solid=false block0= val0=[917.741019443098, (662.4241, 917.9832)] uses={ "barrage": 42, "quickdraw": 105, "frost_turret": 29, "smoke_bomb": 14, "lightning_trap": 155, "deadeye": 4, "marked_prey": 20 } busy=-0.68 state=windup
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.42] DODGE roll death_explosion (hit in 0.18s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.42] DODGE roll Grave Caller:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.42] DODGE roll Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.42] DODGE roll Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.42] DODGE roll Rime Witch:projectile (hit in 0.00s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.58] RETREAT life 28%
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.78] EVADE_FAIL Rime Witch:projectile dmg 14 (life 345/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.92] EVADE_FAIL Rime Witch:projectile dmg 14 (life 326/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.95] EVADE_FAIL Grave Caller:projectile dmg 27 (life 300/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  205.97] EVADE_FAIL Rime Witch:projectile dmg 12 (life 288/528)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  206.52] DODGE roll Abyssal Horror (elite):aoe (hit in 0.08s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  208.02] PASSIVE xp_p13 (Prismatic Path) value 0.0125
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  208.03] DODGE move Grave Caller:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  208.30] EVADE_FAIL Grave Caller:projectile dmg 38 (life 296/539)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  208.77] DODGE roll Abyssal Horror (elite):aoe (hit in 0.47s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  209.93] DODGE move Abyssal Horror:aoe (hit in 0.58s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  209.98] DODGE move Grave Caller:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  210.00] DBG t=210.0 pos=(36, 53) desired=(0.420516, -0.907285) goal=target target=Rime Witch sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  210.00]    WAVES wave=3/3 altar=(70, 35) d_altar=611 pflow=0 :: Abyssa@(77, 34) solid=false flow=60 lost=0.0 st=idle; Abyssa@(74, 33) solid=false flow=58 lost=0.0 st=idle; Abyssa@(74, 35) solid=false flow=58 lost=0.0 st=idle; Shade @(41, 48) solid=false flow=10 lost=0.0 st=recover; Bone B@(70, 35) solid=false flow=54 lost=0.0 st=idle; Bone B@(68, 36) solid=false flow=53 lost=0.0 st=idle; Bone B@(72, 33) solid=false flow=56 lost=0.0 st=idle; Rime W@(40, 48) solid=false flow=9 lost=0.0 st=recover; Bone B@(72, 34) solid=false flow=55 lost=0.0 st=idle; Bone B@(68, 35) solid=false flow=52 lost=0.0 st=idle; Bone B@(69, 35) solid=false flow=53 lost=0.0 st=idle; Rime W@(40, 49) solid=false flow=8 lost=0.0 st=recover; Rime W@(41, 48) solid=false flow=10 lost=0.0 st=recover; Rime W@(41, 49) solid=false flow=9 lost=0.0 st=chase; Grave @(41, 44) solid=false flow=14 lost=0.0 st=recover; Abyssa@(65, 29) solid=false flow=53 lost=0.0 st=idle; Abyssa@(68, 29) solid=false flow=56 lost=0.0 st=idle; Abyssa@(41, 47) solid=false flow=11 lost=0.0 st=chase; Abyssa@(65, 32) solid=false flow=50 lost=0.0 st=idle; Grave @(39, 46) solid=false flow=10 lost=0.0 st=recover; Grave @(39, 46) solid=false flow=10 lost=0.0 st=recover; Grave @(40, 46) solid=false flow=11 lost=0.0 st=recover; Grave @(41, 46) solid=false flow=12 lost=0.0 st=recover; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  210.00]    d=94 los=false tcell=(41, 49) solid=false block0= val0=[0, (654.402, 799.6639)] uses={ "barrage": 42, "quickdraw": 111, "frost_turret": 30, "smoke_bomb": 14, "lightning_trap": 155, "deadeye": 4, "marked_prey": 21 } busy=0.18 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  212.32] DODGE move Abyssal Horror:aoe (hit in 0.70s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  215.00] DBG t=215.0 pos=(44, 58) desired=(0.92388, 0.382683) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  215.00]    WAVES wave=3/3 altar=(70, 35) d_altar=555 pflow=0 :: Abyssa@(77, 34) solid=false flow=63 lost=0.0 st=idle; Abyssa@(76, 35) solid=false flow=63 lost=0.0 st=idle; Abyssa@(74, 34) solid=false flow=60 lost=0.0 st=idle; Shade @(40, 55) solid=false flow=7 lost=0.0 st=recover; Bone B@(67, 35) solid=false flow=54 lost=0.0 st=idle; Bone B@(68, 35) solid=false flow=55 lost=0.0 st=idle; Bone B@(71, 34) solid=false flow=57 lost=0.0 st=idle; Rime W@(39, 50) solid=false flow=13 lost=0.0 st=windup; Bone B@(72, 34) solid=false flow=58 lost=0.0 st=idle; Bone B@(68, 37) solid=false flow=57 lost=0.0 st=idle; Bone B@(69, 35) solid=false flow=56 lost=0.0 st=idle; Rime W@(40, 51) solid=false flow=11 lost=0.0 st=recover; Grave @(40, 47) solid=false flow=15 lost=0.0 st=recover; Abyssa@(66, 29) solid=false flow=57 lost=0.0 st=idle; Abyssa@(68, 30) solid=false flow=58 lost=0.0 st=idle; Abyssa@(39, 49) solid=false flow=14 lost=0.0 st=chase; Abyssa@(67, 33) solid=false flow=54 lost=0.0 st=idle; Grave @(39, 48) solid=false flow=15 lost=0.0 st=recover; Grave @(39, 46) solid=false flow=17 lost=0.0 st=recover; Grave @(40, 50) solid=false flow=12 lost=0.0 st=recover; Grave @(41, 49) solid=false flow=12 lost=0.0 st=recover; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  215.00]    d=35 los=true tcell=(42, 58) solid=false block0= val0=[1178.52795168402, (681.5242, 924.578)] uses={ "barrage": 42, "quickdraw": 116, "frost_turret": 30, "smoke_bomb": 14, "lightning_trap": 159, "deadeye": 5, "marked_prey": 23 } busy=0.27 state=windup
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  215.13] DODGE roll Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  215.13] DODGE roll Abyssal Horror (elite):aoe (hit in 0.47s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  215.45] DODGE move Abyssal Horror:aoe (hit in 0.70s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  215.52] DODGE move death_explosion (hit in 0.70s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  215.70] DODGE move Rime Witch:projectile (hit in 0.00s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  216.50] DODGE move Abyssal Horror:aoe (hit in 0.25s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  216.72] DODGE move Plague Rat:melee (hit in 0.07s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  216.78] EVADE_FAIL Abyssal Horror:aoe dmg 5 (life 498/539)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  217.42] DODGE move Abyssal Horror (elite):aoe (hit in 0.47s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  219.28] DODGE roll Abyssal Horror (elite):aoe (hit in 0.47s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  220.00] DBG t=220.0 pos=(34, 57) desired=(-1, -0) goal=target target=Grave Caller sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  220.00]    WAVES wave=3/3 altar=(70, 35) d_altar=667 pflow=1 :: Abyssa@(77, 34) solid=false flow=65 lost=0.0 st=idle; Abyssa@(76, 33) solid=false flow=65 lost=0.0 st=idle; Abyssa@(75, 35) solid=false flow=64 lost=0.0 st=idle; Bone B@(69, 35) solid=false flow=58 lost=0.0 st=idle; Bone B@(68, 35) solid=false flow=57 lost=0.0 st=idle; Bone B@(70, 34) solid=false flow=58 lost=0.0 st=idle; Rime W@(39, 50) solid=false flow=11 lost=0.0 st=recover; Bone B@(72, 34) solid=false flow=60 lost=0.0 st=idle; Bone B@(68, 36) solid=false flow=58 lost=0.0 st=idle; Bone B@(68, 36) solid=false flow=58 lost=0.0 st=idle; Rime W@(40, 51) solid=false flow=11 lost=0.0 st=recover; Grave @(40, 47) solid=false flow=15 lost=0.0 st=recover; Abyssa@(66, 28) solid=false flow=60 lost=0.0 st=idle; Abyssa@(67, 30) solid=false flow=59 lost=0.0 st=idle; Abyssa@(39, 49) solid=false flow=12 lost=0.0 st=chase; Abyssa@(65, 32) solid=false flow=55 lost=0.0 st=idle; Grave @(39, 48) solid=false flow=13 lost=0.0 st=windup; Grave @(39, 46) solid=false flow=15 lost=0.0 st=windup; Grave @(40, 50) solid=false flow=12 lost=0.0 st=recover; Grave @(41, 49) solid=false flow=14 lost=0.0 st=recover; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  220.00]    d=40 los=true tcell=(32, 58) solid=false block0= val0=[612.834534875689, (521.8273, 925.7211)] uses={ "barrage": 43, "quickdraw": 118, "frost_turret": 31, "smoke_bomb": 15, "lightning_trap": 164, "deadeye": 5, "marked_prey": 24 } busy=0.45 state=recover
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  221.80] DODGE move death_explosion (hit in 0.52s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  225.00] DBG t=225.0 pos=(32, 58) desired=(0.686708, -0.726934) goal=target target=Rime Witch sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  225.00]    WAVES wave=3/3 altar=(70, 35) d_altar=708 pflow=0 :: Abyssa@(77, 33) solid=false flow=70 lost=0.0 st=idle; Abyssa@(74, 33) solid=false flow=67 lost=0.0 st=idle; Abyssa@(74, 34) solid=false flow=66 lost=0.0 st=idle; Bone B@(70, 34) solid=false flow=62 lost=0.0 st=idle; Bone B@(68, 36) solid=false flow=62 lost=0.0 st=idle; Bone B@(71, 33) solid=false flow=64 lost=0.0 st=idle; Rime W@(39, 51) solid=false flow=14 lost=0.0 st=recover; Bone B@(72, 34) solid=false flow=64 lost=0.0 st=idle; Bone B@(67, 36) solid=false flow=61 lost=0.0 st=idle; Bone B@(69, 33) solid=false flow=62 lost=0.0 st=idle; Grave @(40, 51) solid=false flow=15 lost=0.0 st=recover; Abyssa@(66, 28) solid=false flow=64 lost=0.0 st=idle; Abyssa@(67, 31) solid=false flow=62 lost=0.0 st=idle; Abyssa@(39, 50) solid=false flow=15 lost=0.0 st=chase; Abyssa@(65, 31) solid=false flow=60 lost=0.0 st=idle; Grave @(39, 48) solid=false flow=17 lost=0.0 st=chase; Grave @(40, 50) solid=false flow=16 lost=0.0 st=recover; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  225.00]    d=150 los=false tcell=(39, 51) solid=false block0= val0=[0, (629.9406, 825.734)] uses={ "barrage": 43, "quickdraw": 118, "frost_turret": 32, "smoke_bomb": 15, "lightning_trap": 172, "deadeye": 5, "marked_prey": 25 } busy=0.23 state=recover
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  226.98] STUCK at (33, 57), sidestepping (target Grave Caller, goal target)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  226.98]    pos (542.3012, 926.4688) vel (46.43137, -30.96811) dodge_cd -6.60 busy 0.13 dist_here 12 origin (39, 51) boss (67, 57) gw 134 gh 92 up_grid 0
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  226.98]      ##  ##  ##  ##  ##  ##   7   6   5
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  226.98]      ##  ##  ##  ##  ##  ##   8   7   6
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  226.98]      ##  ##  ##  ##  ##  ##   9   8   7
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  226.98]      16  15  14  13  12  11  10   9   8
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  226.98]      17  16  15  14  13  12  11  10   9
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  226.98]      18  17  16  15  14  13  12  11  10
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  226.98]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  226.98]    nearest Abyssal Horror d=80 state=chase aggro=true los=true; active threats 0; desired (0.831936, -0.554872)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  230.00] DBG t=230.0 pos=(32, 57) desired=(0.99928, -0.037947) goal=target target=Grave Caller sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  230.00]    WAVES wave=3/3 altar=(70, 35) d_altar=708 pflow=1 :: Abyssa@(77, 34) solid=false flow=69 lost=0.0 st=idle; Abyssa@(76, 34) solid=false flow=68 lost=0.0 st=idle; Abyssa@(75, 35) solid=false flow=68 lost=0.0 st=idle; Bone B@(69, 35) solid=false flow=62 lost=0.0 st=idle; Bone B@(68, 36) solid=false flow=62 lost=0.0 st=idle; Bone B@(72, 34) solid=false flow=64 lost=0.0 st=idle; Bone B@(72, 33) solid=false flow=65 lost=0.0 st=idle; Bone B@(67, 36) solid=false flow=61 lost=0.0 st=idle; Bone B@(71, 34) solid=false flow=63 lost=0.0 st=idle; Grave @(37, 55) solid=false flow=8 lost=0.0 st=chase; Abyssa@(65, 29) solid=false flow=62 lost=0.0 st=idle; Abyssa@(67, 30) solid=false flow=63 lost=0.0 st=idle; Abyssa@(64, 34) solid=false flow=56 lost=0.0 st=idle; Grave @(38, 53) solid=false flow=11 lost=0.0 st=chase; Grave @(39, 53) solid=false flow=12 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  230.00]    d=89 los=false tcell=(37, 55) solid=false block0= val0=[0, (591.1307, 889.4013)] uses={ "barrage": 43, "quickdraw": 120, "frost_turret": 32, "smoke_bomb": 16, "lightning_trap": 179, "deadeye": 5, "marked_prey": 25 } busy=0.13 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  235.00] DBG t=235.0 pos=(42, 36) desired=(0.675471, -0.737387) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  235.00]    WAVES wave=3/3 altar=(70, 35) d_altar=454 pflow=0 :: Abyssa@(76, 34) solid=false flow=36 lost=0.0 st=idle; Abyssa@(76, 35) solid=false flow=37 lost=0.0 st=idle; Abyssa@(73, 35) solid=false flow=34 lost=0.0 st=idle; Bone B@(67, 34) solid=false flow=27 lost=0.0 st=chase; Bone B@(65, 34) solid=false flow=25 lost=0.0 st=chase; Bone B@(70, 35) solid=false flow=31 lost=0.0 st=idle; Bone B@(74, 35) solid=false flow=35 lost=0.0 st=idle; Bone B@(65, 35) solid=false flow=26 lost=0.0 st=chase; Bone B@(71, 34) solid=false flow=31 lost=0.0 st=idle; Abyssa@(65, 33) solid=false flow=26 lost=0.0 st=chase; Abyssa@(66, 30) solid=false flow=30 lost=0.0 st=chase; Abyssa@(64, 34) solid=false flow=24 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  235.00]    d=370 los=false tcell=(65, 35) solid=false block0= val0=[0, (1023.375, 537.4694)] uses={ "barrage": 43, "quickdraw": 120, "frost_turret": 33, "smoke_bomb": 16, "lightning_trap": 182, "deadeye": 5, "marked_prey": 25 } busy=-2.15 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  240.00] DBG t=240.0 pos=(41, 34) desired=(-1, -0) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  240.00]    WAVES wave=3/3 altar=(70, 35) d_altar=466 pflow=0 :: Abyssa@(79, 33) solid=false flow=39 lost=0.0 st=idle; Abyssa@(76, 34) solid=false flow=35 lost=0.0 st=idle; Abyssa@(60, 34) solid=false flow=19 lost=0.0 st=chase; Bone B@(57, 34) solid=false flow=16 lost=0.0 st=chase; Bone B@(52, 34) solid=false flow=11 lost=0.0 st=chase; Bone B@(58, 34) solid=false flow=17 lost=0.0 st=chase; Bone B@(62, 34) solid=false flow=21 lost=0.0 st=chase; Bone B@(53, 34) solid=false flow=12 lost=0.0 st=chase; Bone B@(58, 34) solid=false flow=17 lost=0.0 st=chase; Abyssa@(54, 34) solid=false flow=13 lost=0.0 st=chase; Abyssa@(56, 34) solid=false flow=15 lost=0.0 st=chase; Abyssa@(48, 34) solid=false flow=7 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  240.00]    d=115 los=true tcell=(48, 34) solid=false block0= val0=[271.556724428973, (765.6469, 547.2325)] uses={ "barrage": 48, "quickdraw": 124, "frost_turret": 34, "smoke_bomb": 16, "lightning_trap": 182, "deadeye": 5, "marked_prey": 25 } busy=0.11 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  245.00] DBG t=245.0 pos=(33, 34) desired=(-1, -0) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  245.00]    WAVES wave=3/3 altar=(70, 35) d_altar=587 pflow=0 :: Abyssa@(77, 34) solid=false flow=44 lost=0.0 st=idle; Abyssa@(75, 34) solid=false flow=42 lost=0.0 st=idle; Abyssa@(51, 34) solid=false flow=18 lost=0.0 st=chase; Bone B@(48, 34) solid=false flow=15 lost=0.0 st=chase; Bone B@(40, 34) solid=false flow=7 lost=0.0 st=chase; Bone B@(49, 34) solid=false flow=16 lost=0.0 st=chase; Bone B@(52, 34) solid=false flow=19 lost=0.0 st=chase; Bone B@(41, 34) solid=false flow=8 lost=0.0 st=chase; Bone B@(49, 34) solid=false flow=16 lost=0.0 st=chase; Abyssa@(45, 34) solid=false flow=12 lost=0.0 st=chase; Abyssa@(47, 34) solid=false flow=14 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  245.00]    d=113 los=true tcell=(40, 34) solid=false block0= val0=[353.023741757665, (643.8129, 547.9998)] uses={ "barrage": 52, "quickdraw": 130, "frost_turret": 34, "smoke_bomb": 16, "lightning_trap": 182, "deadeye": 5, "marked_prey": 25 } busy=0.02 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  250.00] DBG t=250.0 pos=(22, 34) desired=(-1, -0) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  250.00]    WAVES wave=3/3 altar=(70, 35) d_altar=767 pflow=0 :: Abyssa@(77, 33) solid=false flow=56 lost=0.0 st=idle; Abyssa@(74, 33) solid=false flow=53 lost=0.0 st=idle; Abyssa@(40, 34) solid=false flow=18 lost=0.0 st=chase; Bone B@(35, 34) solid=false flow=13 lost=0.0 st=chase; Bone B@(36, 34) solid=false flow=14 lost=0.0 st=chase; Bone B@(42, 34) solid=false flow=20 lost=0.0 st=chase; Bone B@(29, 34) solid=false flow=7 lost=0.0 st=chase; Bone B@(39, 34) solid=false flow=17 lost=0.0 st=chase; Abyssa@(33, 34) solid=false flow=11 lost=0.0 st=chase; Abyssa@(34, 34) solid=false flow=12 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  250.00]    d=116 los=true tcell=(29, 34) solid=false block0= val0=[353.023741757665, (469.6894, 548.0002)] uses={ "barrage": 53, "quickdraw": 135, "frost_turret": 35, "smoke_bomb": 16, "lightning_trap": 185, "deadeye": 5, "marked_prey": 25 } busy=0.27 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  255.00] DBG t=255.0 pos=(18, 34) desired=(-1, -0) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  255.00]    WAVES wave=3/3 altar=(70, 35) d_altar=829 pflow=0 :: Abyssa@(78, 33) solid=false flow=61 lost=0.0 st=idle; Abyssa@(76, 35) solid=false flow=59 lost=0.0 st=idle; Abyssa@(31, 34) solid=false flow=13 lost=0.0 st=chase; Bone B@(25, 34) solid=false flow=7 lost=0.0 st=chase; Bone B@(26, 34) solid=false flow=8 lost=0.0 st=chase; Bone B@(32, 34) solid=false flow=14 lost=0.0 st=chase; Bone B@(30, 34) solid=false flow=12 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  255.00]    d=116 los=true tcell=(25, 34) solid=false block0= val0=[434.490759086357, (408.2066, 548.0002)] uses={ "barrage": 53, "quickdraw": 139, "frost_turret": 36, "smoke_bomb": 16, "lightning_trap": 189, "deadeye": 5, "marked_prey": 25 } busy=0.08 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  260.00] DBG t=260.0 pos=(12, 36) desired=(0.187518, -0.982261) goal=target target=Bone Bulwark sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  260.00]    WAVES wave=3/3 altar=(70, 35) d_altar=931 pflow=0 :: Abyssa@(76, 34) solid=false flow=66 lost=0.0 st=idle; Abyssa@(74, 34) solid=false flow=64 lost=0.0 st=idle; Bone B@(17, 34) solid=false flow=7 lost=0.0 st=chase; Bone B@(23, 34) solid=false flow=13 lost=0.0 st=chase; Bone B@(20, 34) solid=false flow=10 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  260.00]    d=99 los=false tcell=(17, 34) solid=false block0= val0=[0, (283.5676, 544.5098)] uses={ "barrage": 53, "quickdraw": 140, "frost_turret": 36, "smoke_bomb": 17, "lightning_trap": 198, "deadeye": 5, "marked_prey": 25 } busy=0.08 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  264.73] STUCK at (13, 30), sidestepping (target Abyssal Horror, goal target)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  264.73]    pos (210.354, 487.128) vel (61.2858, 9.465766) dodge_cd -44.35 busy 0.04 dist_here 66 origin (74, 35) boss (67, 57) gw 134 gh 92 up_grid 0
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  264.73]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  264.73]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  264.73]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  264.73]      ##  ##  ##  67  66  65  64  63  62
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  264.73]      ##  ##  ##  66  ##  64  63  62  61
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  264.73]      ##  ##  ##  65  64  63  62  61  60
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  264.73]      ##  ##  ##  64  63  62  61  60  59
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  264.73]    nearest Abyssal Horror d=981 state=idle aggro=true los=false; active threats 0; desired (0.99919, 0.040251)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  265.00] DBG t=265.0 pos=(15, 30) desired=(0.506539, 0.862217) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  265.00]    WAVES wave=3/3 altar=(70, 35) d_altar=891 pflow=1 :: Abyssa@(76, 34) solid=false flow=66 lost=0.0 st=idle; Abyssa@(74, 35) solid=false flow=65 lost=0.0 st=idle; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  265.00]    d=984 los=false tcell=(76, 34) solid=false block0= val0=[0, (1199.177, 525.3584)] uses={ "barrage": 54, "quickdraw": 140, "frost_turret": 37, "smoke_bomb": 17, "lightning_trap": 206, "deadeye": 5, "marked_prey": 25 } busy=-0.23 state=idle
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  270.00] DBG t=270.0 pos=(51, 34) desired=(1, 0.000304) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  270.00]    WAVES wave=3/3 altar=(70, 35) d_altar=311 pflow=1 :: Abyssa@(76, 34) solid=false flow=26 lost=0.0 st=chase; Abyssa@(73, 34) solid=false flow=23 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  270.00]    d=405 los=true tcell=(76, 34) solid=false block0= val0=[0, (1183.922, 548.4754)] uses={ "barrage": 54, "quickdraw": 140, "frost_turret": 37, "smoke_bomb": 17, "lightning_trap": 206, "deadeye": 5, "marked_prey": 25 } busy=-5.23 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  275.00] DBG t=275.0 pos=(56, 34) desired=(-1, -0) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  275.00]    WAVES wave=3/3 altar=(70, 35) d_altar=229 pflow=0 :: Abyssa@(63, 34) solid=false flow=7 lost=0.0 st=chase; Abyssa@(61, 34) solid=false flow=5 lost=0.0 st=chase; 
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  275.00]    d=125 los=true tcell=(63, 34) solid=false block0= val0=[353.023741757665, (1016.154, 548)] uses={ "barrage": 55, "quickdraw": 146, "frost_turret": 38, "smoke_bomb": 18, "lightning_trap": 206, "deadeye": 5, "marked_prey": 25 } busy=0.25 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  280.00] DBG t=280.0 pos=(44, 36) desired=(-0.854358, 0.519685) goal=objective:relic_0 target=- sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  285.00] DBG t=285.0 pos=(21, 57) desired=(-1, -0.000006) goal=objective:relic_0 target=- sealed=3 interactables=["town_portal", "relic_0", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  287.38] STUCK at (24, 57), sidestepping (target -, goal objective:relic_2)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  287.38]    pos (387.0066, 919.9965) vel (124.025, 0) dodge_cd -67.00 busy -7.93 dist_here 97 origin (95, 31) boss (67, 57) gw 134 gh 92 up_grid 0
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  287.38]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  287.38]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  287.38]     102 101  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  287.38]     101 100  99  98  97  96  95  94  93
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  287.38]     102 101 100  99  98  97  96  95  94
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  287.38]     103 102 101 100  99  98  97  96  95
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  287.38]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  287.38]    nearest Bone Bulwark d=986 state=idle aggro=false los=false; active threats 0; desired (1, 0.000166)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  290.00] DBG t=290.0 pos=(35, 57) desired=(1, -0.000445) goal=objective:relic_2 target=- sealed=3 interactables=["town_portal", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  295.00] DBG t=295.0 pos=(54, 33) desired=(1, 0.000109) goal=objective:relic_2 target=- sealed=3 interactables=["town_portal", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  300.00] DBG t=300.0 pos=(93, 32) desired=(0.936161, -0.351571) goal=objective:relic_2 target=- sealed=3 interactables=["town_portal", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  305.00] DBG t=305.0 pos=(97, 33) desired=(0, 0) goal=target target=Storm Acolyte sealed=3 interactables=["town_portal", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  305.00]    d=139 los=true tcell=(106, 33) solid=false block0= val0=[1037.10459748193, (1688.636, 538.5377)] uses={ "barrage": 64, "quickdraw": 152, "frost_turret": 41, "smoke_bomb": 19, "lightning_trap": 206, "deadeye": 6, "marked_prey": 26 } busy=0.38 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  310.00] DBG t=310.0 pos=(89, 33) desired=(0, 0) goal=target target=Rime Witch sealed=3 interactables=["town_portal", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  310.00]    d=204 los=true tcell=(102, 33) solid=false block0= val0=[1885.64472269443, (1633.697, 536.3637)] uses={ "barrage": 64, "quickdraw": 154, "frost_turret": 41, "smoke_bomb": 19, "lightning_trap": 213, "deadeye": 6, "marked_prey": 27 } busy=0.02 state=windup
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  315.00] DBG t=315.0 pos=(92, 32) desired=(0, 0) goal=target target=- sealed=3 interactables=["town_portal", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  320.00] DBG t=320.0 pos=(78, 33) desired=(-1, -0) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  320.00]    d=108 los=true tcell=(84, 33) solid=false block0= val0=[271.556724428973, (1346.16, 530.9125)] uses={ "barrage": 66, "quickdraw": 162, "frost_turret": 43, "smoke_bomb": 20, "lightning_trap": 220, "deadeye": 6, "marked_prey": 28 } busy=0.28 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  321.85] PASSIVE xp_p12 (Prismatic Path) value 0.0076
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  321.85] HOTBAR sniper_round, quickdraw, deadeye, frost_turret, smoke_bomb, lightning_trap, marked_prey
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  325.00] DBG t=325.0 pos=(79, 33) desired=(1, 0.000321) goal=objective:relic_2 target=- sealed=3 interactables=["town_portal", "relic_1", "relic_2"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  330.00] DBG t=330.0 pos=(106, 33) desired=(0.997986, -0.063426) goal=target target=Abyssal Horror sealed=3 interactables=["town_portal", "relic_1"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  330.00]    d=245 los=true tcell=(122, 33) solid=false block0= val0=[453.258734043721, (1942.34, 530.9139)] uses={ "barrage": 66, "quickdraw": 163, "frost_turret": 43, "smoke_bomb": 20, "lightning_trap": 224, "deadeye": 6, "marked_prey": 28, "sniper_round": 2 } busy=0.13 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  335.00] DBG t=335.0 pos=(105, 33) desired=(0.99999, -0.004544) goal=objective:relic_1 target=- sealed=3 interactables=["town_portal", "relic_1"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  338.33] MIDRUN equip 1 item(s): Elusive Tempered Boots
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  340.00] DBG t=340.0 pos=(95, 33) desired=(-0.677852, 0.735198) goal=boss_room target=- sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  345.00] DBG t=345.0 pos=(94, 36) desired=(0, -1) goal=target target=Bone Bulwark sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  345.00]    d=113 los=true tcell=(94, 43) solid=false block0= val0=[453.258734043721, (1512, 694.1204)] uses={ "barrage": 66, "quickdraw": 167, "frost_turret": 46, "smoke_bomb": 21, "lightning_trap": 232, "deadeye": 6, "marked_prey": 28, "sniper_round": 3 } busy=0.43 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  350.00] DBG t=350.0 pos=(99, 30) desired=(0.707107, -0.707107) goal=target target=Bone Bulwark sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  350.00]    d=23 los=true tcell=(98, 31) solid=false block0= val0=[639.713678351543, (1576.916, 495.2513)] uses={ "barrage": 66, "quickdraw": 167, "frost_turret": 47, "smoke_bomb": 21, "lightning_trap": 240, "deadeye": 7, "marked_prey": 29, "sniper_round": 3 } busy=0.28 state=recover
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  350.27] DODGE move Bone Bulwark (elite):melee (hit in 0.26s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  352.97] DODGE roll Bone Bulwark:melee (hit in 0.33s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  352.97] DODGE roll Bone Bulwark (elite):melee (hit in 0.23s) -> partial
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  353.28] EVADE_FAIL Bone Bulwark:melee dmg 36 (life 497/595)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  354.58] DODGE move Bone Bulwark:melee (hit in 0.42s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  355.00] DBG t=355.0 pos=(95, 31) desired=(1, 0) goal=target target=Bone Bulwark sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  355.00]    d=17 los=true tcell=(95, 30) solid=false block0= val0=[934.966145283024, (1531.792, 483.0662)] uses={ "barrage": 66, "quickdraw": 172, "frost_turret": 47, "smoke_bomb": 21, "lightning_trap": 243, "deadeye": 7, "marked_prey": 30, "sniper_round": 3 } busy=0.07 state=windup
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  355.12] DODGE move Bone Bulwark (elite):melee (hit in 0.21s) -> safe
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  360.00] DBG t=360.0 pos=(110, 32) desired=(1, 0) goal=target target=Bone Bulwark sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  360.00]    d=113 los=true tcell=(103, 32) solid=false block0= val0=[492.087444885802, (1665.659, 516.051)] uses={ "barrage": 66, "quickdraw": 173, "frost_turret": 48, "smoke_bomb": 22, "lightning_trap": 251, "deadeye": 7, "marked_prey": 30, "sniper_round": 3 } busy=0.20 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  362.90] STUCK at (113, 32), sidestepping (target -, goal loot:material)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  362.90]    pos (1808.438, 519.9834) vel (-129.8548, 0.254068) dodge_cd -8.83 busy -0.23 dist_here 4 origin (109, 32) boss (67, 57) gw 134 gh 92 up_grid 0
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  362.90]      ##  ##  ##  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  362.90]      ##  ##  ##  ##  ##   7   8   9  10
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  362.90]      ##  ##  ##  ##  ##   6   7   8   9
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  362.90]       0   1   2   3   4   5   6   7   8
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  362.90]       1   2   3   4   5   6   7   8   9
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  362.90]       2   3   4   5   6   7   8   9  10
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  362.90]      ##  ##  ##  ##  ##   8   9  10  11
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  362.90]    nearest Bone Bulwark d=499 state=idle aggro=false los=false; active threats 0; desired (-0.999998, 0.001968)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  365.02] DBG t=365.0 pos=(97, 31) desired=(-0.663042, -0.748582) goal=loot:material target=- sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  370.02] DBG t=370.0 pos=(73, 32) desired=(-0.423312, 0.905984) goal=loot:item target=- sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  370.47] MIDRUN equip 1 item(s): Iron Ward
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  375.02] DBG t=375.0 pos=(53, 34) desired=(-1, 0.000296) goal=loot:item target=- sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  380.02] DBG t=380.0 pos=(37, 34) desired=(-0.728068, -0.685505) goal=loot:material target=- sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  385.02] DBG t=385.0 pos=(70, 35) desired=(1, 0.000332) goal=boss_room target=- sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  390.02] DBG t=390.0 pos=(94, 51) desired=(0, 0) goal=target target=Bone Bulwark sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  390.02]    d=123 los=true tcell=(96, 59) solid=false block0= val0=[283.286708777326, (1540.574, 937.5076)] uses={ "barrage": 66, "quickdraw": 173, "frost_turret": 50, "smoke_bomb": 22, "lightning_trap": 255, "deadeye": 7, "marked_prey": 30, "sniper_round": 3 } busy=0.07 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  395.02] DBG t=395.0 pos=(94, 42) desired=(0, 0) goal=target target=Bone Bulwark sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  395.02]    d=116 los=true tcell=(94, 49) solid=false block0= val0=[283.286708777326, (1512.001, 791.7865)] uses={ "barrage": 66, "quickdraw": 174, "frost_turret": 51, "smoke_bomb": 22, "lightning_trap": 264, "deadeye": 7, "marked_prey": 30, "sniper_round": 3 } busy=0.43 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  400.02] DBG t=400.0 pos=(93, 52) desired=(-0.374622, 0.927177) goal=boss_room target=- sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  405.02] DBG t=405.0 pos=(100, 54) desired=(-0.380114, -0.92494) goal=target target=Bone Bulwark sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  405.02]    d=53 los=false tcell=(97, 53) solid=false block0= val0=[0, (1562.356, 853.4244)] uses={ "barrage": 66, "quickdraw": 174, "frost_turret": 52, "smoke_bomb": 23, "lightning_trap": 279, "deadeye": 7, "marked_prey": 30, "sniper_round": 3 } busy=0.02 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  410.02] DBG t=410.0 pos=(100, 59) desired=(-0.683607, -0.72985) goal=target target=Grave Brute sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  410.02]    d=196 los=false tcell=(89, 53) solid=false block0= val0=[0, (1441.529, 852.8058)] uses={ "barrage": 66, "quickdraw": 174, "frost_turret": 53, "smoke_bomb": 23, "lightning_trap": 288, "deadeye": 7, "marked_prey": 30, "sniper_round": 3 } busy=-0.18 state=chase
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  414.28] BOSS spawned
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  415.02] DBG t=415.0 pos=(76, 57) desired=(0, 0) goal=target target=The Iron Penitent sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  415.02]    d=117 los=true tcell=(68, 57) solid=false block0= val0=[283.286708777326, (1103.332, 916)] uses={ "barrage": 66, "quickdraw": 174, "frost_turret": 53, "smoke_bomb": 24, "lightning_trap": 291, "deadeye": 8, "marked_prey": 31, "sniper_round": 3 } busy=0.03 state=windup
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  420.02] DBG t=420.0 pos=(77, 57) desired=(0, 0) goal=target target=The Iron Penitent sealed=0 interactables=["town_portal"]
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  420.02]    d=117 los=true tcell=(69, 57) solid=false block0= val0=[492.087444885802, (1117.331, 916.0001)] uses={ "barrage": 66, "quickdraw": 174, "frost_turret": 54, "smoke_bomb": 24, "lightning_trap": 291, "deadeye": 8, "marked_prey": 31, "sniper_round": 5 } busy=0.32 state=recover
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.23] BOSS killed
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.23] PASSIVE xp_p11 (Prismatic Path) value 0.0119
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.23] PASSIVE c_r1 (Focus) value 0.0089
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.30] STUCK at (77, 57), sidestepping (target -, goal loot:rune)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.30]    pos (1242.568, 920.0052) vel (-131.67, 0) dodge_cd -69.23 busy -0.03 dist_here 7 origin (70, 57) boss (67, 57) gw 134 gh 92 up_grid 1
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.30]       6   7   8   9  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.30]       5   6   7   8  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.30]       4   5   6   7   8   9  10  11  12
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.30]       3   4   5   6   7   8   9  10  11
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.30]       4   5   6   7   8   9  10  11  12
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.30]       5   6   7   8  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  423.30]       6   7   8  ##  ##  ##  ##  ##  ##
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0  424.22] RUN end boss_killed in 424.2s, damage taken 3083, dodges 180 (rolls 30), avoided 133, potions 8
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] EQUIP helmet <- uncommon Elusive Tempered Coif of the Salamander (ilvl 28, 0 sockets) replacing Tempered Coif, score +0.014
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] EQUIP belt <- uncommon Chain Belt of the Salamander (ilvl 29, 1 sockets) replacing Iron Veil, score +0.010
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] EQUIP charm <- uncommon Vicious Storm Charm (ilvl 29, 0 sockets) replacing Blood Charm, score +0.010
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] BAG sold 37 (+2180 gold), salvaged 3, kept 0
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Add Socket on Blood Mark (chest) cost 140 gold, 2 Iron Fragment, 1 Monster Core, score +0.000
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Add Socket on Elusive Tempered Coif of the Salamander (helmet) cost 152 gold, 2 Iron Fragment, 1 Monster Core, score +0.000
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Add Socket on Elusive Tempered Gloves (gloves) cost 140 gold, 2 Iron Fragment, 1 Monster Core, score +0.000
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Add Socket on Hale Bone Amulet (amulet) cost 144 gold, 2 Iron Fragment, 1 Monster Core, score +0.000
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Upgrade Base on Tempered Rifle (main_hand) cost 165 gold, 3 Scrap, 2 Iron Fragment, score +0.061
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Upgrade Base on Blood Mark (chest) cost 90 gold, 2 Scrap, 1 Iron Fragment, score +0.006
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Upgrade Base on Elusive Tempered Coif of the Salamander (helmet) cost 99 gold, 2 Scrap, 1 Iron Fragment, score +0.002
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Upgrade Base on Elusive Tempered Gloves (gloves) cost 90 gold, 2 Scrap, 1 Iron Fragment, score +0.002
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Upgrade Base on Elusive Tempered Boots (boots) cost 102 gold, 2 Scrap, 1 Iron Fragment, score +0.002
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Raise Rarity on Blood Mark (chest) cost 405 gold, 2 Elemental Essence, 3 Scrap, score +0.015
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Add Affix on Blood Mark (chest) cost 125 gold, 1 Rare Catalyst, 1 Arcane Dust, score +0.025
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Add Affix on Elusive Tempered Gloves of the Floe (gloves) cost 125 gold, 1 Rare Catalyst, 1 Arcane Dust, score +0.000
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Add Affix on Iron Ward (ring) cost 137 gold, 1 Rare Catalyst, 1 Arcane Dust, score +0.020
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Add Affix on Storm Spire (ring) cost 137 gold, 1 Rare Catalyst, 1 Arcane Dust, score +0.035
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Reroll Affix on Blood Mark (chest) cost 60 gold, 1 Arcane Dust, score +0.007
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] CRAFT Reroll Affix on Storm Spire (ring) cost 66 gold, 1 Arcane Dust, score +0.041
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM combine 3x bloodstone:1 -> bloodstone:2
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM unsocket sapphire:2 from Tempered Rifle
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket topaz:2 into main_hand socket 1 (score +0.028)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM unsocket topaz:1 from Tempered Rifle
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket ruby:2 into main_hand socket 2 (score +0.027)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM unsocket ruby:1 from Tempered Rifle
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket sapphire:2 into main_hand socket 3 (score +0.031)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket amethyst:2 into chest socket 1 (score +0.025)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket amethyst:2 into helmet socket 1 (score +0.026)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket amethyst:2 into gloves socket 1 (score +0.026)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket ruby:1 into boots socket 1 (score +0.021)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket ruby:1 into boots socket 2 (score +0.020)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket amethyst:1 into belt socket 1 (score +0.017)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket bloodstone:2 into amulet socket 1 (score +0.030)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] GEM socket bloodstone:2 into ring1 socket 1 (score +0.030)
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] RUNE split -> sniper_round
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] RUNE split -> quickdraw
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] RUNE efficiency -> sniper_round
+[ranger-balanced-Expert-T4-L28-s700-fresh-none-ts1-c11-r0    0.00] RUNE recharge -> deadeye

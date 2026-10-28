@@ -16,6 +16,10 @@ No assets need importing: all pixel art is generated from palette grids in
 
 > Exporting: add `*.json` to *Export > Resources > Filters to export non-resource files* so the data folder is packed.
 
+### Dying Canvas UI preview
+
+Double-click `Preview inventory.cmd`, or open `tests/ui_inventory_preview.tscn` and press F6, to try the standalone inventory art study. Hover, pinned selection, equipment comparison and local sample swaps work with forty bag slots. See [preview controls and scope](docs/UI_INVENTORY_PREVIEW.md). Custom painted icons, a production font and the final HUD artwork are still pending.
+
 ## Controls
 
 | Input | Action |
@@ -25,7 +29,7 @@ No assets need importing: all pixel art is generated from palette grids in
 | LMB / RMB / Q / E / R / T / G | Skills 1-7 (hold to repeat) |
 | Space | Dodge roll (brief invulnerability) |
 | 1 / 2 | Life / mana flask |
-| F | Interact / pick up nearest item (LMB on an item label also picks it up) |
+| F | Interact / pick up. With the cursor on (or within 40 px of) an item label: pick it up if it is within reach, otherwise send your pet to fetch it. Clicking an item label only picks it up if Pause > Options > Loot Pickup is set to Mouse Click or Both (default: Keybind, F only; in Mouse Click mode F no longer picks up items) |
 | I (or B) | Inventory |
 | C | Character sheet |
 | P | Passive skill tree |
@@ -58,6 +62,59 @@ Burning Blood, Volatile Dead, Tempest, Grim Healing, Glass Pact) shown at the
 Dungeon Gate before you enter; each adds item quantity, rarity and experience.
 Rooms can contain **hazards** (spike traps, fire vents, miasma pools).
 
+### Pets
+
+Buy pets with gold from the **Pet Keeper** in town (16 pets: dog, cat, frog, slime,
+robot, goblin, fox, bunny, hedgehog, baby dragon, axolotl, tiny ghost, owl,
+mushroom buddy, bat, mimic). The active pet follows you, collects gold and
+crafting materials on its own, and fetches a far item when you press F on its
+label. Each pet has its own upgrade tier (0-5, paid in crafting materials): every
+tier unlocks one more rarity for F plus a capability (speed, shorter cooldown,
+blink, wall-pass and magnet, full camera range). Switching pets is free at any
+time (pause menu > Pets) and each pet keeps its upgrades. Pets are cosmetic only:
+no collision, no health, never targeted, and their quirks use their own RNG.
+All numbers are in `data/pets.json`. Every pickup (yours and the pet's) goes
+through `level.pickup()`, which re-checks the loot filter, the pet's rarity cap,
+bag space and the single-claim rule at the moment of collection. Pets are off
+under `Game.testing` (tests and bots) unless `Game.pets_in_tests` is set.
+
+### Training Grounds
+
+Talk to **Drillmaster Rook** in the hub (Setup tab) to spawn a test dummy, or a cluster of three for an
+AoE test. Choose the duration (10 s / 30 s), whether All sources or Player only count (Player only drops
+minions, turrets and traps), a defence profile (none, a Tier 3 normal enemy, a Tier 6 boss with a poise
+bar) and, for AoE, Tight or Spread. The first counted hit starts the timer; when it ends the dummy shows
+average DPS, peak second, the settings and the top damage sources above its head, and the Result tab
+shows the full breakdown (damage, share, DPS and hits per skill; per-dummy table and average targets per
+cast for AoE). The History tab keeps the last 5 tests for each character (this session only): click a
+row to see its breakdown, the build it was made with (gear, hotbar, level, passives) and what changed
+since the previous comparable test. "Clear history" asks first. Tests are only comparable if type,
+duration, counting, profile (and spacing for AoE) match and both are, or are not, marked DEV (a
+damage-changing Developer-tools flag was on). Summons, deployables and buffs work in the hub only while
+dummies exist. All numbers and wording are in `data/training.json`. The dummy cannot die, move or be
+stunned, takes damage through the normal combat path and changes nothing about how combat works;
+training is off under `Game.testing` unless `Game.training_in_tests` is set.
+
+### Crafting corruption
+
+Every item has a corruption meter (0-100%, shown as "Corruption: N%" on every tooltip, as a bar in the
+Blacksmith window and as a small red marker on 100% items in the bag and stashes). Three Blacksmith
+crafts roll for it: **Add Affix**, **Reroll Affix** (one chosen affix per click) and **Raise Rarity**. The
+craft is always applied in full first; then one roll at 60% adds 25% corruption (Dan's tuning, 2026-10-29). At 100%
+those three crafts are refused (nothing is spent) and their buttons are disabled, so every item gets at least
+4 rolling crafts and about 6.7 on average (a negative binomial). Upgrade Base, Remove Affix and Add Socket never roll and still work
+at 100%, as do equipping, selling, salvaging, locking, stashing and the Destroy sweep. Because a blank base
+may run out of crafts before it reaches a perfect roll, a base that already has good affixes matters. The
+Blacksmith asks to confirm every craft and adds a warning when the item is above 60% corruption.
+
+All numbers are in `data/corruption.json` (chance, step, max, `drop_start`, which crafts roll or are
+exempt, confirm threshold, colours). The rules are the pure script `scripts/core/corruption_rules.gd`.
+The value is an integer `corruption` on the item dictionary (absent at 0%), so there is no save version
+change and it survives save/load, the personal stash and the shared stash. The Blacksmith owns its own
+random number generator for the roll; it never touches the global, Combat or Loot streams, and bots and
+the smartbot (which call the craft functions directly) never roll corruption. Developer tools (F1, Items)
+can set or clear the value on bag items and mark the save as dev-used.
+
 ## Architecture
 
 ```
@@ -68,6 +125,8 @@ scripts/core/         Autoloads and state
   events.gd           Global signal bus                         (autoload Events)
   game.gd             Character, settings, input map, save/load (autoload Game)
   loot.gd             Item generation, affixes, drops, crafting (autoload Loot)
+  training_rules.gd   Pure Training Grounds maths: window, DPS, breakdown, history, text
+  training_log.gd     Training session, results and per-character history (autoload TrainingLog)
   stat_block.gd       Modifier aggregation: flat / increased / more, with sources
   character_data.gd   Level, passives, inventory, equipment, stat resolution, save format
 scripts/combat/
@@ -101,6 +160,11 @@ xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_tiers.tsc
 xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens.tscn -- ranger /tmp/shots
 xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_s3.tscn   # skills, runes, specialisations
 xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_s4.tscn   # passive web, jeweller, charms
+godot --headless --fixed-fps 60 --path . res://tests/corruption_only.tscn          # corruption checks only (~130, about 1 minute)
+godot --headless --fixed-fps 60 --path . res://tests/items_crafting_only.tscn      # item, crafting, lock, stash UI, dev tools and corruption (~320)
+godot --path . res://tests/screens_corruption.tscn -- /tmp/corruption             # corruption screenshots (needs a display)
+godot --headless --fixed-fps 60 --path . res://tests/train_only.tscn -- world    # Training Grounds checks only (~160, about 1 minute)
+godot --path . res://tests/screens_training.tscn -- /tmp/training                 # Training Grounds screenshots (needs a display)
 ```
 
 ## Implemented in this slice
@@ -110,7 +174,7 @@ xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_s4.tscn  
 * Warrior one-hand + shield (block) or two-handers; Ranger bows/firearms, mines and turrets; Mage elemental spells, blink and skeleton summons that follow you, path around walls, attack, die and carry over between areas.
 * Passive web: 203 nodes in 21 named clusters (14 keystones), three class starts linked by hybrid roads, a central hub and an outer Wanderer's Road joining six outer clusters (Sanguine Rites, Prismatic Ward, Windwalker, Executioner's Path, Mind Fortress, Void Communion) so every keystone is reachable by every class. Pan/zoom, search box, cluster labels, click any reachable node to allocate the whole route (previewed in blue), stat-change previews, gold-cost refunds that never disconnect the tree.
 * Loot: 129 item bases, 52 affixes with tiers, 5 rarities, item comparison tooltips with stat deltas, loot filter, sorting, selling, salvaging, stash, merchant stock.
-* Crafting: upgrade base, reroll / add / remove affix, raise rarity, add socket, salvage - each with costs, preview and confirmation.
+* Crafting: upgrade base, reroll / add / remove affix, raise rarity, add socket, salvage - each with costs, preview and confirmation. Add, reroll and raise rarity roll for item corruption (see Crafting corruption).
 * Sockets and gems: gear rolls 0-3 sockets (by slot; more likely at higher item level). 8 gem types x 4 grades (Chipped, Flawed, Polished, Flawless); each gem gives different stats in a weapon, armour or jewellery. The Jeweller (hub) sockets and removes gems, combines 3 into the next grade and sells random gems. Gems drop from monsters and return to you when an item is sold, salvaged or destroyed.
 * Charms: 10 charm bases for the charm slot with charm-only affixes (damage reduction, cooldown recovery, flask effect, life on kill, +1 to all skills and more).
 * Legendaries: 20, including Emberheart, Wolfmother's Fang, Tyrant's Signet, Glacial Crest, The Thornwarden, Phantom Treads, Sigil of Echoes, Gunsmith's Pride, Warlord's Grip and Starfall.
@@ -124,9 +188,12 @@ xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_s4.tscn  
 * Statuses: ignite, chill, freeze, shock (scaling magnitude), bleed, poison, stun, intimidate, frailty, marked, snare, agony; execute and range-based damage conditions.
 * Elite modifiers (10) including damage shields, summoners and blinkers.
 * Combat feedback: damage numbers, crits, hit flash, screen shake, telegraphs, status tints (ignite, chill, shock, bleed, stun).
+* Training Grounds: Drillmaster Rook, single-target and three-dummy AoE DPS tests (10 s / 30 s, All sources or Player only, three defence profiles, Tight or Spread), per-skill attribution (statuses, minions, turrets and traps are credited to the skill that caused them), Result and History tabs with comparable-result deltas and build snapshots. Nothing in it changes gameplay or the save format.
 
 ## Known limitations / next steps
 
+* Crafting corruption: drops start at 0% (`drop_start` is in the data file for later), there is no way to cleanse corruption, the 50% chance does not rise as corruption grows, legendaries cannot be crafted so their corruption only shows on the tooltip, and the numbers are tuned by feel (60% chance, +25% step: 4 rolling crafts minimum, about 6.7 on average); the affix pools still make good items easy, which Dan plans to fix by adding weaker affixes. The tooltip bar is solid block characters because Godot 4.0 text boxes have no background colour tag.
+* Training Grounds history is kept in memory for the session only (lost when the game closes); a per-character file is a possible later addition. The T3/T6 defence profiles use the tier's dungeon data (a spawn-weighted average of its normal enemies, or its boss) at your character's level, not a specific enemy. Passive and item procs that carry no skill are listed under "Other". There is no mortal-mode dummy and no damage-taken or movement measurement yet.
 * Higher tiers are tuned with the autoplay bot (which never dodges); expect to refine numbers after real play.
 * Skill catalogue is 80 of ~146 listed skills. New skills are mostly JSON entries using existing behaviours; channelled and transform skills need new behaviours.
 * Sound effects are procedural; no music yet; no controller bindings yet (all input goes through the input map, so adding a pad is a binding change).

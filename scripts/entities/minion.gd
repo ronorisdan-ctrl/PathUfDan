@@ -17,9 +17,11 @@ var think_t := 0.0
 var moving := false
 var dmg_mult := 1.0
 var life_t := -1.0   # >0 for temporary minions
+var skill_id := ""   # the summoning skill (Training Grounds credits minion damage to it)
 
 func setup(id: String, player, lvl: int, sk: Dictionary = {}) -> void:
 	def_id = id
+	skill_id = str(sk.get("id", ""))
 	def = Data.summons.get(id, {})
 	owner_player = player
 	faction = "player"
@@ -112,6 +114,7 @@ func _attack() -> void:
 		return
 	facing = signf(target.global_position.x - global_position.x)
 	var pk: Dictionary = Combat.minion_packet(owner_player.ch, def, mlevel)
+	pk["src_skill"] = skill_id
 	if dmg_mult != 1.0:
 		for k in pk["dmg"]:
 			pk["dmg"][k] = [pk["dmg"][k][0] * dmg_mult, pk["dmg"][k][1] * dmg_mult]

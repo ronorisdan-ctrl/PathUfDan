@@ -1,7 +1,33 @@
-# determinism re-check after the AoE fix (run twice, compare) + regression
+# re-validation v2: after the stale-progress-clock and blood-altar navigation bot fixes
 parallel=1
---class=ranger --tier=2 --runs=10 --seed=7 --profile=Expert --jobs=10 --out=res://tests/smartbot/out/det3_a.csv
---class=ranger --tier=2 --runs=10 --seed=7 --profile=Expert --jobs=10 --out=res://tests/smartbot/out/det3_b.csv
---class=mage --tier=2 --runs=5 --mode=carry --carry=2 --seed=7 --profile=Competent --jobs=5 --out=res://tests/smartbot/out/det3_carry_a.csv
---class=mage --tier=2 --runs=5 --mode=carry --carry=2 --seed=7 --profile=Competent --jobs=5 --out=res://tests/smartbot/out/det3_carry_b.csv
-realtime scene=res://tests/test_runner.tscn
+--class=ranger --tier=2 --level=12 --runs=10 --seed=7 --profile=Expert --jobs=10 --out=res://tests/smartbot/out/rv2_det_a.csv
+--class=ranger --tier=2 --level=12 --runs=10 --seed=7 --profile=Expert --jobs=10 --out=res://tests/smartbot/out/rv2_det_b.csv
+--class=mage --tier=2 --level=12 --runs=5 --mode=carry --carry=2 --seed=7 --profile=Competent --jobs=5 --out=res://tests/smartbot/out/rv2_carry_a.csv
+--class=mage --tier=2 --level=12 --runs=5 --mode=carry --carry=2 --seed=7 --profile=Competent --jobs=5 --out=res://tests/smartbot/out/rv2_carry_b.csv
+--class=warrior --tier=2 --level=12 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=warrior --tier=3 --level=20 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=warrior --tier=4 --level=28 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=warrior --tier=2 --level=12 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=warrior --tier=3 --level=20 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=warrior --tier=4 --level=28 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=warrior --tier=2 --level=12 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=warrior --tier=3 --level=20 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=warrior --tier=4 --level=28 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=ranger --tier=2 --level=12 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=ranger --tier=3 --level=20 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=ranger --tier=4 --level=28 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=ranger --tier=2 --level=12 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=ranger --tier=3 --level=20 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=ranger --tier=4 --level=28 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=ranger --tier=2 --level=12 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=ranger --tier=3 --level=20 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=ranger --tier=4 --level=28 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=mage --tier=2 --level=12 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=mage --tier=3 --level=20 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=mage --tier=4 --level=28 --runs=30 --seed=700 --profile=NoDodge --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=mage --tier=2 --level=12 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=mage --tier=3 --level=20 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=mage --tier=4 --level=28 --runs=30 --seed=700 --profile=Competent --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=mage --tier=2 --level=12 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=mage --tier=3 --level=20 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv
+--class=mage --tier=4 --level=28 --runs=30 --seed=700 --profile=Expert --jobs=15 --out=res://tests/smartbot/out/rv2_order.csv

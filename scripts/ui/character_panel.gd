@@ -89,6 +89,8 @@ func refresh() -> void:
 	_row("Minion life", "+%d%%" % int(ch.stats.inc("minion_life")), "minion_life", "")
 	_row("Trap damage", "+%d%%" % int(ch.stats.inc("trap_damage")), "trap_damage", "")
 	_row("Turret damage", "+%d%%" % int(ch.stats.inc("turret_damage")), "turret_damage", "")
+	_section("Loot")
+	_row("Increased Item Rarity", "+%d%%" % int(f.get("item_rarity", 0.0)), "item_rarity", "Raises the chance that drops are Magic, Rare or better. Comes from gear, gems and passives.")
 	_section("Special")
 	var flags: Array = ch.stats.flags.keys()
 	if flags.is_empty():

@@ -1,0 +1,34 @@
+# Changelog
+
+## Crafting corruption (branch `feature/crafting-corruption`, not merged)
+
+- Phase 1: `data/corruption.json`, pure rules in `scripts/core/corruption_rules.gd`, `Data.corruption_cfg`, rules tests. Add Affix, Reroll Affix and Raise Rarity roll (50% for +20% corruption); Upgrade Base, Remove Affix and Add Socket are exempt.
+- Phase 2: the Blacksmith applies the craft in full, then rolls once with its own RNG (`apply_craft`). At 100% add / reroll / raise rarity are refused before any cost. The value is saved as an integer `corruption` on the item (no save version change) and survives the personal and shared stash.
+- Phase 3: "Corruption: N%" line and a 10-block bar on every item tooltip (grey, amber, red; red "Corrupted: cannot be crafted" at 100%), a wide bar with tick marks and "N more corruption events before lock" in the Blacksmith, a risk line on each rolling craft button, disabled add / reroll / raise rarity buttons with the refusal as tooltip at 100%, a warning in the confirm dialog above 60%, a red corner marker on 100% item slots, and Set / Clear corruption buttons in the F1 Items tab (dev-used save flag). Tests: `test_corruption_ui()`, `tests/items_crafting_only.tscn`, screenshots via `tests/screens_corruption.tscn`.
+- Tuning (Dan, 2026-10-29): chance 0.6 and step 25 in `data/corruption.json` (minimum 4 rolling crafts, about 6.7 on average). The corruption tests now read the numbers from the data file instead of hard-coding 50% / +20%.
+- Phase 4: README section (Crafting corruption, test commands, limitations), this entry and a status note in the project docs.
+
+## 2026-10-28 — Dying Canvas inventory preview
+
+- Added a standalone inventory/character UI study with tarnished cabinet frames, forty bag cells, eleven equipment cells, hover/pinned/focus states, comparison gains/losses, ring target switching, local sample swaps, sorting, filtering and reset.
+- Added a one-click launcher, JSON sample fixtures, focused interaction checks and five repeatable screenshot states. Existing procedural icons and fonts remain provisional; the illustrated concept is a visual reference, not a flattened in-game panel.
+- The preview does not create or save a character; live gameplay and UI are unchanged.
+
+## Training Grounds (branch `feature/training-grounds`, not merged)
+
+Added
+- **Drillmaster Rook** (hub NPC) and a Training panel with Setup, Result and History tabs.
+- Single-target and three-dummy AoE DPS tests: 10 s or 30 s, All sources or Player only, defence profile (none, Tier 3 normal enemy, Tier 6 boss with poise), cluster spacing Tight or Spread.
+- Result above the dummy's head (average DPS, peak second, settings, top three sources; in AoE a total line above dummy 1 and each dummy's own DPS and share), and a full Result tab with a per-skill breakdown, per-dummy table and average targets hit per cast.
+- History of the last 5 tests per character (session only), with the change against the previous comparable test, a build snapshot (character, level, specialisation, main/off hand, hotbar, passives) and "what changed since last time". Clear history asks for confirmation.
+- `data/training.json` (all tuning and wording), `scripts/core/training_rules.gd` (pure rules), `scripts/core/training_log.gd` (new autoload `TrainingLog`, listed last, after `Dev`), `scripts/entities/training_dummy.gd`, `scripts/ui/training_panel.gd`.
+- Tests: `test_training()` and `test_training_world()` in `tests/test_runner.gd` (about 160 checks), `tests/train_only.tscn` for a quick run, `tests/screens_training.tscn` for screenshots.
+
+Changed
+- The old fixed hub dummy (an enemy entry in the hub) is replaced by the spawnable training dummy.
+- Summon, deploy and buff skills are allowed in the hub, but only while training dummies exist (`player.gd`, one condition).
+- Player damage packets carry a cast number (`Combat.cast_serial`); statuses record the skill that applied them (`src_skill`, `src_kind`); minions know which skill summoned them. These are bookkeeping only: smartbot results are byte-identical to the baseline (warrior/ranger/mage, tier 2 Competent and tier 3 Expert, seed 700).
+
+Not changed
+- Gameplay, balance, the save format (no `SAVE_VERSION` change) and the existing autoload order (`TrainingLog` is appended).
+- The Training Grounds are off under `Game.testing` unless `Game.training_in_tests` is set.

@@ -38,6 +38,14 @@ var dungeon_mod_list := []
 var rooms := {}
 var attributes := {}
 var stat_info := {}
+var stun_cfg := {}
+var pets_cfg := {}   # data/pets.json
+var pet_list := []
+var pets := {}
+var stash_cfg := {}   # data/stash.json: tab size, tab price curve, tab cap
+var corruption_cfg := {}  # data/corruption.json: item corruption tuning
+var dev_cfg := {}     # data/dev_tools.json: developer tools presets
+var training_cfg := {}  # data/training.json: Training Grounds tuning
 var load_errors := []
 
 func _ready() -> void:
@@ -72,6 +80,14 @@ func load_all() -> void:
 	rooms = _load("rooms")
 	attributes = _load("attributes")
 	stat_info = _load("stats")
+	stun_cfg = _load("stun")
+	pets_cfg = _load("pets")
+	pet_list = pets_cfg.get("pets", []) if pets_cfg is Dictionary else []
+	pets = _index(pet_list)
+	stash_cfg = _load("stash")
+	corruption_cfg = _load("corruption")
+	dev_cfg = _load("dev_tools")
+	training_cfg = _load("training")
 	if load_errors.size() > 0:
 		push_error("Data load errors: " + str(load_errors))
 

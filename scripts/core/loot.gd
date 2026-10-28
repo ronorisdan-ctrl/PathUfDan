@@ -2,6 +2,9 @@ extends Node
 ## Item generation, affix rolling, drop tables, item text and crafting rules.
 ## Everything is driven by data/item_bases.json, affixes.json, uniques.json and loot.json.
 
+const DevRules = preload("res://scripts/core/dev_rules.gd")
+const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
+
 var rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
@@ -29,15 +32,24 @@ func make_item(base_id: String, rarity: String, ilvl: int) -> Dictionary:
 			it[k] = b[k]
 	return it
 
-func roll_item(ilvl: int, rarity_bonus: float = 0.0, class_id: String = "", forced_rarity: String = "") -> Dictionary:
-	var rarity := forced_rarity if forced_rarity != "" else roll_rarity(rarity_bonus)
+## legendary_weight >= 0 overrides the legendary weight for this roll only (used by the vendor);
+## the default -1 leaves normal drop odds untouched.
+func roll_item(ilvl: int, rarity_bonus: float = 0.0, class_id: String = "", forced_rarity: String = "", legendary_weight: float = -1.0) -> Dictionary:
+	var rarity := forced_rarity if forced_rarity != "" else roll_rarity(rarity_bonus, legendary_weight)
 	if rarity == "legendary":
 		var u := roll_unique(ilvl, class_id)
 		if not u.is_empty():
 			return u
 		rarity = "epic"
 	var base_id := pick_base(ilvl, class_id)
+	return roll_item_of(base_id, rarity, ilvl)
+
+## Rolls an item of a chosen base and rarity (affixes, sockets, name) exactly as a drop
+## would. roll_item uses it after picking the base; developer tools call it directly.
+func roll_item_of(base_id: String, rarity: String, ilvl: int) -> Dictionary:
 	var it := make_item(base_id, rarity, ilvl)
+	if it.is_empty():
+		return it
 	var rd: Dictionary = Data.rarities.get(rarity, {})
 	var rng_aff: Array = rd.get("affixes", [0, 0])
 	var n := rng.randi_range(int(rng_aff[0]), int(rng_aff[1]))
@@ -154,17 +166,26 @@ func random_gem(monster_level: int) -> String:
 	var t := best if (best == 0 or rng.randf() < 0.65) else best - 1
 	return gem_id(gl[rng.randi() % gl.size()]["id"], t)
 
-func roll_rarity(bonus: float) -> String:
-	var total := 0.0
+## Effective rarity weights (same order as Data.rarity_list). A non-negative legendary_weight
+## replaces the legendary entry as-is (the rarity bonus is not applied to it).
+func rarity_weights(bonus: float, legendary_weight: float = -1.0) -> Array:
 	var weights := []
 	for i in Data.rarity_list.size():
 		var r: Dictionary = Data.rarity_list[i]
 		var w := float(r["weight"])
-		if i == 1:
+		if r["id"] == "legendary" and legendary_weight >= 0.0:
+			w = legendary_weight
+		elif i == 1:
 			w *= 1.0 + bonus / 200.0
 		elif i >= 2:
 			w *= 1.0 + bonus / 100.0
 		weights.append(w)
+	return weights
+
+func roll_rarity(bonus: float, legendary_weight: float = -1.0) -> String:
+	var weights := rarity_weights(bonus, legendary_weight)
+	var total := 0.0
+	for w in weights:
 		total += w
 	var roll := rng.randf() * total
 	for i in weights.size():
@@ -433,7 +454,7 @@ func cost_text(cost: Dictionary) -> String:
 	return ", ".join(parts)
 
 # ------------------------------------------------------------------ tooltip
-func tooltip(it: Dictionary, ch = null) -> String:
+func tooltip(it: Dictionary, ch = null, show_corruption: bool = true) -> String:
 	var col := Data.rarity_color(it.get("rarity", "common")).to_html(false)
 	var lines := []
 	var up := int(it.get("upgrade", 0))
@@ -500,6 +521,8 @@ func tooltip(it: Dictionary, ch = null) -> String:
 		if u.get("flavor", "") != "":
 			lines.append("[i][color=#a07850]\"%s\"[/color][/i]" % u["flavor"])
 	lines.append("[color=#3a3440]────────────────────[/color]")
+	if show_corruption:
+		lines.append(CorruptionRules.tooltip_bbcode(it))
 	lines.append("[color=#8a8494]Sell: %d gold   Salvage: %s[/color]" % [sell_value(it), cost_text(salvage_yield(it))])
 	return "\n".join(lines)
 
@@ -509,7 +532,10 @@ func roll_drops(monster_level: int, loot_mult: float, is_elite: bool, is_boss: b
 	var out := []
 	var L: Dictionary = Data.loot
 	var rolls := 1
-	var bonus := rarity_stat
+	# developer tools loot luck (runtime only; always 1 for bots, tests and normal play)
+	var luck: float = Dev.loot_luck()
+	loot_mult *= luck
+	var bonus := DevRules.lucky_rarity(rarity_stat, luck)
 	if is_elite:
 		rolls = int(L.get("elite_item_rolls", 2))
 		bonus += float(L.get("elite_rarity_bonus", 150))
@@ -603,6 +629,11 @@ func craft_cost(op: String, it: Dictionary) -> Dictionary:
 func craft_check(op: String, it: Dictionary, affix_index: int = -1) -> String:
 	if it.is_empty():
 		return "Select an item"
+	# Corruption first: a fully corrupted item refuses add / reroll / raise rarity
+	# before any cost is looked at (exempt crafts are never refused here).
+	var corrupt_why: String = CorruptionRules.craft_refusal(it, op)
+	if corrupt_why != "":
+		return corrupt_why
 	var legendary: bool = it.get("rarity") == "legendary"
 	match op:
 		"upgrade":

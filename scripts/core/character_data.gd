@@ -3,13 +3,15 @@ extends RefCounted
 ## Also resolves the final StatBlock from every source.
 
 const StatBlock = preload("res://scripts/core/stat_block.gd")
+const PetRules = preload("res://scripts/core/pet_rules.gd")
+const StashRules = preload("res://scripts/core/stash_rules.gd")
 
-const SAVE_VERSION := 1
+const SAVE_VERSION := 3   # 2: adds the pets block; 3: stash tabs (stash_extra_tabs)
 const BAG_SIZE := 40
-const STASH_SIZE := 60
 const EQUIP_SLOTS := ["main_hand", "off_hand", "helmet", "chest", "gloves", "boots", "belt", "amulet", "ring1", "ring2", "charm"]
 const HOTBAR_SIZE := 7
 const MAX_SKILL_LEVEL := 20
+const MAX_LEVEL := 60
 
 var char_name := "Dan"
 var class_id := "warrior"
@@ -20,6 +22,7 @@ var bonus_passive_points := 0
 var allocated := []
 var inventory := []
 var stash := []
+var stash_extra_tabs := 0   # extra stash tabs bought with gold (the first tab is free)
 var equipment := {}
 var gold := 0
 var materials := {}
@@ -33,6 +36,9 @@ var spec_id := ""
 var spec_nodes := []
 var progress := {"bosses_killed": {}, "runs": 0, "deaths": 0, "highest_tier": 1}
 var next_uid := 1
+var pets := {}              # pet id -> {"tier": int, "name": String}; upgrades belong to each pet
+var active_pet := ""        # which owned pet follows you ("" = none)
+var dev_used := false       # set by developer tools that change progress; shown as "(dev)" in the load menu
 
 # runtime (not saved)
 var stats = null          # StatBlock
@@ -41,7 +47,7 @@ var final := {}           # resolved numbers used by gameplay
 
 func _init() -> void:
 	inventory.resize(BAG_SIZE)
-	stash.resize(STASH_SIZE)
+	stash.resize(StashRules.total_slots(Data.stash_cfg, 0, false))
 	for s in EQUIP_SLOTS:
 		equipment[s] = null
 
@@ -79,13 +85,17 @@ func take_uid() -> int:
 	return next_uid
 
 # ---------------------------------------------------------------- progression
+## XP needed to go from level l to l + 1.
+static func xp_for_level(l: int) -> int:
+	return int(round(60.0 * pow(l, 1.55) + 40.0 * l))
+
 func xp_to_next() -> int:
-	return int(round(60.0 * pow(level, 1.55) + 40.0 * level))
+	return xp_for_level(level)
 
 func add_xp(amount: int) -> void:
 	xp += amount
 	var leveled := false
-	while xp >= xp_to_next() and level < 60:
+	while xp >= xp_to_next() and level < MAX_LEVEL:
 		xp -= xp_to_next()
 		level += 1
 		passive_points += 1
@@ -654,6 +664,58 @@ func sort_bag() -> void:
 		inventory[i] = items[i] if i < items.size() else null
 	Events.inventory_changed.emit()
 
+## Locked items can't be sold, salvaged or destroyed. The flag lives on the item dictionary
+## (so it is saved, stashed and withdrawn with it) and is only written while true.
+static func is_locked(it) -> bool:
+	return it != null and typeof(it) == TYPE_DICTIONARY and bool(it.get("locked", false))
+
+func set_item_locked(it, locked: bool) -> void:
+	if it == null:
+		return
+	if locked:
+		it["locked"] = true
+	else:
+		it.erase("locked")
+	Events.inventory_changed.emit()
+
+## Bag slot indices holding an unlocked item of `rarity` or lower (equipped gear is not in the bag).
+func bag_slots_up_to(rarity: String) -> Array:
+	var limit: int = Data.rarity_index(rarity)
+	var out := []
+	for i in inventory.size():
+		var it = inventory[i]
+		if it != null and not is_locked(it) and Data.rarity_index(it.get("rarity", "common")) <= limit:
+			out.append(i)
+	return out
+
+## Locked items of `rarity` or lower that a sweep leaves alone.
+func bag_locked_up_to(rarity: String) -> int:
+	var limit: int = Data.rarity_index(rarity)
+	var n := 0
+	for it in inventory:
+		if it != null and is_locked(it) and Data.rarity_index(it.get("rarity", "common")) <= limit:
+			n += 1
+	return n
+
+## How many of those are upgraded (so the confirm dialog can warn about them).
+func bag_upgraded_up_to(rarity: String) -> int:
+	var n := 0
+	for i in bag_slots_up_to(rarity):
+		if int(inventory[i].get("upgrade", 0)) > 0:
+			n += 1
+	return n
+
+## Destroys every bag item of `rarity` or lower. Socketed gems return to the pouch.
+## Returns the number of items destroyed.
+func destroy_bag_up_to(rarity: String) -> int:
+	var idxs := bag_slots_up_to(rarity)
+	for i in idxs:
+		reclaim_gems(inventory[i])
+		inventory[i] = null
+	if not idxs.is_empty():
+		Events.inventory_changed.emit()
+	return idxs.size()
+
 func weapon():
 	return equipment.get("main_hand")
 
@@ -822,16 +884,20 @@ func equipment_with(item: Dictionary) -> Dictionary:
 
 # ---------------------------------------------------------------- save / load
 func to_dict() -> Dictionary:
-	return {
+	var d := {
 		"version": SAVE_VERSION,
 		"name": char_name, "class": class_id, "level": level, "xp": xp,
 		"bonus_passive_points": bonus_passive_points,
-		"allocated": allocated, "inventory": inventory, "stash": stash, "equipment": equipment,
+		"allocated": allocated, "inventory": inventory, "stash": stash, "stash_extra_tabs": stash_extra_tabs, "equipment": equipment,
 		"gold": gold, "materials": materials, "loadout": loadout, "unlocked_skills": unlocked_skills,
 		"flask_charges": flask_charges, "progress": progress, "next_uid": next_uid,
 		"runes": runes, "skill_runes": skill_runes, "spec": spec_id, "spec_nodes": spec_nodes,
 		"gems": gems,
+		"pets": pets, "active_pet": active_pet,
 	}
+	if dev_used:
+		d["dev_used"] = true   # written only when set, so normal saves are unchanged
+	return d
 
 func from_dict(d: Dictionary) -> void:
 	var ver := int(d.get("version", 1))
@@ -848,7 +914,7 @@ func from_dict(d: Dictionary) -> void:
 	if not allocated.has(class_def().get("start_passive", "")):
 		allocated.push_front(class_def().get("start_passive", ""))
 	inventory = _fix_list(d.get("inventory", []), BAG_SIZE)
-	stash = _fix_list(d.get("stash", []), STASH_SIZE)
+	_load_stash(d, ver)
 	var eq: Dictionary = d.get("equipment", {})
 	for s in EQUIP_SLOTS:
 		var it = eq.get(s)
@@ -885,8 +951,41 @@ func from_dict(d: Dictionary) -> void:
 		spec_id = ""
 	spec_nodes = Array(d.get("spec_nodes", [])).filter(func(n): return Data.spec_nodes.has(n))
 	next_uid = int(d.get("next_uid", 1))
+	pets = {}
+	var pd = d.get("pets", {})
+	if typeof(pd) == TYPE_DICTIONARY:
+		for k in pd:
+			if Data.pets.has(k) and typeof(pd[k]) == TYPE_DICTIONARY:
+				pets[k] = {"tier": clampi(int(pd[k].get("tier", 0)), 0, PetRules.max_tier()),
+					"name": PetRules.clean_name(str(pd[k].get("name", "")), Data.pets[k]["name"])}
+	active_pet = str(d.get("active_pet", ""))
+	if not pets.has(active_pet):
+		active_pet = ""
+	dev_used = bool(d.get("dev_used", false))   # optional field: older saves load as false
 	refresh_unlocks(false)
 	recalc()
+
+## Restores the stash tabs. Version 2 and older saves held 60 slots of which only 56 were
+## ever shown; StashRules.migrate_legacy rescues anything in the hidden four. The tab
+## count is also raised if items sit beyond it, so a load can never drop an item.
+func _load_stash(d: Dictionary, ver: int) -> void:
+	var cfg: Dictionary = Data.stash_cfg
+	var raw: Array = Array(d.get("stash", []))
+	var extra := StashRules.clamp_extra(cfg, int(d.get("stash_extra_tabs", 0)))
+	if ver < 3:
+		var mg := StashRules.migrate_legacy(cfg, raw)
+		raw = mg["slots"]
+		extra = StashRules.clamp_extra(cfg, extra + int(mg["extra_added"]))
+	var per := StashRules.slots_per_tab(cfg)
+	var last := -1
+	for i in raw.size():
+		if raw[i] != null:
+			last = i
+	if last >= 0:
+		var need_tabs := int(ceil(float(last + 1) / float(per)))
+		extra = maxi(extra, need_tabs - StashRules.free_tabs(cfg, false))
+	stash_extra_tabs = extra
+	stash = _fix_list(raw, StashRules.total_slots(cfg, extra, false))
 
 func _fix_list(arr, size: int) -> Array:
 	var out := []
@@ -900,7 +999,7 @@ func _fix_item(it):
 	if not Data.item_bases.has(it.get("base", "")):
 		return null
 	# JSON turns ints into floats; normalise the integer fields
-	for k in ["ilvl", "req_level", "upgrade", "uid", "sockets"]:
+	for k in ["ilvl", "req_level", "upgrade", "uid", "sockets", "corruption"]:
 		if it.has(k):
 			it[k] = int(it[k])
 	if it.has("gems"):
@@ -909,3 +1008,94 @@ func _fix_item(it):
 			gl.append(g if (typeof(g) == TYPE_STRING and (g == "" or Loot.gem_valid(g))) else "")
 		it["gems"] = gl
 	return it
+
+# ---------------------------------------------------------------- stash tabs
+func stash_tab_count() -> int:
+	return StashRules.tab_total(Data.stash_cfg, stash_extra_tabs, false)
+
+func stash_next_cost() -> int:
+	return StashRules.tab_cost(Data.stash_cfg, stash_extra_tabs)
+
+## Buys one extra personal stash tab. Returns "" or the refusal reason.
+func buy_stash_tab() -> String:
+	var why := StashRules.buy_refusal(Data.stash_cfg, stash_extra_tabs, gold)
+	if why != "":
+		return why
+	gold -= stash_next_cost()
+	stash_extra_tabs += 1
+	StashRules.ensure_slots(Data.stash_cfg, stash, stash_tab_count())
+	Events.currency_changed.emit()
+	return ""
+
+# ---------------------------------------------------------------- pets
+# Each pet keeps its own tier and name. Switching is free and never refunds or
+# resets anything, so you can always switch back to a pet exactly as you left it.
+func owns_pet(id: String) -> bool:
+	return pets.has(id)
+
+func pet_tier(id: String) -> int:
+	return int(pets.get(id, {}).get("tier", 0))
+
+func pet_name(id: String) -> String:
+	return str(pets.get(id, {}).get("name", Data.pets.get(id, {}).get("name", id)))
+
+func can_buy_pet(id: String) -> String:
+	if not Data.pets.has(id):
+		return "Unknown pet"
+	if pets.has(id):
+		return "Already owned"
+	if gold < int(Data.pets[id].get("price", 0)):
+		return "Not enough gold"
+	return ""
+
+## Buys a pet with gold. The first pet you buy starts following you.
+func buy_pet(id: String) -> String:
+	var why := can_buy_pet(id)
+	if why != "":
+		return why
+	gold -= int(Data.pets[id].get("price", 0))
+	pets[id] = {"tier": 0, "name": Data.pets[id]["name"]}
+	Events.currency_changed.emit()
+	if active_pet == "":
+		set_active_pet(id)
+	return ""
+
+func set_active_pet(id: String) -> bool:
+	if id != "" and not pets.has(id):
+		return false
+	if id == active_pet:
+		return true
+	active_pet = id
+	Events.pet_changed.emit()
+	return true
+
+func pet_upgrade_cost(id: String) -> Dictionary:
+	return PetRules.upgrade_cost(id, pet_tier(id))
+
+func can_upgrade_pet(id: String) -> String:
+	if not pets.has(id):
+		return "You don't own this pet"
+	if pet_tier(id) >= PetRules.max_tier():
+		return "Already at the highest tier"
+	if not has_materials(pet_upgrade_cost(id)):
+		return "Not enough materials"
+	return ""
+
+func upgrade_pet(id: String) -> String:
+	var why := can_upgrade_pet(id)
+	if why != "":
+		return why
+	if not pay(pet_upgrade_cost(id)):
+		return "Not enough materials"
+	pets[id]["tier"] = pet_tier(id) + 1
+	if id == active_pet:
+		Events.pet_changed.emit()
+	return ""
+
+func rename_pet(id: String, nm: String) -> bool:
+	if not pets.has(id):
+		return false
+	pets[id]["name"] = PetRules.clean_name(nm, Data.pets[id]["name"])
+	if id == active_pet:
+		Events.pet_changed.emit()
+	return true

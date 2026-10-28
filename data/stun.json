@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "guarantee_ratio": 0.5,
+  "min_chance": 0.1,
+  "min_threshold_mult": 0.25,
+  "immunity_after_stun": 1.75,
+  "kinds": {
+    "player": { "threshold": 0.20, "min_duration": 0.30, "max_duration": 0.50,
+                "dodge_breaks_after": 0.15, "cancels_cast": true },
+    "normal": { "threshold": 0.10, "min_duration": 0.40, "max_duration": 0.80,
+                "interrupts_windup": true },
+    "elite":  { "threshold": 0.25, "min_duration": 0.40, "max_duration": 0.70,
+                "interrupts_windup": true }
+  },
+  "poise": {
+    "fill_fraction": 0.15,
+    "big_hit_start": 0.05,
+    "big_hit_full": 0.15,
+    "big_hit_multiplier": 1.75,
+    "regen_delay": 3.0,
+    "regen_per_sec": 15.0,
+    "stagger_duration": 1.0,
+    "immunity_after_stagger": 8.0,
+    "interrupts_windup": true
+  }
+}

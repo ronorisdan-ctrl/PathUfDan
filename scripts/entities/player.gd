@@ -119,7 +119,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		use_flask(1)
 	elif event.is_action_pressed("interact"):
 		if level != null:
-			level.interact(self)
+			level.interact(self, get_global_mouse_position())
 
 func release_all() -> void:
 	for i in held.size():
@@ -154,7 +154,7 @@ func _physics_process(delta: float) -> void:
 		var inp := Vector2.ZERO
 		if input_enabled:
 			inp = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-		var spd: float = ch.final.get("move_speed", 100)
+		var spd: float = ch.final.get("move_speed", 100) * Dev.move_mult()
 		if busy > 0:
 			spd *= current_move_mult
 		vel = inp * spd * speed_mult()
@@ -238,6 +238,8 @@ func weapon_ok(sk: Dictionary) -> bool:
 	return false
 
 func mana_cost(sk: Dictionary) -> float:
+	if Dev.infinite_mana():
+		return 0.0
 	var c: float = float(sk.get("cost", 0)) * ch.final.get("mana_cost_mult", 1.0)
 	if ch.stats.has_flag("hollow_crown") and mana >= ch.final.get("max_mana", 0) * 0.9:
 		c = 0.0
@@ -281,7 +283,7 @@ func try_use_slot(i: int) -> bool:
 			msg_cd = 1.0
 			Events.message.emit(why, Color("#ff8080"))
 		return false
-	if sk.get("behavior") in ["summon", "deploy", "buff"] and level != null and not level.allow_combat:
+	if sk.get("behavior") in ["summon", "deploy", "buff"] and level != null and not level.allow_combat and not level.training_active:
 		if msg_cd <= 0:
 			msg_cd = 1.0
 			Events.message.emit("You cannot do that in town", Color("#ff8080"))
@@ -295,12 +297,13 @@ func try_use_slot(i: int) -> bool:
 	current_move_mult = float(sk.get("move_mult", 0.45))
 	busy = current_use_time
 	var cd: float = float(sk.get("cooldown", 0)) * ch.final.get("cdr_mult", 1.0)
-	if cd > 0:
+	if cd > 0 and not Dev.no_cooldowns():
 		cooldowns[sk["id"]] = cd
 	swing_t = current_use_time
 	swing_dur = current_use_time
 	swing_kind = sk.get("behavior", "")
 	facing = signf(aim_pos.x - global_position.x) if absf(aim_pos.x - global_position.x) > 1 else facing
+	Combat.cast_serial += 1   # packets built during this cast carry the number (Training Grounds: targets hit per cast)
 	exec.execute(self, sk, aim_pos)
 	_on_skill_used(sk)
 	var b: String = sk.get("behavior", "")
@@ -401,8 +404,12 @@ func clear_summons() -> void:
 
 # ------------------------------------------------------------------ movement skills
 func start_dodge() -> void:
-	if dodge_cd > 0 or dodge_t > 0 or dash_t > 0 or speed_mult() <= 0:
+	if dodge_cd > 0 or dodge_t > 0 or dash_t > 0:
 		return
+	if speed_mult() <= 0:
+		if not can_dodge_out_of_stun():
+			return
+		statuses.erase("stun")
 	var inp := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	dodge_dir = inp.normalized() if inp.length() > 0.1 else (aim_pos - global_position).normalized()
 	if dodge_dir == Vector2.ZERO:
@@ -448,6 +455,11 @@ func _dash_hits() -> void:
 func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float:
 	if not alive or dodge_t > 0 or invuln_t > 0:
 		return 0.0
+	if Dev.god():
+		# developer god mode: the hit lands (so on-hit effects and feedback still run) but deals nothing
+		if level != null and randf() < 0.25:
+			Combat.number(level, global_position, "God", Color("#ffe080"))
+		return 0.0
 	var f: Dictionary = ch.final
 	var att_lvl := 1
 	if source != null and is_instance_valid(source) and "mlevel" in source:
@@ -489,10 +501,33 @@ func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float
 	apply_damage(total, source, crit, Combat.dominant_type(rolled))
 	if total > 0:
 		Sfx.play("hurt")
+		if alive:
+			_try_hit_stun(total)
 	Events.player_damaged.emit(total)
 	if total > max_life * 0.1:
 		shake(2.0)
 	return total
+
+## Hit stun: rolled on the life actually lost. "Stun threshold" (inc) makes it harder.
+func _try_hit_stun(dmg: float) -> void:
+	if dash_t > 0 or dodge_t > 0 or Data.stun_cfg.is_empty():
+		return
+	var thr: float = maxf(0.0, 1.0 + ch.stats.inc("stun_threshold") / 100.0)
+	if try_hit_stun(dmg, "player", thr) <= 0.0:
+		return
+	var k: Dictionary = Data.stun_cfg["kinds"]["player"]
+	if k.get("cancels_cast", true):
+		busy = 0.0          # skills in progress are interrupted (delayed hits are dropped)
+		swing_t = 0.0
+		pending.clear()
+	shake(2.5)
+	Sfx.play("block")
+
+## The dodge roll breaks a hit stun once it has lasted dodge_breaks_after seconds (not freeze).
+func can_dodge_out_of_stun() -> bool:
+	if not statuses.has("stun") or statuses.has("freeze") or Data.stun_cfg.is_empty():
+		return false
+	return stun_elapsed() >= float(Data.stun_cfg["kinds"]["player"].get("dodge_breaks_after", 0.15))
 
 func _on_block() -> void:
 	if ch.stats.has_flag("retaliate"):
@@ -505,6 +540,18 @@ func _on_block() -> void:
 		add_buff("last_bastion", [{"stat": "damage_reduction", "type": "flat", "value": 25}], 3.0)
 	if ch.stats.has_flag("bulwark"):
 		add_buff("bulwark", [{"stat": "damage_reduction", "type": "flat", "value": 15}], 2.0)
+
+## Developer god mode also blocks damage over time and every status (stun, freeze,
+## poison, agony, frailty, marked, snare, ...) at the point where they are applied.
+func take_dot(amount: float, dtype: String) -> void:
+	if Dev.god():
+		return
+	super.take_dot(amount, dtype)
+
+func add_status(type: String, duration: float, data: Dictionary) -> void:
+	if Dev.god():
+		return
+	super.add_status(type, duration, data)
 
 func dot_resist(dtype: String) -> float:
 	if dtype == "physical":
@@ -537,12 +584,14 @@ func on_kill(e) -> void:
 				m.heal(m.max_life * 0.1)
 
 func use_flask(i: int) -> void:
-	if ch.flask_charges[i] < 1.0:
+	var infinite: bool = Dev.infinite_flasks()
+	if ch.flask_charges[i] < 1.0 and not infinite:
 		if msg_cd <= 0:
 			msg_cd = 0.8
 			Events.message.emit("Flask is empty", Color("#ff8080"))
 		return
-	ch.flask_charges[i] -= 1.0
+	if not infinite:
+		ch.flask_charges[i] -= 1.0
 	var fm: float = ch.final.get("flask_mult", 1.0)
 	if i == 0:
 		heal(max_life * 0.4 * fm)

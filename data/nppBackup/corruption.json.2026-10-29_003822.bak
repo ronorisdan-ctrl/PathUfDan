@@ -1,0 +1,19 @@
+{
+	"chance": 0.5,
+	"step": 25,
+	"max": 100,
+	"drop_start": 0,
+	"rolling_crafts": ["add", "reroll", "rarity"],
+	"exempt_crafts": ["upgrade", "remove", "socket"],
+	"confirm_above": 60,
+	"colors": {"low": "#9aa0a6", "mid": "#e0a030", "high": "#d03030"},
+	"refusal_text": "Corrupted: this item can no longer be crafted",
+	"craft_notes": {
+		"add": "Add Affix: rolls",
+		"reroll": "Reroll Affix (one chosen affix per click = one roll): rolls",
+		"rarity": "Raise Rarity (adds affixes up to the new rarity): rolls, Dan's decision 2026-10-28",
+		"upgrade": "Upgrade Base: exempt",
+		"remove": "Remove Affix: exempt",
+		"socket": "Add Socket: exempt (gem socketing at the Jeweller is exempt too)"
+	}
+}

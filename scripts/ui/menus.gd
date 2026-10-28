@@ -108,6 +108,12 @@ func show_settings() -> void:
 		Game.settings["fullscreen"] = on
 		Game.apply_settings())
 	v.add_child(fs)
+	var dev := CheckBox.new()
+	dev.text = "Developer tools"
+	dev.tooltip_text = "Testing cheats: F1 opens the Developer panel in game. Characters that use them are marked (dev)."
+	dev.button_pressed = bool(Game.settings.get("dev_tools", false))
+	dev.toggled.connect(func(on): Dev.set_enabled(on))
+	v.add_child(dev)
 	v.add_child(UIKit.label("Controls: WASD move, LMB/RMB/Q/E/R skills, Space dodge, 1/2 flasks,\nF interact/pick up, I inventory, C character, P passives, K skills,\nTab map, Z loot filter, Esc menu", 12, UIKit.MUTED))
 	v.add_child(UIKit.button("Back", func():
 		Game.save_settings()
@@ -182,6 +188,7 @@ func _pick(cls: String) -> void:
 func _start(cls: String, slot: int) -> void:
 	Game.new_character(cls)
 	Game.current_slot = slot
+	Game.select_filter_character(true)
 	Game.save_game(slot)
 	main.start_game()
 
@@ -197,6 +204,10 @@ func _confirm(text: String, on_yes: Callable) -> void:
 	dlg.confirmed.connect(on_yes)
 	dlg.canceled.connect(dlg.queue_free)
 	dlg.confirmed.connect(dlg.queue_free)
+	dlg.window_input.connect(func(e):
+		if e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_SPACE:
+			dlg.set_input_as_handled()
+			dlg.get_ok_button().emit_signal("pressed"))
 	add_child(dlg)
 	dlg.popup_centered()
 

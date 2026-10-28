@@ -23,7 +23,11 @@ Art="*res://scripts/gfx/art.gd"
 Sfx="*res://scripts/core/sfx.gd"
 Combat="*res://scripts/combat/combat.gd"
 Loot="*res://scripts/core/loot.gd"
+LootFilter="*res://scripts/core/loot_filter.gd"
 Game="*res://scripts/core/game.gd"
+SharedStash="*res://scripts/core/shared_stash.gd"
+Dev="*res://scripts/core/dev_tools.gd"
+TrainingLog="*res://scripts/core/training_log.gd"
 
 [display]
 

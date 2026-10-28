@@ -17,6 +17,7 @@ var equip_slots := {}
 var bag_slots := []
 var mats_label: RichTextLabel
 var filter_btn: Button
+var destroy_btn: Button
 var info_label: Label
 
 func _init() -> void:
@@ -47,6 +48,7 @@ func _init() -> void:
 		var sl2 = ItemSlot.new()
 		sl2.key = i
 		sl2.clicked.connect(_on_bag_click)
+		sl2.double_clicked.connect(_on_bag_double_click)
 		sl2.hovered.connect(_on_hover)
 		sl2.unhovered.connect(_on_unhover)
 		grid.add_child(sl2)
@@ -55,6 +57,9 @@ func _init() -> void:
 	body.add_child(mats_label)
 	var h := HBoxContainer.new()
 	h.add_child(UIKit.button("Sort", func(): Game.ch.sort_bag()))
+	destroy_btn = UIKit.button("Destroy...", _open_destroy_menu)
+	destroy_btn.tooltip_text = "Destroy every bag item of a chosen rarity and lower"
+	h.add_child(destroy_btn)
 	filter_btn = UIKit.button("Filter", func(): ui.cycle_loot_filter())
 	h.add_child(filter_btn)
 	body.add_child(h)
@@ -75,14 +80,14 @@ func refresh() -> void:
 	for i in bag_slots.size():
 		bag_slots[i].set_item(ch.inventory[i])
 		bag_slots[i].selected = _is_selected(ch.inventory[i])
-		bag_slots[i].price = Loot.sell_value(ch.inventory[i]) if ui.is_open("vendor") and ch.inventory[i] != null else -1
+		bag_slots[i].price = Loot.sell_value(ch.inventory[i]) if ui.is_open("vendor") and ch.inventory[i] != null and not ch.is_locked(ch.inventory[i]) else -1
 	var parts := ["[color=#e8c050]Gold: %d[/color]" % ch.gold]
 	for k in Data.materials:
 		var md: Dictionary = Data.materials[k]
 		parts.append("[color=%s]%s: %d[/color]" % [md.get("color", "#fff"), md["name"], int(ch.materials.get(k, 0))])
 	mats_label.text = "   ".join(parts)
 	filter_btn.text = "Loot filter: " + ui.loot_filter_name()
-	var hint := "LMB: equip   RMB: actions   "
+	var hint := "Double-click: equip   RMB: actions   "
 	if ui.is_open("vendor"):
 		hint += "Shift+LMB: sell"
 	elif ui.is_open("blacksmith"):
@@ -90,7 +95,7 @@ func refresh() -> void:
 	elif ui.is_open("jeweller"):
 		hint = "LMB: select for socketing   RMB: actions"
 	elif ui.is_open("stash"):
-		hint = "LMB: move to stash   RMB: actions"
+		hint = "LMB: move to %s   RMB: actions" % ui.panels["stash"].target_name()
 	info_label.text = hint
 
 func _is_selected(it) -> bool:
@@ -137,6 +142,17 @@ func _on_bag_click(sl, button: int, shift: bool) -> void:
 	if shift and ui.is_open("vendor"):
 		sell(idx)
 		return
+	# A plain single left-click no longer equips; see _on_bag_double_click.
+
+## Double left-click on a bag item equips it (same as the right-click "Equip" entry).
+## Only applies when no crafting/stash panel has given left-click another job.
+func _on_bag_double_click(sl) -> void:
+	var ch = Game.ch
+	var idx: int = sl.key
+	if ch.inventory[idx] == null:
+		return
+	if ui.is_open("jeweller") or ui.is_open("blacksmith") or ui.is_open("stash"):
+		return
 	var err: String = ch.equip_from_bag(idx)
 	if err != "":
 		ui.toast(err, UIKit.BAD)
@@ -148,15 +164,23 @@ func _context_bag(idx: int, it: Dictionary) -> void:
 	opts.append(["Equip", _equip_idx.bind(idx, ""), ch.equip_restriction(it) == ""])
 	if it.get("slot") == "ring":
 		opts.append(["Equip in Ring 2", _equip_idx.bind(idx, "ring2"), ch.equip_restriction(it) == ""])
+	var locked: bool = ch.is_locked(it)
+	opts.append(["Unlock item" if locked else "Lock item", func(): ch.set_item_locked(it, not locked)])
 	if ui.is_open("vendor"):
-		opts.append(["Sell for %d gold" % Loot.sell_value(it), func(): sell(idx)])
+		opts.append(["Sell for %d gold" % Loot.sell_value(it), func(): sell(idx), not locked])
 	if ui.is_open("blacksmith"):
 		opts.append(["Select for crafting", func(): ui.panels["blacksmith"].select(it)])
-		opts.append(["Salvage", func(): salvage(idx)])
+		opts.append(["Salvage", func(): salvage(idx), not locked])
 	if ui.is_open("stash"):
-		opts.append(["Move to stash", func(): ui.panels["stash"].deposit(idx)])
-	opts.append(["Destroy", func(): _destroy(idx)])
+		opts.append(["Move to " + ui.panels["stash"].target_name(), func(): ui.panels["stash"].deposit(idx)])
+	opts.append(["Destroy", func(): _destroy(idx), not locked])
 	ui.show_context(opts)
+
+func _refuse_locked(it) -> bool:
+	if Game.ch.is_locked(it):
+		ui.toast("This item is locked. Unlock it first (right-click).", UIKit.BAD)
+		return true
+	return false
 
 func _equip_idx(idx: int, slot: String) -> void:
 	var e: String = Game.ch.equip_from_bag(idx, slot)
@@ -196,7 +220,7 @@ func _valuable(it: Dictionary) -> bool:
 func sell(idx: int) -> void:
 	var ch = Game.ch
 	var it = ch.inventory[idx]
-	if it == null:
+	if it == null or _refuse_locked(it):
 		return
 	var do_sell := func():
 		if ch.inventory[idx] != it:
@@ -210,7 +234,7 @@ func sell(idx: int) -> void:
 		Events.inventory_changed.emit()
 		Events.currency_changed.emit()
 		ui.refresh_open()
-	if _valuable(it):
+	if it.get("rarity") == "legendary":
 		ui.ask("Sell [color=#%s]%s[/color] for %d gold?" % [Data.rarity_color(it["rarity"]).to_html(false), it["name"], Loot.sell_value(it)], do_sell)
 	else:
 		do_sell.call()
@@ -218,7 +242,7 @@ func sell(idx: int) -> void:
 func salvage(idx: int) -> void:
 	var ch = Game.ch
 	var it = ch.inventory[idx]
-	if it == null:
+	if it == null or _refuse_locked(it):
 		return
 	var y: Dictionary = Loot.salvage_yield(it)
 	var do_salvage := func():
@@ -240,10 +264,47 @@ func salvage(idx: int) -> void:
 	else:
 		do_salvage.call()
 
+## "Destroy..." button: pick a rarity, everything in the bag of that rarity or lower goes.
+func _open_destroy_menu() -> void:
+	var ch = Game.ch
+	if ch == null:
+		return
+	var opts := []
+	for r in Data.rarity_list:
+		var rid: String = r["id"]
+		var n: int = ch.bag_slots_up_to(rid).size()
+		var label := "%s (%d item%s)" % [r["name"] if Data.rarity_index(rid) == 0 else r["name"] + " and lower", n, "" if n == 1 else "s"]
+		opts.append([label, _confirm_destroy_up_to.bind(rid), n > 0])
+	ui.show_context(opts)
+
+func _confirm_destroy_up_to(rid: String) -> void:
+	var ch = Game.ch
+	var n: int = ch.bag_slots_up_to(rid).size()
+	if n == 0:
+		ui.toast("Nothing to destroy", UIKit.MUTED)
+		return
+	var rname: String = Data.rarities.get(rid, {}).get("name", rid.capitalize())
+	var scope := rname if Data.rarity_index(rid) == 0 else rname + " and lower"
+	var txt := "Destroy [color=#%s]%d item%s[/color] in your bag (%s)? This cannot be undone.\nEquipped items are not affected." % [
+		Data.rarity_color(rid).to_html(false), n, "" if n == 1 else "s", scope]
+	var kept: int = ch.bag_locked_up_to(rid)
+	if kept > 0:
+		txt += "\n[color=#80c0ff]%d locked item%s will be kept.[/color]" % [kept, "" if kept == 1 else "s"]
+	var up: int = ch.bag_upgraded_up_to(rid)
+	if up > 0:
+		txt += "\n[color=#ff8080]%d of them %s been upgraded.[/color]" % [up, "has" if up == 1 else "have"]
+	if Data.rarity_index(rid) >= Data.rarity_index("legendary"):
+		txt += "\n[color=#ff8080]This includes legendary items.[/color]"
+	ui.ask(txt, func():
+		var done: int = ch.destroy_bag_up_to(rid)
+		ui.hide_tooltip()
+		ui.toast("Destroyed %d item%s" % [done, "" if done == 1 else "s"], Color("#c0a080"))
+		ui.refresh_open())
+
 func _destroy(idx: int) -> void:
 	var ch = Game.ch
 	var it = ch.inventory[idx]
-	if it == null:
+	if it == null or _refuse_locked(it):
 		return
 	ui.ask("Destroy [color=#%s]%s[/color]? This cannot be undone." % [Data.rarity_color(it["rarity"]).to_html(false), it["name"]], func():
 		if ch.inventory[idx] == it:

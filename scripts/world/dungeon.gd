@@ -408,7 +408,7 @@ func _physics_process(delta: float) -> void:
 			h.position = clamp_to_floor(player.global_position, player.global_position + Vector2(rng.randf_range(-50, 50), rng.randf_range(-50, 50)))
 			floor_layer.add_child(h)
 	if wave_state.get("active", false):
-		_tick_waves()
+		_tick_waves(delta)
 
 func _track_room() -> void:
 	var pc := to_cell(player.global_position)
@@ -498,7 +498,8 @@ func _on_boss_dead(e) -> void:
 	if tier >= 5 and rng.randf() < 0.25 + 0.03 * depth:
 		spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, 0.0, ch.class_id, "legendary")}, e.global_position)
 	if def.get("endless", false):
-		ch.progress["abyss_best"] = maxi(int(ch.progress.get("abyss_best", 0)), depth)
+		if not ch.dev_used:   # developer-tainted characters never set depth records
+			ch.progress["abyss_best"] = maxi(int(ch.progress.get("abyss_best", 0)), depth)
 		_add_portal(e.global_position + Vector2(-40, 30), "Descend to depth %d" % (depth + 1), "descend", Color("#ff4060"))
 	_add_portal(e.global_position + Vector2(0, 30), "Exit Portal", "exit_portal", Color("#ffd060"))
 	Events.boss_died.emit(e)
@@ -557,9 +558,10 @@ func _next_wave() -> void:
 	Events.message.emit("Wave %d of %d" % [wave_state["wave"], wave_state["total"]], Color("#ff8060"))
 	Events.objective_changed.emit(objective_text())
 
-func _tick_waves() -> void:
+func _tick_waves(delta: float = 0.0) -> void:
 	var alive: Array = wave_state["alive"].filter(func(e): return is_instance_valid(e) and e.alive)
 	wave_state["alive"] = alive
+	_rescue_wave_enemies(alive, delta)
 	if alive.is_empty():
 		if int(wave_state["wave"]) >= int(wave_state["total"]):
 			wave_state["active"] = false
@@ -570,6 +572,42 @@ func _tick_waves() -> void:
 				spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level, 150.0 + rarity_bonus(), player.ch.class_id)}, wave_state["pos"])
 		else:
 			_next_wave()
+
+## Safety net for the Blood Altar: a wave enemy that the player cannot reach (inside rock,
+## outside the grid, or in a floor pocket with no path) would keep the arena sealed forever.
+## After 3 s without a path (accumulated; free time only slowly cancels it) it is moved back
+## to the floor next to the altar.
+const WAVE_RESCUE_AFTER := 3.0
+
+func _rescue_wave_enemies(alive: Array, delta: float) -> void:
+	if player == null or not is_instance_valid(player) or not player.alive:
+		return
+	var altar: Vector2 = wave_state["pos"]
+	if player.global_position.distance_to(altar) > 640.0:
+		return    # the player walked away; the flow field does not cover the altar
+	if flow_value(to_cell(player.global_position)) < 0:
+		return    # flow field not valid this frame (player mid-roll over a wall edge)
+	var lost: Dictionary = wave_state.get("lost", {})
+	for e in alive:
+		var id: int = e.get_instance_id()
+		var stuck: bool = is_solid(e.global_position) or flow_value(to_cell(e.global_position)) < 0
+		if not stuck:
+			# slow decay: an enemy that keeps slipping back into the rock still adds up
+			var left: float = float(lost.get(id, 0.0)) - delta * 0.25
+			if left <= 0.0:
+				lost.erase(id)
+			else:
+				lost[id] = left
+			continue
+		lost[id] = float(lost.get(id, 0.0)) + delta
+		if lost[id] >= WAVE_RESCUE_AFTER:
+			lost.erase(id)
+			e.global_position = random_floor_near(to_cell(altar), 2)
+			e.velocity = Vector2.ZERO
+			if "knock" in e:
+				e.knock = Vector2.ZERO
+			add_fx(VFX.make("ring", e.global_position, Color("#ff4040"), 0.5, 20))
+	wave_state["lost"] = lost
 
 func _reveal_around(p: Vector2, rad: int) -> void:
 	var c := to_cell(p)

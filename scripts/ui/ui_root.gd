@@ -13,10 +13,14 @@ const PANELS := {
 	"vendor": "res://scripts/ui/vendor_panel.gd",
 	"blacksmith": "res://scripts/ui/blacksmith_panel.gd",
 	"jeweller": "res://scripts/ui/jeweller_panel.gd",
+	"pets": "res://scripts/ui/pet_panel.gd",
+	"training": "res://scripts/ui/training_panel.gd",
 	"stash": "res://scripts/ui/stash_panel.gd",
 	"dungeon": "res://scripts/ui/dungeon_panel.gd",
 	"pause": "res://scripts/ui/pause_panel.gd",
+	"options": "res://scripts/ui/options_panel.gd",
 	"death": "res://scripts/ui/death_panel.gd",
+	"dev": "res://scripts/ui/dev_panel.gd",
 }
 
 var root: Control
@@ -51,6 +55,8 @@ func _ready() -> void:
 		p.visible = false
 		root.add_child(p)
 		panels[k] = p
+	LootFilter.upgrade_checker = Callable(self, "filter_is_upgrade")
+	LootFilter.known_sounds = Sfx.streams.keys()
 	toasts = VBoxContainer.new()
 	toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toasts.position = Vector2(0, 90)
@@ -124,8 +130,8 @@ func toggle(n: String) -> void:
 		close(n)
 	else:
 		# left-side panels share space
-		if n in ["character", "vendor", "blacksmith", "stash", "jeweller"]:
-			for o in ["character", "vendor", "blacksmith", "stash", "jeweller"]:
+		if n in ["character", "vendor", "blacksmith", "stash", "jeweller", "pets", "training"]:
+			for o in ["character", "vendor", "blacksmith", "stash", "jeweller", "pets", "training"]:
 				if o != n and is_open(o):
 					open_set.erase(o)
 					panels[o].visible = false
@@ -147,8 +153,8 @@ func refresh_open() -> void:
 		panels[k].refresh()
 
 func _update_pause() -> void:
-	# the game pauses only for the pause menu; everything else is live (ARPG style)
-	get_tree().paused = is_open("pause")
+	# the game pauses only for the pause menu (and the developer frame pause); everything else is live
+	get_tree().paused = is_open("pause") or Dev.frame_paused()
 
 func _release_player() -> void:
 	if Game.level != null and Game.level.player != null and is_instance_valid(Game.level.player):
@@ -168,6 +174,10 @@ func open_station(kind: String) -> void:
 		"jeweller":
 			toggle("jeweller")
 			open("inventory")
+		"pets":
+			toggle("pets")
+		"training":
+			toggle("training")
 		"dungeon":
 			toggle("dungeon")
 		"altar":
@@ -177,6 +187,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Game.ch == null or Game.level == null:
 		return
 	if is_open("death"):
+		return
+	if event.is_action_pressed("dev_panel") and Dev.enabled():
+		close("pause")
+		toggle("dev")
+		get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("pause"):
 		if confirm.visible:
@@ -204,17 +219,50 @@ func _unhandled_input(event: InputEvent) -> void:
 		cycle_loot_filter()
 		get_viewport().set_input_as_handled()
 
+## Z cycles through the character's filters (presets first, then saved ones).
 func cycle_loot_filter() -> void:
-	var v := (int(Game.settings.get("loot_filter", 0)) + 1) % 4
-	Game.settings["loot_filter"] = v
-	Game.save_settings()
+	var names: Array = LootFilter.list_filters()
+	var i := names.find(LootFilter.active_name)
+	LootFilter.load_filter(names[(i + 1) % names.size()])
 	if Game.level != null:
 		Game.level.refresh_loot_filter()
 	toast("Loot filter: " + loot_filter_name(), Color("#c0c0ff"))
 	refresh_open()
 
 func loot_filter_name() -> String:
-	return ["Show all", "Hide Common", "Rare and better", "Epic and better"][int(Game.settings.get("loot_filter", 0))]
+	return str(LootFilter.filter.get("name", LootFilter.active_name))
+
+var filter_editor = null
+
+## Opens the in-game loot filter editor (rules, colours, sounds, import/export).
+func open_filter_editor() -> void:
+	if filter_editor == null:
+		filter_editor = load("res://scripts/ui/loot_filter_panel.gd").new()
+		root.add_child(filter_editor)
+		filter_editor.position = Vector2(150, 50)
+	filter_editor.open()
+
+## Hook for the filter's "is an upgrade for me" condition (same maths as the tooltip).
+func filter_is_upgrade(it: Dictionary) -> bool:
+	var ch = Game.ch
+	if ch == null or ch.equip_restriction(it) != "":
+		return false
+	var eq: Dictionary = ch.equipment_with(it)
+	var a: Dictionary = ch.final
+	var b: Dictionary = ch.preview_final(ch.allocated, eq)
+	var dmg_ok := true
+	var gain := false
+	var sid: String = ch.loadout[0]
+	if sid != "":
+		var before: float = ch.preview_skill_avg(sid, ch.allocated)
+		var after: float = ch.preview_skill_avg(sid, ch.allocated, eq)
+		if before > 0:
+			dmg_ok = after >= before * 0.99
+			gain = after > before * 1.01
+	for k in ["max_life", "armour", "evasion", "block_chance", "res_fire", "res_cold", "res_lightning"]:
+		if float(b.get(k, 0)) > float(a.get(k, 0)) + 0.5:
+			gain = true
+	return gain and dmg_ok
 
 # ------------------------------------------------------------------ tooltip
 func show_tooltip(text: String, text2: String = "") -> void:
@@ -254,6 +302,8 @@ func _place_tooltips() -> void:
 func item_tooltip(it: Dictionary, compare: bool) -> void:
 	var ch = Game.ch
 	var main := Loot.tooltip(it, ch)
+	if bool(it.get("locked", false)):
+		main += "\n[color=#ffd060]Locked: cannot be sold, salvaged or destroyed[/color]"
 	var other := ""
 	if compare:
 		var slot: String = ch.slot_for(it)
@@ -343,6 +393,17 @@ func hide_context() -> void:
 	context.visible = false
 
 func _input(event: InputEvent) -> void:
+	# While a confirmation is showing: Space = Confirm, Escape = Cancel.
+	# Handled here so the game (dodge, pause menu) never sees these keys.
+	if confirm.visible and event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_SPACE:
+			get_viewport().set_input_as_handled()
+			_on_confirm()
+			return
+		elif event.keycode == KEY_ESCAPE:
+			get_viewport().set_input_as_handled()
+			_on_cancel()
+			return
 	if context.visible and event is InputEventMouseButton and event.pressed:
 		if not Rect2(context.global_position, context.size).has_point(event.position):
 			hide_context()
