@@ -14,9 +14,11 @@ const PANELS := {
 	"blacksmith": "res://scripts/ui/blacksmith_panel.gd",
 	"jeweller": "res://scripts/ui/jeweller_panel.gd",
 	"pets": "res://scripts/ui/pet_panel.gd",
+	"training": "res://scripts/ui/training_panel.gd",
 	"stash": "res://scripts/ui/stash_panel.gd",
 	"dungeon": "res://scripts/ui/dungeon_panel.gd",
 	"pause": "res://scripts/ui/pause_panel.gd",
+	"options": "res://scripts/ui/options_panel.gd",
 	"death": "res://scripts/ui/death_panel.gd",
 	"dev": "res://scripts/ui/dev_panel.gd",
 }
@@ -128,8 +130,8 @@ func toggle(n: String) -> void:
 		close(n)
 	else:
 		# left-side panels share space
-		if n in ["character", "vendor", "blacksmith", "stash", "jeweller", "pets"]:
-			for o in ["character", "vendor", "blacksmith", "stash", "jeweller", "pets"]:
+		if n in ["character", "vendor", "blacksmith", "stash", "jeweller", "pets", "training"]:
+			for o in ["character", "vendor", "blacksmith", "stash", "jeweller", "pets", "training"]:
 				if o != n and is_open(o):
 					open_set.erase(o)
 					panels[o].visible = false
@@ -174,6 +176,8 @@ func open_station(kind: String) -> void:
 			open("inventory")
 		"pets":
 			toggle("pets")
+		"training":
+			toggle("training")
 		"dungeon":
 			toggle("dungeon")
 		"altar":
@@ -298,6 +302,8 @@ func _place_tooltips() -> void:
 func item_tooltip(it: Dictionary, compare: bool) -> void:
 	var ch = Game.ch
 	var main := Loot.tooltip(it, ch)
+	if bool(it.get("locked", false)):
+		main += "\n[color=#ffd060]Locked: cannot be sold, salvaged or destroyed[/color]"
 	var other := ""
 	if compare:
 		var slot: String = ch.slot_for(it)

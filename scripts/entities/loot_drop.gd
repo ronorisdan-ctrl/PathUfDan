@@ -11,7 +11,8 @@ var label := ""
 var t := 0.0
 var pop := Vector2.ZERO
 var picked := false
-var hidden_by_filter := false
+var hidden_by_filter := false  # not drawn right now (filter hides it and Alt is not held)
+var filter_hidden := false     # the filter's own decision; ignores the Alt reveal. Pets obey this.
 var label_off := 0.0   # vertical offset so overlapping labels stack
 var claimed_by = null  # the pet (or player) reaching for this drop; first claim wins
 var magnet_by = null   # the pet whose magnet is pulling this drop
@@ -92,11 +93,15 @@ func is_claimed_by_other(who) -> bool:
 func rarity_idx() -> int:
 	return Data.rarity_index(item.get("rarity", "common")) if kind == "item" else -1
 
-## True if the current loot filter hides this drop (re-read from settings every call).
+## True if the current loot filter hides this drop, whether or not Alt is held.
+## Re-evaluated on every call (so a changed filter or gear is honoured) and stored
+## in `filter_hidden`.
 func filtered_now() -> bool:
 	if kind != "item":
+		filter_hidden = false
 		return false
-	return not bool(_evaluate().get("drawn", true))
+	filter_hidden = bool(_evaluate().get("filter_hidden", false))
+	return filter_hidden
 
 ## Runs the loot filter for this item. Bots and tests bypass it (everything shows)
 ## unless Game.filter_in_tests is on, so balance data is unaffected.
@@ -115,6 +120,7 @@ func _on_reveal(_on) -> void:
 
 func refresh_filter() -> void:
 	hidden_by_filter = false
+	filter_hidden = false
 	fres = {}
 	fs = 8
 	label_color = color
@@ -122,6 +128,7 @@ func refresh_filter() -> void:
 	if kind == "item":
 		fres = _evaluate()
 		hidden_by_filter = not bool(fres.get("drawn", true))
+		filter_hidden = bool(fres.get("filter_hidden", false))
 		if not fres.is_empty():
 			if fres.get("color") != null:
 				label_color = fres["color"]

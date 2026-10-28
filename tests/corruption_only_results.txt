@@ -1,0 +1,46 @@
+==== 44 passed, 0 failed ====
+--- item corruption rules
+PASS  corruption: data/corruption.json loads
+PASS  corruption: defaults are 50% chance, +20 step, max 100, drop_start 0
+PASS  corruption: confirm_above is 60
+PASS  corruption: every Blacksmith craft is either rolling or exempt, never both or neither
+PASS  corruption: data lists only real craft ids
+PASS  corruption: add, reroll and raise rarity roll
+PASS  corruption: upgrade, remove and socket are exempt
+PASS  corruption: get_level is 0 without the field and for null
+PASS  corruption: get_level clamps above 100
+PASS  corruption: get_level clamps below 0
+PASS  corruption: set_level stores the value
+PASS  corruption: set_level(0) erases the key
+PASS  corruption: set_level clamps to 100
+PASS  corruption: set_level clamps negatives to 0 and erases
+PASS  corruption: events remaining (5, 3, 0)
+PASS  corruption: add is refused at 100%
+PASS  corruption: add is allowed at 80%
+PASS  corruption: reroll is refused at 100%
+PASS  corruption: reroll is allowed at 80%
+PASS  corruption: rarity is refused at 100%
+PASS  corruption: rarity is allowed at 80%
+PASS  corruption: upgrade is allowed at 100%
+PASS  corruption: remove is allowed at 100%
+PASS  corruption: socket is allowed at 100%
+PASS  corruption: refusal text
+PASS  corruption: exempt craft takes no random number and changes nothing
+PASS  corruption: a rolling craft takes exactly one random number
+PASS  corruption: roll reports before/after and adds the step on a hit
+PASS  corruption: a hit at 60% gives 80%
+PASS  corruption: a hit at 80% gives exactly 100
+PASS  corruption: a further hit never exceeds 100
+PASS  corruption: a miss leaves the value unchanged
+PASS  corruption: an odd step still caps at 100
+PASS  corruption: risk text
+PASS  corruption: result text on a hit
+PASS  corruption: result text on a miss
+PASS  corruption: no result text for exempt crafts
+PASS  corruption: default drop_start leaves items clean
+PASS  corruption: drop_start from data is applied
+PASS  corruption: no item locks before its 5th rolling craft (min over 10,000 items)
+PASS  corruption: mean rolling crafts to lockout is within 0.2 of 10
+PASS  corruption: hit rate over 10,000 rolls is within 1.5 points of 50%
+PASS  corruption: rolls leave the global RNG alone
+PASS  corruption: rolls leave the Loot RNG alone

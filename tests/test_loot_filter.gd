@@ -130,8 +130,15 @@ func _t_hide_and_reveal() -> void:
 	f.reveal_hidden = true
 	var shown: Dictionary = f.evaluate(_item("common"))
 	_check(shown["drawn"] and shown["clickable"] and shown["visibility"] == "hide", "Alt reveal draws hidden items and makes them clickable")
+	_check(shown["filter_hidden"], "Alt reveal does not change the filter's hide decision (filter_hidden stays true)")
 	f.reveal_hidden = false
 	_check(not f.evaluate(_item("common"))["drawn"], "hidden again when Alt is released")
+	_check(f.evaluate(_item("common"))["filter_hidden"] == shown["filter_hidden"] and hid["filter_hidden"], "filter_hidden is identical with Alt held and released")
+	var vis = _mk({"rules": []})
+	_check(not vis.evaluate(_item("common"))["filter_hidden"], "a shown item is not filter_hidden")
+	var mini = _mk({"rules": [_rule("m", {}, {"visibility": "minimal"})]})
+	_check(not mini.evaluate(_item("common"))["filter_hidden"], "a minimal item is not filter_hidden")
+	_check(not f.evaluate(_item("legendary"))["filter_hidden"], "the safety net keeps a legendary from being filter_hidden")
 
 
 func _t_minimal() -> void:

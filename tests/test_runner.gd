@@ -34,6 +34,8 @@ func frames(n: int) -> void:
 		await get_tree().physics_frame
 
 func _ready() -> void:
+	if has_meta("no_auto"):
+		return   # tests/train_only.gd drives single groups itself
 	Game.testing = true
 	Loot.set_seed(12345)
 	await get_tree().process_frame
@@ -58,10 +60,15 @@ func _ready() -> void:
 	await test_crafting()
 	await test_boss_and_death()
 	await test_dev_tools()
+	test_training()
+	await test_training_world()
 	test_save_load()
 	test_save_slots()
 	await test_ui()
 	await test_stash_ui()
+	await test_destroy_by_rarity()
+	await test_item_lock()
+	await test_corruption()
 	var summary := "==== %d passed, %d failed ====" % [passes, fails]
 	print("\n" + summary)
 	_log(summary)
@@ -1294,11 +1301,28 @@ func test_loot_filter() -> void:
 	LootFilter.reveal_hidden = true
 	LootFilter.emit_signal("reveal_changed", true)
 	check(dc.visible and not dc.hidden_by_filter, "loot filter: holding Alt reveals the hidden drop")
+	# the pet never takes what the filter hides, Alt or not; the player still can
+	var lv_stub = load("res://scripts/world/level.gd").new()
+	var player_stub := Node2D.new()
+	lv_stub.player = player_stub
+	lv_stub.loot = [dc]
+	var pet_stub = load("res://scripts/entities/pet.gd").new()
+	pet_stub.tier = 5
+	check(dc.filter_hidden and not dc.hidden_by_filter, "loot filter: with Alt held the drop is drawn but stays filter_hidden")
+	check(lv_stub.collect_block(dc, pet_stub) == "hidden", "loot filter: the pet is refused an Alt-revealed drop (fetch, auto-loot and magnet all use this gate)")
+	check(lv_stub.collect_block(dc, player_stub) == "" and lv_stub.collect_block(dc) == "", "loot filter: the player can still pick up an Alt-revealed drop")
+	check(lv_stub.drop_at_cursor(dc.label_rect().get_center()) == dc and lv_stub.nearest_item(dc.global_position, 10.0) == dc, "loot filter: with Alt held the player can target the hidden drop")
+	check(not dl.filter_hidden and lv_stub.collect_block(dl, pet_stub) == "", "loot filter: the pet may still take a drop the filter shows")
 	LootFilter.reveal_hidden = false
 	LootFilter.emit_signal("reveal_changed", false)
 	check(not dc.visible, "loot filter: releasing Alt hides it again")
+	check(dc.filter_hidden and lv_stub.collect_block(dc, pet_stub) == "hidden", "loot filter: the pet is refused the hidden drop without Alt too")
+	check(lv_stub.drop_at_cursor(dc.label_rect().get_center()) == null and lv_stub.nearest_item(dc.global_position, 10.0) == null, "loot filter: without Alt the player cannot target the hidden drop")
 	LootFilter.load_filter("show_all")
 	check(dc.visible, "loot filter: switching filter updates drops already on the floor")
+	check(not dc.filter_hidden and lv_stub.collect_block(dc, pet_stub) == "", "loot filter: once the filter shows the drop the pet may take it")
+	for n in [lv_stub, player_stub, pet_stub]:
+		n.free()
 	LootFilter.load_filter("rare_plus")
 	var dr = LootDropS.new()
 	dr.setup_item(Loot.make_item(one_h, "rare", 5))
@@ -2059,6 +2083,222 @@ func test_stash_ui() -> void:
 	SS.reset()
 	_stash_clean_files()
 
+# ------------------------------------------------------------------ destroy by rarity
+func test_destroy_by_rarity() -> void:
+	print("\n--- destroy bag items by rarity")
+	_log("--- destroy bag items by rarity")
+	if main.ui == null:
+		Game.new_character("warrior")   # start_game needs a character
+		main.start_game()
+		await frames(2)
+	var ui = main.ui
+	Game.new_character("warrior")
+	var ch = Game.ch
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var ids := []
+	for r in Data.rarity_list:
+		ids.append(r["id"])
+	# two of every rarity
+	for rid in ids:
+		for n in 2:
+			ch.add_to_bag(_stash_test_item(rid, 5))
+	var total: int = ids.size() * 2
+	check(ch.bag_slots_up_to("common").size() == 2, "destroy: 'common' counts only common items")
+	check(ch.bag_slots_up_to("rare").size() == 6, "destroy: 'rare' counts common, uncommon and rare")
+	check(ch.bag_slots_up_to("legendary").size() == total, "destroy: top rarity counts the whole bag")
+	# equipped gear is never in the bag, so it is never touched
+	var worn = _stash_test_item("common", 5)
+	ch.equipment["main_hand"] = worn
+	# upgraded count + socketed gem return
+	var up = ch.inventory[ch.bag_slots_up_to("common")[0]]
+	up["upgrade"] = 2
+	check(ch.bag_upgraded_up_to("common") == 1 and ch.bag_upgraded_up_to("rare") == 1, "destroy: upgraded items are counted for the warning")
+	var gem_id := "ruby:1"
+	var had_gem := false
+	if Loot.gem_valid(gem_id):
+		up["sockets"] = 1
+		up["gems"] = [gem_id]
+		had_gem = true
+		var before: int = int(ch.gems.get(gem_id, 0))
+		var gone: int = ch.destroy_bag_up_to("common")
+		check(gone == 2, "destroy: common sweep removes both common items")
+		check(int(ch.gems.get(gem_id, 0)) == before + 1, "destroy: socketed gems return to the pouch")
+	else:
+		var gone2: int = ch.destroy_bag_up_to("common")
+		check(gone2 == 2, "destroy: common sweep removes both common items")
+	check(ch.bag_slots_up_to("legendary").size() == total - 2, "destroy: higher rarities are untouched by a common sweep")
+	var left_ok := true
+	for it in ch.inventory:
+		if it != null and it.get("rarity") == "common":
+			left_ok = false
+	check(left_ok, "destroy: no common item is left")
+	check(ch.equipment.get("main_hand") == worn, "destroy: equipped items survive")
+	check(ch.destroy_bag_up_to("common") == 0, "destroy: running the same sweep twice destroys nothing")
+	# up to epic: leaves only legendary
+	var n_epic: int = ch.destroy_bag_up_to("epic")
+	check(n_epic == 6, "destroy: epic sweep removes the remaining uncommon, rare and epic items")
+	var only_leg := true
+	var legs := 0
+	for it in ch.inventory:
+		if it != null:
+			legs += 1
+			if it.get("rarity") != "legendary":
+				only_leg = false
+	check(only_leg and legs == 2, "destroy: only the legendaries remain")
+	# unknown / odd rarity strings fall back safely (index 0 = common)
+	check(ch.bag_slots_up_to("not_a_rarity").size() == 0, "destroy: unknown rarity id only matches common-or-lower items (none left)")
+	# UI: menu entries and confirm dialog
+	for rid in ids:
+		for n in 2:
+			ch.add_to_bag(_stash_test_item(rid, 5))
+	ui.open("inventory")
+	await frames(2)
+	var p = ui.panels["inventory"]
+	check(p.destroy_btn != null and p.destroy_btn.text.begins_with("Destroy"), "destroy ui: the inventory has a Destroy button")
+	p._open_destroy_menu()
+	var menu: VBoxContainer = ui.context.get_child(0)
+	await frames(1)
+	check(menu.get_child_count() >= ids.size(), "destroy ui: one menu entry per rarity")
+	var count_before: int = ch.bag_slots_up_to("legendary").size()
+	p._confirm_destroy_up_to("uncommon")
+	check(ui.confirm.visible and ui.confirm_text.text.contains("4 items"), "destroy ui: asks first and states the item count")
+	check(ch.bag_slots_up_to("legendary").size() == count_before, "destroy ui: nothing is destroyed before confirming")
+	ui._on_cancel()
+	check(ch.bag_slots_up_to("legendary").size() == count_before, "destroy ui: cancelling keeps every item")
+	p._confirm_destroy_up_to("uncommon")
+	ui._on_confirm()
+	check(ch.bag_slots_up_to("legendary").size() == count_before - 4, "destroy ui: confirming removes the items")
+	ui.close_all()
+	await frames(2)
+	ch.equipment["main_hand"] = null
+
+# ------------------------------------------------------------------ item lock
+func test_item_lock() -> void:
+	print("\n--- item lock")
+	_log("--- item lock")
+	if main.ui == null:
+		Game.new_character("warrior")   # start_game needs a character
+		main.start_game()
+		await frames(2)
+	var ui = main.ui
+	Game.new_character("warrior")
+	var ch = Game.ch
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var CD = CharDataT
+	# ---- rules
+	var a = _stash_test_item("common", 5)
+	var b = _stash_test_item("common", 5)
+	var c = _stash_test_item("rare", 5)
+	var d = _stash_test_item("legendary", 5)
+	ch.add_to_bag(a)
+	ch.add_to_bag(b)
+	ch.add_to_bag(c)
+	ch.add_to_bag(d)
+	check(not CD.is_locked(a) and not CD.is_locked(null), "lock: items start unlocked and null is never locked")
+	ch.set_item_locked(a, true)
+	check(CD.is_locked(a) and a.get("locked") == true, "lock: set_item_locked(true) marks the item")
+	ch.set_item_locked(c, true)
+	check(ch.bag_slots_up_to("common").size() == 1, "lock: a locked common is skipped by the common sweep")
+	check(ch.bag_slots_up_to("legendary").size() == 2, "lock: sweep candidates exclude locked items (4 items, 2 locked)")
+	check(ch.bag_locked_up_to("common") == 1 and ch.bag_locked_up_to("rare") == 2 and ch.bag_locked_up_to("legendary") == 2, "lock: locked items are counted per rarity cap")
+	var gone: int = ch.destroy_bag_up_to("legendary")
+	check(gone == 2, "lock: a full sweep destroys only the unlocked items")
+	check(ch.inventory.has(a) and ch.inventory.has(c) and not ch.inventory.has(b) and not ch.inventory.has(d), "lock: locked items are still in the bag, unlocked ones are gone")
+	ch.set_item_locked(a, false)
+	check(not CD.is_locked(a) and not a.has("locked"), "lock: unlocking removes the flag entirely (saves stay unchanged)")
+	check(ch.bag_slots_up_to("common").size() == 1, "lock: an unlocked item is swept again")
+	ch.set_item_locked(a, true)
+	# ---- survives saving
+	var sd = JSON.parse_string(JSON.stringify(ch.to_dict()))
+	Game.load_from_dict(sd)
+	ch = Game.ch
+	var locked_after := 0
+	var unlocked_after := 0
+	for it in ch.inventory:
+		if it != null:
+			if CD.is_locked(it):
+				locked_after += 1
+			else:
+				unlocked_after += 1
+	check(locked_after == 2 and unlocked_after == 0, "lock: the lock survives a save and load")
+	# ---- UI: nothing locked can be sold, salvaged or destroyed
+	ui.open("inventory")
+	ui.open("vendor")
+	await frames(2)
+	var p = ui.panels["inventory"]
+	var idx_a := -1
+	var idx_c := -1
+	for i in ch.inventory.size():
+		var it = ch.inventory[i]
+		if it != null and it.get("rarity") == "common":
+			idx_a = i
+		elif it != null and it.get("rarity") == "rare":
+			idx_c = i
+	check(idx_a >= 0 and idx_c >= 0, "lock ui: both locked items are in the bag after loading")
+	var gold0: int = ch.gold
+	var mats0 := JSON.stringify(ch.materials)
+	p.sell(idx_a)
+	check(ch.inventory[idx_a] != null and ch.gold == gold0, "lock ui: a locked item cannot be sold")
+	p.salvage(idx_a)
+	check(ch.inventory[idx_a] != null and JSON.stringify(ch.materials) == mats0, "lock ui: a locked item cannot be salvaged")
+	ui.confirm.visible = false
+	p._destroy(idx_a)
+	check(not ui.confirm.visible and ch.inventory[idx_a] != null, "lock ui: a locked item cannot be destroyed (no dialog either)")
+	# context menu: lock toggle present, sell/destroy greyed out
+	p._context_bag(idx_a, ch.inventory[idx_a])
+	await frames(1)
+	var menu: VBoxContainer = ui.context.get_child(0)
+	var unlock_btn: Button = null
+	var sell_btn: Button = null
+	var destroy_btn: Button = null
+	for ch2 in menu.get_children():
+		if ch2 is Button and not ch2.is_queued_for_deletion():
+			if ch2.text == "Unlock item":
+				unlock_btn = ch2
+			elif ch2.text.begins_with("Sell for"):
+				sell_btn = ch2
+			elif ch2.text == "Destroy":
+				destroy_btn = ch2
+	check(unlock_btn != null and not unlock_btn.disabled, "lock ui: right-click menu offers 'Unlock item' for a locked item")
+	check(sell_btn != null and sell_btn.disabled, "lock ui: Sell is greyed out for a locked item")
+	check(destroy_btn != null and destroy_btn.disabled, "lock ui: Destroy is greyed out for a locked item")
+	# tooltip names the lock
+	ui.item_tooltip(ch.inventory[idx_a], false)
+	check(ui.tooltip_text.text.contains("Locked"), "lock ui: the tooltip says the item is locked")
+	ui.hide_tooltip()
+	# the menu button actually toggles
+	unlock_btn.pressed.emit()
+	await frames(1)
+	check(not CD.is_locked(ch.inventory[idx_a]), "lock ui: pressing Unlock removes the lock")
+	p._context_bag(idx_a, ch.inventory[idx_a])
+	await frames(1)
+	menu = ui.context.get_child(0)
+	var lock_btn: Button = null
+	for ch3 in menu.get_children():
+		if ch3 is Button and not ch3.is_queued_for_deletion() and ch3.text == "Lock item":
+			lock_btn = ch3
+	check(lock_btn != null, "lock ui: an unlocked item offers 'Lock item'")
+	lock_btn.pressed.emit()
+	await frames(1)
+	check(CD.is_locked(ch.inventory[idx_a]), "lock ui: pressing Lock sets the lock")
+	# the Destroy... sweep dialog mentions the locked item that stays
+	p._confirm_destroy_up_to("rare")
+	check(ui.confirm.visible == false, "lock ui: with only locked items left the sweep has nothing to confirm")
+	ch.add_to_bag(_stash_test_item("uncommon", 5))
+	p._confirm_destroy_up_to("rare")
+	check(ui.confirm.visible and ui.confirm_text.text.contains("1 item") and ui.confirm_text.text.contains("2 locked items will be kept"), "lock ui: the sweep dialog says how many locked items are kept")
+	ui._on_confirm()
+	check(ch.inventory[idx_a] != null and ch.inventory[idx_c] != null, "lock ui: the confirmed sweep still leaves the locked items")
+	# unlocked rare can be sold again
+	ch.set_item_locked(ch.inventory[idx_c], false)
+	var g1: int = ch.gold
+	p.sell(idx_c)
+	check(ch.inventory[idx_c] == null and ch.gold > g1, "lock ui: after unlocking, the item can be sold")
+	ui.close_all()
+	await frames(2)
+
 # ------------------------------------------------------------------ developer tools
 const DevRulesT = preload("res://scripts/core/dev_rules.gd")
 const CharDataT = preload("res://scripts/core/character_data.gd")
@@ -2509,10 +2749,10 @@ func test_dev_tools() -> void:
 	var pr: Vector2 = ui.panels["dev"].size
 	check(pr.x <= 1280 and pr.y <= 720, "dev: the panel fits the 1280x720 screen", str(pr))
 	ui.close("dev")
-	ui.open("pause")
+	ui.open("options")
 	await frames(1)
-	check(ui.panels["pause"].dev_btn.visible, "dev: the pause menu shows the Developer tools button")
-	ui.close("pause")
+	check(ui.panels["options"].dev_btn.visible, "dev: the Options menu shows the Developer tools button")
+	ui.close("options")
 	# ---- off again
 	Dev.set_enabled(false)
 	check(Dev.flags == R.default_flags() and not Dev.god(), "dev: switching off resets god mode and every flag")
@@ -2520,11 +2760,800 @@ func test_dev_tools() -> void:
 	await frames(1)
 	check(not ui.panels["dev"].tabs.visible and ui.panels["dev"].off_label.visible, "dev: the panel shows only a hint while the tools are off")
 	ui.close_all()
-	ui.open("pause")
+	ui.open("options")
 	await frames(1)
-	check(not ui.panels["pause"].dev_btn.visible, "dev: no pause menu button while off")
+	check(not ui.panels["options"].dev_btn.visible, "dev: no Options menu button while off")
 	ui.close_all()
 	Game.dev_in_tests = false
 	Game.settings["dev_tools"] = false
 	Dev.reset_flags()
 	Game.ch = old_ch
+
+
+# ------------------------------------------------------------------ training grounds
+const TrainingRulesT = preload("res://scripts/core/training_rules.gd")
+
+func _tev(kind: String, amount: float, skill: String = "fireball", status: String = "", crit: bool = false, dummy: int = 1, cast: int = -1) -> Dictionary:
+	return {"kind": kind, "amount": amount, "skill_id": skill, "status_id": status, "crit": crit, "dummy": dummy, "cast_id": cast}
+
+func _trun(counting: String = "all", dur: int = 10, type: String = "single") -> Dictionary:
+	var s: Dictionary = TrainingRulesT.default_settings(Data.training_cfg)
+	s["counting"] = counting
+	s["duration"] = dur
+	s["type"] = type
+	return TrainingRulesT.new_run(s, 3 if type == "aoe" else 1)
+
+func test_training() -> void:
+	print("\n--- training grounds (rules and history)")
+	_log("--- training grounds (rules and history)")
+	var R = TrainingRulesT
+	var cfg: Dictionary = Data.training_cfg
+	check(Data.load_errors.is_empty() and not cfg.is_empty(), "training: data/training.json loads")
+	var durs: Array = cfg.get("durations", [])
+	check(durs.size() == 2 and int(durs[0]) == 10 and int(durs[1]) == 30 and int(cfg.get("history_size", 0)) == 5, "training: durations 10/30 and history size 5 come from data")
+	check(cfg["profiles"].has("none") and cfg["profiles"].has("t3_normal") and cfg["profiles"].has("t6_boss"), "training: the three defence profiles exist")
+	# ---- window start
+	var run := _trun()
+	check(R.record(run, _tev("dot", 50.0, "fireball", "ignite")) == "ignored_idle" and not run["started"], "training: a DoT tick alone never starts the window")
+	check(R.record(run, _tev("hit", 100.0)) == "counted" and run["started"] and run["events"][0]["t"] == 0.0, "training: the first direct hit starts the window and counts at t=0")
+	R.tick(run, 1.0, 2.0)
+	check(R.record(run, _tev("dot", 30.0, "fireball", "ignite")) == "counted" and is_equal_approx(run["events"][1]["t"], 1.0), "training: DoT ticks count once the window runs (t = game time since start)")
+	var pr := _trun("player")
+	check(R.record(pr, _tev("minion", 80.0, "summon_skeleton")) == "ignored_source" and not pr["started"], "training: Player only - a minion hit neither counts nor starts the window")
+	check(R.record(pr, _tev("deployable", 80.0, "fire_trap")) == "ignored_source" and not pr["started"], "training: Player only - a trap/turret hit neither counts nor starts the window")
+	check(R.record(pr, _tev("dot", 20.0, "fireball", "ignite")) == "ignored_idle", "training: Player only - a DoT tick before the first hit is ignored")
+	check(R.record(pr, _tev("hit", 10.0)) == "counted" and pr["started"], "training: Player only - the player's own hit starts the window")
+	var ar := _trun("all")
+	check(R.record(ar, _tev("minion", 5.0, "summon_skeleton")) == "counted" and ar["started"], "training: All sources - a minion hit starts the window")
+	var ar2 := _trun("all")
+	check(R.record(ar2, _tev("minion", 5.0, "summon_skeleton", "ignite")) == "ignored_idle", "training: a minion-applied ignite tick is a tick, so it cannot start the window")
+	check(not R.event_is_direct(_tev("deployable", 5.0, "fire_trap", "ignite")) and R.event_is_direct(_tev("deployable", 5.0, "fire_trap")), "training: status ticks are never direct hits, whoever applied them")
+	# ---- window end (half-open [0, duration))
+	var er := _trun("all", 10)
+	R.record(er, _tev("hit", 10.0))
+	for i in 99:
+		R.tick(er, 0.1, 2.0)
+	check(R.is_running(er) and R.record(er, _tev("hit", 5.0)) == "counted", "training: a hit just before the end counts")
+	R.tick(er, 0.1, 2.0)
+	check(er["finished"] and is_equal_approx(er["elapsed"], 10.0), "training: the window ends after exactly the chosen duration")
+	check(R.record(er, _tev("hit", 99.0)) == "ignored_ended" and R.total_damage(er["events"]) == 15.0, "training: a hit at exactly the end time and later is ignored (window is [0, duration))")
+	check(not R.can_start(er), "training: the restart grace blocks a new test right after the result")
+	R.tick(er, 1.0, 2.0)
+	check(not R.can_start(er), "training: still blocked after 1 s of a 2 s grace")
+	R.tick(er, 1.5, 2.0)
+	check(R.can_start(er), "training: a new test may start once the grace is over")
+	var pz := _trun()
+	R.record(pz, _tev("hit", 1.0))
+	R.tick(pz, 0.0, 2.0)
+	check(is_equal_approx(pz["elapsed"], 0.0), "training: no game time passing (pause) means no countdown")
+	# ---- averages and peak
+	var ev30 := []
+	ev30.append({"t": 0.0, "amount": 3000.0, "kind": "hit", "skill_id": "a", "status_id": "", "crit": false, "dummy": 1})
+	check(is_equal_approx(R.average_dps(ev30, 10.0), 300.0) and is_equal_approx(R.average_dps(ev30, 30.0), 100.0), "training: average DPS = total / full duration (10 s and 30 s)")
+	var burst := [
+		{"t": 0.2, "amount": 100.0, "kind": "hit", "skill_id": "a", "status_id": ""},
+		{"t": 0.9, "amount": 400.0, "kind": "hit", "skill_id": "a", "status_id": ""},
+		{"t": 1.1, "amount": 400.0, "kind": "hit", "skill_id": "a", "status_id": ""},
+		{"t": 5.0, "amount": 700.0, "kind": "hit", "skill_id": "a", "status_id": ""},
+	]
+	var pk: Dictionary = R.peak_window(burst, 1.0)
+	check(is_equal_approx(pk["dps"], 900.0) and is_equal_approx(pk["start"], 0.2), "training: a burst crossing a whole-second boundary is one window (900 from t=0.2)", str(pk))
+	var pk2: Dictionary = R.peak_window([{"t": 0.0, "amount": 500.0, "kind": "hit"}, {"t": 1.0, "amount": 500.0, "kind": "hit"}], 1.0)
+	check(is_equal_approx(pk2["dps"], 500.0), "training: events exactly 1.0 s apart are not in the same window", str(pk2))
+	var pk3: Dictionary = R.peak_window([], 1.0)
+	check(pk3["dps"] == 0.0, "training: peak second of an empty test is 0")
+	var late := [{"t": 1.0, "amount": 100.0, "kind": "hit"}, {"t": 6.0, "amount": 100.0, "kind": "hit"}]
+	check(is_equal_approx(R.peak_window(late, 1.0)["start"], 1.0), "training: ties keep the earliest peak second")
+	# ---- hit stats ignore ticks
+	var mix := [
+		_tev("hit", 100.0, "a", "", true), _tev("hit", 300.0, "a", "", false),
+		_tev("dot", 1000.0, "a", "ignite"), _tev("minion", 200.0, "m", "", false),
+	]
+	for i in mix.size():
+		mix[i]["t"] = float(i)
+	check(R.direct_hits(mix) == 3, "training: direct hits are hit/minion/deployable, DoT ticks are not hits")
+	check(is_equal_approx(R.crit_rate(mix), 1.0 / 3.0), "training: crit rate ignores DoT ticks")
+	check(is_equal_approx(R.average_hit(mix), 200.0) and is_equal_approx(R.biggest_hit(mix), 300.0), "training: average and biggest hit ignore DoT ticks")
+	# ---- breakdown and attribution
+	var names := {"fireball": "Fireball", "summon_skeleton": "Skeleton Warriors", "fire_trap": "Fire Trap"}
+	var brk := [
+		_tev("hit", 400.0, "fireball"), _tev("dot", 200.0, "fireball", "ignite"),
+		_tev("minion", 150.0, "summon_skeleton"), _tev("deployable", 100.0, "fire_trap"),
+		_tev("hit", 50.0, "passive"), _tev("hit", 100.0, ""),
+	]
+	for i in brk.size():
+		brk[i]["t"] = float(i) * 0.1
+	var rows: Array = R.breakdown(brk, 10.0, names, cfg)
+	check(rows.size() == 6 and rows[0]["label"] == "Fireball" and is_equal_approx(rows[0]["damage"], 400.0), "training: breakdown is sorted by damage, highest first")
+	var labels := []
+	for r in rows:
+		labels.append(r["label"])
+	check(labels.has("Ignite (from Fireball)"), "training: a DoT is credited to the skill that applied it (sub-row)", str(labels))
+	check(labels.has("Skeleton Warriors (minions)") and labels.has("Fire Trap (deployed)"), "training: minion and deployable rows carry their tags", str(labels))
+	check(labels.has("Passive and item effects") and labels.has("Other"), "training: passive effects and unknown sources get their own rows", str(labels))
+	var sum_exact := 0.0
+	var sum_text := 0.0
+	for r in rows:
+		sum_exact += r["share"]
+		sum_text += r["share_text"]
+	check(absf(sum_exact - 100.0) < 0.0001 and absf(sum_text - 100.0) < 0.0001, "training: breakdown shares sum to 100% (exact and rounded)", "%f %f" % [sum_exact, sum_text])
+	var thirds: Array = R.round_shares([100.0 / 3.0, 100.0 / 3.0, 100.0 / 3.0])
+	check(absf(thirds[0] + thirds[1] + thirds[2] - 100.0) < 0.0001, "training: thirds round to exactly 100.0 (largest remainder)", str(thirds))
+	check(is_equal_approx(rows[0]["dps"], 40.0), "training: row DPS = row damage / duration")
+	check(R.top_rows(rows, 3).size() == 3, "training: the head label shows the top 3 rows")
+	# a trap-applied ignite is excluded in Player only, a player-applied one is kept
+	var po := _trun("player")
+	R.record(po, _tev("hit", 10.0, "fireball"))
+	var r_trap: String = R.record(po, _tev("deployable", 5.0, "fire_trap", "ignite"))
+	var r_mine: String = R.record(po, _tev("dot", 5.0, "fireball", "ignite"))
+	check(r_trap == "ignored_source" and r_mine == "counted", "training: Player only drops a trap's ignite and keeps the player's own", r_trap + " " + r_mine)
+	# ---- full result
+	var fr := _trun("all", 10)
+	R.record(fr, _tev("hit", 1000.0, "fireball", "", true))
+	R.tick(fr, 0.5, 2.0)
+	R.record(fr, _tev("dot", 200.0, "fireball", "ignite"))
+	for i in 30:
+		R.tick(fr, 0.5, 2.0)
+	var res: Dictionary = R.build_result(fr, names, cfg)
+	check(fr["finished"] and is_equal_approx(res["total"], 1200.0) and is_equal_approx(res["avg_dps"], 120.0) and res["hits"] == 1, "training: build_result totals, average DPS and hit count", str(res))
+	check(is_equal_approx(res["peak_dps"], 1200.0) and is_equal_approx(res["peak_start"], 0.0), "training: build_result peak second", str(res))
+	# ---- poise breaks only count while running
+	var pb := _trun()
+	R.add_poise_break(pb)
+	check(pb["poise_breaks"] == 0, "training: poise breaks before the test starts are not counted")
+	R.record(pb, _tev("hit", 1.0))
+	R.add_poise_break(pb)
+	check(pb["poise_breaks"] == 1, "training: poise breaks inside the window are counted")
+	# ---- dev marking
+	var dr := _trun()
+	R.mark_dev(dr, ["one_hit"], cfg["dev_flags_that_mark"])
+	check(not dr["dev"], "training: no DEV mark before the window runs")
+	R.record(dr, _tev("hit", 1.0))
+	R.mark_dev(dr, ["god", "overlay"], cfg["dev_flags_that_mark"])
+	check(not dr["dev"], "training: flags that do not change damage do not mark the result")
+	R.mark_dev(dr, ["time_scale"], cfg["dev_flags_that_mark"])
+	check(dr["dev"], "training: a damage-affecting flag marks the result DEV")
+	var DevR = preload("res://scripts/core/dev_rules.gd")
+	var fl: Dictionary = DevR.default_flags()
+	check(R.marking_flags(fl, DevR.default_flags(), cfg["dev_flags_that_mark"], 0).is_empty(), "training: default Dev flags mark nothing")
+	fl["damage_mult"] = 5.0
+	fl["time_scale"] = 2.0
+	var mf: Array = R.marking_flags(fl, DevR.default_flags(), cfg["dev_flags_that_mark"], 10)
+	check(mf.has("damage_mult") and mf.has("time_scale") and mf.has("attr_bonus") and not mf.has("god"), "training: marking_flags reports the real Dev flag names", str(mf))
+	for f in cfg["dev_flags_that_mark"]:
+		check(f == "attr_bonus" or DevR.default_flags().has(f), "training: dev_flags_that_mark names a real Dev flag (%s)" % f)
+	# ---- comparisons and history
+	var base := {"settings": {"type": "single", "duration": 10, "counting": "all", "profile": "none", "spacing": "tight"}, "dev": false, "avg_dps": 1000.0}
+	var same := base.duplicate(true)
+	same["avg_dps"] = 1120.0
+	check(R.comparable(base, same), "training: identical settings are comparable")
+	var d30 := base.duplicate(true)
+	d30["settings"]["duration"] = 30
+	var dpo := base.duplicate(true)
+	dpo["settings"]["counting"] = "player"
+	var dpf := base.duplicate(true)
+	dpf["settings"]["profile"] = "t6_boss"
+	var ddev := base.duplicate(true)
+	ddev["dev"] = true
+	check(not R.comparable(base, d30) and not R.comparable(base, dpo) and not R.comparable(base, dpf) and not R.comparable(base, ddev), "training: duration, counting, profile and DEV differences make results not comparable")
+	var a1 := base.duplicate(true)
+	a1["settings"]["type"] = "aoe"
+	var a2 := a1.duplicate(true)
+	a2["settings"]["spacing"] = "spread"
+	var a3 := a1.duplicate(true)
+	a3["settings"]["spacing"] = "tight"
+	var s_aoe := base.duplicate(true)
+	s_aoe["settings"]["spacing"] = "spread"
+	check(not R.comparable(a1, a2) and R.comparable(a1, a3) and not R.comparable(base, a1), "training: AoE compares only with AoE of the same spacing; single vs AoE never")
+	check(R.comparable(base, s_aoe), "training: spacing is ignored for single-target results")
+	var dl: Dictionary = R.delta_vs_history(same, [base])
+	check(dl["comparable"] and is_equal_approx(dl["pct"], 12.0) and R.fmt_delta(dl) == "+12% vs previous", "training: delta is the % change in average DPS vs the latest comparable result", str(dl))
+	var dn: Dictionary = R.delta_vs_history(same, [d30, dpo])
+	check(not dn["comparable"] and R.fmt_delta(dn) == "not comparable", "training: no comparable result in history -> 'not comparable'")
+	var dskip: Dictionary = R.delta_vs_history(same, [d30, base])
+	check(dskip["comparable"] and is_equal_approx(dskip["prev_dps"], 1000.0), "training: the delta skips non-comparable entries to find the most recent comparable one")
+	var hist := []
+	for i in 7:
+		var e := base.duplicate(true)
+		e["avg_dps"] = float(i)
+		hist = R.push_history(hist, e, 5)
+	check(hist.size() == 5 and hist[0]["avg_dps"] == 6.0 and hist[4]["avg_dps"] == 2.0, "training: history keeps 5, newest first, and drops the oldest on the 6th")
+	check(R.fmt_num(6980.0) == "6,980" and R.fmt_num(1234567.0) == "1,234,567" and R.fmt_num(12.0) == "12" and R.fmt_num(999999.4) == "999,999", "training: numbers use thousands separators")
+	check(R.settings_text({"type": "single", "duration": 10, "counting": "all", "profile": "none"}, cfg) == "10 s · All sources · No defences", "training: settings text reads '10 s - All sources - No defences'")
+	# ---- AoE helpers
+	var aoe_ev := [
+		_tev("hit", 300.0, "nova", "", false, 1, 1), _tev("hit", 300.0, "nova", "", false, 2, 1), _tev("hit", 300.0, "nova", "", false, 3, 1),
+		_tev("hit", 100.0, "bolt", "", false, 1, 2),
+		_tev("dot", 100.0, "nova", "ignite", false, 2, 1),
+	]
+	var pd: Array = R.per_dummy(aoe_ev, 3, 10.0)
+	var pd_share := 0.0
+	var pd_dmg := 0.0
+	for r in pd:
+		pd_share += r["share"]
+		pd_dmg += r["damage"]
+	check(pd.size() == 3 and absf(pd_share - 100.0) < 0.0001 and is_equal_approx(pd_dmg, R.total_damage(aoe_ev)), "training: AoE total is the sum of the three dummies and per-dummy shares sum to 100%")
+	check(pd[0]["hits"] == 2 and pd[1]["hits"] == 1, "training: per-dummy hit counts ignore DoT ticks")
+	check(is_equal_approx(R.targets_per_cast(aoe_ev), 2.0), "training: average targets hit per cast = distinct dummies per cast id, averaged (3 and 1 -> 2)")
+	check(R.targets_per_cast([_tev("hit", 1.0)]) == -1.0, "training: targets per cast is unavailable (-1) when hits carry no cast id")
+	# ---- settings
+	var st: Dictionary = R.sanitize_settings(cfg, {"type": "aoe", "duration": 99, "counting": "nonsense", "profile": "t6_boss", "spacing": "spread"})
+	check(st["type"] == "aoe" and st["duration"] == 10 and st["counting"] == "all" and st["profile"] == "t6_boss" and st["spacing"] == "spread", "training: invalid Setup values fall back to the defaults, valid ones are kept", str(st))
+	# ---- TrainingLog (session and history, no scene)
+	var old_slot: int = Game.current_slot
+	Game.testing = true
+	Game.training_in_tests = false
+	check(not TrainingLog.available(), "training: unavailable under Game.testing without the opt-in flag")
+	Game.training_in_tests = true
+	check(TrainingLog.available(), "training: Game.training_in_tests turns it on for tests")
+	TrainingLog.reset_settings()
+	check(TrainingLog.settings == R.default_settings(cfg), "training: TrainingLog starts with the data defaults")
+	TrainingLog.set_option("duration", 30)
+	TrainingLog.set_option("counting", "player")
+	TrainingLog.set_option("duration", 77)
+	check(TrainingLog.settings["duration"] == 30 and TrainingLog.settings["counting"] == "player", "training: Setup choices are remembered and invalid values are refused")
+	TrainingLog.reset_settings()
+	Game.current_slot = 91
+	TrainingLog.clear_history()
+	TrainingLog.discard()
+	check(TrainingLog.report(_tev("hit", 5.0)) == "no_run", "training: damage with no dummies spawned is ignored")
+	TrainingLog.set_option("duration", 10)
+	TrainingLog.begin(1)
+	check(TrainingLog.has_run() and not TrainingLog.is_running(), "training: Spawn creates an idle test")
+	check(TrainingLog.report(_tev("hit", 500.0)) == "counted" and TrainingLog.is_running(), "training: the first hit starts the test")
+	for i in 100:
+		TrainingLog.tick(0.1)
+	check(not TrainingLog.is_running() and not TrainingLog.last_result.is_empty(), "training: the test ends after 10 s of game time and stores the result")
+	check(TrainingLog.history().size() == 1 and is_equal_approx(TrainingLog.history()[0]["avg_dps"], 50.0), "training: the result is added to history once")
+	TrainingLog.tick(0.1)
+	check(TrainingLog.history().size() == 1, "training: ticking after the result does not add it again")
+	check(TrainingLog.report(_tev("hit", 5.0)) == "ignored_grace", "training: a hit during the restart grace is ignored")
+	for i in 25:
+		TrainingLog.tick(0.1)
+	check(TrainingLog.report(_tev("dot", 5.0, "fireball", "ignite")) == "ignored_ended", "training: a DoT tick after the result never starts a new test")
+	check(TrainingLog.report(_tev("hit", 700.0)) == "counted" and TrainingLog.is_running() and TrainingLog.last_result.is_empty(), "training: after the grace a new direct hit starts a new test")
+	# Remove / leaving the hub discards a running test: it never reaches history
+	TrainingLog.discard()
+	for i in 120:
+		TrainingLog.tick(0.1)
+	check(TrainingLog.history().size() == 1 and not TrainingLog.has_run(), "training: a discarded running test is never added to history")
+	# Reset clears the result and returns to idle with the same dummies
+	TrainingLog.begin(3)
+	TrainingLog.report(_tev("hit", 10.0, "nova", "", false, 2, 1))
+	TrainingLog.reset_run()
+	check(TrainingLog.has_run() and not TrainingLog.is_running() and TrainingLog.run["dummies"] == 3 and TrainingLog.last_result.is_empty(), "training: Reset returns to idle and clears the result")
+	# per save slot and survival
+	TrainingLog.discard()
+	Game.current_slot = 92
+	check(TrainingLog.history().is_empty(), "training: a different save slot starts with an empty history")
+	Game.current_slot = 91
+	check(TrainingLog.history().size() == 1, "training: history is kept per save slot while switching characters")
+	var res_first: Dictionary = TrainingLog.history()[0]
+	check(TrainingLog.delta_for(res_first)["comparable"] == false, "training: the only entry has nothing to compare with")
+	TrainingLog.clear_history()
+	Game.current_slot = 92
+	check(TrainingLog.history().is_empty(), "training: Clear history only clears the current character")
+	Game.current_slot = old_slot
+	# ---- history rows, build snapshots and what changed
+	check(R.fmt_ago(100.0, 102.0) == "just now" and R.fmt_ago(100.0, 145.0) == "45 s ago" and R.fmt_ago(0.0, 750.0) == "12 min ago" and R.fmt_ago(0.0, 3900.0) == "1 h 5 min ago", "training: 'ago' text reads just now / s / min / h")
+	var snap_a := {"name": "Dan", "class": "mage", "level": 12, "spec": "", "main_hand": "Oak Staff", "off_hand": "", "hotbar": ["firebolt", "frost_nova", "", "", "", "", ""], "hotbar_names": ["Firebolt", "Frost Nova", "", "", "", "", ""], "passives": 7}
+	var snap_b := snap_a.duplicate(true)
+	snap_b["level"] = 13
+	snap_b["main_hand"] = "Yew Staff"
+	snap_b["hotbar_names"][2] = "Meteor"
+	snap_b["passives"] = 9
+	var sl: Array = R.snapshot_lines(snap_a)
+	check(sl.size() == 4 and sl[0] == "Dan, level 12 Mage" and "Oak Staff" in sl[1] and "none" in sl[1] and sl[2] == "Hotbar: Firebolt, Frost Nova" and sl[3] == "Allocated passives: 7", "training: snapshot lines name the character, gear, hotbar and passives", str(sl))
+	check(R.snapshot_lines({}).is_empty(), "training: an empty snapshot gives no lines")
+	var chg: Array = R.snapshot_changes(snap_b, snap_a)
+	check(chg.size() == 4 and R.snapshot_changes(snap_a, snap_a).is_empty() and R.snapshot_changes({}, snap_a).is_empty(), "training: snapshot changes list level, main hand, hotbar slot and passives", str(chg))
+	var e_old := {"settings": {"type": "single", "duration": 10, "counting": "all", "profile": "none", "spacing": "tight"}, "avg_dps": 1000.0, "peak_dps": 1500.0, "dev": false, "when": 10.0, "snapshot": snap_a, "breakdown": [], "total": 10000.0, "hits": 10, "crit_rate": 0.0, "avg_hit": 1000.0, "biggest_hit": 1000.0, "duration": 10.0, "peak_start": 1.0}
+	var e_new := e_old.duplicate(true)
+	e_new["avg_dps"] = 1100.0
+	e_new["when"] = 70.0
+	e_new["snapshot"] = snap_b
+	var e_other := e_old.duplicate(true)
+	e_other["settings"]["duration"] = 30
+	var hist_l := [e_new, e_other, e_old]
+	check(R.previous_comparable(e_new, hist_l, 1) == e_old and R.previous_comparable(e_old, hist_l, 3).is_empty(), "training: the previous comparable entry skips entries with other settings")
+	var rl: Array = R.history_row_lines(e_new, R.delta_vs_history(e_new, hist_l, 1), 130.0, cfg)
+	check(rl.size() == 2 and "1 min ago" in rl[0] and "Single" in rl[0] and "1,100 DPS" in rl[0] and "peak 1,500" in rl[0] and "+10%" in rl[0] and "10 s" in rl[1], "training: a History row shows when, type, DPS, peak and the change", str(rl))
+	var dt: String = R.history_detail_text(e_new, R.delta_vs_history(e_new, hist_l, 1), snap_a, cfg)
+	check("Build when tested" in dt and "Changed since the previous comparable test" in dt and "main hand Oak Staff to Yew Staff" in dt, "training: a History detail shows the build and the changes", dt.substr(max(0, dt.length() - 240)))
+	TrainingLog.clear_history()
+	TrainingLog.history_by_slot.erase(91)
+	TrainingLog.history_by_slot.erase(92)
+	TrainingLog.discard()
+	TrainingLog.reset_settings()
+	Game.training_in_tests = false
+
+
+# ------------------------------------------------------------------ training grounds: hub, dummy, attribution
+const EnemyT = preload("res://scripts/entities/enemy.gd")
+
+func _tpk(skill: String, kind: String = "spell", dmg: float = 100.0, extra: Dictionary = {}) -> Dictionary:
+	var pk := {"dmg": {"fire": [dmg, dmg]}, "crit_chance": 0.0, "crit_mult": 1.0, "faction": "player", "status": [], "tags": [], "flags": {}, "skill": skill, "kind": kind, "cast": Combat.cast_serial}
+	for k in extra:
+		pk[k] = extra[k]
+	return pk
+
+func _tevs(kind: String = "", skill: String = "") -> Array:
+	var out := []
+	for e in TrainingLog.run.get("events", []):
+		if (kind == "" or e["kind"] == kind) and (skill == "" or e["skill_id"] == skill):
+			out.append(e)
+	return out
+
+func _tready(p) -> void:
+	p.busy = 0
+	p.mana = 999
+	p.cooldowns.clear()
+
+func test_training_world() -> void:
+	print("\n--- training grounds (hub, dummy, attribution)")
+	_log("--- training grounds (hub, dummy, attribution)")
+	Game.training_in_tests = false
+	TrainingLog.discard()
+	TrainingLog.reset_settings()
+	Game.new_character("mage")
+	main.start_game()
+	await frames(3)
+	var hub = Game.level
+	var p = hub.player
+	var ch = Game.ch
+	check(hub.has_method("training_spawn") and hub.training_dummies.is_empty() and not hub.training_active, "training world: the hub starts with no dummies")
+	# ---- off under tests
+	var why: String = hub.training_spawn()
+	check(why != "" and hub.training_dummies.is_empty() and not hub.training_active, "training world: Spawn is refused under Game.testing without the opt-in flag")
+	Game.training_in_tests = true
+	# ---- summon is refused in the hub until dummies exist
+	ch.loadout[2] = "summon_skeletons"
+	_tready(p)
+	check(not p.try_use_slot(2) and p.minions.is_empty(), "training world: summoning in the hub is refused while no dummies exist")
+	why = hub.training_spawn()
+	check(why == "" and hub.training_dummies.size() == 1 and hub.training_active, "training world: Spawn creates one dummy and switches the hub rule on", why)
+	var d = hub.training_dummies[0]
+	check(hub.enemies.has(d) and d.is_in_group("training_dummy") and d.faction == "enemy", "training world: the dummy is a normal hostile target (level.enemies) in the training_dummy group")
+	_tready(p)
+	check(p.try_use_slot(2), "training world: summoning is allowed in the hub while dummies exist")
+	await frames(3)
+	check(p.minions.size() > 0, "training world: the summoned minions exist")
+	for m in p.minions.duplicate():
+		if is_instance_valid(m):
+			m.die(null)
+	p.minions.clear()
+	# ---- basic hit path
+	TrainingLog.reset_run()
+	var pos0: Vector2 = d.global_position
+	var pk := _tpk("fireball", "spell", 100.0)
+	Combat.deal(pk, p, d)
+	var evs := _tevs("hit", "fireball")
+	check(evs.size() == 1 and absf(float(evs[0]["amount"]) - 100.0) < 0.5 and evs[0]["dummy"] == 1, "training world: a hit is recorded once with its skill and the damage after mitigation (no defences = 100)", str(evs))
+	check(TrainingLog.is_running(), "training world: the first hit starts the test")
+	Combat.deal(_tpk("fireball", "spell", 1.0e12), p, d)
+	check(d.alive and d.life == d.max_life, "training world: the dummy cannot die")
+	d.die(null)
+	check(d.alive, "training world: kill-all style die() calls do nothing")
+	d.knock = Vector2(900, 0)
+	await frames(10)
+	check(d.global_position.distance_to(pos0) < 0.01, "training world: knockback does not move the dummy")
+	# enemy damage is not counted
+	var n0: int = TrainingLog.run["events"].size()
+	d.receive_hit({"fire": 500.0}, {"faction": "enemy"}, null, false)
+	check(TrainingLog.run["events"].size() == n0, "training world: only player damage is counted")
+	# ---- ignite is credited to the skill that applied it
+	TrainingLog.reset_run()
+	d.statuses.clear()
+	Combat.deal(_tpk("fire_nova", "spell", 100.0, {"status": [{"type": "ignite", "chance": 100.0}]}), p, d)
+	await frames(75)
+	var ticks := _tevs("dot", "fire_nova")
+	check(d.statuses.has("ignite") or ticks.size() > 0, "training world: a normal ignite is applied to the dummy")
+	check(ticks.size() >= 1 and ticks[0]["status_id"] == "ignite", "training world: ignite ticks are credited to the skill that applied them", str(TrainingLog.run["events"]))
+	# statuses end with the window
+	TrainingLog.tick(100.0)
+	check(not TrainingLog.last_result.is_empty() and d.statuses.is_empty(), "training world: the test ends and the dummy's statuses are cleared")
+	var total_end: float = float(TrainingLog.last_result.get("total", -1.0))
+	await frames(40)
+	check(is_equal_approx(float(TrainingLog.last_result.get("total", -2.0)), total_end), "training world: nothing is added to the result after it ended")
+	# ---- Player-only counting (a trap's ignite is dropped)
+	TrainingLog.set_option("counting", "player")
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	Combat.deal(_tpk("fireball", "spell", 100.0), p, d)
+	Combat.deal(_tpk("explosive_mine", "trap", 100.0), p, d)
+	check(_tevs("hit", "fireball").size() == 1 and _tevs("deployable").size() == 0, "training world: Player only does not count a trap's damage")
+	TrainingLog.set_option("counting", "all")
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	Combat.deal(_tpk("explosive_mine", "trap", 100.0), p, d)
+	check(_tevs("deployable", "explosive_mine").size() == 1, "training world: All sources counts a trap's damage under the trap's skill")
+
+	# ---- profiles: defences match a real enemy built the same way
+	var dg := {"tier": 3, "min_level": 1, "max_level": 10, "pool": [{"id": "ghoul", "w": 40}], "resist_bonus": 10, "life_mult": 1.5, "boss": ""}
+	var prof: Dictionary = Data.training_cfg["profiles"]["t3_normal"]
+	var def_all: Dictionary = TrainingRulesT.profile_defence(prof, [dg], {"ghoul": Data.enemies["ghoul"]}, 7)
+	var real = EnemyT.new()
+	real.setup(Data.enemies["ghoul"], 7, [], {"life": 1.5, "resist": 10.0})
+	var same := is_equal_approx(def_all["armour"], real.armour) and is_equal_approx(def_all["life"], real.max_life)
+	for el in ["fire", "cold", "lightning", "void"]:
+		same = same and is_equal_approx(float(def_all["resist"][el]), float(real.resist.get(el, 0.0)))
+	check(same, "training world: a profile's armour, resist and life match a real enemy.gd setup", "%s vs %s/%s/%s" % [str(def_all), real.armour, real.max_life, str(real.resist)])
+	real.free()
+	var dg2 := {"tier": 3, "min_level": 1, "max_level": 10, "pool": [{"id": "ghoul", "w": 3}, {"id": "bloater", "w": 1}], "resist_bonus": 0, "life_mult": 1.0, "boss": ""}
+	var en2 := {"ghoul": Data.enemies["ghoul"], "bloater": Data.enemies["bloater"]}
+	var d2: Dictionary = TrainingRulesT.profile_defence(prof, [dg2], en2, 4)
+	var arm2: float = (3.0 * float(Data.enemies["ghoul"].get("armour", 0)) + float(Data.enemies["bloater"].get("armour", 0))) / 4.0 * (1.0 + 0.12 * 3.0)
+	check(is_equal_approx(d2["armour"], arm2) and d2["level"] == 4, "training world: the normal profile averages the dungeon pool by spawn weight")
+	var bprof: Dictionary = Data.training_cfg["profiles"]["t6_boss"]
+	var db: Dictionary = TrainingRulesT.profile_defence(bprof, Data.dungeon_list, Data.enemies, 1)
+	check(db["life"] > 0.0 and db["level"] == 39 and db["poise"], "training world: the boss profile uses the tier's boss, one level above the dungeon's floor", str(db))
+	TrainingLog.set_option("profile", "t3_normal")
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	var t3: Dictionary = TrainingRulesT.profile_defence(prof, Data.dungeon_list, Data.enemies, ch.level)
+	check(d.armour > 0.0 and is_equal_approx(d.armour, t3["armour"]) and not d.poise_on, "training world: the T3 dummy carries the profile's armour and no poise bar", "dummy armour=%s profile=%s poise=%s" % [d.armour, str(t3), d.poise_on])
+	TrainingLog.set_option("profile", "t6_boss")
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	check(d.poise_on and d.is_boss, "training world: the T6 boss dummy has poise")
+	for i in 40:
+		Combat.deal(_tpk("fireball", "spell", 5.0e6), p, d)
+	check(int(TrainingLog.run["poise_breaks"]) >= 1, "training world: poise breaks on the boss dummy are counted", str(TrainingLog.run["poise_breaks"]))
+	var bpos: Vector2 = d.global_position
+	var pcfg: Dictionary = Data.stun_cfg["poise"]
+	await frames(int((float(pcfg["stagger_duration"]) + float(pcfg["immunity_after_stagger"]) + 1.0) * 60.0))
+	check(d.global_position.distance_to(bpos) < 0.01 and d.alive, "training world: the boss dummy does not move or stagger away after a poise break")
+	var part: float = d.poise_life * float(pcfg["fill_fraction"]) * 0.5
+	Combat.deal(_tpk("fireball", "spell", part), p, d)
+	var poise_up: float = float(d.poise_state["poise"])
+	await frames(int((float(pcfg["regen_delay"]) + 100.0 / float(pcfg["regen_per_sec"]) + 1.0) * 60.0))
+	check(poise_up > 10.0 and float(d.poise_state["poise"]) < 0.01, "training world: poise fills from hits and drains back to empty", "%s -> %s" % [poise_up, d.poise_state["poise"]])
+	TrainingLog.set_option("profile", "none")
+	# ---- pausing stops the countdown
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	Combat.deal(_tpk("fireball"), p, d)
+	var el0: float = float(TrainingLog.run["elapsed"])
+	get_tree().paused = true
+	await frames(30)
+	var el_paused: float = float(TrainingLog.run["elapsed"])
+	get_tree().paused = false
+	await frames(30)
+	var el_run: float = float(TrainingLog.run["elapsed"])
+	check(is_equal_approx(el_paused, el0) and el_run > el_paused + 0.3, "training world: pausing stops the countdown and it resumes afterwards", "%s %s %s" % [el0, el_paused, el_run])
+	Engine.time_scale = 2.0
+	var ts0: float = float(TrainingLog.run["elapsed"])
+	await frames(60)
+	var ts1: float = float(TrainingLog.run["elapsed"])
+	Engine.time_scale = 1.0
+	check(ts1 - ts0 > 0.9, "training world: game time still advances per physics frame with a Dev time scale", "%s" % (ts1 - ts0))
+	hub.training_remove()
+
+	# ---- spawn replaces; remove discards a running test
+	hub.training_spawn()
+	hub.training_spawn()
+	await frames(2)
+	var live := 0
+	for e in hub.enemies:
+		if is_instance_valid(e) and e.is_in_group("training_dummy"):
+			live += 1
+	check(hub.training_dummies.size() == 1 and live == 1 and get_tree().get_nodes_in_group("training_dummy").size() == 1, "training world: Spawn replaces the old dummy instead of adding another", "live=%d" % live)
+	d = hub.training_dummies[0]
+	var hist0: int = TrainingLog.history().size()
+	Combat.deal(_tpk("fireball"), p, d)
+	check(TrainingLog.is_running(), "training world: a test is running before Remove")
+	hub.training_remove()
+	await frames(2)
+	check(not TrainingLog.is_running() and TrainingLog.history().size() == hist0 and hub.training_dummies.is_empty() and not hub.training_active and get_tree().get_nodes_in_group("training_dummy").is_empty(), "training world: Remove discards a running test and leaves history alone")
+	_tready(p)
+	check(not p.try_use_slot(2), "training world: summoning is refused again once the dummies are gone")
+
+	# ---- AoE cluster
+	TrainingLog.set_option("type", "aoe")
+	TrainingLog.set_option("spacing", "tight")
+	why = hub.training_spawn()
+	check(why == "" and hub.training_dummies.size() == 3, "training world: AoE spawns three dummies", why)
+	if hub.training_dummies.size() == 3:
+		var a = hub.training_dummies[0]
+		var b = hub.training_dummies[1]
+		var c = hub.training_dummies[2]
+		var tight: float = float(Data.training_cfg["cluster_spacing"]["tight"])
+		check(absf(a.global_position.distance_to(b.global_position) - tight) < 0.5 and absf(b.global_position.distance_to(c.global_position) - tight) < 0.5 and absf(a.global_position.distance_to(c.global_position) - tight) < 0.5, "training world: tight cluster spacing comes from data")
+		Combat.cast_serial += 1
+		Combat.deal(_tpk("fireball", "spell", 100.0), p, b)
+		Combat.deal(_tpk("fireball", "spell", 100.0), p, c)
+		var dums := {}
+		for e in TrainingLog.run["events"]:
+			dums[e["dummy"]] = true
+		check(dums.has(2) and dums.has(3) and TrainingLog.is_running() and TrainingLog.run["events"][0]["t"] == 0.0, "training world: hits on different dummies share one window")
+		TrainingLog.tick(100.0)
+		var lr: Dictionary = TrainingLog.last_result
+		check(lr.has("per_dummy") and lr["settings"]["type"] == "aoe" and absf(float(lr["total"]) - 200.0) < 1.0, "training world: the AoE result sums all dummies", str(lr.get("total")))
+		check(is_equal_approx(float(lr.get("targets_per_cast", -9.0)), 2.0), "training world: the AoE result reports distinct dummies hit per cast", str(lr.get("targets_per_cast")))
+	TrainingLog.set_option("spacing", "spread")
+	why = hub.training_spawn()
+	if hub.training_dummies.size() == 3:
+		var sp: float = float(Data.training_cfg["cluster_spacing"]["spread"])
+		check(absf(hub.training_dummies[0].global_position.distance_to(hub.training_dummies[1].global_position) - sp) < 0.5, "training world: spread cluster spacing comes from data")
+	else:
+		check(false, "training world: the spread cluster fits in the hub", why)
+	TrainingLog.set_option("type", "single")
+
+	# ---- minion damage is credited to the summoning skill
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	var sk: Dictionary = ch.resolved_skill("summon_skeletons")
+	var m = p.spawn_minion(sk.get("minion", "skeleton_warrior"), 1, d.global_position + Vector2(-14, 0), sk)
+	await frames(240)
+	var mev := _tevs("minion")
+	check(m != null and mev.size() > 0 and mev[0]["skill_id"] == "summon_skeletons", "training world: minion damage is credited to the summoning skill", str(mev.slice(0, 2)))
+	hub.training_remove()
+	for mm in p.minions.duplicate():
+		if is_instance_valid(mm):
+			mm.die(null)
+	p.minions.clear()
+
+	# ---- history survives a dungeon trip; a running test does not
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	Combat.deal(_tpk("fireball"), p, d)
+	TrainingLog.tick(100.0)
+	check(TrainingLog.history().size() >= 1, "training world: a finished test is stored in this character's history")
+	var hn: int = TrainingLog.history().size()
+	Combat.deal(_tpk("fireball"), p, d)
+	TrainingLog.tick(0.01)
+	main.enter_dungeon("forgotten_depths", 31)
+	await frames(3)
+	check(not TrainingLog.has_run() or not TrainingLog.is_running(), "training world: leaving the hub drops a running test")
+	main.go_hub(false)
+	await frames(3)
+	check(TrainingLog.history().size() == hn and Game.level.training_dummies.is_empty(), "training world: history survives a dungeon trip and the new hub starts without dummies")
+	TrainingLog.clear_history()
+	TrainingLog.discard()
+
+	# ---- the panel (Setup and Result tabs)
+	hub = Game.level
+	p = hub.player
+	var ui = main.ui
+	ui.open_station("training")
+	await frames(2)
+	var tp = ui.panels["training"]
+	check(ui.is_open("training") and tp.visible, "training panel: Rook opens the panel")
+	check(tp.choice_btns["type"].has("aoe") and not tp.spacing_row.visible, "training panel: cluster spacing is hidden for a single-target test")
+	tp.choice_btns["type"]["aoe"].pressed.emit()
+	check(TrainingLog.settings["type"] == "aoe" and tp.spacing_row.visible, "training panel: choosing AoE shows the spacing row")
+	tp.choice_btns["duration"][30].pressed.emit()
+	tp.choice_btns["profile"]["t3_normal"].pressed.emit()
+	check(int(TrainingLog.settings["duration"]) == 30 and TrainingLog.settings["profile"] == "t3_normal", "training panel: option buttons set the test options")
+	check(tp.reset_btn.disabled and tp.remove_btn.disabled, "training panel: Reset and Remove wait until dummies exist")
+	tp._spawn()
+	var hub2 = Game.level
+	check(hub2.training_dummies.size() == 3 and not tp.reset_btn.disabled and not tp.remove_btn.disabled, "training panel: Spawn creates the AoE cluster and enables Reset/Remove", tp.msg_label.text)
+	d = hub2.training_dummies[0]
+	Combat.deal(_tpk("fireball", "spell", 250.0), p, d)
+	tp._show_tab("result")
+	await frames(2)
+	check(tp.result_label.text.contains("running"), "training panel: the Result tab says a test is running")
+	TrainingLog.tick(100.0)
+	await frames(2)
+	check(tp.result_label.text.contains("250") or tp.result_label.text.contains("Fireball") or tp.result_label.text.contains("fireball"), "training panel: the Result tab shows the finished result", tp.result_label.text.substr(0, 200))
+	check(tp.size.y <= 720.0 and tp.size.x <= 640.0, "training panel: fits a 1280x720 window", str(tp.size))
+	# ---- build snapshot and the History tab
+	var hist: Array = TrainingLog.history()
+	var snap: Dictionary = hist[0].get("snapshot", {}) if hist.size() > 0 else {}
+	var mh = ch.equipment.get("main_hand")
+	check(snap.get("name") == ch.char_name and snap.get("class") == "mage" and int(snap.get("level", 0)) == ch.level and snap.get("hotbar", []).size() == 7 and snap.get("main_hand") == (mh["name"] if mh != null else "") and int(snap.get("passives", -1)) == ch.allocated.size(), "training history: a finished test stores the build snapshot", str(snap))
+	ch.loadout[3] = "frost_nova"
+	tp._remove()
+	tp._spawn()
+	var d3 = Game.level.training_dummies[0]
+	Combat.deal(_tpk("fireball", "spell", 500.0), p, d3)
+	TrainingLog.tick(100.0)
+	check(TrainingLog.history().size() == 2 and TrainingLog.history()[0]["snapshot"]["hotbar"][3] == "frost_nova" and TrainingLog.history()[1]["snapshot"]["hotbar"][3] != "frost_nova", "training history: the second test is stored first with its own snapshot")
+	tp._show_tab("history")
+	await frames(2)
+	var rows := 0
+	var first_btn: Button = null
+	for c in tp.history_list.get_children():
+		if c is Button:
+			rows += 1
+			if first_btn == null:
+				first_btn = c
+	check(rows == 2 and not tp.clear_btn.disabled, "training history: the History tab lists one row per test")
+	first_btn.pressed.emit()
+	await frames(2)
+	var detail := ""
+	for c in tp.history_list.get_children():
+		if c is RichTextLabel:
+			detail = c.text
+	check(tp.open_row == 0 and detail.contains("Build when tested") and detail.contains("Changed since the previous comparable test") and detail.contains("slot 4"), "training history: clicking a row shows its build and what changed", detail.substr(max(0, detail.length() - 260)))
+	for c in tp.history_list.get_children():   # the list is rebuilt on every refresh: find the button again
+		if c is Button:
+			first_btn = c
+			break
+	first_btn.pressed.emit()
+	await frames(2)
+	check(tp.open_row == -1, "training history: clicking the row again collapses it")
+	tp._ask_clear()
+	check(ui.confirm.visible, "training history: Clear history asks for confirmation")
+	ui._on_cancel()
+	check(TrainingLog.history().size() == 2, "training history: cancelling keeps the history")
+	tp._ask_clear()
+	ui._on_confirm()
+	await frames(2)
+	check(TrainingLog.history().is_empty() and tp.clear_btn.disabled, "training history: confirming clears this character's history")
+	tp._show_tab("result")
+	tp._reset()
+	check(TrainingLog.last_result.is_empty() and not TrainingLog.is_running(), "training panel: Reset clears the result")
+	tp._remove()
+	check(hub2.training_dummies.is_empty() and tp.reset_btn.disabled, "training panel: Remove clears the dummies")
+	ui.close_all()
+	TrainingLog.reset_settings()
+
+	# ---- ranger: turret and mine damage is credited to the deploying skill
+	Game.new_character("ranger")
+	main.start_game()
+	await frames(3)
+	hub = Game.level
+	p = hub.player
+	ch = Game.ch
+	ch.loadout[2] = "ballista_turret"
+	_tready(p)
+	check(not p.try_use_slot(2) and p.deployables.is_empty(), "training world: deploying in the hub is refused while no dummies exist")
+	hub.training_spawn()
+	d = hub.training_dummies[0]
+	p.global_position = d.global_position + Vector2(-50, 0)
+	p.auto_aim_override = p.global_position + Vector2(10, 0)
+	_tready(p)
+	check(p.try_use_slot(2), "training world: deploying a turret works in the hub while dummies exist")
+	await frames(300)
+	var tev := _tevs("deployable", "ballista_turret")
+	check(tev.size() > 0, "training world: turret damage is credited to the deploying skill", str(TrainingLog.run["events"].slice(0, 3)))
+	hub.training_remove()
+	Game.training_in_tests = false
+	TrainingLog.discard()
+	TrainingLog.reset_settings()
+
+# ------------------------------------------------------------------ item corruption (rules)
+const CorruptionRulesT = preload("res://scripts/core/corruption_rules.gd")
+
+func _corr_sim_crafts(rng: RandomNumberGenerator, cfg: Dictionary) -> int:
+	## Rolling crafts a fresh item survives until it locks (the locking craft counts).
+	var R = CorruptionRulesT
+	var it := {}
+	var n := 0
+	while not R.is_maxed(it, cfg):
+		n += 1
+		R.roll(it, "add", rng, cfg)
+		if n > 1000:
+			break
+	return n
+
+func test_corruption() -> void:
+	print("\n--- item corruption rules")
+	_log("--- item corruption rules")
+	var R = CorruptionRulesT
+	var cfg: Dictionary = Data.corruption_cfg
+	# ---- data
+	check(Data.load_errors.is_empty() and not cfg.is_empty(), "corruption: data/corruption.json loads")
+	check(is_equal_approx(R.chance(), 0.5) and R.step() == 20 and R.max_level() == 100 and R.drop_start() == 0, "corruption: defaults are 50% chance, +20 step, max 100, drop_start 0")
+	check(int(cfg.get("confirm_above", 0)) == 60, "corruption: confirm_above is 60")
+	# every Blacksmith craft is on exactly one side of the table
+	var all_ok := true
+	var detail := ""
+	for op in Loot.craft_ops():
+		if R.rolls_for(op) == R.is_exempt(op):
+			all_ok = false
+			detail += " " + op
+	check(all_ok, "corruption: every Blacksmith craft is either rolling or exempt, never both or neither", detail)
+	var listed_ok := true
+	for op in cfg.get("rolling_crafts", []) + cfg.get("exempt_crafts", []):
+		if not (op in Loot.craft_ops()):
+			listed_ok = false
+	check(listed_ok, "corruption: data lists only real craft ids")
+	check(R.rolls_for("add") and R.rolls_for("reroll") and R.rolls_for("rarity"), "corruption: add, reroll and raise rarity roll")
+	check(R.is_exempt("upgrade") and R.is_exempt("remove") and R.is_exempt("socket"), "corruption: upgrade, remove and socket are exempt")
+	# ---- get / set
+	var it := {}
+	check(R.get_level(it) == 0 and R.get_level(null) == 0, "corruption: get_level is 0 without the field and for null")
+	it["corruption"] = 140
+	check(R.get_level(it) == 100, "corruption: get_level clamps above 100")
+	it["corruption"] = -5
+	check(R.get_level(it) == 0, "corruption: get_level clamps below 0")
+	R.set_level(it, 40)
+	check(it.get("corruption") == 40 and R.get_level(it) == 40, "corruption: set_level stores the value")
+	R.set_level(it, 0)
+	check(not it.has("corruption"), "corruption: set_level(0) erases the key")
+	R.set_level(it, 250)
+	check(it["corruption"] == 100 and R.is_maxed(it), "corruption: set_level clamps to 100")
+	R.set_level(it, -10)
+	check(not it.has("corruption"), "corruption: set_level clamps negatives to 0 and erases")
+	check(R.events_remaining({}) == 5 and R.events_remaining({"corruption": 40}) == 3 and R.events_remaining({"corruption": 100}) == 0, "corruption: events remaining (5, 3, 0)")
+	# ---- refusal
+	var full := {"corruption": 100}
+	for op in ["add", "reroll", "rarity"]:
+		check(R.craft_refusal(full, op) != "", "corruption: %s is refused at 100%%" % op)
+		check(R.craft_refusal({"corruption": 80}, op) == "", "corruption: %s is allowed at 80%%" % op)
+	for op in ["upgrade", "remove", "socket"]:
+		check(R.craft_refusal(full, op) == "", "corruption: %s is allowed at 100%%" % op)
+	check(R.craft_refusal(full, "add") == "Corrupted: this item can no longer be crafted", "corruption: refusal text")
+	# ---- roll: one randf per rolling craft, none otherwise
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 777
+	var ref := RandomNumberGenerator.new()
+	ref.seed = 777
+	var x := {}
+	var r1: Dictionary = R.roll(x, "upgrade", rng)
+	check(not r1["rolled"] and not r1["hit"] and not x.has("corruption") and rng.state == ref.state, "corruption: exempt craft takes no random number and changes nothing")
+	var r2: Dictionary = R.roll(x, "add", rng)
+	ref.randf()
+	check(r2["rolled"] and rng.state == ref.state, "corruption: a rolling craft takes exactly one random number")
+	check(r2["before"] == 0 and r2["after"] == (20 if r2["hit"] else 0), "corruption: roll reports before/after and adds the step on a hit")
+	# forced outcomes with test configs
+	var always := cfg.duplicate(true)
+	always["chance"] = 1.0
+	var never := cfg.duplicate(true)
+	never["chance"] = 0.0
+	var y := {"corruption": 60}
+	R.roll(y, "reroll", rng, always)
+	check(y["corruption"] == 80, "corruption: a hit at 60% gives 80%")
+	var r3: Dictionary = R.roll(y, "reroll", rng, always)
+	check(y["corruption"] == 100 and r3["after"] == 100, "corruption: a hit at 80% gives exactly 100")
+	var r4: Dictionary = R.roll(y, "reroll", rng, always)
+	check(y["corruption"] == 100 and r4["after"] == 100, "corruption: a further hit never exceeds 100")
+	var z := {"corruption": 40}
+	var r5: Dictionary = R.roll(z, "add", rng, never)
+	check(r5["rolled"] and not r5["hit"] and z["corruption"] == 40, "corruption: a miss leaves the value unchanged")
+	var odd := cfg.duplicate(true)
+	odd["step"] = 30
+	odd["chance"] = 1.0
+	var w := {"corruption": 90}
+	R.roll(w, "add", rng, odd)
+	check(w["corruption"] == 100, "corruption: an odd step still caps at 100")
+	# ---- texts
+	check(R.risk_text() == "50% chance of +20% corruption", "corruption: risk text", R.risk_text())
+	check(R.result_text({"rolled": true, "hit": true, "after": 60}) == "Corruption rose to 60%", "corruption: result text on a hit")
+	check(R.result_text({"rolled": true, "hit": false, "after": 60}) == "No corruption gained", "corruption: result text on a miss")
+	check(R.result_text({"rolled": false}) == "", "corruption: no result text for exempt crafts")
+	# ---- drop_start
+	var d := {}
+	R.apply_drop_start(d)
+	check(not d.has("corruption"), "corruption: default drop_start leaves items clean")
+	var ds := cfg.duplicate(true)
+	ds["drop_start"] = 40
+	R.apply_drop_start(d, ds)
+	check(d.get("corruption") == 40, "corruption: drop_start from data is applied")
+	# ---- statistics (own seeded rng)
+	var srng := RandomNumberGenerator.new()
+	srng.seed = 20261028
+	var mn := 1000
+	var total := 0
+	var runs := 10000
+	for i in runs:
+		var n := _corr_sim_crafts(srng, cfg)
+		mn = mini(mn, n)
+		total += n
+	var mean := float(total) / float(runs)
+	check(mn == 5, "corruption: no item locks before its 5th rolling craft (min over 10,000 items)", str(mn))
+	check(absf(mean - 10.0) <= 0.2, "corruption: mean rolling crafts to lockout is within 0.2 of 10", str(mean))
+	var hits := 0
+	var hrng := RandomNumberGenerator.new()
+	hrng.seed = 424242
+	for i in runs:
+		var q := {}
+		if R.roll(q, "add", hrng)["hit"]:
+			hits += 1
+	check(absf(float(hits) / float(runs) - 0.5) <= 0.015, "corruption: hit rate over 10,000 rolls is within 1.5 points of 50%", str(float(hits) / float(runs)))
+	# ---- isolation: rolls never touch the global or Loot RNG
+	var loot_state: int = Loot.rng.state
+	seed(99)
+	var irng := RandomNumberGenerator.new()
+	irng.seed = 5
+	for i in 200:
+		R.roll({}, "add", irng)
+	var after_global: int = randi()
+	seed(99)
+	var expect_global: int = randi()
+	check(after_global == expect_global, "corruption: rolls leave the global RNG alone")
+	check(Loot.rng.state == loot_state, "corruption: rolls leave the Loot RNG alone")
+	await frames(1)

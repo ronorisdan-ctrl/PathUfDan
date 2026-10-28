@@ -664,6 +664,58 @@ func sort_bag() -> void:
 		inventory[i] = items[i] if i < items.size() else null
 	Events.inventory_changed.emit()
 
+## Locked items can't be sold, salvaged or destroyed. The flag lives on the item dictionary
+## (so it is saved, stashed and withdrawn with it) and is only written while true.
+static func is_locked(it) -> bool:
+	return it != null and typeof(it) == TYPE_DICTIONARY and bool(it.get("locked", false))
+
+func set_item_locked(it, locked: bool) -> void:
+	if it == null:
+		return
+	if locked:
+		it["locked"] = true
+	else:
+		it.erase("locked")
+	Events.inventory_changed.emit()
+
+## Bag slot indices holding an unlocked item of `rarity` or lower (equipped gear is not in the bag).
+func bag_slots_up_to(rarity: String) -> Array:
+	var limit: int = Data.rarity_index(rarity)
+	var out := []
+	for i in inventory.size():
+		var it = inventory[i]
+		if it != null and not is_locked(it) and Data.rarity_index(it.get("rarity", "common")) <= limit:
+			out.append(i)
+	return out
+
+## Locked items of `rarity` or lower that a sweep leaves alone.
+func bag_locked_up_to(rarity: String) -> int:
+	var limit: int = Data.rarity_index(rarity)
+	var n := 0
+	for it in inventory:
+		if it != null and is_locked(it) and Data.rarity_index(it.get("rarity", "common")) <= limit:
+			n += 1
+	return n
+
+## How many of those are upgraded (so the confirm dialog can warn about them).
+func bag_upgraded_up_to(rarity: String) -> int:
+	var n := 0
+	for i in bag_slots_up_to(rarity):
+		if int(inventory[i].get("upgrade", 0)) > 0:
+			n += 1
+	return n
+
+## Destroys every bag item of `rarity` or lower. Socketed gems return to the pouch.
+## Returns the number of items destroyed.
+func destroy_bag_up_to(rarity: String) -> int:
+	var idxs := bag_slots_up_to(rarity)
+	for i in idxs:
+		reclaim_gems(inventory[i])
+		inventory[i] = null
+	if not idxs.is_empty():
+		Events.inventory_changed.emit()
+	return idxs.size()
+
 func weapon():
 	return equipment.get("main_hand")
 

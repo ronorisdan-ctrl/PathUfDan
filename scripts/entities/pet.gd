@@ -502,7 +502,7 @@ func _quirk(delta: float) -> void:
 			for n in level.loot:
 				if is_instance_valid(n) and n.kind == "item" and n.rarity_idx() >= 2 and not seen_drops.has(n.get_instance_id()):
 					seen_drops[n.get_instance_id()] = true
-					if in_view(n.global_position) and not n.hidden_by_filter:
+					if in_view(n.global_position) and not n.filter_hidden:
 						face = signf(n.global_position.x - gp.x) if absf(n.global_position.x - gp.x) > 1 else face
 						float_text("Hoo!", Color("#ffe8a0"))
 						hop = 0.7

@@ -86,7 +86,7 @@ func evaluate(item: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 		"visibility": str(filter.get("default", "show")),
 		"visible": true, "color": null, "font_px": -1, "beam": null,
 		"sound": "", "minimap": {}, "rule": "", "safety_override": false,
-		"drawn": true, "clickable": true,
+		"drawn": true, "clickable": true, "filter_hidden": false,
 	}
 	for rule in filter.get("rules", []):
 		if not rule.get("enabled", true):
@@ -109,7 +109,10 @@ func evaluate(item: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	if res["visibility"] == "hide" and safe_i >= 0 and d["rarity_i"] >= safe_i:
 		res["visibility"] = "show"
 		res["safety_override"] = true
-	res["visible"] = res["visibility"] != "hide" or reveal_hidden
+	# The show/hide decision itself. It never looks at the Alt reveal: reveal only
+	# changes what is drawn and what the player can target, never what a pet may take.
+	res["filter_hidden"] = res["visibility"] == "hide"
+	res["visible"] = not res["filter_hidden"] or reveal_hidden
 	# A hidden item gets no sprite, label, beam, light, sound or minimap icon, and
 	# cannot be clicked or picked up (including future auto-pickup).
 	res["drawn"] = res["visible"]

@@ -1,3 +1,8 @@
 # Godot 4+ specific ignores
 .godot/
 tests/last_results.txt
+tests/train_only_results.txt
+tests/smartbot/out/tg_*
+tests/screens_out_training/
+tests/screens_out_inventory_preview/
+tests/ui_preview_*.log
