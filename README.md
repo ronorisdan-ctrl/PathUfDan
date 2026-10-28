@@ -95,6 +95,26 @@ dummies exist. All numbers and wording are in `data/training.json`. The dummy ca
 stunned, takes damage through the normal combat path and changes nothing about how combat works;
 training is off under `Game.testing` unless `Game.training_in_tests` is set.
 
+### Crafting corruption
+
+Every item has a corruption meter (0-100%, shown as "Corruption: N%" on every tooltip, as a bar in the
+Blacksmith window and as a small red marker on 100% items in the bag and stashes). Three Blacksmith
+crafts roll for it: **Add Affix**, **Reroll Affix** (one chosen affix per click) and **Raise Rarity**. The
+craft is always applied in full first; then one roll at 50% adds 20% corruption. At 100% those three crafts
+are refused (nothing is spent) and their buttons are disabled, so every item gets at least 5 rolling crafts
+and 10 on average (a negative binomial). Upgrade Base, Remove Affix and Add Socket never roll and still work
+at 100%, as do equipping, selling, salvaging, locking, stashing and the Destroy sweep. Because a blank base
+may run out of crafts before it reaches a perfect roll, a base that already has good affixes matters. The
+Blacksmith asks to confirm every craft and adds a warning when the item is above 60% corruption.
+
+All numbers are in `data/corruption.json` (chance, step, max, `drop_start`, which crafts roll or are
+exempt, confirm threshold, colours). The rules are the pure script `scripts/core/corruption_rules.gd`.
+The value is an integer `corruption` on the item dictionary (absent at 0%), so there is no save version
+change and it survives save/load, the personal stash and the shared stash. The Blacksmith owns its own
+random number generator for the roll; it never touches the global, Combat or Loot streams, and bots and
+the smartbot (which call the craft functions directly) never roll corruption. Developer tools (F1, Items)
+can set or clear the value on bag items and mark the save as dev-used.
+
 ## Architecture
 
 ```
@@ -140,6 +160,9 @@ xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_tiers.tsc
 xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens.tscn -- ranger /tmp/shots
 xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_s3.tscn   # skills, runes, specialisations
 xvfb-run godot --rendering-driver opengl3 --path . res://tests/screens_s4.tscn   # passive web, jeweller, charms
+godot --headless --fixed-fps 60 --path . res://tests/corruption_only.tscn          # corruption checks only (~130, about 1 minute)
+godot --headless --fixed-fps 60 --path . res://tests/items_crafting_only.tscn      # item, crafting, lock, stash UI, dev tools and corruption (~320)
+godot --path . res://tests/screens_corruption.tscn -- /tmp/corruption             # corruption screenshots (needs a display)
 godot --headless --fixed-fps 60 --path . res://tests/train_only.tscn -- world    # Training Grounds checks only (~160, about 1 minute)
 godot --path . res://tests/screens_training.tscn -- /tmp/training                 # Training Grounds screenshots (needs a display)
 ```
@@ -151,7 +174,7 @@ godot --path . res://tests/screens_training.tscn -- /tmp/training               
 * Warrior one-hand + shield (block) or two-handers; Ranger bows/firearms, mines and turrets; Mage elemental spells, blink and skeleton summons that follow you, path around walls, attack, die and carry over between areas.
 * Passive web: 203 nodes in 21 named clusters (14 keystones), three class starts linked by hybrid roads, a central hub and an outer Wanderer's Road joining six outer clusters (Sanguine Rites, Prismatic Ward, Windwalker, Executioner's Path, Mind Fortress, Void Communion) so every keystone is reachable by every class. Pan/zoom, search box, cluster labels, click any reachable node to allocate the whole route (previewed in blue), stat-change previews, gold-cost refunds that never disconnect the tree.
 * Loot: 129 item bases, 52 affixes with tiers, 5 rarities, item comparison tooltips with stat deltas, loot filter, sorting, selling, salvaging, stash, merchant stock.
-* Crafting: upgrade base, reroll / add / remove affix, raise rarity, add socket, salvage - each with costs, preview and confirmation.
+* Crafting: upgrade base, reroll / add / remove affix, raise rarity, add socket, salvage - each with costs, preview and confirmation. Add, reroll and raise rarity roll for item corruption (see Crafting corruption).
 * Sockets and gems: gear rolls 0-3 sockets (by slot; more likely at higher item level). 8 gem types x 4 grades (Chipped, Flawed, Polished, Flawless); each gem gives different stats in a weapon, armour or jewellery. The Jeweller (hub) sockets and removes gems, combines 3 into the next grade and sells random gems. Gems drop from monsters and return to you when an item is sold, salvaged or destroyed.
 * Charms: 10 charm bases for the charm slot with charm-only affixes (damage reduction, cooldown recovery, flask effect, life on kill, +1 to all skills and more).
 * Legendaries: 20, including Emberheart, Wolfmother's Fang, Tyrant's Signet, Glacial Crest, The Thornwarden, Phantom Treads, Sigil of Echoes, Gunsmith's Pride, Warlord's Grip and Starfall.
@@ -169,6 +192,7 @@ godot --path . res://tests/screens_training.tscn -- /tmp/training               
 
 ## Known limitations / next steps
 
+* Crafting corruption: drops start at 0% (`drop_start` is in the data file for later), there is no way to cleanse corruption, the 50% chance does not rise as corruption grows, legendaries cannot be crafted so their corruption only shows on the tooltip, and the numbers are untuned guesses (5 rolling crafts minimum, 10 on average) that need real play. The tooltip bar is solid block characters because Godot 4.0 text boxes have no background colour tag.
 * Training Grounds history is kept in memory for the session only (lost when the game closes); a per-character file is a possible later addition. The T3/T6 defence profiles use the tier's dungeon data (a spawn-weighted average of its normal enemies, or its boss) at your character's level, not a specific enemy. Passive and item procs that carry no skill are listed under "Other". There is no mortal-mode dummy and no damage-taken or movement measurement yet.
 * Higher tiers are tuned with the autoplay bot (which never dodges); expect to refine numbers after real play.
 * Skill catalogue is 80 of ~146 listed skills. New skills are mostly JSON entries using existing behaviours; channelled and transform skills need new behaviours.

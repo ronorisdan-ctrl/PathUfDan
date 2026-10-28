@@ -1,10 +1,11 @@
 # Changelog
 
-## Crafting corruption (branch `feature/crafting-corruption`, in progress)
+## Crafting corruption (branch `feature/crafting-corruption`, not merged)
 
 - Phase 1: `data/corruption.json`, pure rules in `scripts/core/corruption_rules.gd`, `Data.corruption_cfg`, rules tests. Add Affix, Reroll Affix and Raise Rarity roll (50% for +20% corruption); Upgrade Base, Remove Affix and Add Socket are exempt.
 - Phase 2: the Blacksmith applies the craft in full, then rolls once with its own RNG (`apply_craft`). At 100% add / reroll / raise rarity are refused before any cost. The value is saved as an integer `corruption` on the item (no save version change) and survives the personal and shared stash.
 - Phase 3: "Corruption: N%" line and a 10-block bar on every item tooltip (grey, amber, red; red "Corrupted: cannot be crafted" at 100%), a wide bar with tick marks and "N more corruption events before lock" in the Blacksmith, a risk line on each rolling craft button, disabled add / reroll / raise rarity buttons with the refusal as tooltip at 100%, a warning in the confirm dialog above 60%, a red corner marker on 100% item slots, and Set / Clear corruption buttons in the F1 Items tab (dev-used save flag). Tests: `test_corruption_ui()`, `tests/items_crafting_only.tscn`, screenshots via `tests/screens_corruption.tscn`.
+- Phase 4: README section (Crafting corruption, test commands, limitations), this entry and a status note in the project docs.
 
 ## 2026-10-28 — Dying Canvas inventory preview
 
