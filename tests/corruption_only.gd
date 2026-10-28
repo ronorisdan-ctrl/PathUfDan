@@ -14,6 +14,7 @@ func _ready() -> void:
 	await T.frames(2)
 	await T.test_corruption()
 	await T.test_corruption_crafting()
+	await T.test_corruption_ui()
 	var f := FileAccess.open("res://tests/corruption_only_results.txt", FileAccess.WRITE)
 	f.store_line("==== %d passed, %d failed ====" % [T.passes, T.fails])
 	for l in T.log_lines:

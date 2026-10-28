@@ -70,6 +70,7 @@ func _ready() -> void:
 	await test_item_lock()
 	await test_corruption()
 	await test_corruption_crafting()
+	await test_corruption_ui()
 	var summary := "==== %d passed, %d failed ====" % [passes, fails]
 	print("\n" + summary)
 	_log(summary)
@@ -3744,4 +3745,198 @@ func test_corruption_crafting() -> void:
 	var eqwhy: String = ch.equip_from_bag(ch.inventory.find(f1))
 	check(eqwhy == "" or eqwhy.length() > 0, "corruption actions: equipping a 100% item is not blocked by corruption", eqwhy)
 	check(not ("orrupt" in eqwhy), "corruption actions: equip refusal (if any) is not about corruption", eqwhy)
+	await frames(1)
+
+# ------------------------------------------------------------------ item corruption (visuals and dev tools)
+func _corr_buttons(box: Node) -> Array:
+	var out := []
+	for c in box.get_children():
+		if c is Button:
+			out.append(c)
+	return out
+
+func _corr_button_for(box: Node, craft_name: String):
+	for b in _corr_buttons(box):
+		if craft_name in b.text:
+			return b
+	return null
+
+func test_corruption_ui() -> void:
+	print("\n--- item corruption visuals and dev tools")
+	_log("--- item corruption visuals and dev tools")
+	if main.ui == null:
+		Game.new_character("warrior")
+		main.start_game()
+		await frames(2)
+	var ui = main.ui
+	Game.new_character("warrior")
+	var ch = Game.ch
+	var R = CorruptionRulesT
+	var cfg: Dictionary = Data.corruption_cfg
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	ch.gold = 100000
+	for k in Data.materials:
+		ch.materials[k] = 50
+	var base: String = "rusty_sword" if Data.item_bases.has("rusty_sword") else Data.item_base_list[0]["id"]
+	# ---- colours
+	var low := Color(cfg["colors"]["low"])
+	var mid := Color(cfg["colors"]["mid"])
+	var high := Color(cfg["colors"]["high"])
+	check(R.level_color(0).is_equal_approx(low) and R.level_color(50).is_equal_approx(mid) and R.level_color(100).is_equal_approx(high), "corruption ui: colour is grey at 0, amber at 50, red at 100")
+	var c20 := R.level_color(20)
+	var c80 := R.level_color(80)
+	check(not c20.is_equal_approx(low) and not c20.is_equal_approx(mid) and c20.r > low.r - 0.001, "corruption ui: colours between the stops are interpolated")
+	check(c80.g < mid.g and c80.g > high.g and not c80.is_equal_approx(high), "corruption ui: 80% sits between amber and red")
+	# ---- tooltip text at 0, 40 and 100
+	var t0 := Loot.make_item(base, "rare", 10)
+	var t40 := Loot.make_item(base, "rare", 10)
+	var t100 := Loot.make_item(base, "rare", 10)
+	R.set_level(t40, 40)
+	R.set_level(t100, 100)
+	var tip0: String = Loot.tooltip(t0, ch)
+	var tip40: String = Loot.tooltip(t40, ch)
+	var tip100: String = Loot.tooltip(t100, ch)
+	check("Corruption: 0%" in tip0 and "Corrupted: cannot be crafted" not in tip0, "corruption ui: a clean item shows 'Corruption: 0%' and no lock line")
+	check("Corruption: 40%" in tip40 and ("#" + R.level_color(40).to_html(false)) in tip40 and "Corrupted: cannot be crafted" not in tip40, "corruption ui: 40% shows the number in its own colour")
+	check("Corruption: 100%" in tip100 and "Corrupted: cannot be crafted" in tip100 and ("#" + high.to_html(false)) in tip100, "corruption ui: 100% shows the red 'Corrupted: cannot be crafted' line")
+	check("Corruption" not in Loot.tooltip(t40, ch, false), "corruption ui: the tooltip line can be left out (Blacksmith has its own readout)")
+	var leg: Dictionary = Loot.make_unique("worldsplitter", 10)
+	check("Corruption: 0%" in Loot.tooltip(leg, ch), "corruption ui: legendaries show the line too")
+	check(R.bar_bbcode(40).count("\u2588") == 10 and R.bar_bbcode(40).count("[color=") == 2 and R.bar_bbcode(0).count("[color=") == 1 and R.bar_bbcode(100).count("[color=") == 1, "corruption ui: tooltip bar is 10 blocks, part filled at 40%, all empty at 0 and all filled at 100")
+	# ---- real tooltip panel and comparison tooltip
+	ui.item_tooltip(t40, false)
+	check("Corruption: 40%" in ui.tooltip_text.text, "corruption ui: the hover tooltip shows the line")
+	var eq := Loot.make_item(base, "rare", 10)
+	R.set_level(eq, 60)
+	eq["uid"] = ch.take_uid()
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	ch.inventory[0] = eq
+	if ch.equip_from_bag(0) == "":
+		ui.item_tooltip(t40, true)
+		check(ui.tooltip2.visible and "Corruption: 60%" in ui.tooltip2_text.text, "corruption ui: the equipped-item comparison tooltip shows its line")
+	ui.hide_tooltip()
+	# ---- slot markers
+	var Slot = preload("res://scripts/ui/item_slot.gd")
+	var ssize := Vector2(44, 44)
+	var pad: Rect2 = Slot.padlock_rect(ssize)
+	var mark: Rect2 = Slot.corrupted_rect(ssize)
+	check(not pad.intersects(mark) and mark.end.x <= ssize.x and mark.end.y <= ssize.y, "corruption ui: the slot marker sits in the opposite corner and does not overlap the padlock")
+	var sl = Slot.new()
+	sl.size = ssize
+	sl.item = t100
+	check(R.is_maxed(sl.item) and not R.is_maxed(t40) and not R.is_maxed(t0), "corruption ui: the marker shows at 100% only")
+	sl.free()
+	# ---- Blacksmith readout, risk text, disabled buttons
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	ui.open_station("blacksmith")
+	await frames(2)
+	var bs = ui.panels["blacksmith"]
+	var work := Loot.make_item(base, "uncommon", 20)
+	work["uid"] = ch.take_uid()
+	R.set_level(work, 40)
+	ch.add_to_bag(work)
+	bs.select(work)
+	await frames(2)
+	check(bs.corr_bar.visible and bs.corr_bar.bar_label() == "Corruption 40%", "corruption ui: Blacksmith bar shows the number", bs.corr_bar.bar_label())
+	check(bs.corr_bar.note_text() == "3 more corruption events before lock", "corruption ui: remaining events are derived (3 at 40%)", bs.corr_bar.note_text())
+	check("Corruption" not in bs.item_text.text, "corruption ui: the Blacksmith item text has no second corruption line")
+	for nm in ["Add Affix", "Reroll Affix", "Raise Rarity"]:
+		var b = _corr_button_for(bs.op_box, nm)
+		check(b != null and "Risk: 50% chance of +20% corruption" in b.text, "corruption ui: %s button carries the risk line" % nm)
+	for nm in ["Upgrade Base", "Remove Affix", "Add Socket"]:
+		var b2 = _corr_button_for(bs.op_box, nm)
+		check(b2 != null and "Risk" not in b2.text, "corruption ui: %s button has no risk line" % nm)
+	bs.op = "add"
+	bs.refresh()
+	check("Risk: 50% chance of +20% corruption" in bs.preview.text, "corruption ui: the preview repeats the risk for a rolling craft")
+	# ---- confirm dialog
+	bs.select(work)
+	bs.op = "upgrade"
+	bs._craft()
+	check(ui.confirm.visible and "Risk" not in ui.confirm_text.text, "corruption ui: an exempt craft's confirm dialog has no corruption text")
+	ui.confirm.visible = false
+	R.set_level(work, 60)
+	bs.select(work)
+	bs.op = "upgrade"
+	bs.op = "add"
+	bs._craft()
+	check(ui.confirm.visible and "Risk: 50% chance" in ui.confirm_text.text and "Warning" not in ui.confirm_text.text, "corruption ui: at 60% the confirm shows the risk but no warning (threshold is above 60)")
+	ui.confirm.visible = false
+	R.set_level(work, 80)
+	bs.select(work)
+	bs.op = "add"
+	bs._craft()
+	check(ui.confirm.visible and "Warning" in ui.confirm_text.text, "corruption ui: above 60% the confirm dialog adds a warning")
+	# confirming applies the craft, rolls once and refreshes the bar immediately
+	if Loot.craft_check("add", work) == "":
+		bs.corr_rng.seed = 11
+		var before: int = R.get_level(work)
+		ui.confirm_cb.call()
+		ui.confirm.visible = false
+		await frames(2)
+		check(bs.corr_bar.level == R.get_level(work) and R.get_level(work) in [before, mini(100, before + 20)], "corruption ui: the bar refreshes right after a craft", "%d -> %d bar %d" % [before, R.get_level(work), bs.corr_bar.level])
+		var toast_ok := false
+		for tchild in ui.toasts.get_children():
+			if tchild is Label and "complete" in tchild.text and ("Corruption rose" in tchild.text or "No corruption gained" in tchild.text):
+				toast_ok = true
+		check(toast_ok, "corruption ui: a result toast says whether corruption rose")
+	ui.confirm.visible = false
+	# ---- 100%: buttons disabled with the refusal as tooltip, exempt ones stay on
+	R.set_level(work, 100)
+	bs.select(work)
+	await frames(2)
+	for nm in ["Add Affix", "Reroll Affix", "Raise Rarity"]:
+		var b3 = _corr_button_for(bs.op_box, nm)
+		check(b3 != null and b3.disabled and b3.tooltip_text == "Corrupted: this item can no longer be crafted", "corruption ui: %s is disabled at 100%% with the refusal as tooltip" % nm)
+	var bu = _corr_button_for(bs.op_box, "Upgrade Base")
+	check(bu != null and not bu.disabled, "corruption ui: Upgrade Base stays enabled at 100%")
+	check(bs.corr_bar.note_text() == "Corrupted: cannot be crafted", "corruption ui: the readout says the item is corrupted")
+	bs.op = "add"
+	bs.refresh()
+	check(bs.confirm_btn.disabled, "corruption ui: the Craft button is disabled for a refused craft")
+	# ---- text fits (1280x720 layout): the longest lines are narrower than the bar and the tooltip
+	var font := ThemeDB.fallback_font
+	var longest := "Corrupted: cannot be crafted"
+	check(font.get_string_size("3 more corruption events before lock", HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x < 380 and font.get_string_size(longest, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x < 380, "corruption ui: readout text fits the 390 px bar")
+	check(font.get_string_size("Risk: 50% chance of +20% corruption", HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x < 400, "corruption ui: risk line fits the Blacksmith width")
+	bs.select(null)
+	ui.close("blacksmith")
+	# ---- dev tools
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var d1 := Loot.make_item(base, "rare", 10)
+	var d2 := Loot.make_item(base, "rare", 10)
+	d1["uid"] = ch.take_uid()   # distinct contents so find() cannot confuse the two items
+	d2["uid"] = ch.take_uid()
+	ch.add_to_bag(d1)
+	ch.add_to_bag(d2)
+	Game.settings["dev_tools"] = false
+	Game.dev_in_tests = false
+	var off: Dictionary = Dev.set_item_corruption(0, 40)
+	check(not off["ok"] and R.get_level(d1) == 0 and not ch.dev_used, "corruption dev: off unless Developer tools are on")
+	_dev_on()
+	ch.dev_used = false
+	var idx1: int = ch.inventory.find(d1)
+	var idx2: int = ch.inventory.find(d2)
+	var r1: Dictionary = Dev.set_item_corruption(idx1, 60)
+	check(r1["ok"] and R.get_level(d1) == 60 and d1["corruption"] == 60 and ch.dev_used, "corruption dev: set to 60% marks the save as dev-used")
+	for v in [0, 20, 40, 60, 80, 100]:
+		Dev.set_item_corruption(idx1, v)
+		check(R.get_level(d1) == v and (v == 0) == (not d1.has("corruption")), "corruption dev: value %d applied through set_level" % v)
+	Dev.set_item_corruption(idx1, 80)
+	Dev.set_item_corruption(idx2, 100)
+	check(Dev.clear_item_corruption(idx1)["ok"] and R.get_level(d1) == 0 and R.get_level(d2) == 100, "corruption dev: clear selected resets only that item")
+	Dev.set_item_corruption(idx1, 40)
+	check(Dev.clear_bag_corruption()["ok"] and R.get_level(d1) == 0 and R.get_level(d2) == 0 and not d1.has("corruption") and not d2.has("corruption"), "corruption dev: clear all bag items resets every item and erases the key")
+	check(not Dev.set_item_corruption(30, 20)["ok"] and not Dev.set_item_corruption(-1, 20)["ok"], "corruption dev: an empty slot or no selection is refused")
+	var dp = ui.panels["dev"]
+	dp.refresh()
+	check(dp.corr_item_pick != null and dp.corr_item_pick.item_count == 2, "corruption dev: the panel lists the bag items", str(dp.corr_item_pick.item_count))
+	var sd = JSON.parse_string(JSON.stringify(ch.to_dict()))
+	check(bool(sd.get("dev_used", false)), "corruption dev: the dev_used flag is written to the save")
+	Game.settings["dev_tools"] = false
+	Game.dev_in_tests = false
 	await frames(1)

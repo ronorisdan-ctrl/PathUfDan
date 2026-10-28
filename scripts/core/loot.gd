@@ -454,7 +454,7 @@ func cost_text(cost: Dictionary) -> String:
 	return ", ".join(parts)
 
 # ------------------------------------------------------------------ tooltip
-func tooltip(it: Dictionary, ch = null) -> String:
+func tooltip(it: Dictionary, ch = null, show_corruption: bool = true) -> String:
 	var col := Data.rarity_color(it.get("rarity", "common")).to_html(false)
 	var lines := []
 	var up := int(it.get("upgrade", 0))
@@ -521,6 +521,8 @@ func tooltip(it: Dictionary, ch = null) -> String:
 		if u.get("flavor", "") != "":
 			lines.append("[i][color=#a07850]\"%s\"[/color][/i]" % u["flavor"])
 	lines.append("[color=#3a3440]────────────────────[/color]")
+	if show_corruption:
+		lines.append(CorruptionRules.tooltip_bbcode(it))
 	lines.append("[color=#8a8494]Sell: %d gold   Salvage: %s[/color]" % [sell_value(it), cost_text(salvage_yield(it))])
 	return "\n".join(lines)
 

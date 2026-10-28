@@ -22,6 +22,8 @@ var rarity_pick: OptionButton
 var ilvl_spin: SpinBox
 var socket_spin: SpinBox
 var max_roll: CheckBox
+var corr_item_pick: OptionButton
+var corr_value_pick: OptionButton
 var uniq_pick: OptionButton
 var drop_rarity: OptionButton
 var dungeon_pick: OptionButton
@@ -301,6 +303,22 @@ func _build_items(v: VBoxContainer) -> void:
 	_mult_row(v, "Loot luck", "loot_luck", "loot_luck", "Multiply drop chance and rarity while on")
 	var hf := _row(v, "Filter")
 	_check(hf, "reveal_hidden", "Reveal hidden items", "Show items the loot filter hides (same as holding Alt)")
+	_head(v, "Item corruption (bag items)")
+	var hc := _row(v, "Item")
+	corr_item_pick = _option(hc, [], 300)
+	corr_item_pick.tooltip_text = "A bag item (refreshes when the panel updates)"
+	var hc2 := _row(v, "Value")
+	var cvals := []
+	for n in _steps("corruption_values", [0, 20, 40, 60, 80, 100]):
+		cvals.append(["%d%%" % int(n), str(int(n))])
+	corr_value_pick = _option(hc2, cvals, 90)
+	corr_value_pick.select(cvals.size() - 1)
+	_btn(hc2, "Set corruption", "Set the chosen bag item to this value", func():
+		return Dev.set_item_corruption(_corr_idx(), int(_picked(corr_value_pick))))
+	var hc3 := _row(v, "")
+	_btn(hc3, "Clear selected", "Set the chosen bag item back to 0%", func():
+		return Dev.clear_item_corruption(_corr_idx()))
+	_btn(hc3, "Clear all bag items", "Set every bag item back to 0%", Dev.clear_bag_corruption)
 	_head(v, "Bag")
 	var hb := _row(v, "")
 	var cb := UIKit.button("Clear bag", func():
@@ -311,6 +329,32 @@ func _build_items(v: VBoxContainer) -> void:
 	cb.tooltip_text = "Destroy everything in the bag (asks first)"
 	hb.add_child(cb)
 	_btn(hb, "Give me a decent kit", "Equip a rare item in every slot at your level (old gear goes to the bag)", Dev.decent_kit)
+
+func _corr_idx() -> int:
+	var p := _picked(corr_item_pick)
+	return int(p) if p != "" else -1
+
+## Rebuilds the bag-item list for the corruption tools, keeping the chosen slot.
+func _fill_corruption_items() -> void:
+	if corr_item_pick == null:
+		return
+	var keep := _picked(corr_item_pick)
+	corr_item_pick.clear()
+	var ch = Game.ch
+	if ch == null:
+		return
+	var n := 0
+	for i in ch.inventory.size():
+		var it = ch.inventory[i]
+		if it == null:
+			continue
+		corr_item_pick.add_item("%d: %s  (%d%%)" % [i + 1, it.get("name", "?"), preload("res://scripts/core/corruption_rules.gd").get_level(it)], n)
+		corr_item_pick.set_item_metadata(n, str(i))
+		if str(i) == keep:
+			corr_item_pick.select(n)
+		n += 1
+	if corr_item_pick.selected < 0 and n > 0:
+		corr_item_pick.select(0)
 
 func _fill_bases() -> void:
 	if base_pick == null:
@@ -486,6 +530,7 @@ func refresh() -> void:
 	var ch = Game.ch
 	if ch != null:
 		status_label.text = "%s, level %d %s   Gold %s%s" % [ch.char_name, ch.level, ch.class_def().get("name", ch.class_id), Dev._fmt(ch.gold), "   (dev)" if ch.dev_used else ""]
+	_fill_corruption_items()
 	for flag in flag_boxes:
 		flag_boxes[flag].set_pressed_no_signal(bool(Dev.flags.get(flag, false)))
 	for flag in mult_rows:
