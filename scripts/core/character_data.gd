@@ -999,7 +999,7 @@ func _fix_item(it):
 	if not Data.item_bases.has(it.get("base", "")):
 		return null
 	# JSON turns ints into floats; normalise the integer fields
-	for k in ["ilvl", "req_level", "upgrade", "uid", "sockets"]:
+	for k in ["ilvl", "req_level", "upgrade", "uid", "sockets", "corruption"]:
 		if it.has(k):
 			it[k] = int(it[k])
 	if it.has("gems"):

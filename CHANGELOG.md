@@ -1,5 +1,10 @@
 # Changelog
 
+## Crafting corruption (branch `feature/crafting-corruption`, in progress)
+
+- Phase 1: `data/corruption.json`, pure rules in `scripts/core/corruption_rules.gd`, `Data.corruption_cfg`, rules tests. Add Affix, Reroll Affix and Raise Rarity roll (50% for +20% corruption); Upgrade Base, Remove Affix and Add Socket are exempt.
+- Phase 2: the Blacksmith applies the craft in full, then rolls once with its own RNG (`apply_craft`). At 100% add / reroll / raise rarity are refused before any cost. The value is saved as an integer `corruption` on the item (no save version change) and survives the personal and shared stash.
+
 ## 2026-10-28 — Dying Canvas inventory preview
 
 - Added a standalone inventory/character UI study with tarnished cabinet frames, forty bag cells, eleven equipment cells, hover/pinned/focus states, comparison gains/losses, ring target switching, local sample swaps, sorting, filtering and reset.

@@ -3,6 +3,7 @@ extends Node
 ## Everything is driven by data/item_bases.json, affixes.json, uniques.json and loot.json.
 
 const DevRules = preload("res://scripts/core/dev_rules.gd")
+const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
 
 var rng := RandomNumberGenerator.new()
 
@@ -626,6 +627,11 @@ func craft_cost(op: String, it: Dictionary) -> Dictionary:
 func craft_check(op: String, it: Dictionary, affix_index: int = -1) -> String:
 	if it.is_empty():
 		return "Select an item"
+	# Corruption first: a fully corrupted item refuses add / reroll / raise rarity
+	# before any cost is looked at (exempt crafts are never refused here).
+	var corrupt_why: String = CorruptionRules.craft_refusal(it, op)
+	if corrupt_why != "":
+		return corrupt_why
 	var legendary: bool = it.get("rarity") == "legendary"
 	match op:
 		"upgrade":

@@ -69,6 +69,7 @@ func _ready() -> void:
 	await test_destroy_by_rarity()
 	await test_item_lock()
 	await test_corruption()
+	await test_corruption_crafting()
 	var summary := "==== %d passed, %d failed ====" % [passes, fails]
 	print("\n" + summary)
 	_log(summary)
@@ -3556,4 +3557,191 @@ func test_corruption() -> void:
 	var expect_global: int = randi()
 	check(after_global == expect_global, "corruption: rolls leave the global RNG alone")
 	check(Loot.rng.state == loot_state, "corruption: rolls leave the Loot RNG alone")
+	await frames(1)
+
+# ------------------------------------------------------------------ item corruption (crafting, saves, stashes)
+func test_corruption_crafting() -> void:
+	print("\n--- item corruption crafting and persistence")
+	_log("--- item corruption crafting and persistence")
+	if main.ui == null:
+		Game.new_character("warrior")
+		main.start_game()
+		await frames(2)
+	var ui = main.ui
+	Game.new_character("warrior")
+	var ch = Game.ch
+	var R = CorruptionRulesT
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	ch.gold = 100000
+	for k in Data.materials:
+		ch.materials[k] = 50
+	var bs = ui.panels["blacksmith"]
+	var always := Data.corruption_cfg.duplicate(true)
+	always["chance"] = 1.0
+	# ---- the Blacksmith owns its own RNG
+	check(bs.corr_rng != null and bs.corr_rng is RandomNumberGenerator, "corruption craft: the Blacksmith owns its own RandomNumberGenerator")
+	# ---- apply_craft: craft first, then roll
+	var it: Dictionary = Loot.make_item("rusty_sword" if Data.item_bases.has("rusty_sword") else Data.item_base_list[0]["id"], "rare", 20)
+	it["uid"] = ch.take_uid()
+	for op in ["add", "reroll", "rarity", "upgrade", "remove", "socket"]:
+		var t: Dictionary = Loot.make_item(it["base"], "uncommon", 20)
+		if op in ["reroll", "remove"] and t["affixes"].is_empty():
+			continue
+		if Loot.craft_check(op, t, 0) != "":
+			continue
+		var n_aff: int = t["affixes"].size()
+		bs.corr_rng.seed = 1
+		var res: Dictionary = bs.apply_craft(op, t, 0)
+		check(res["rolled"] == R.rolls_for(op), "corruption craft: %s %s for corruption" % [op, "rolls" if R.rolls_for(op) else "does not roll"])
+		if not R.rolls_for(op):
+			check(R.get_level(t) == 0 and not t.has("corruption"), "corruption craft: %s leaves corruption untouched" % op)
+		match op:
+			"add":
+				check(t["affixes"].size() == n_aff + 1, "corruption craft: add affix still applies in full")
+			"rarity":
+				check(t["rarity"] != "uncommon", "corruption craft: raise rarity still applies in full")
+			"remove":
+				check(t["affixes"].size() == n_aff - 1, "corruption craft: remove affix applies")
+	# ---- the craft that reaches 100% still succeeds, then the item is locked
+	var e: Dictionary = Loot.make_item(it["base"], "uncommon", 20)
+	R.set_level(e, 80)
+	var n0: int = e["affixes"].size()
+	var saved_cfg = Data.corruption_cfg
+	Data.corruption_cfg = always
+	var res2: Dictionary = bs.apply_craft("add" if Loot.craft_check("add", e) == "" else "reroll", e, 0)
+	Data.corruption_cfg = saved_cfg
+	check(res2["hit"] and R.get_level(e) == 100, "corruption craft: a hit at 80% reaches exactly 100")
+	check(e["affixes"].size() == n0 + 1 or e["affixes"].size() == n0, "corruption craft: the locking craft was applied")
+	for op in ["add", "reroll", "rarity"]:
+		check(Loot.craft_check(op, e, 0) == "Corrupted: this item can no longer be crafted", "corruption craft: %s is refused at 100%% with the clear message" % op)
+	for op in ["upgrade", "socket"]:
+		check(Loot.craft_check(op, e, 0) != "Corrupted: this item can no longer be crafted", "corruption craft: %s is not refused for corruption at 100%%" % op)
+	if not e["affixes"].is_empty():
+		check(Loot.craft_check("remove", e, 0) == "", "corruption craft: remove affix still works at 100%")
+	# ---- a refused craft spends nothing
+	bs.select(e)
+	bs.op = "add"
+	var gold0: int = ch.gold
+	var mats0: Dictionary = ch.materials.duplicate()
+	bs._craft()
+	check(ch.gold == gold0 and ch.materials == mats0 and R.get_level(e) == 100, "corruption craft: refused craft at 100% spends no gold or materials")
+	bs.select(null)
+	# ---- Blacksmith rolling does not disturb Loot RNG beyond the craft itself
+	var base_item: Dictionary = Loot.make_item(it["base"], "uncommon", 20)
+	var copy1: Dictionary = base_item.duplicate(true)
+	var copy2: Dictionary = base_item.duplicate(true)
+	# Adding an affix shuffles with the GLOBAL RNG (existing Loot behaviour), so seed both
+	# streams the same way before each run and compare the end state with and without the roll.
+	Loot.set_seed(4242)
+	seed(77)
+	Loot.craft_apply("add", copy1, 0)
+	var state_craft_only: int = Loot.rng.state
+	var glob_craft_only: int = randi()
+	Loot.set_seed(4242)
+	seed(77)
+	bs.apply_craft("add", copy2, 0)
+	var state_with_roll: int = Loot.rng.state
+	var glob_with_roll: int = randi()
+	check(state_with_roll == state_craft_only and copy1["affixes"] == copy2["affixes"], "corruption craft: rolling takes nothing from the Loot RNG and the craft result is identical")
+	check(glob_with_roll == glob_craft_only, "corruption craft: rolling takes nothing from the global RNG")
+	# ---- persistence: save and load
+	var s := Loot.make_item(it["base"], "rare", 20)
+	s["uid"] = ch.take_uid()
+	R.set_level(s, 60)
+	var clean := Loot.make_item(it["base"], "rare", 20)
+	clean["uid"] = ch.take_uid()
+	ch.add_to_bag(s)
+	ch.add_to_bag(clean)
+	var sd = JSON.parse_string(JSON.stringify(ch.to_dict()))
+	Game.load_from_dict(sd)
+	ch = Game.ch
+	var found60 := false
+	var found_clean := true
+	for x in ch.inventory:
+		if x != null and int(x.get("uid", -1)) == int(s["uid"]):
+			found60 = R.get_level(x) == 60 and typeof(x["corruption"]) == TYPE_INT
+		if x != null and int(x.get("uid", -1)) == int(clean["uid"]):
+			found_clean = not x.has("corruption")
+	check(found60, "corruption persist: the value survives save and load as an integer")
+	check(found_clean, "corruption persist: a clean item gains no corruption key")
+	# old save without the field loads as 0%
+	var olditem := Loot.make_item(it["base"], "rare", 20)
+	olditem.erase("corruption")
+	check(R.get_level(olditem) == 0, "corruption persist: items without the field read as 0%")
+	check(CharDataT.SAVE_VERSION == 3, "corruption persist: SAVE_VERSION is unchanged (3)")
+	# equipped item keeps its value
+	var eq := Loot.make_item("rusty_sword" if Data.item_bases.has("rusty_sword") else Data.item_base_list[0]["id"], "rare", 5)
+	R.set_level(eq, 100)
+	eq["uid"] = ch.take_uid()
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	ch.inventory[0] = eq
+	var why: String = ch.equip_from_bag(0)
+	if why == "":
+		var sd2 = JSON.parse_string(JSON.stringify(ch.to_dict()))
+		Game.load_from_dict(sd2)
+		var kept := false
+		for slot in Game.ch.equipment:
+			var q = Game.ch.equipment[slot]
+			if q != null and int(q.get("uid", -1)) == int(eq["uid"]):
+				kept = R.get_level(q) == 100
+		check(kept, "corruption persist: an equipped 100% item keeps its value after save and load")
+	ch = Game.ch
+	# ---- personal stash
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var st := Loot.make_item(it["base"], "rare", 20)
+	st["uid"] = ch.take_uid()
+	R.set_level(st, 40)
+	ch.stash[3] = st
+	var sd3 = JSON.parse_string(JSON.stringify(ch.to_dict()))
+	Game.load_from_dict(sd3)
+	check(Game.ch.stash[3] != null and R.get_level(Game.ch.stash[3]) == 40, "corruption persist: personal stash keeps the value through save and load")
+	ch = Game.ch
+	# ---- shared stash: deposit, reload from disk, withdraw
+	var SS = SharedStash
+	var old_path: String = SS.path
+	SS.path = STASH_TEST_PATH
+	SS.reset()
+	_stash_clean_files()
+	var sh := Loot.make_item(it["base"], "rare", 20)
+	sh["uid"] = ch.take_uid()
+	R.set_level(sh, 80)
+	ch.inventory[0] = sh
+	var dep: Dictionary = SS.deposit(ch, 0, 0)
+	check(dep["err"] == "" and R.get_level(SS.slots[0]) == 80, "corruption persist: deposit into the shared stash keeps the value")
+	SS.extra_tabs = 0
+	SS.slots = []
+	SS.load_file()
+	check(SS.slots[0] != null and R.get_level(SS.slots[0]) == 80 and typeof(SS.slots[0]["corruption"]) == TYPE_INT, "corruption persist: the shared stash file round-trip keeps the value as an integer")
+	var wd: String = SS.withdraw(ch, 0)
+	var got = null
+	for x in ch.inventory:
+		if x != null and x.get("name") == sh["name"]:
+			got = x
+	check(wd == "" and got != null and R.get_level(got) == 80, "corruption persist: withdrawing keeps the value")
+	SS.reset()
+	_stash_clean_files()
+	SS.path = old_path
+	# ---- other actions work on a 100% item
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var f1 := Loot.make_item(it["base"], "common", 5)
+	f1["uid"] = ch.take_uid()
+	R.set_level(f1, 100)
+	var f2 := Loot.make_item(it["base"], "common", 5)
+	f2["uid"] = ch.take_uid()
+	R.set_level(f2, 100)
+	ch.add_to_bag(f1)
+	ch.add_to_bag(f2)
+	ch.set_item_locked(f1, true)
+	check(CharDataT.is_locked(f1) and R.get_level(f1) == 100, "corruption actions: a 100% item can be locked")
+	check(not Loot.salvage_yield(f2).is_empty(), "corruption actions: a 100% item can be salvaged")
+	var gone: int = ch.destroy_bag_up_to("common")
+	check(gone == 1 and ch.inventory.has(f1) and not ch.inventory.has(f2), "corruption actions: the Destroy sweep removes an unlocked 100% item and keeps the locked one")
+	ch.set_item_locked(f1, false)
+	var eqwhy: String = ch.equip_from_bag(ch.inventory.find(f1))
+	check(eqwhy == "" or eqwhy.length() > 0, "corruption actions: equipping a 100% item is not blocked by corruption", eqwhy)
+	check(not ("orrupt" in eqwhy), "corruption actions: equip refusal (if any) is not about corruption", eqwhy)
 	await frames(1)

@@ -13,8 +13,13 @@ var preview: RichTextLabel
 var confirm_btn: Button
 var mats: RichTextLabel
 var scroll: ScrollContainer
+const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
+## Own random stream for corruption rolls. Never the global, Combat or Loot RNG,
+## so crafting corruption cannot change drops or combat. Tests may replace it.
+var corr_rng := RandomNumberGenerator.new()
 
 func _init() -> void:
+	corr_rng.randomize()
 	place = "left"
 	build("Blacksmith Oren", Vector2(440, 0))
 	# Everything except the Craft button and the materials line lives in one
@@ -143,9 +148,18 @@ func _craft() -> void:
 		if not ch.pay(cost):
 			ui.toast("Not enough materials", UIKit.BAD)
 			return
-		Loot.craft_apply(o, it, ai)
+		var cr := apply_craft(o, it, ai)
 		affix_index = -1
 		ch.recalc()
 		Events.inventory_changed.emit()
-		ui.toast("%s complete" % Loot.craft_name(o), Color("#ffd080"))
+		var extra := CorruptionRules.result_text(cr)
+		ui.toast("%s complete%s" % [Loot.craft_name(o), ("  -  " + extra) if extra != "" else ""], Color("#ffd080") if not cr.get("hit", false) else UIKit.BAD)
 		refresh())
+
+## Applies a craft in full, THEN rolls for corruption (add / reroll / raise rarity).
+## The craft is never weakened or wasted by corruption, including the one that
+## takes the item to 100%. Payment and confirmation happen before this is called.
+## Returns the roll result {rolled, hit, before, after}.
+func apply_craft(o: String, it: Dictionary, ai: int) -> Dictionary:
+	Loot.craft_apply(o, it, ai)
+	return CorruptionRules.roll(it, o, corr_rng)
