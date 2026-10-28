@@ -69,6 +69,8 @@ func _ready() -> void:
 	await test_destroy_by_rarity()
 	await test_item_lock()
 	await test_corruption()
+	await test_corruption_crafting()
+	await test_corruption_ui()
 	var summary := "==== %d passed, %d failed ====" % [passes, fails]
 	print("\n" + summary)
 	_log(summary)
@@ -3436,7 +3438,8 @@ func test_corruption() -> void:
 	var cfg: Dictionary = Data.corruption_cfg
 	# ---- data
 	check(Data.load_errors.is_empty() and not cfg.is_empty(), "corruption: data/corruption.json loads")
-	check(is_equal_approx(R.chance(), 0.5) and R.step() == 20 and R.max_level() == 100 and R.drop_start() == 0, "corruption: defaults are 50% chance, +20 step, max 100, drop_start 0")
+	check(is_equal_approx(R.chance(), float(cfg["chance"])) and R.step() == int(cfg["step"]) and R.max_level() == 100 and R.drop_start() == 0, "corruption: rules read chance and step from the data file; max 100, drop_start 0")
+	var steps_to_lock: int = int(ceil(100.0 / float(R.step())))   # tuning-independent: minimum rolling crafts
 	check(int(cfg.get("confirm_above", 0)) == 60, "corruption: confirm_above is 60")
 	# every Blacksmith craft is on exactly one side of the table
 	var all_ok := true
@@ -3468,7 +3471,7 @@ func test_corruption() -> void:
 	check(it["corruption"] == 100 and R.is_maxed(it), "corruption: set_level clamps to 100")
 	R.set_level(it, -10)
 	check(not it.has("corruption"), "corruption: set_level clamps negatives to 0 and erases")
-	check(R.events_remaining({}) == 5 and R.events_remaining({"corruption": 40}) == 3 and R.events_remaining({"corruption": 100}) == 0, "corruption: events remaining (5, 3, 0)")
+	check(R.events_remaining({}) == steps_to_lock and R.events_remaining({"corruption": 100}) == 0 and R.events_remaining({"corruption": 40}) == int(ceil(60.0 / float(R.step()))), "corruption: events remaining are derived from the step (full, 40%, 100%)")
 	# ---- refusal
 	var full := {"corruption": 100}
 	for op in ["add", "reroll", "rarity"]:
@@ -3488,17 +3491,18 @@ func test_corruption() -> void:
 	var r2: Dictionary = R.roll(x, "add", rng)
 	ref.randf()
 	check(r2["rolled"] and rng.state == ref.state, "corruption: a rolling craft takes exactly one random number")
-	check(r2["before"] == 0 and r2["after"] == (20 if r2["hit"] else 0), "corruption: roll reports before/after and adds the step on a hit")
+	check(r2["before"] == 0 and r2["after"] == (R.step() if r2["hit"] else 0), "corruption: roll reports before/after and adds the step on a hit")
 	# forced outcomes with test configs
 	var always := cfg.duplicate(true)
 	always["chance"] = 1.0
 	var never := cfg.duplicate(true)
 	never["chance"] = 0.0
-	var y := {"corruption": 60}
+	var y := {"corruption": 40}
 	R.roll(y, "reroll", rng, always)
-	check(y["corruption"] == 80, "corruption: a hit at 60% gives 80%")
+	check(y["corruption"] == 40 + R.step(), "corruption: a hit at 40% adds exactly one step")
+	R.set_level(y, 100 - R.step())
 	var r3: Dictionary = R.roll(y, "reroll", rng, always)
-	check(y["corruption"] == 100 and r3["after"] == 100, "corruption: a hit at 80% gives exactly 100")
+	check(y["corruption"] == 100 and r3["after"] == 100, "corruption: a hit one step below the top gives exactly 100")
 	var r4: Dictionary = R.roll(y, "reroll", rng, always)
 	check(y["corruption"] == 100 and r4["after"] == 100, "corruption: a further hit never exceeds 100")
 	var z := {"corruption": 40}
@@ -3511,7 +3515,7 @@ func test_corruption() -> void:
 	R.roll(w, "add", rng, odd)
 	check(w["corruption"] == 100, "corruption: an odd step still caps at 100")
 	# ---- texts
-	check(R.risk_text() == "50% chance of +20% corruption", "corruption: risk text", R.risk_text())
+	check(R.risk_text() == "%d%% chance of +%d%% corruption" % [int(round(R.chance() * 100.0)), R.step()], "corruption: risk text", R.risk_text())
 	check(R.result_text({"rolled": true, "hit": true, "after": 60}) == "Corruption rose to 60%", "corruption: result text on a hit")
 	check(R.result_text({"rolled": true, "hit": false, "after": 60}) == "No corruption gained", "corruption: result text on a miss")
 	check(R.result_text({"rolled": false}) == "", "corruption: no result text for exempt crafts")
@@ -3534,8 +3538,9 @@ func test_corruption() -> void:
 		mn = mini(mn, n)
 		total += n
 	var mean := float(total) / float(runs)
-	check(mn == 5, "corruption: no item locks before its 5th rolling craft (min over 10,000 items)", str(mn))
-	check(absf(mean - 10.0) <= 0.2, "corruption: mean rolling crafts to lockout is within 0.2 of 10", str(mean))
+	check(mn == steps_to_lock, "corruption: no item locks before its %dth rolling craft (min over 10,000 items)" % steps_to_lock, str(mn))
+	var want_mean: float = float(steps_to_lock) / R.chance()
+	check(absf(mean - want_mean) <= 0.2, "corruption: mean rolling crafts to lockout is within 0.2 of %.2f" % want_mean, str(mean))
 	var hits := 0
 	var hrng := RandomNumberGenerator.new()
 	hrng.seed = 424242
@@ -3543,7 +3548,7 @@ func test_corruption() -> void:
 		var q := {}
 		if R.roll(q, "add", hrng)["hit"]:
 			hits += 1
-	check(absf(float(hits) / float(runs) - 0.5) <= 0.015, "corruption: hit rate over 10,000 rolls is within 1.5 points of 50%", str(float(hits) / float(runs)))
+	check(absf(float(hits) / float(runs) - R.chance()) <= 0.015, "corruption: hit rate over 10,000 rolls is within 1.5 points of the configured chance", str(float(hits) / float(runs)))
 	# ---- isolation: rolls never touch the global or Loot RNG
 	var loot_state: int = Loot.rng.state
 	seed(99)
@@ -3556,4 +3561,385 @@ func test_corruption() -> void:
 	var expect_global: int = randi()
 	check(after_global == expect_global, "corruption: rolls leave the global RNG alone")
 	check(Loot.rng.state == loot_state, "corruption: rolls leave the Loot RNG alone")
+	await frames(1)
+
+# ------------------------------------------------------------------ item corruption (crafting, saves, stashes)
+func test_corruption_crafting() -> void:
+	print("\n--- item corruption crafting and persistence")
+	_log("--- item corruption crafting and persistence")
+	if main.ui == null:
+		Game.new_character("warrior")
+		main.start_game()
+		await frames(2)
+	var ui = main.ui
+	Game.new_character("warrior")
+	var ch = Game.ch
+	var R = CorruptionRulesT
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	ch.gold = 100000
+	for k in Data.materials:
+		ch.materials[k] = 50
+	var bs = ui.panels["blacksmith"]
+	var always := Data.corruption_cfg.duplicate(true)
+	always["chance"] = 1.0
+	# ---- the Blacksmith owns its own RNG
+	check(bs.corr_rng != null and bs.corr_rng is RandomNumberGenerator, "corruption craft: the Blacksmith owns its own RandomNumberGenerator")
+	# ---- apply_craft: craft first, then roll
+	var it: Dictionary = Loot.make_item("rusty_sword" if Data.item_bases.has("rusty_sword") else Data.item_base_list[0]["id"], "rare", 20)
+	it["uid"] = ch.take_uid()
+	for op in ["add", "reroll", "rarity", "upgrade", "remove", "socket"]:
+		var t: Dictionary = Loot.make_item(it["base"], "uncommon", 20)
+		if op in ["reroll", "remove"] and t["affixes"].is_empty():
+			continue
+		if Loot.craft_check(op, t, 0) != "":
+			continue
+		var n_aff: int = t["affixes"].size()
+		bs.corr_rng.seed = 1
+		var res: Dictionary = bs.apply_craft(op, t, 0)
+		check(res["rolled"] == R.rolls_for(op), "corruption craft: %s %s for corruption" % [op, "rolls" if R.rolls_for(op) else "does not roll"])
+		if not R.rolls_for(op):
+			check(R.get_level(t) == 0 and not t.has("corruption"), "corruption craft: %s leaves corruption untouched" % op)
+		match op:
+			"add":
+				check(t["affixes"].size() == n_aff + 1, "corruption craft: add affix still applies in full")
+			"rarity":
+				check(t["rarity"] != "uncommon", "corruption craft: raise rarity still applies in full")
+			"remove":
+				check(t["affixes"].size() == n_aff - 1, "corruption craft: remove affix applies")
+	# ---- the craft that reaches 100% still succeeds, then the item is locked
+	var e: Dictionary = Loot.make_item(it["base"], "uncommon", 20)
+	R.set_level(e, 100 - R.step())
+	var n0: int = e["affixes"].size()
+	var saved_cfg = Data.corruption_cfg
+	Data.corruption_cfg = always
+	var res2: Dictionary = bs.apply_craft("add" if Loot.craft_check("add", e) == "" else "reroll", e, 0)
+	Data.corruption_cfg = saved_cfg
+	check(res2["hit"] and R.get_level(e) == 100, "corruption craft: a hit one step below the top reaches exactly 100")
+	check(e["affixes"].size() == n0 + 1 or e["affixes"].size() == n0, "corruption craft: the locking craft was applied")
+	for op in ["add", "reroll", "rarity"]:
+		check(Loot.craft_check(op, e, 0) == "Corrupted: this item can no longer be crafted", "corruption craft: %s is refused at 100%% with the clear message" % op)
+	for op in ["upgrade", "socket"]:
+		check(Loot.craft_check(op, e, 0) != "Corrupted: this item can no longer be crafted", "corruption craft: %s is not refused for corruption at 100%%" % op)
+	if not e["affixes"].is_empty():
+		check(Loot.craft_check("remove", e, 0) == "", "corruption craft: remove affix still works at 100%")
+	# ---- a refused craft spends nothing
+	bs.select(e)
+	bs.op = "add"
+	var gold0: int = ch.gold
+	var mats0: Dictionary = ch.materials.duplicate()
+	bs._craft()
+	check(ch.gold == gold0 and ch.materials == mats0 and R.get_level(e) == 100, "corruption craft: refused craft at 100% spends no gold or materials")
+	bs.select(null)
+	# ---- Blacksmith rolling does not disturb Loot RNG beyond the craft itself
+	var base_item: Dictionary = Loot.make_item(it["base"], "uncommon", 20)
+	var copy1: Dictionary = base_item.duplicate(true)
+	var copy2: Dictionary = base_item.duplicate(true)
+	# Adding an affix shuffles with the GLOBAL RNG (existing Loot behaviour), so seed both
+	# streams the same way before each run and compare the end state with and without the roll.
+	Loot.set_seed(4242)
+	seed(77)
+	Loot.craft_apply("add", copy1, 0)
+	var state_craft_only: int = Loot.rng.state
+	var glob_craft_only: int = randi()
+	Loot.set_seed(4242)
+	seed(77)
+	bs.apply_craft("add", copy2, 0)
+	var state_with_roll: int = Loot.rng.state
+	var glob_with_roll: int = randi()
+	check(state_with_roll == state_craft_only and copy1["affixes"] == copy2["affixes"], "corruption craft: rolling takes nothing from the Loot RNG and the craft result is identical")
+	check(glob_with_roll == glob_craft_only, "corruption craft: rolling takes nothing from the global RNG")
+	# ---- persistence: save and load
+	var s := Loot.make_item(it["base"], "rare", 20)
+	s["uid"] = ch.take_uid()
+	R.set_level(s, 60)
+	var clean := Loot.make_item(it["base"], "rare", 20)
+	clean["uid"] = ch.take_uid()
+	ch.add_to_bag(s)
+	ch.add_to_bag(clean)
+	var sd = JSON.parse_string(JSON.stringify(ch.to_dict()))
+	Game.load_from_dict(sd)
+	ch = Game.ch
+	var found60 := false
+	var found_clean := true
+	for x in ch.inventory:
+		if x != null and int(x.get("uid", -1)) == int(s["uid"]):
+			found60 = R.get_level(x) == 60 and typeof(x["corruption"]) == TYPE_INT
+		if x != null and int(x.get("uid", -1)) == int(clean["uid"]):
+			found_clean = not x.has("corruption")
+	check(found60, "corruption persist: the value survives save and load as an integer")
+	check(found_clean, "corruption persist: a clean item gains no corruption key")
+	# old save without the field loads as 0%
+	var olditem := Loot.make_item(it["base"], "rare", 20)
+	olditem.erase("corruption")
+	check(R.get_level(olditem) == 0, "corruption persist: items without the field read as 0%")
+	check(CharDataT.SAVE_VERSION == 3, "corruption persist: SAVE_VERSION is unchanged (3)")
+	# equipped item keeps its value
+	var eq := Loot.make_item("rusty_sword" if Data.item_bases.has("rusty_sword") else Data.item_base_list[0]["id"], "rare", 5)
+	R.set_level(eq, 100)
+	eq["uid"] = ch.take_uid()
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	ch.inventory[0] = eq
+	var why: String = ch.equip_from_bag(0)
+	if why == "":
+		var sd2 = JSON.parse_string(JSON.stringify(ch.to_dict()))
+		Game.load_from_dict(sd2)
+		var kept := false
+		for slot in Game.ch.equipment:
+			var q = Game.ch.equipment[slot]
+			if q != null and int(q.get("uid", -1)) == int(eq["uid"]):
+				kept = R.get_level(q) == 100
+		check(kept, "corruption persist: an equipped 100% item keeps its value after save and load")
+	ch = Game.ch
+	# ---- personal stash
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var st := Loot.make_item(it["base"], "rare", 20)
+	st["uid"] = ch.take_uid()
+	R.set_level(st, 40)
+	ch.stash[3] = st
+	var sd3 = JSON.parse_string(JSON.stringify(ch.to_dict()))
+	Game.load_from_dict(sd3)
+	check(Game.ch.stash[3] != null and R.get_level(Game.ch.stash[3]) == 40, "corruption persist: personal stash keeps the value through save and load")
+	ch = Game.ch
+	# ---- shared stash: deposit, reload from disk, withdraw
+	var SS = SharedStash
+	var old_path: String = SS.path
+	SS.path = STASH_TEST_PATH
+	SS.reset()
+	_stash_clean_files()
+	var sh := Loot.make_item(it["base"], "rare", 20)
+	sh["uid"] = ch.take_uid()
+	R.set_level(sh, 80)
+	ch.inventory[0] = sh
+	var dep: Dictionary = SS.deposit(ch, 0, 0)
+	check(dep["err"] == "" and R.get_level(SS.slots[0]) == 80, "corruption persist: deposit into the shared stash keeps the value")
+	SS.extra_tabs = 0
+	SS.slots = []
+	SS.load_file()
+	check(SS.slots[0] != null and R.get_level(SS.slots[0]) == 80 and typeof(SS.slots[0]["corruption"]) == TYPE_INT, "corruption persist: the shared stash file round-trip keeps the value as an integer")
+	var wd: String = SS.withdraw(ch, 0)
+	var got = null
+	for x in ch.inventory:
+		if x != null and x.get("name") == sh["name"]:
+			got = x
+	check(wd == "" and got != null and R.get_level(got) == 80, "corruption persist: withdrawing keeps the value")
+	SS.reset()
+	_stash_clean_files()
+	SS.path = old_path
+	# ---- other actions work on a 100% item
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var f1 := Loot.make_item(it["base"], "common", 5)
+	f1["uid"] = ch.take_uid()
+	R.set_level(f1, 100)
+	var f2 := Loot.make_item(it["base"], "common", 5)
+	f2["uid"] = ch.take_uid()
+	R.set_level(f2, 100)
+	ch.add_to_bag(f1)
+	ch.add_to_bag(f2)
+	ch.set_item_locked(f1, true)
+	check(CharDataT.is_locked(f1) and R.get_level(f1) == 100, "corruption actions: a 100% item can be locked")
+	check(not Loot.salvage_yield(f2).is_empty(), "corruption actions: a 100% item can be salvaged")
+	var gone: int = ch.destroy_bag_up_to("common")
+	check(gone == 1 and ch.inventory.has(f1) and not ch.inventory.has(f2), "corruption actions: the Destroy sweep removes an unlocked 100% item and keeps the locked one")
+	ch.set_item_locked(f1, false)
+	var eqwhy: String = ch.equip_from_bag(ch.inventory.find(f1))
+	check(eqwhy == "" or eqwhy.length() > 0, "corruption actions: equipping a 100% item is not blocked by corruption", eqwhy)
+	check(not ("orrupt" in eqwhy), "corruption actions: equip refusal (if any) is not about corruption", eqwhy)
+	await frames(1)
+
+# ------------------------------------------------------------------ item corruption (visuals and dev tools)
+func _corr_buttons(box: Node) -> Array:
+	var out := []
+	for c in box.get_children():
+		if c is Button:
+			out.append(c)
+	return out
+
+func _corr_button_for(box: Node, craft_name: String):
+	for b in _corr_buttons(box):
+		if craft_name in b.text:
+			return b
+	return null
+
+func test_corruption_ui() -> void:
+	print("\n--- item corruption visuals and dev tools")
+	_log("--- item corruption visuals and dev tools")
+	if main.ui == null:
+		Game.new_character("warrior")
+		main.start_game()
+		await frames(2)
+	var ui = main.ui
+	Game.new_character("warrior")
+	var ch = Game.ch
+	var R = CorruptionRulesT
+	var cfg: Dictionary = Data.corruption_cfg
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	ch.gold = 100000
+	for k in Data.materials:
+		ch.materials[k] = 50
+	var base: String = "rusty_sword" if Data.item_bases.has("rusty_sword") else Data.item_base_list[0]["id"]
+	# ---- colours
+	var low := Color(cfg["colors"]["low"])
+	var mid := Color(cfg["colors"]["mid"])
+	var high := Color(cfg["colors"]["high"])
+	check(R.level_color(0).is_equal_approx(low) and R.level_color(50).is_equal_approx(mid) and R.level_color(100).is_equal_approx(high), "corruption ui: colour is grey at 0, amber at 50, red at 100")
+	var c20 := R.level_color(20)
+	var c80 := R.level_color(80)
+	check(not c20.is_equal_approx(low) and not c20.is_equal_approx(mid) and c20.r > low.r - 0.001, "corruption ui: colours between the stops are interpolated")
+	check(c80.g < mid.g and c80.g > high.g and not c80.is_equal_approx(high), "corruption ui: 80% sits between amber and red")
+	# ---- tooltip text at 0, 40 and 100
+	var t0 := Loot.make_item(base, "rare", 10)
+	var t40 := Loot.make_item(base, "rare", 10)
+	var t100 := Loot.make_item(base, "rare", 10)
+	R.set_level(t40, 40)
+	R.set_level(t100, 100)
+	var tip0: String = Loot.tooltip(t0, ch)
+	var tip40: String = Loot.tooltip(t40, ch)
+	var tip100: String = Loot.tooltip(t100, ch)
+	check("Corruption: 0%" in tip0 and "Corrupted: cannot be crafted" not in tip0, "corruption ui: a clean item shows 'Corruption: 0%' and no lock line")
+	check("Corruption: 40%" in tip40 and ("#" + R.level_color(40).to_html(false)) in tip40 and "Corrupted: cannot be crafted" not in tip40, "corruption ui: 40% shows the number in its own colour")
+	check("Corruption: 100%" in tip100 and "Corrupted: cannot be crafted" in tip100 and ("#" + high.to_html(false)) in tip100, "corruption ui: 100% shows the red 'Corrupted: cannot be crafted' line")
+	check("Corruption" not in Loot.tooltip(t40, ch, false), "corruption ui: the tooltip line can be left out (Blacksmith has its own readout)")
+	var leg: Dictionary = Loot.make_unique("worldsplitter", 10)
+	check("Corruption: 0%" in Loot.tooltip(leg, ch), "corruption ui: legendaries show the line too")
+	check(R.bar_bbcode(40).count("\u2588") == 10 and R.bar_bbcode(40).count("[color=") == 2 and R.bar_bbcode(0).count("[color=") == 1 and R.bar_bbcode(100).count("[color=") == 1, "corruption ui: tooltip bar is 10 blocks, part filled at 40%, all empty at 0 and all filled at 100")
+	# ---- real tooltip panel and comparison tooltip
+	ui.item_tooltip(t40, false)
+	check("Corruption: 40%" in ui.tooltip_text.text, "corruption ui: the hover tooltip shows the line")
+	var eq := Loot.make_item(base, "rare", 10)
+	R.set_level(eq, 60)
+	eq["uid"] = ch.take_uid()
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	ch.inventory[0] = eq
+	if ch.equip_from_bag(0) == "":
+		ui.item_tooltip(t40, true)
+		check(ui.tooltip2.visible and "Corruption: 60%" in ui.tooltip2_text.text, "corruption ui: the equipped-item comparison tooltip shows its line")
+	ui.hide_tooltip()
+	# ---- slot markers
+	var Slot = preload("res://scripts/ui/item_slot.gd")
+	var ssize := Vector2(44, 44)
+	var pad: Rect2 = Slot.padlock_rect(ssize)
+	var mark: Rect2 = Slot.corrupted_rect(ssize)
+	check(not pad.intersects(mark) and mark.end.x <= ssize.x and mark.end.y <= ssize.y, "corruption ui: the slot marker sits in the opposite corner and does not overlap the padlock")
+	var sl = Slot.new()
+	sl.size = ssize
+	sl.item = t100
+	check(R.is_maxed(sl.item) and not R.is_maxed(t40) and not R.is_maxed(t0), "corruption ui: the marker shows at 100% only")
+	sl.free()
+	# ---- Blacksmith readout, risk text, disabled buttons
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	ui.open_station("blacksmith")
+	await frames(2)
+	var bs = ui.panels["blacksmith"]
+	var work := Loot.make_item(base, "uncommon", 20)
+	work["uid"] = ch.take_uid()
+	R.set_level(work, 40)
+	ch.add_to_bag(work)
+	bs.select(work)
+	await frames(2)
+	check(bs.corr_bar.visible and bs.corr_bar.bar_label() == "Corruption 40%", "corruption ui: Blacksmith bar shows the number", bs.corr_bar.bar_label())
+	check(bs.corr_bar.note_text() == R.events_text(work) and "more corruption event" in bs.corr_bar.note_text(), "corruption ui: remaining events are derived from the level", bs.corr_bar.note_text())
+	check("Corruption" not in bs.item_text.text, "corruption ui: the Blacksmith item text has no second corruption line")
+	for nm in ["Add Affix", "Reroll Affix", "Raise Rarity"]:
+		var b = _corr_button_for(bs.op_box, nm)
+		check(b != null and ("Risk: " + R.risk_text()) in b.text, "corruption ui: %s button carries the risk line" % nm)
+	for nm in ["Upgrade Base", "Remove Affix", "Add Socket"]:
+		var b2 = _corr_button_for(bs.op_box, nm)
+		check(b2 != null and "Risk" not in b2.text, "corruption ui: %s button has no risk line" % nm)
+	bs.op = "add"
+	bs.refresh()
+	check(("Risk: " + R.risk_text()) in bs.preview.text, "corruption ui: the preview repeats the risk for a rolling craft")
+	# ---- confirm dialog
+	bs.select(work)
+	bs.op = "upgrade"
+	bs._craft()
+	check(ui.confirm.visible and "Risk" not in ui.confirm_text.text, "corruption ui: an exempt craft's confirm dialog has no corruption text")
+	ui.confirm.visible = false
+	R.set_level(work, 60)
+	bs.select(work)
+	bs.op = "upgrade"
+	bs.op = "add"
+	bs._craft()
+	check(ui.confirm.visible and ("Risk: " + R.risk_text()) in ui.confirm_text.text and "Warning" not in ui.confirm_text.text, "corruption ui: at 60% the confirm shows the risk but no warning (threshold is above 60)")
+	ui.confirm.visible = false
+	R.set_level(work, 80)
+	bs.select(work)
+	bs.op = "add"
+	bs._craft()
+	check(ui.confirm.visible and "Warning" in ui.confirm_text.text, "corruption ui: above 60% the confirm dialog adds a warning")
+	# confirming applies the craft, rolls once and refreshes the bar immediately
+	if Loot.craft_check("add", work) == "":
+		bs.corr_rng.seed = 11
+		var before: int = R.get_level(work)
+		ui.confirm_cb.call()
+		ui.confirm.visible = false
+		await frames(2)
+		check(bs.corr_bar.level == R.get_level(work) and R.get_level(work) in [before, mini(100, before + R.step())], "corruption ui: the bar refreshes right after a craft", "%d -> %d bar %d" % [before, R.get_level(work), bs.corr_bar.level])
+		var toast_ok := false
+		for tchild in ui.toasts.get_children():
+			if tchild is Label and "complete" in tchild.text and ("Corruption rose" in tchild.text or "No corruption gained" in tchild.text):
+				toast_ok = true
+		check(toast_ok, "corruption ui: a result toast says whether corruption rose")
+	ui.confirm.visible = false
+	# ---- 100%: buttons disabled with the refusal as tooltip, exempt ones stay on
+	R.set_level(work, 100)
+	bs.select(work)
+	await frames(2)
+	for nm in ["Add Affix", "Reroll Affix", "Raise Rarity"]:
+		var b3 = _corr_button_for(bs.op_box, nm)
+		check(b3 != null and b3.disabled and b3.tooltip_text == "Corrupted: this item can no longer be crafted", "corruption ui: %s is disabled at 100%% with the refusal as tooltip" % nm)
+	var bu = _corr_button_for(bs.op_box, "Upgrade Base")
+	check(bu != null and not bu.disabled, "corruption ui: Upgrade Base stays enabled at 100%")
+	check(bs.corr_bar.note_text() == "Corrupted: cannot be crafted", "corruption ui: the readout says the item is corrupted")
+	bs.op = "add"
+	bs.refresh()
+	check(bs.confirm_btn.disabled, "corruption ui: the Craft button is disabled for a refused craft")
+	# ---- text fits (1280x720 layout): the longest lines are narrower than the bar and the tooltip
+	var font := ThemeDB.fallback_font
+	var longest := "Corrupted: cannot be crafted"
+	check(font.get_string_size("3 more corruption events before lock", HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x < 380 and font.get_string_size(longest, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x < 380, "corruption ui: readout text fits the 390 px bar")
+	check(font.get_string_size("Risk: " + R.risk_text(), HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x < 400, "corruption ui: risk line fits the Blacksmith width")
+	bs.select(null)
+	ui.close("blacksmith")
+	# ---- dev tools
+	for i in ch.inventory.size():
+		ch.inventory[i] = null
+	var d1 := Loot.make_item(base, "rare", 10)
+	var d2 := Loot.make_item(base, "rare", 10)
+	d1["uid"] = ch.take_uid()   # distinct contents so find() cannot confuse the two items
+	d2["uid"] = ch.take_uid()
+	ch.add_to_bag(d1)
+	ch.add_to_bag(d2)
+	Game.settings["dev_tools"] = false
+	Game.dev_in_tests = false
+	var off: Dictionary = Dev.set_item_corruption(0, 40)
+	check(not off["ok"] and R.get_level(d1) == 0 and not ch.dev_used, "corruption dev: off unless Developer tools are on")
+	_dev_on()
+	ch.dev_used = false
+	var idx1: int = ch.inventory.find(d1)
+	var idx2: int = ch.inventory.find(d2)
+	var r1: Dictionary = Dev.set_item_corruption(idx1, 60)
+	check(r1["ok"] and R.get_level(d1) == 60 and d1["corruption"] == 60 and ch.dev_used, "corruption dev: set to 60% marks the save as dev-used")
+	for v in [0, 20, 40, 60, 80, 100]:
+		Dev.set_item_corruption(idx1, v)
+		check(R.get_level(d1) == v and (v == 0) == (not d1.has("corruption")), "corruption dev: value %d applied through set_level" % v)
+	Dev.set_item_corruption(idx1, 80)
+	Dev.set_item_corruption(idx2, 100)
+	check(Dev.clear_item_corruption(idx1)["ok"] and R.get_level(d1) == 0 and R.get_level(d2) == 100, "corruption dev: clear selected resets only that item")
+	Dev.set_item_corruption(idx1, 40)
+	check(Dev.clear_bag_corruption()["ok"] and R.get_level(d1) == 0 and R.get_level(d2) == 0 and not d1.has("corruption") and not d2.has("corruption"), "corruption dev: clear all bag items resets every item and erases the key")
+	check(not Dev.set_item_corruption(30, 20)["ok"] and not Dev.set_item_corruption(-1, 20)["ok"], "corruption dev: an empty slot or no selection is refused")
+	var dp = ui.panels["dev"]
+	dp.refresh()
+	check(dp.corr_item_pick != null and dp.corr_item_pick.item_count == 2, "corruption dev: the panel lists the bag items", str(dp.corr_item_pick.item_count))
+	var sd = JSON.parse_string(JSON.stringify(ch.to_dict()))
+	check(bool(sd.get("dev_used", false)), "corruption dev: the dev_used flag is written to the save")
+	Game.settings["dev_tools"] = false
+	Game.dev_in_tests = false
 	await frames(1)

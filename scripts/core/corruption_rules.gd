@@ -84,3 +84,54 @@ static func apply_drop_start(it: Dictionary, cfg = null) -> void:
 	var s := drop_start(cfg)
 	if s > 0:
 		set_level(it, s, cfg)
+
+# ------------------------------------------------------------------ display helpers (pure text and colours)
+
+## Grey (low) -> amber (mid) -> red (high), interpolated smoothly from the data colours.
+static func level_color(level: int, cfg = null) -> Color:
+	var c: Dictionary = _c(cfg).get("colors", {})
+	var low := Color(str(c.get("low", "#9aa0a6")))
+	var mid := Color(str(c.get("mid", "#e0a030")))
+	var high := Color(str(c.get("high", "#d03030")))
+	var t := clampf(float(level) / float(max_level(cfg)), 0.0, 1.0)
+	return low.lerp(mid, t * 2.0) if t < 0.5 else mid.lerp(high, (t - 0.5) * 2.0)
+
+## Text bar for RichTextLabel tooltips (Godot 4.0 has no [bgcolor]): `segs` solid blocks,
+## the filled ones in the corruption colour, the rest dark.
+static func bar_bbcode(level: int, segs: int = 10, cfg = null) -> String:
+	var filled := clampi(int(round(float(level) / float(max_level(cfg)) * float(segs))), 0, segs)
+	var s := ""
+	if filled > 0:
+		s += "[color=#%s]%s[/color]" % [level_color(level, cfg).to_html(false), "\u2588".repeat(filled)]
+	if filled < segs:
+		s += "[color=#2e2a36]%s[/color]" % "\u2588".repeat(segs - filled)
+	return s
+
+## "3 more corruption events before lock" (derived, never stored).
+static func events_text(it, cfg = null) -> String:
+	var n := events_remaining(it, cfg)
+	if n <= 0:
+		return "Corrupted: cannot be crafted"
+	return "%d more corruption event%s before lock" % [n, "" if n == 1 else "s"]
+
+## Item tooltip block: the line with the number, the bar and, at max, the red lock line.
+static func tooltip_bbcode(it, cfg = null) -> String:
+	var lv := get_level(it, cfg)
+	var col := level_color(lv, cfg).to_html(false)
+	var out := "[color=#%s]Corruption: %d%%[/color]  %s" % [col, lv, bar_bbcode(lv, 10, cfg)]
+	if is_maxed(it, cfg):
+		out += "\n[color=#%s]Corrupted: cannot be crafted[/color]" % level_color(max_level(cfg), cfg).to_html(false)
+	return out
+
+## Extra lines for the Blacksmith confirm dialog ("" for crafts that do not roll).
+static func confirm_text(it, craft_id: String, cfg = null) -> String:
+	if not rolls_for(craft_id, cfg):
+		return ""
+	var lv := get_level(it, cfg)
+	var s := "[color=#e0a030]Risk: %s[/color]\nCorruption is %d%%: %s." % [risk_text(cfg), lv, events_text(it, cfg)]
+	if lv > int(_c(cfg).get("confirm_above", 60)):
+		s += "\n[color=#ff8080]Warning: this item is close to being locked. Another hit may end its crafting.[/color]"
+	return s
+
+static func needs_warning(it, craft_id: String, cfg = null) -> bool:
+	return rolls_for(craft_id, cfg) and get_level(it, cfg) > int(_c(cfg).get("confirm_above", 60))

@@ -1,6 +1,6 @@
 {
-	"chance": 0.5,
-	"step": 20,
+	"chance": 0.6,
+	"step": 25,
 	"max": 100,
 	"drop_start": 0,
 	"rolling_crafts": ["add", "reroll", "rarity"],

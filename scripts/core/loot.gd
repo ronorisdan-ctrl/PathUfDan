@@ -3,6 +3,7 @@ extends Node
 ## Everything is driven by data/item_bases.json, affixes.json, uniques.json and loot.json.
 
 const DevRules = preload("res://scripts/core/dev_rules.gd")
+const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
 
 var rng := RandomNumberGenerator.new()
 
@@ -453,7 +454,7 @@ func cost_text(cost: Dictionary) -> String:
 	return ", ".join(parts)
 
 # ------------------------------------------------------------------ tooltip
-func tooltip(it: Dictionary, ch = null) -> String:
+func tooltip(it: Dictionary, ch = null, show_corruption: bool = true) -> String:
 	var col := Data.rarity_color(it.get("rarity", "common")).to_html(false)
 	var lines := []
 	var up := int(it.get("upgrade", 0))
@@ -520,6 +521,8 @@ func tooltip(it: Dictionary, ch = null) -> String:
 		if u.get("flavor", "") != "":
 			lines.append("[i][color=#a07850]\"%s\"[/color][/i]" % u["flavor"])
 	lines.append("[color=#3a3440]────────────────────[/color]")
+	if show_corruption:
+		lines.append(CorruptionRules.tooltip_bbcode(it))
 	lines.append("[color=#8a8494]Sell: %d gold   Salvage: %s[/color]" % [sell_value(it), cost_text(salvage_yield(it))])
 	return "\n".join(lines)
 
@@ -626,6 +629,11 @@ func craft_cost(op: String, it: Dictionary) -> Dictionary:
 func craft_check(op: String, it: Dictionary, affix_index: int = -1) -> String:
 	if it.is_empty():
 		return "Select an item"
+	# Corruption first: a fully corrupted item refuses add / reroll / raise rarity
+	# before any cost is looked at (exempt crafts are never refused here).
+	var corrupt_why: String = CorruptionRules.craft_refusal(it, op)
+	if corrupt_why != "":
+		return corrupt_why
 	var legendary: bool = it.get("rarity") == "legendary"
 	match op:
 		"upgrade":

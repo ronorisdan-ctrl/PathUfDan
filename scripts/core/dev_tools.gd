@@ -14,6 +14,7 @@ extends Node
 const DevRules = preload("res://scripts/core/dev_rules.gd")
 const CharacterData = preload("res://scripts/core/character_data.gd")
 const PetRules = preload("res://scripts/core/pet_rules.gd")
+const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
 
 signal changed   # enabled state or a flag changed (panel, HUD)
 
@@ -545,6 +546,40 @@ func _give(it: Dictionary) -> Dictionary:
 		return _fail("Bag full")
 	lv.spawn_drop({"kind": "item", "item": it}, p.global_position + Vector2(0, 10))
 	return {"ok": true, "msg": "%s dropped at your feet (bag full)" % it["name"], "item": it}
+
+## Sets the corruption of the bag item in slot `bag_idx` through corruption_rules.set_level.
+## Counts as dev use (taints the save), like the other item tools.
+func set_item_corruption(bag_idx: int, value: int) -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	var ch = Game.ch
+	if bag_idx < 0 or bag_idx >= ch.inventory.size() or ch.inventory[bag_idx] == null:
+		return _fail("Pick a bag item first")
+	var it: Dictionary = ch.inventory[bag_idx]
+	CorruptionRules.set_level(it, value)
+	_taint()
+	Events.inventory_changed.emit()
+	return _ok("%s: corruption set to %d%%" % [it.get("name", "Item"), CorruptionRules.get_level(it)])
+
+## Clears one bag item back to 0%.
+func clear_item_corruption(bag_idx: int) -> Dictionary:
+	return set_item_corruption(bag_idx, 0)
+
+## Clears every bag item back to 0%.
+func clear_bag_corruption() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	var ch = Game.ch
+	var n := 0
+	for it in ch.inventory:
+		if it != null and CorruptionRules.get_level(it) > 0:
+			CorruptionRules.set_level(it, 0)
+			n += 1
+	_taint()
+	Events.inventory_changed.emit()
+	return _ok("Corruption cleared on %d bag item%s" % [n, "" if n == 1 else "s"])
 
 func unique_for_base(base_id: String) -> String:
 	for u in Data.unique_list:
