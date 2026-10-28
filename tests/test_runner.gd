@@ -3438,7 +3438,8 @@ func test_corruption() -> void:
 	var cfg: Dictionary = Data.corruption_cfg
 	# ---- data
 	check(Data.load_errors.is_empty() and not cfg.is_empty(), "corruption: data/corruption.json loads")
-	check(is_equal_approx(R.chance(), 0.5) and R.step() == 20 and R.max_level() == 100 and R.drop_start() == 0, "corruption: defaults are 50% chance, +20 step, max 100, drop_start 0")
+	check(is_equal_approx(R.chance(), float(cfg["chance"])) and R.step() == int(cfg["step"]) and R.max_level() == 100 and R.drop_start() == 0, "corruption: rules read chance and step from the data file; max 100, drop_start 0")
+	var steps_to_lock: int = int(ceil(100.0 / float(R.step())))   # tuning-independent: minimum rolling crafts
 	check(int(cfg.get("confirm_above", 0)) == 60, "corruption: confirm_above is 60")
 	# every Blacksmith craft is on exactly one side of the table
 	var all_ok := true
@@ -3470,7 +3471,7 @@ func test_corruption() -> void:
 	check(it["corruption"] == 100 and R.is_maxed(it), "corruption: set_level clamps to 100")
 	R.set_level(it, -10)
 	check(not it.has("corruption"), "corruption: set_level clamps negatives to 0 and erases")
-	check(R.events_remaining({}) == 5 and R.events_remaining({"corruption": 40}) == 3 and R.events_remaining({"corruption": 100}) == 0, "corruption: events remaining (5, 3, 0)")
+	check(R.events_remaining({}) == steps_to_lock and R.events_remaining({"corruption": 100}) == 0 and R.events_remaining({"corruption": 40}) == int(ceil(60.0 / float(R.step()))), "corruption: events remaining are derived from the step (full, 40%, 100%)")
 	# ---- refusal
 	var full := {"corruption": 100}
 	for op in ["add", "reroll", "rarity"]:
@@ -3490,17 +3491,18 @@ func test_corruption() -> void:
 	var r2: Dictionary = R.roll(x, "add", rng)
 	ref.randf()
 	check(r2["rolled"] and rng.state == ref.state, "corruption: a rolling craft takes exactly one random number")
-	check(r2["before"] == 0 and r2["after"] == (20 if r2["hit"] else 0), "corruption: roll reports before/after and adds the step on a hit")
+	check(r2["before"] == 0 and r2["after"] == (R.step() if r2["hit"] else 0), "corruption: roll reports before/after and adds the step on a hit")
 	# forced outcomes with test configs
 	var always := cfg.duplicate(true)
 	always["chance"] = 1.0
 	var never := cfg.duplicate(true)
 	never["chance"] = 0.0
-	var y := {"corruption": 60}
+	var y := {"corruption": 40}
 	R.roll(y, "reroll", rng, always)
-	check(y["corruption"] == 80, "corruption: a hit at 60% gives 80%")
+	check(y["corruption"] == 40 + R.step(), "corruption: a hit at 40% adds exactly one step")
+	R.set_level(y, 100 - R.step())
 	var r3: Dictionary = R.roll(y, "reroll", rng, always)
-	check(y["corruption"] == 100 and r3["after"] == 100, "corruption: a hit at 80% gives exactly 100")
+	check(y["corruption"] == 100 and r3["after"] == 100, "corruption: a hit one step below the top gives exactly 100")
 	var r4: Dictionary = R.roll(y, "reroll", rng, always)
 	check(y["corruption"] == 100 and r4["after"] == 100, "corruption: a further hit never exceeds 100")
 	var z := {"corruption": 40}
@@ -3513,7 +3515,7 @@ func test_corruption() -> void:
 	R.roll(w, "add", rng, odd)
 	check(w["corruption"] == 100, "corruption: an odd step still caps at 100")
 	# ---- texts
-	check(R.risk_text() == "50% chance of +20% corruption", "corruption: risk text", R.risk_text())
+	check(R.risk_text() == "%d%% chance of +%d%% corruption" % [int(round(R.chance() * 100.0)), R.step()], "corruption: risk text", R.risk_text())
 	check(R.result_text({"rolled": true, "hit": true, "after": 60}) == "Corruption rose to 60%", "corruption: result text on a hit")
 	check(R.result_text({"rolled": true, "hit": false, "after": 60}) == "No corruption gained", "corruption: result text on a miss")
 	check(R.result_text({"rolled": false}) == "", "corruption: no result text for exempt crafts")
@@ -3536,8 +3538,9 @@ func test_corruption() -> void:
 		mn = mini(mn, n)
 		total += n
 	var mean := float(total) / float(runs)
-	check(mn == 5, "corruption: no item locks before its 5th rolling craft (min over 10,000 items)", str(mn))
-	check(absf(mean - 10.0) <= 0.2, "corruption: mean rolling crafts to lockout is within 0.2 of 10", str(mean))
+	check(mn == steps_to_lock, "corruption: no item locks before its %dth rolling craft (min over 10,000 items)" % steps_to_lock, str(mn))
+	var want_mean: float = float(steps_to_lock) / R.chance()
+	check(absf(mean - want_mean) <= 0.2, "corruption: mean rolling crafts to lockout is within 0.2 of %.2f" % want_mean, str(mean))
 	var hits := 0
 	var hrng := RandomNumberGenerator.new()
 	hrng.seed = 424242
@@ -3545,7 +3548,7 @@ func test_corruption() -> void:
 		var q := {}
 		if R.roll(q, "add", hrng)["hit"]:
 			hits += 1
-	check(absf(float(hits) / float(runs) - 0.5) <= 0.015, "corruption: hit rate over 10,000 rolls is within 1.5 points of 50%", str(float(hits) / float(runs)))
+	check(absf(float(hits) / float(runs) - R.chance()) <= 0.015, "corruption: hit rate over 10,000 rolls is within 1.5 points of the configured chance", str(float(hits) / float(runs)))
 	# ---- isolation: rolls never touch the global or Loot RNG
 	var loot_state: int = Loot.rng.state
 	seed(99)
@@ -3606,13 +3609,13 @@ func test_corruption_crafting() -> void:
 				check(t["affixes"].size() == n_aff - 1, "corruption craft: remove affix applies")
 	# ---- the craft that reaches 100% still succeeds, then the item is locked
 	var e: Dictionary = Loot.make_item(it["base"], "uncommon", 20)
-	R.set_level(e, 80)
+	R.set_level(e, 100 - R.step())
 	var n0: int = e["affixes"].size()
 	var saved_cfg = Data.corruption_cfg
 	Data.corruption_cfg = always
 	var res2: Dictionary = bs.apply_craft("add" if Loot.craft_check("add", e) == "" else "reroll", e, 0)
 	Data.corruption_cfg = saved_cfg
-	check(res2["hit"] and R.get_level(e) == 100, "corruption craft: a hit at 80% reaches exactly 100")
+	check(res2["hit"] and R.get_level(e) == 100, "corruption craft: a hit one step below the top reaches exactly 100")
 	check(e["affixes"].size() == n0 + 1 or e["affixes"].size() == n0, "corruption craft: the locking craft was applied")
 	for op in ["add", "reroll", "rarity"]:
 		check(Loot.craft_check(op, e, 0) == "Corrupted: this item can no longer be crafted", "corruption craft: %s is refused at 100%% with the clear message" % op)
@@ -3841,17 +3844,17 @@ func test_corruption_ui() -> void:
 	bs.select(work)
 	await frames(2)
 	check(bs.corr_bar.visible and bs.corr_bar.bar_label() == "Corruption 40%", "corruption ui: Blacksmith bar shows the number", bs.corr_bar.bar_label())
-	check(bs.corr_bar.note_text() == "3 more corruption events before lock", "corruption ui: remaining events are derived (3 at 40%)", bs.corr_bar.note_text())
+	check(bs.corr_bar.note_text() == R.events_text(work) and "more corruption event" in bs.corr_bar.note_text(), "corruption ui: remaining events are derived from the level", bs.corr_bar.note_text())
 	check("Corruption" not in bs.item_text.text, "corruption ui: the Blacksmith item text has no second corruption line")
 	for nm in ["Add Affix", "Reroll Affix", "Raise Rarity"]:
 		var b = _corr_button_for(bs.op_box, nm)
-		check(b != null and "Risk: 50% chance of +20% corruption" in b.text, "corruption ui: %s button carries the risk line" % nm)
+		check(b != null and ("Risk: " + R.risk_text()) in b.text, "corruption ui: %s button carries the risk line" % nm)
 	for nm in ["Upgrade Base", "Remove Affix", "Add Socket"]:
 		var b2 = _corr_button_for(bs.op_box, nm)
 		check(b2 != null and "Risk" not in b2.text, "corruption ui: %s button has no risk line" % nm)
 	bs.op = "add"
 	bs.refresh()
-	check("Risk: 50% chance of +20% corruption" in bs.preview.text, "corruption ui: the preview repeats the risk for a rolling craft")
+	check(("Risk: " + R.risk_text()) in bs.preview.text, "corruption ui: the preview repeats the risk for a rolling craft")
 	# ---- confirm dialog
 	bs.select(work)
 	bs.op = "upgrade"
@@ -3863,7 +3866,7 @@ func test_corruption_ui() -> void:
 	bs.op = "upgrade"
 	bs.op = "add"
 	bs._craft()
-	check(ui.confirm.visible and "Risk: 50% chance" in ui.confirm_text.text and "Warning" not in ui.confirm_text.text, "corruption ui: at 60% the confirm shows the risk but no warning (threshold is above 60)")
+	check(ui.confirm.visible and ("Risk: " + R.risk_text()) in ui.confirm_text.text and "Warning" not in ui.confirm_text.text, "corruption ui: at 60% the confirm shows the risk but no warning (threshold is above 60)")
 	ui.confirm.visible = false
 	R.set_level(work, 80)
 	bs.select(work)
@@ -3877,7 +3880,7 @@ func test_corruption_ui() -> void:
 		ui.confirm_cb.call()
 		ui.confirm.visible = false
 		await frames(2)
-		check(bs.corr_bar.level == R.get_level(work) and R.get_level(work) in [before, mini(100, before + 20)], "corruption ui: the bar refreshes right after a craft", "%d -> %d bar %d" % [before, R.get_level(work), bs.corr_bar.level])
+		check(bs.corr_bar.level == R.get_level(work) and R.get_level(work) in [before, mini(100, before + R.step())], "corruption ui: the bar refreshes right after a craft", "%d -> %d bar %d" % [before, R.get_level(work), bs.corr_bar.level])
 		var toast_ok := false
 		for tchild in ui.toasts.get_children():
 			if tchild is Label and "complete" in tchild.text and ("Corruption rose" in tchild.text or "No corruption gained" in tchild.text):
@@ -3901,7 +3904,7 @@ func test_corruption_ui() -> void:
 	var font := ThemeDB.fallback_font
 	var longest := "Corrupted: cannot be crafted"
 	check(font.get_string_size("3 more corruption events before lock", HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x < 380 and font.get_string_size(longest, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x < 380, "corruption ui: readout text fits the 390 px bar")
-	check(font.get_string_size("Risk: 50% chance of +20% corruption", HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x < 400, "corruption ui: risk line fits the Blacksmith width")
+	check(font.get_string_size("Risk: " + R.risk_text(), HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x < 400, "corruption ui: risk line fits the Blacksmith width")
 	bs.select(null)
 	ui.close("blacksmith")
 	# ---- dev tools

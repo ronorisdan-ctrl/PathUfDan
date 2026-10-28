@@ -100,9 +100,9 @@ training is off under `Game.testing` unless `Game.training_in_tests` is set.
 Every item has a corruption meter (0-100%, shown as "Corruption: N%" on every tooltip, as a bar in the
 Blacksmith window and as a small red marker on 100% items in the bag and stashes). Three Blacksmith
 crafts roll for it: **Add Affix**, **Reroll Affix** (one chosen affix per click) and **Raise Rarity**. The
-craft is always applied in full first; then one roll at 50% adds 20% corruption. At 100% those three crafts
-are refused (nothing is spent) and their buttons are disabled, so every item gets at least 5 rolling crafts
-and 10 on average (a negative binomial). Upgrade Base, Remove Affix and Add Socket never roll and still work
+craft is always applied in full first; then one roll at 60% adds 25% corruption (Dan's tuning, 2026-10-29). At 100%
+those three crafts are refused (nothing is spent) and their buttons are disabled, so every item gets at least
+4 rolling crafts and about 6.7 on average (a negative binomial). Upgrade Base, Remove Affix and Add Socket never roll and still work
 at 100%, as do equipping, selling, salvaging, locking, stashing and the Destroy sweep. Because a blank base
 may run out of crafts before it reaches a perfect roll, a base that already has good affixes matters. The
 Blacksmith asks to confirm every craft and adds a warning when the item is above 60% corruption.
@@ -192,7 +192,7 @@ godot --path . res://tests/screens_training.tscn -- /tmp/training               
 
 ## Known limitations / next steps
 
-* Crafting corruption: drops start at 0% (`drop_start` is in the data file for later), there is no way to cleanse corruption, the 50% chance does not rise as corruption grows, legendaries cannot be crafted so their corruption only shows on the tooltip, and the numbers are untuned guesses (5 rolling crafts minimum, 10 on average) that need real play. The tooltip bar is solid block characters because Godot 4.0 text boxes have no background colour tag.
+* Crafting corruption: drops start at 0% (`drop_start` is in the data file for later), there is no way to cleanse corruption, the 50% chance does not rise as corruption grows, legendaries cannot be crafted so their corruption only shows on the tooltip, and the numbers are tuned by feel (60% chance, +25% step: 4 rolling crafts minimum, about 6.7 on average); the affix pools still make good items easy, which Dan plans to fix by adding weaker affixes. The tooltip bar is solid block characters because Godot 4.0 text boxes have no background colour tag.
 * Training Grounds history is kept in memory for the session only (lost when the game closes); a per-character file is a possible later addition. The T3/T6 defence profiles use the tier's dungeon data (a spawn-weighted average of its normal enemies, or its boss) at your character's level, not a specific enemy. Passive and item procs that carry no skill are listed under "Other". There is no mortal-mode dummy and no damage-taken or movement measurement yet.
 * Higher tiers are tuned with the autoplay bot (which never dodges); expect to refine numbers after real play.
 * Skill catalogue is 80 of ~146 listed skills. New skills are mostly JSON entries using existing behaviours; channelled and transform skills need new behaviours.
