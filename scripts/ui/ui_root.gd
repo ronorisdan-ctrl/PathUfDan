@@ -18,6 +18,7 @@ const PANELS := {
 	"stash": "res://scripts/ui/stash_panel.gd",
 	"dungeon": "res://scripts/ui/dungeon_panel.gd",
 	"pause": "res://scripts/ui/pause_panel.gd",
+	"options": "res://scripts/ui/options_panel.gd",
 	"death": "res://scripts/ui/death_panel.gd",
 	"dev": "res://scripts/ui/dev_panel.gd",
 }

@@ -620,7 +620,14 @@ func nearest_item(pos: Vector2, maxd: float):
 				best = n
 	return best
 
+## Settings > Options > Loot Pickup: "keybind" (F only, default), "mouse" or "both".
+func loot_pickup_mode() -> String:
+	var m := str(Game.settings.get("loot_pickup", "keybind"))
+	return m if m in ["keybind", "mouse", "both"] else "keybind"
+
 func try_click_pickup(mouse: Vector2, p) -> bool:
+	if loot_pickup_mode() == "keybind":
+		return false
 	for n in loot:
 		if is_instance_valid(n) and not n.hidden_by_filter and n.label_rect().has_point(mouse):
 			if n.global_position.distance_to(p.global_position) < float(PetRules.setting("manual_pickup_reach", 70)):
@@ -678,7 +685,8 @@ func drop_at_cursor(mouse: Vector2):
 ## your pet is sent for it. With nothing near the cursor, F works as before
 ## (nearest interactable, then the nearest item at your feet).
 func interact(p, mouse = null) -> void:
-	if mouse != null:
+	var f_loots := loot_pickup_mode() != "mouse"
+	if mouse != null and f_loots:
 		var target = drop_at_cursor(mouse)
 		if target != null:
 			if target.global_position.distance_to(p.global_position) <= float(PetRules.setting("manual_pickup_reach", 70)):
@@ -691,6 +699,8 @@ func interact(p, mouse = null) -> void:
 	var it = nearest_interactable(p.global_position)
 	if it != null:
 		on_interact(it)
+		return
+	if not f_loots:
 		return
 	var n = nearest_item(p.global_position, 34.0)
 	if n != null:

@@ -68,6 +68,7 @@ func _ready() -> void:
 	await test_stash_ui()
 	await test_destroy_by_rarity()
 	await test_item_lock()
+	await test_corruption()
 	var summary := "==== %d passed, %d failed ====" % [passes, fails]
 	print("\n" + summary)
 	_log(summary)
@@ -1300,11 +1301,28 @@ func test_loot_filter() -> void:
 	LootFilter.reveal_hidden = true
 	LootFilter.emit_signal("reveal_changed", true)
 	check(dc.visible and not dc.hidden_by_filter, "loot filter: holding Alt reveals the hidden drop")
+	# the pet never takes what the filter hides, Alt or not; the player still can
+	var lv_stub = load("res://scripts/world/level.gd").new()
+	var player_stub := Node2D.new()
+	lv_stub.player = player_stub
+	lv_stub.loot = [dc]
+	var pet_stub = load("res://scripts/entities/pet.gd").new()
+	pet_stub.tier = 5
+	check(dc.filter_hidden and not dc.hidden_by_filter, "loot filter: with Alt held the drop is drawn but stays filter_hidden")
+	check(lv_stub.collect_block(dc, pet_stub) == "hidden", "loot filter: the pet is refused an Alt-revealed drop (fetch, auto-loot and magnet all use this gate)")
+	check(lv_stub.collect_block(dc, player_stub) == "" and lv_stub.collect_block(dc) == "", "loot filter: the player can still pick up an Alt-revealed drop")
+	check(lv_stub.drop_at_cursor(dc.label_rect().get_center()) == dc and lv_stub.nearest_item(dc.global_position, 10.0) == dc, "loot filter: with Alt held the player can target the hidden drop")
+	check(not dl.filter_hidden and lv_stub.collect_block(dl, pet_stub) == "", "loot filter: the pet may still take a drop the filter shows")
 	LootFilter.reveal_hidden = false
 	LootFilter.emit_signal("reveal_changed", false)
 	check(not dc.visible, "loot filter: releasing Alt hides it again")
+	check(dc.filter_hidden and lv_stub.collect_block(dc, pet_stub) == "hidden", "loot filter: the pet is refused the hidden drop without Alt too")
+	check(lv_stub.drop_at_cursor(dc.label_rect().get_center()) == null and lv_stub.nearest_item(dc.global_position, 10.0) == null, "loot filter: without Alt the player cannot target the hidden drop")
 	LootFilter.load_filter("show_all")
 	check(dc.visible, "loot filter: switching filter updates drops already on the floor")
+	check(not dc.filter_hidden and lv_stub.collect_block(dc, pet_stub) == "", "loot filter: once the filter shows the drop the pet may take it")
+	for n in [lv_stub, player_stub, pet_stub]:
+		n.free()
 	LootFilter.load_filter("rare_plus")
 	var dr = LootDropS.new()
 	dr.setup_item(Loot.make_item(one_h, "rare", 5))
@@ -2731,10 +2749,10 @@ func test_dev_tools() -> void:
 	var pr: Vector2 = ui.panels["dev"].size
 	check(pr.x <= 1280 and pr.y <= 720, "dev: the panel fits the 1280x720 screen", str(pr))
 	ui.close("dev")
-	ui.open("pause")
+	ui.open("options")
 	await frames(1)
-	check(ui.panels["pause"].dev_btn.visible, "dev: the pause menu shows the Developer tools button")
-	ui.close("pause")
+	check(ui.panels["options"].dev_btn.visible, "dev: the Options menu shows the Developer tools button")
+	ui.close("options")
 	# ---- off again
 	Dev.set_enabled(false)
 	check(Dev.flags == R.default_flags() and not Dev.god(), "dev: switching off resets god mode and every flag")
@@ -2742,9 +2760,9 @@ func test_dev_tools() -> void:
 	await frames(1)
 	check(not ui.panels["dev"].tabs.visible and ui.panels["dev"].off_label.visible, "dev: the panel shows only a hint while the tools are off")
 	ui.close_all()
-	ui.open("pause")
+	ui.open("options")
 	await frames(1)
-	check(not ui.panels["pause"].dev_btn.visible, "dev: no pause menu button while off")
+	check(not ui.panels["options"].dev_btn.visible, "dev: no Options menu button while off")
 	ui.close_all()
 	Game.dev_in_tests = false
 	Game.settings["dev_tools"] = false
@@ -3395,3 +3413,147 @@ func test_training_world() -> void:
 	Game.training_in_tests = false
 	TrainingLog.discard()
 	TrainingLog.reset_settings()
+
+# ------------------------------------------------------------------ item corruption (rules)
+const CorruptionRulesT = preload("res://scripts/core/corruption_rules.gd")
+
+func _corr_sim_crafts(rng: RandomNumberGenerator, cfg: Dictionary) -> int:
+	## Rolling crafts a fresh item survives until it locks (the locking craft counts).
+	var R = CorruptionRulesT
+	var it := {}
+	var n := 0
+	while not R.is_maxed(it, cfg):
+		n += 1
+		R.roll(it, "add", rng, cfg)
+		if n > 1000:
+			break
+	return n
+
+func test_corruption() -> void:
+	print("\n--- item corruption rules")
+	_log("--- item corruption rules")
+	var R = CorruptionRulesT
+	var cfg: Dictionary = Data.corruption_cfg
+	# ---- data
+	check(Data.load_errors.is_empty() and not cfg.is_empty(), "corruption: data/corruption.json loads")
+	check(is_equal_approx(R.chance(), 0.5) and R.step() == 20 and R.max_level() == 100 and R.drop_start() == 0, "corruption: defaults are 50% chance, +20 step, max 100, drop_start 0")
+	check(int(cfg.get("confirm_above", 0)) == 60, "corruption: confirm_above is 60")
+	# every Blacksmith craft is on exactly one side of the table
+	var all_ok := true
+	var detail := ""
+	for op in Loot.craft_ops():
+		if R.rolls_for(op) == R.is_exempt(op):
+			all_ok = false
+			detail += " " + op
+	check(all_ok, "corruption: every Blacksmith craft is either rolling or exempt, never both or neither", detail)
+	var listed_ok := true
+	for op in cfg.get("rolling_crafts", []) + cfg.get("exempt_crafts", []):
+		if not (op in Loot.craft_ops()):
+			listed_ok = false
+	check(listed_ok, "corruption: data lists only real craft ids")
+	check(R.rolls_for("add") and R.rolls_for("reroll") and R.rolls_for("rarity"), "corruption: add, reroll and raise rarity roll")
+	check(R.is_exempt("upgrade") and R.is_exempt("remove") and R.is_exempt("socket"), "corruption: upgrade, remove and socket are exempt")
+	# ---- get / set
+	var it := {}
+	check(R.get_level(it) == 0 and R.get_level(null) == 0, "corruption: get_level is 0 without the field and for null")
+	it["corruption"] = 140
+	check(R.get_level(it) == 100, "corruption: get_level clamps above 100")
+	it["corruption"] = -5
+	check(R.get_level(it) == 0, "corruption: get_level clamps below 0")
+	R.set_level(it, 40)
+	check(it.get("corruption") == 40 and R.get_level(it) == 40, "corruption: set_level stores the value")
+	R.set_level(it, 0)
+	check(not it.has("corruption"), "corruption: set_level(0) erases the key")
+	R.set_level(it, 250)
+	check(it["corruption"] == 100 and R.is_maxed(it), "corruption: set_level clamps to 100")
+	R.set_level(it, -10)
+	check(not it.has("corruption"), "corruption: set_level clamps negatives to 0 and erases")
+	check(R.events_remaining({}) == 5 and R.events_remaining({"corruption": 40}) == 3 and R.events_remaining({"corruption": 100}) == 0, "corruption: events remaining (5, 3, 0)")
+	# ---- refusal
+	var full := {"corruption": 100}
+	for op in ["add", "reroll", "rarity"]:
+		check(R.craft_refusal(full, op) != "", "corruption: %s is refused at 100%%" % op)
+		check(R.craft_refusal({"corruption": 80}, op) == "", "corruption: %s is allowed at 80%%" % op)
+	for op in ["upgrade", "remove", "socket"]:
+		check(R.craft_refusal(full, op) == "", "corruption: %s is allowed at 100%%" % op)
+	check(R.craft_refusal(full, "add") == "Corrupted: this item can no longer be crafted", "corruption: refusal text")
+	# ---- roll: one randf per rolling craft, none otherwise
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 777
+	var ref := RandomNumberGenerator.new()
+	ref.seed = 777
+	var x := {}
+	var r1: Dictionary = R.roll(x, "upgrade", rng)
+	check(not r1["rolled"] and not r1["hit"] and not x.has("corruption") and rng.state == ref.state, "corruption: exempt craft takes no random number and changes nothing")
+	var r2: Dictionary = R.roll(x, "add", rng)
+	ref.randf()
+	check(r2["rolled"] and rng.state == ref.state, "corruption: a rolling craft takes exactly one random number")
+	check(r2["before"] == 0 and r2["after"] == (20 if r2["hit"] else 0), "corruption: roll reports before/after and adds the step on a hit")
+	# forced outcomes with test configs
+	var always := cfg.duplicate(true)
+	always["chance"] = 1.0
+	var never := cfg.duplicate(true)
+	never["chance"] = 0.0
+	var y := {"corruption": 60}
+	R.roll(y, "reroll", rng, always)
+	check(y["corruption"] == 80, "corruption: a hit at 60% gives 80%")
+	var r3: Dictionary = R.roll(y, "reroll", rng, always)
+	check(y["corruption"] == 100 and r3["after"] == 100, "corruption: a hit at 80% gives exactly 100")
+	var r4: Dictionary = R.roll(y, "reroll", rng, always)
+	check(y["corruption"] == 100 and r4["after"] == 100, "corruption: a further hit never exceeds 100")
+	var z := {"corruption": 40}
+	var r5: Dictionary = R.roll(z, "add", rng, never)
+	check(r5["rolled"] and not r5["hit"] and z["corruption"] == 40, "corruption: a miss leaves the value unchanged")
+	var odd := cfg.duplicate(true)
+	odd["step"] = 30
+	odd["chance"] = 1.0
+	var w := {"corruption": 90}
+	R.roll(w, "add", rng, odd)
+	check(w["corruption"] == 100, "corruption: an odd step still caps at 100")
+	# ---- texts
+	check(R.risk_text() == "50% chance of +20% corruption", "corruption: risk text", R.risk_text())
+	check(R.result_text({"rolled": true, "hit": true, "after": 60}) == "Corruption rose to 60%", "corruption: result text on a hit")
+	check(R.result_text({"rolled": true, "hit": false, "after": 60}) == "No corruption gained", "corruption: result text on a miss")
+	check(R.result_text({"rolled": false}) == "", "corruption: no result text for exempt crafts")
+	# ---- drop_start
+	var d := {}
+	R.apply_drop_start(d)
+	check(not d.has("corruption"), "corruption: default drop_start leaves items clean")
+	var ds := cfg.duplicate(true)
+	ds["drop_start"] = 40
+	R.apply_drop_start(d, ds)
+	check(d.get("corruption") == 40, "corruption: drop_start from data is applied")
+	# ---- statistics (own seeded rng)
+	var srng := RandomNumberGenerator.new()
+	srng.seed = 20261028
+	var mn := 1000
+	var total := 0
+	var runs := 10000
+	for i in runs:
+		var n := _corr_sim_crafts(srng, cfg)
+		mn = mini(mn, n)
+		total += n
+	var mean := float(total) / float(runs)
+	check(mn == 5, "corruption: no item locks before its 5th rolling craft (min over 10,000 items)", str(mn))
+	check(absf(mean - 10.0) <= 0.2, "corruption: mean rolling crafts to lockout is within 0.2 of 10", str(mean))
+	var hits := 0
+	var hrng := RandomNumberGenerator.new()
+	hrng.seed = 424242
+	for i in runs:
+		var q := {}
+		if R.roll(q, "add", hrng)["hit"]:
+			hits += 1
+	check(absf(float(hits) / float(runs) - 0.5) <= 0.015, "corruption: hit rate over 10,000 rolls is within 1.5 points of 50%", str(float(hits) / float(runs)))
+	# ---- isolation: rolls never touch the global or Loot RNG
+	var loot_state: int = Loot.rng.state
+	seed(99)
+	var irng := RandomNumberGenerator.new()
+	irng.seed = 5
+	for i in 200:
+		R.roll({}, "add", irng)
+	var after_global: int = randi()
+	seed(99)
+	var expect_global: int = randi()
+	check(after_global == expect_global, "corruption: rolls leave the global RNG alone")
+	check(Loot.rng.state == loot_state, "corruption: rolls leave the Loot RNG alone")
+	await frames(1)

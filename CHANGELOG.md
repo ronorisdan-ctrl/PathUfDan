@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Dying Canvas inventory preview
+
+- Added a standalone inventory/character UI study with tarnished cabinet frames, forty bag cells, eleven equipment cells, hover/pinned/focus states, comparison gains/losses, ring target switching, local sample swaps, sorting, filtering and reset.
+- Added a one-click launcher, JSON sample fixtures, focused interaction checks and five repeatable screenshot states. Existing procedural icons and fonts remain provisional; the illustrated concept is a visual reference, not a flattened in-game panel.
+- The preview does not create or save a character; live gameplay and UI are unchanged.
+
 ## Training Grounds (branch `feature/training-grounds`, not merged)
 
 Added

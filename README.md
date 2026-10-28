@@ -16,6 +16,10 @@ No assets need importing: all pixel art is generated from palette grids in
 
 > Exporting: add `*.json` to *Export > Resources > Filters to export non-resource files* so the data folder is packed.
 
+### Dying Canvas UI preview
+
+Double-click `Preview inventory.cmd`, or open `tests/ui_inventory_preview.tscn` and press F6, to try the standalone inventory art study. Hover, pinned selection, equipment comparison and local sample swaps work with forty bag slots. See [preview controls and scope](docs/UI_INVENTORY_PREVIEW.md). Custom painted icons, a production font and the final HUD artwork are still pending.
+
 ## Controls
 
 | Input | Action |
@@ -25,7 +29,7 @@ No assets need importing: all pixel art is generated from palette grids in
 | LMB / RMB / Q / E / R / T / G | Skills 1-7 (hold to repeat) |
 | Space | Dodge roll (brief invulnerability) |
 | 1 / 2 | Life / mana flask |
-| F | Interact / pick up. With the cursor on (or within 40 px of) an item label: pick it up if it is within reach, otherwise send your pet to fetch it. LMB on an item label also picks it up |
+| F | Interact / pick up. With the cursor on (or within 40 px of) an item label: pick it up if it is within reach, otherwise send your pet to fetch it. Clicking an item label only picks it up if Pause > Options > Loot Pickup is set to Mouse Click or Both (default: Keybind, F only; in Mouse Click mode F no longer picks up items) |
 | I (or B) | Inventory |
 | C | Character sheet |
 | P | Passive skill tree |
