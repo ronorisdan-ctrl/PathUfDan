@@ -1,0 +1,1202 @@
+{
+  "_doc": "Sprite-sheet manifest. One PNG per animation under assets/; rows are directions, columns are frames. 'file' defaults to sprites/<category>/<id>/<id>_<anim>.png. Missing files fall back to the old art (Art.sprite(fallback)). See docs/ART_STYLE_GUIDE.md.",
+  "defaults": {
+    "frame": [
+      64,
+      64
+    ],
+    "pivot": [
+      32,
+      58
+    ],
+    "fps": 10,
+    "directions": 8,
+    "mirror": true,
+    "shadow": "medium"
+  },
+  "sprites": {
+    "warrior": {
+      "category": "classes",
+      "phase": "V1",
+      "directions": 8,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "the Warrior hero, correctly proportioned and painted 'true': slate iron armour, blood madder tabard (signature accent), burnt sienna leather",
+      "attack_label": "melee swing",
+      "notes": "Attack: 2-frame wind-up, smear on frame 3 (impact), recovery. Body only, no weapon (weapons are a separate layer). Melee hits land 30% into the swing.",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "skill"
+        },
+        "cast": {
+          "frames": 6,
+          "impact_frame": 2,
+          "sync": "skill"
+        },
+        "channel": {
+          "frames": 4,
+          "loop": true
+        },
+        "dodge": {
+          "frames": 6,
+          "sync": "dodge"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 8,
+          "corpse_frame": 7
+        }
+      },
+      "fallback": "warrior",
+      "priority": 1
+    },
+    "ranger": {
+      "category": "classes",
+      "phase": "V1",
+      "directions": 8,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "the Ranger hero: verdigris hood (signature accent), sienna leather, ochre fletching on the quiver",
+      "attack_label": "bow shot",
+      "notes": "Attack = shoot. Projectiles release at once (frame 0-1), so draw the release early: impact_frame should be 0 or 1 once art exists.",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "skill"
+        },
+        "cast": {
+          "frames": 6,
+          "impact_frame": 2,
+          "sync": "skill"
+        },
+        "channel": {
+          "frames": 4,
+          "loop": true
+        },
+        "dodge": {
+          "frames": 6,
+          "sync": "dodge"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 8,
+          "corpse_frame": 7
+        }
+      },
+      "fallback": "ranger",
+      "priority": 2
+    },
+    "mage": {
+      "category": "classes",
+      "phase": "V1",
+      "directions": 8,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "the Mage hero: bone black robe with lead white trim, ultramarine sash, hands glowing with fresh ultramarine paint",
+      "attack_label": "spell cast",
+      "notes": "Cast: hands catch fresh-paint colour. Most spells fire at once, so the release pose should be frame 0-1.",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "skill"
+        },
+        "cast": {
+          "frames": 6,
+          "impact_frame": 2,
+          "sync": "skill"
+        },
+        "channel": {
+          "frames": 4,
+          "loop": true
+        },
+        "dodge": {
+          "frames": 6,
+          "sync": "dodge"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 8,
+          "corpse_frame": 7
+        }
+      },
+      "fallback": "mage",
+      "priority": 3
+    },
+    "ghoul": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 1,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a ghoul whose skin is peeling paint, hanging off in curled flakes; too-long fingers",
+      "notes": "Wind-up must read as both arms raised to claw (0.45 s).",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "ghoul",
+      "priority": 1
+    },
+    "plague_rat": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 1,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "small",
+      "desc": "a plague rat with a white fuzzy mould-bloom halo",
+      "notes": "Small enemy. Wind-up is very short (0.25 s): one clear crouch frame.",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        28
+      ],
+      "fallback": "rat"
+    },
+    "bone_archer": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 1,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a bone archer: chalky lead white bones that don't take shadow, drawing a bow",
+      "notes": "Wind-up = bow drawn (0.55 s).",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "skeleton_archer"
+    },
+    "ash_cultist": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 1,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "an ash cultist, the upper half soot-blackened by smoke damage",
+      "notes": "Ranged caster; wind-up = staff raised (0.8 s).",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "cultist"
+    },
+    "grave_brute": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 2,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a grave brute of heavy overpainting: thick impasto lumps, slightly too-big hands",
+      "notes": "Slam: wind-up must read as a raised club over the head (0.95 s).",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "brute"
+    },
+    "bloater": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 2,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a bloater: water-damaged, swollen warped surface with tide-line stains",
+      "notes": "Explodes: wind-up = swelling up (0.8 s).",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "special": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup",
+          "what": "explode"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "bloater"
+    },
+    "shade_assassin": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 2,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a shade assassin with a faint pentimento after-image a few pixels behind it",
+      "notes": "Dash attack: wind-up = low crouch (0.55 s).",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "special": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup",
+          "what": "dash"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "assassin"
+    },
+    "bone_bulwark": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 2,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a bone bulwark: chalky lead white bones behind a heavy shield",
+      "notes": "Front guard: needs a block pose.",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "special": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup",
+          "what": "block"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "shieldbearer"
+    },
+    "grave_caller": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 3,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a grave caller (necromancer) with a blank, smoothed face plate where the name was scraped off",
+      "notes": "Summoner: wind-up = arms spread to summon (0.9 s).",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "special": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup",
+          "what": "summon"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "necromancer"
+    },
+    "rime_witch": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 3,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a rime witch with cerulean frosted edges like varnish bloom",
+      "notes": "Ranged ice caster (0.75 s wind-up).",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "cultist"
+    },
+    "storm_acolyte": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 4,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a storm acolyte with lightning-burn lines across the robe",
+      "notes": "Nova caster (0.9 s wind-up).",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "cultist"
+    },
+    "carrion_bat": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 3,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "small",
+      "desc": "a carrion bat whose wings are made of flying paint chips",
+      "notes": "Small, fast. Wind-up 0.2 s: one dive frame.",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        28
+      ],
+      "fallback": "bat"
+    },
+    "abyssal_horror": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 6,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "an abyssal horror, its body partly a hole in the canvas showing raw linen at the edges",
+      "notes": "Slam (0.9 s wind-up).",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "brute"
+    },
+    "guardian_knight": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 2,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a guardian knight: champion with unique armour, gilded and grim",
+      "notes": "Champion: telegraphs with its own colour. 0.6 s wind-up.",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "warrior"
+    },
+    "guardian_witch": {
+      "category": "monsters",
+      "phase": "V3",
+      "tier": 3,
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a guardian witch: champion necromancer with a crown of sketch lines",
+      "notes": "Champion summoner, 0.8 s wind-up.",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "special": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup",
+          "what": "summon"
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "fallback": "necromancer"
+    },
+    "warden": {
+      "category": "bosses",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "frame": [
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        88
+      ],
+      "shadow": "large",
+      "desc": "Sir Morcant, the Drowned Warden: a finished, dignified portrait gone stiff, yellowed varnish",
+      "notes": "Patterns: cleave, charge. Needs phase-change and stagger (poise break) poses.",
+      "fallback": "warden",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 7,
+          "impact_frame": 4,
+          "sync": "windup"
+        },
+        "phase_change": {
+          "frames": 8,
+          "loop": false
+        },
+        "stagger": {
+          "frames": 4,
+          "loop": true
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 8,
+          "corpse_frame": 7
+        }
+      }
+    },
+    "gravemaw": {
+      "category": "bosses",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "frame": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        120
+      ],
+      "shadow": "large",
+      "desc": "Gravemaw: its own paint cracking open into a mouth (craquelure)",
+      "notes": "Patterns: burrow, emerge, spit, eruption.",
+      "fallback": "gravemaw",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 7,
+          "impact_frame": 4,
+          "sync": "windup"
+        },
+        "phase_change": {
+          "frames": 8,
+          "loop": false
+        },
+        "stagger": {
+          "frames": 4,
+          "loop": true
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 8,
+          "corpse_frame": 7
+        }
+      }
+    },
+    "archon_velis": {
+      "category": "bosses",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "frame": [
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        88
+      ],
+      "shadow": "large",
+      "desc": "Archon Velis: two versions of one figure, one painted over the other (pentimento)",
+      "notes": "Patterns: teleport, fan, spiral, meteor.",
+      "fallback": "cultist",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 7,
+          "impact_frame": 4,
+          "sync": "windup"
+        },
+        "phase_change": {
+          "frames": 8,
+          "loop": false
+        },
+        "stagger": {
+          "frames": 4,
+          "loop": true
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 8,
+          "corpse_frame": 7
+        }
+      }
+    },
+    "iron_penitent": {
+      "category": "bosses",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "frame": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        120
+      ],
+      "shadow": "large",
+      "desc": "the Iron Penitent: an armoured figure blocked in with dead colour, never finished",
+      "notes": "Patterns: mortar, cannon, overheated/vulnerable state.",
+      "fallback": "construct",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 7,
+          "impact_frame": 4,
+          "sync": "windup"
+        },
+        "phase_change": {
+          "frames": 8,
+          "loop": false
+        },
+        "stagger": {
+          "frames": 4,
+          "loop": true
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 8,
+          "corpse_frame": 7
+        }
+      }
+    },
+    "malgrath": {
+      "category": "bosses",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "frame": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        120
+      ],
+      "shadow": "large",
+      "desc": "Malgrath: a frantic charcoal sketch, redrawn every phase",
+      "notes": "Patterns: ward, hymn spiral, summon.",
+      "fallback": "demon",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 7,
+          "impact_frame": 4,
+          "sync": "windup"
+        },
+        "phase_change": {
+          "frames": 8,
+          "loop": false
+        },
+        "stagger": {
+          "frames": 4,
+          "loop": true
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 8,
+          "corpse_frame": 7
+        }
+      }
+    },
+    "stormheart": {
+      "category": "bosses",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "frame": [
+        160,
+        160
+      ],
+      "pivot": [
+        80,
+        152
+      ],
+      "shadow": "large",
+      "desc": "the Stormheart Colossus: fresh, violent paint attacking the empty canvas",
+      "notes": "Patterns: storm; abyss tyrants may reuse bosses with palette swaps.",
+      "fallback": "brute",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 7,
+          "impact_frame": 4,
+          "sync": "windup"
+        },
+        "phase_change": {
+          "frames": 8,
+          "loop": false
+        },
+        "stagger": {
+          "frames": 4,
+          "loop": true
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 8,
+          "corpse_frame": 7
+        }
+      }
+    },
+    "skeleton_warrior": {
+      "category": "minions",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a summoned skeleton warrior, the player's ally, lead white bones with a faint ultramarine glow",
+      "fallback": "skeleton",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      }
+    },
+    "skeleton_archer": {
+      "category": "minions",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a summoned skeleton archer ally",
+      "fallback": "skeleton_archer",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      }
+    },
+    "fire_elemental": {
+      "category": "minions",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a fire elemental ally of wet vermilion brushstrokes",
+      "fallback": "cultist",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      }
+    },
+    "storm_wisp": {
+      "category": "minions",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a storm wisp ally: a small knot of Naples yellow-white light",
+      "fallback": "bat",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        26
+      ]
+    },
+    "bone_golem": {
+      "category": "minions",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a bone golem ally, heavy impasto bones",
+      "fallback": "brute",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      }
+    },
+    "shadow_wraith": {
+      "category": "minions",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a shadow wraith ally with pentimento after-images",
+      "fallback": "assassin",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      }
+    },
+    "clockwork_drone": {
+      "category": "minions",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "shadow": "medium",
+      "desc": "a clockwork drone ally of tarnished brass",
+      "fallback": "bat",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 6,
+          "impact_frame": 3,
+          "sync": "windup"
+        },
+        "death": {
+          "frames": 6,
+          "corpse_frame": 5
+        }
+      },
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        26
+      ]
+    }
+  }
+}

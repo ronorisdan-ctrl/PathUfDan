@@ -8,8 +8,12 @@ extends RefCounted
 ##  - then a normal town visit (hotbar, passives, spec, crafting, gems, runes)
 
 const KIT_CHOICES := 3
+const Gear = preload("res://tests/smartbot/sb_gear.gd")
+const TrainingRules = preload("res://scripts/core/training_rules.gd")
 
 var hub = null
+var ring := 0               # Atlas ring of the run (0 = dungeon tier); set by smartbot.gd
+var gear = Gear.new()
 
 func default_level(tier: int) -> int:
 	var d := _dungeon_for_tier(tier)
@@ -46,9 +50,24 @@ func make(cls: String, tier: int, lvl: int, rng: RandomNumberGenerator) -> Dicti
 			ch.progress["bosses_killed"][od["id"]] = 1
 			ch.bonus_passive_points += 1
 	ch.progress["runs"] = maxi(0, (tier - 1) * 4)
+	var profile: String = hub.gear
+	if profile != "legacy":
+		_reference_points(ch, tier)
+		hub.stage_def = stage_defence(tier, ch.level)
 	ch.refresh_unlocks(false)
 	hub.choose_hotbar(ch)
 	ch.recalc()
+	if profile != "legacy":
+		# Phase B: typical / geared gear, currencies, gems and runes from the economy model
+		gear.hub = hub
+		gear.rng.seed = rng.randi()
+		hub.craft_rng.seed = rng.randi()
+		for i in ch.inventory.size():
+			ch.inventory[i] = null
+		gear.make(ch, profile, tier, ring)
+		ch.recalc()
+		hub.town_visit(ch)
+		return {"level": ch.level, "gear_power": hub.gear_power(ch), "gear": gear.last}
 	# gear: best of a few natural drops per slot
 	var rb := float(d.get("rarity_bonus", 0)) * 0.5
 	var order := ["main_hand", "off_hand", "chest", "helmet", "gloves", "boots", "belt", "amulet", "ring1", "ring2", "charm"]
@@ -92,3 +111,27 @@ func make(cls: String, tier: int, lvl: int, rng: RandomNumberGenerator) -> Dicti
 	ch.recalc()
 	hub.town_visit(ch)
 	return {"level": ch.level, "gear_power": hub.gear_power(ch)}
+
+## Phase B reference player (BOT_GEAR_AUDIT.md section 5): in the Atlas a player also has
+## the T6 first kill, Abyss milestones (assumed depth 10 per ring) and the Layer Wardens of
+## the rings below. Dungeon stages already match the reference.
+func _reference_points(ch, tier: int) -> void:
+	if ring <= 0:
+		return
+	var d6 := _dungeon_for_tier(6)
+	if not ch.progress["bosses_killed"].has(d6["id"]):
+		ch.progress["bosses_killed"][d6["id"]] = 1
+		ch.bonus_passive_points += 1
+	ch.progress["abyss_best"] = maxi(int(ch.progress.get("abyss_best", 0)), 10 * ring)
+	ch.bonus_passive_points += ring - 1
+
+## Generic enemy defence of the stage for the Phase B score: the tier's normal pool (T6 +
+## the ring's resist bonus in the Atlas), one resistance for fire / cold / lightning alike.
+func stage_defence(tier: int, lvl: int) -> Dictionary:
+	var t := 6 if ring > 0 else tier
+	var pd: Dictionary = TrainingRules.profile_defence({"tier": t, "kind": "normal"}, Data.dungeon_list, Data.enemies, lvl)
+	var r: Dictionary = pd.get("resist", {})
+	var res := (float(r.get("fire", 0)) + float(r.get("cold", 0)) + float(r.get("lightning", 0))) / 3.0
+	if ring > 0:
+		res += float(gear._ring(ring).get("resist_bonus", 0)) - float(_dungeon_for_tier(6).get("resist_bonus", 0))
+	return {"armour": float(pd.get("armour", 0.0)), "res": res}

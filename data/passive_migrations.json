@@ -1,0 +1,26 @@
+{
+ "_about": "Passive tree versioning. Bump tree_version whenever node ids, links, costs or effects change in a way that should reset allocations; saves made with an older tree_version get a FULL free refund on load (Dan, 2026-11-04). history[N] lists what changed going from version N-1 to N: removed or renamed ids as old_id -> new_id (or null when removed). Allocations are not remapped (always full refund); the map exists so build codes and presets can be translated, and the validator checks it. Never reuse an id.",
+ "tree_version": 6,
+ "history": {
+  "2": {},
+  "3": {
+   "xo0_2": null,
+   "xo0_4": null,
+   "xo1_2": null,
+   "xo1_4": null,
+   "xo2_2": null,
+   "xo2_4": null,
+   "xo3_2": null,
+   "xo3_4": null,
+   "xo4_2": null,
+   "xo4_4": null,
+   "xo5_2": null,
+   "xo5_4": null,
+   "xp_p13": null,
+   "xp_p14": null
+  },
+  "4": {},
+  "5": {},
+  "6": {}
+ }
+}

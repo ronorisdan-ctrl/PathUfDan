@@ -12,7 +12,12 @@ func _init() -> void:
 
 func on_open() -> void:
 	var ch = Game.ch
-	text.text = "[center]The darkness takes you... but not forever.\n\nYou will wake in town with full life.\n[color=#ff8080]You lose %d experience (10%% of this level).[/color][/center]" % int(ch.xp_to_next() * 0.1)
+	var rot_line := ""
+	if Game.level != null and Game.level.has_method("apply_death_rot"):
+		var n: int = Game.level.apply_death_rot()
+		if n > 0:
+			rot_line = "\n[color=#b0d060]The Rot feeds on your fall: this region is now Rot %d.[/color]" % n
+	text.text = "[center]The darkness takes you... but not forever.\n\nYou will wake in town with full life.\n[color=#ff8080]You lose %d experience (10%% of this level).[/color]%s[/center]" % [int(ch.xp_to_next() * 0.1), rot_line]
 
 func _return() -> void:
 	var ch = Game.ch

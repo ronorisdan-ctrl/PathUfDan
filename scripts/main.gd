@@ -5,6 +5,7 @@ const UIRoot = preload("res://scripts/ui/ui_root.gd")
 const Menus = preload("res://scripts/ui/menus.gd")
 const Hub = preload("res://scripts/world/hub.gd")
 const Dungeon = preload("res://scripts/world/dungeon.gd")
+const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 
 var world: Node2D
 var ui = null
@@ -90,9 +91,64 @@ func go_hub(completed: bool) -> void:
 			ui.toast("Returned to town victorious. The merchant has new stock.", Color("#ffd080"))
 
 func enter_dungeon(id: String, seed_value: int = 0, run: Dictionary = {}) -> bool:
-	var def: Dictionary = Data.dungeons.get(id, {})
+	if id.begins_with("atlas:"):
+		return enter_atlas(AtlasRules.parse(id.trim_prefix("atlas:")), seed_value)
+	var def: Dictionary = Data.dungeons.get(id, Data.zones.get(id, {}))   # zones: biome templates (dev only)
 	if def.is_empty():
 		return false
+	return _start_run(def, seed_value, run)
+
+## Atlas of Ruin (Endgame Phase 1A): runs hex h of the character's atlas. The layout seed and
+## base modifiers come from the atlas seed and the hex's clear count unless seed_value is given.
+func enter_atlas(h: Vector2i, seed_value: int = 0) -> bool:
+	var ch = Game.ch
+	if ch == null:
+		return false
+	var st: Dictionary = AtlasRules.ensure(ch)
+	if not AtlasRules.can_enter(st, h):
+		return false
+	var s0 := int(st["seed"])
+	var def := AtlasRules.zone_def(s0, h)
+	if def.is_empty():
+		return false
+	def = AtlasRules.apply_rot(def, AtlasRules.rot_of(st, h), s0, h, st)   # Rot (Phase 1C; Varnish-aware)
+	var wr := AtlasRules.warden_at(st, h)   # Layer Warden summoned here (Phase 2A): replaces the boss, no Heart
+	if wr > 0:
+		def = AtlasRules.apply_warden(def, wr)
+	var n := AtlasRules.clears(st, h)
+	# Zone mechanics: the slotted Pigments' (Phase 1E) plus the hex's natural roll (Phase 1D).
+	# Game.atlas_force_mechanic ("none" = off, or an id) replaces the natural roll for bots/tests.
+	var pigs := AtlasRules.run_pigments(st, h)
+	var mechs := AtlasRules.run_mechanics(st, h, pigs)
+	if Game.atlas_force_mechanic != "":
+		mechs = []
+		for p in pigs:
+			if not mechs.has(str(p["id"])):
+				mechs.append(str(p["id"]))
+		for fm in Game.atlas_force_mechanic.split(",", false):   # Phase 2E: a comma list forces several (smartbot)
+			if fm != "none" and not mechs.has(fm):
+				mechs.append(fm)
+	def["mechanics"] = mechs
+	def["mechanic"] = mechs[0] if mechs.size() > 0 else ""
+	def["pigment_mods"] = AtlasRules.pigment_mods(pigs)
+	def["pigment_uids"] = pigs.map(func(p): return int(p["uid"]))
+	def["pigment_reward"] = float(AtlasRules.pig_cfg().get("reward", 10)) * pigs.size()
+	# Varnish (Phase 1E): zone parameters only
+	var fx := AtlasRules.varnish_fx(st)
+	def["varnish_fx"] = fx
+	def["damage_mult"] = float(def.get("damage_mult", 1.0)) * float(fx["damage_mult"])
+	if int(fx["elite_mods"]) != 0:
+		var em: Array = def.get("elite_mods", [1, 2])
+		def["elite_mods"] = [int(em[0]) + int(fx["elite_mods"]), int(em[1]) + int(fx["elite_mods"])]
+	if not pigs.is_empty():
+		var gone := AtlasRules.spend_pigments(st, def["pigment_uids"], 1)
+		if not gone.is_empty() and ui != null:
+			ui.toast("Used up: %s" % ", ".join(gone), Color("#e0c890"))
+	if seed_value == 0:
+		seed_value = AtlasRules.layout_seed(s0, h, n)
+	return _start_run(def, seed_value, {"mods": AtlasRules.run_mods(s0, h, n, def), "depth": 1, "atlas": AtlasRules.key(h)})
+
+func _start_run(def: Dictionary, seed_value: int, run: Dictionary) -> bool:
 	Game.autosave()   # snapshot before the run starts
 	var minions: int = Game.carried_minions
 	_clear_level()
@@ -127,3 +183,6 @@ func open_station(kind: String) -> void:
 
 func _on_player_died() -> void:
 	Game.carried_minions = 0
+	# Atlas zones: death adds Rot to the hex (Phase 1C; idempotent, the death panel calls it too)
+	if Game.level != null and Game.level.has_method("apply_death_rot"):
+		Game.level.apply_death_rot()

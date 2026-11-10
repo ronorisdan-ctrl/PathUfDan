@@ -31,7 +31,41 @@ static func builds() -> Array:
 	return ["balanced", "glass", "defensive"]
 
 func targets_for(cls: String, build: String) -> Array:
+	## Phase B: a keystone build plan (sb_builds.gd) replaces the build's targets:
+	## tree gem socket and first mastery early, the keystone from ks_at, other masteries after.
+	if hub != null and not hub.plan.is_empty():
+		var pl: Dictionary = hub.plan
+		var out := []
+		for s in pl.get("sockets", []):
+			out.append({"node": s, "at": 1})
+		var ms: Array = pl.get("masteries", [])
+		if ms.size() > 0:
+			out.append({"node": ms[0], "at": 1})
+		out.append({"node": pl["keystone"], "at": int(pl.get("ks_at", 8))})
+		for i in range(1, ms.size()):
+			out.append({"node": ms[i], "at": int(pl.get("ks_at", 8))})
+		return out
 	return TARGETS.get(cls, {}).get(build, [])
+
+## Best effect for a mastery node by the power score (Phase B plans).
+func best_mastery_option(ch, id: String) -> String:
+	var best := ""
+	var bv := -INF
+	var al: Array = ch.allocated.duplicate()
+	al.append(id)
+	for o in ch.mastery_options(id):
+		if ch.can_choose_mastery(id, o["id"]) != "":
+			continue
+		var choices: Dictionary = ch.mastery_choices.duplicate()
+		choices[id] = o["id"]
+		var keep: Dictionary = ch.mastery_choices
+		ch.mastery_choices = choices
+		var v: float = hub.score(ch, null, al)
+		ch.mastery_choices = keep
+		if v > bv:
+			bv = v
+			best = o["id"]
+	return best
 
 func _cost(id: String) -> int:
 	return int(Data.passives.get(id, {}).get("cost", 1))
@@ -40,7 +74,7 @@ func _frontier(ch) -> Array:
 	var out := []
 	for n in Data.passive_list:
 		var id: String = n["id"]
-		if n.get("type") in ["start", "keystone"]:
+		if n.get("type") in ["start", "keystone", "mastery", "socket"]:
 			continue
 		if ch.can_allocate(id) == "":
 			out.append(id)
@@ -72,7 +106,12 @@ func spend(ch, build: String) -> Array:
 			if _cost(first) > ch.available_passive_points():
 				waiting = true     # save the point for the 2-point keystone
 				break
-			if ch.allocate(first):
+			var opt := ""
+			if ch.is_mastery(first):
+				opt = best_mastery_option(ch, first)
+			if ch.allocate(first, opt):
+				if opt != "":
+					lines.append("MASTERY %s = %s" % [first, opt])
 				lines.append("PASSIVE %s (%s) towards %s, %d left on route" % [first, Data.passives[first].get("name", ""), nid, path.size() - 1])
 				acted = true
 				break
@@ -90,7 +129,7 @@ func spend(ch, build: String) -> Array:
 			var v := g1 / _cost(id)
 			for l in Data.passives[id].get("links", []):
 				var ln: Dictionary = Data.passives.get(l, {})
-				if ch.allocated.has(l) or ln.is_empty() or ln.get("type") in ["start", "keystone"]:
+				if ch.allocated.has(l) or ln.is_empty() or ln.get("type") in ["start", "keystone", "mastery", "socket"]:
 					continue
 				var al2 := al.duplicate()
 				al2.append(l)

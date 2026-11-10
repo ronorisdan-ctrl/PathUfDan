@@ -62,6 +62,22 @@
      "type": "flat",
      "value": 5
     }
+   ],
+   "tree": [
+    {
+     "stat": "fire_damage",
+     "type": "inc",
+     "value": 4
+    },
+    {
+     "stat": "res_fire",
+     "type": "flat",
+     "value": 4
+    }
+   ],
+   "tree_tags": [
+    "fire",
+    "ignite"
    ]
   },
   {
@@ -93,6 +109,23 @@
      "type": "flat",
      "value": 5
     }
+   ],
+   "tree": [
+    {
+     "stat": "cold_damage",
+     "type": "inc",
+     "value": 4
+    },
+    {
+     "stat": "res_cold",
+     "type": "flat",
+     "value": 4
+    }
+   ],
+   "tree_tags": [
+    "cold",
+    "chill",
+    "freeze"
    ]
   },
   {
@@ -124,6 +157,24 @@
      "type": "flat",
      "value": 5
     }
+   ],
+   "tree": [
+    {
+     "stat": "lightning_damage",
+     "type": "inc",
+     "value": 4
+    },
+    {
+     "stat": "trap_damage",
+     "type": "inc",
+     "value": 4
+    }
+   ],
+   "tree_tags": [
+    "lightning",
+    "shock",
+    "trap",
+    "deployable"
    ]
   },
   {
@@ -155,6 +206,25 @@
      "type": "flat",
      "value": 3
     }
+   ],
+   "tree": [
+    {
+     "stat": "physical_damage",
+     "type": "inc",
+     "value": 4
+    },
+    {
+     "stat": "armour",
+     "type": "inc",
+     "value": 5
+    }
+   ],
+   "tree_tags": [
+    "physical",
+    "melee",
+    "armour",
+    "stun",
+    "block"
    ]
   },
   {
@@ -186,6 +256,25 @@
      "type": "flat",
      "value": 3
     }
+   ],
+   "tree": [
+    {
+     "stat": "attack_speed",
+     "type": "inc",
+     "value": 2
+    },
+    {
+     "stat": "projectile_speed",
+     "type": "inc",
+     "value": 4
+    }
+   ],
+   "tree_tags": [
+    "speed",
+    "projectile",
+    "evasion",
+    "mobility",
+    "dodge"
    ]
   },
   {
@@ -217,6 +306,25 @@
      "type": "flat",
      "value": 3
     }
+   ],
+   "tree": [
+    {
+     "stat": "spell_damage",
+     "type": "inc",
+     "value": 4
+    },
+    {
+     "stat": "minion_damage",
+     "type": "inc",
+     "value": 4
+    }
+   ],
+   "tree_tags": [
+    "spell",
+    "arcane",
+    "void",
+    "minion",
+    "mana"
    ]
   },
   {
@@ -253,6 +361,24 @@
      "type": "inc",
      "value": 4
     }
+   ],
+   "tree": [
+    {
+     "stat": "crit_chance",
+     "type": "inc",
+     "value": 5
+    },
+    {
+     "stat": "crit_multi",
+     "type": "flat",
+     "value": 3
+    }
+   ],
+   "tree_tags": [
+    "crit",
+    "execute",
+    "marked",
+    "resist"
    ]
   },
   {
@@ -279,6 +405,26 @@
      "type": "flat",
      "value": 3
     }
+   ],
+   "tree": [
+    {
+     "stat": "max_life",
+     "type": "flat",
+     "value": 6
+    },
+    {
+     "stat": "dot_damage",
+     "type": "inc",
+     "value": 4
+    }
+   ],
+   "tree_tags": [
+    "life",
+    "sustain",
+    "bleed",
+    "poison",
+    "dot",
+    "ailment"
    ]
   }
  ]

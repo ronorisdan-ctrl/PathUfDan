@@ -32,6 +32,7 @@ func run() -> Dictionary:
 	_t_minimal()
 	_t_level_delta()
 	_t_affixes_and_upgrade()
+	_t_rot_touched()
 	_t_normalize_garbage()
 	_t_roundtrip()
 	_t_per_character()
@@ -164,6 +165,39 @@ func _t_affixes_and_upgrade() -> void:
 	_check(g.evaluate(_item("rare"))["color"] == null, "no upgrade checker means not an upgrade")
 	g.upgrade_checker = func(_it): return true
 	_check(g.evaluate(_item("rare"))["color"] != null, "upgrade checker is used")
+
+
+func _preset(n: String) -> Node:
+	var f = LF.new()
+	f.set_filter(f.import_text(FileAccess.get_file_as_string(LF.PRESET_DIR + n + ".json"))["data"])
+	return f
+
+
+## Endgame 2B: rot_touched / rot_implicit_any conditions and the preset rules.
+func _t_rot_touched() -> void:
+	var rot := {"rot_implicit": {"id": "spore_bloom", "tier": 1, "mods": []}}
+	var f = _mk({"rules": [_rule("rot", {"rot_touched": true}, {"color": "#00ff00"}),
+		_rule("not rot", {"rot_touched": false}, {"color": "#ff0000"})]})
+	_check(f.evaluate(_item("common", rot))["color"] == Color.html("#00ff00"), "rot_touched true matches a Rot-touched item")
+	_check(f.evaluate(_item("common"))["color"] == Color.html("#ff0000"), "rot_touched false matches a plain item")
+	_check(f.evaluate(_item("common", {"rot_implicit": "junk"}))["color"] == Color.html("#ff0000"), "a malformed rot_implicit counts as not Rot-touched")
+	var g = _mk({"rules": [_rule("ids", {"rot_implicit_any": "spore_bloom, blighted_fortune"}, {"color": "#00ff00"})]})
+	_check(g.evaluate(_item("rare", rot))["color"] != null, "rot_implicit_any matches a listed id (comma list)")
+	_check(g.evaluate(_item("rare", {"rot_implicit": {"id": "rotting_hide"}}))["color"] == null, "rot_implicit_any rejects other ids")
+	_check(g.evaluate(_item("rare"))["color"] == null, "rot_implicit_any rejects plain items")
+	var green := Color.html("#b0e050")
+	for n in LF.PRESET_NAMES:
+		var p = _preset(n)
+		var c: Dictionary = p.evaluate(_item("common", rot))
+		_check(c["visibility"] == "show" and c["beam"] == green and not c["minimap"].is_empty(), "preset %s shows a common Rot-touched item with a green beam and icon" % n)
+		var r: Dictionary = p.evaluate(_item("rare", rot))
+		_check(r["visibility"] == "show" and r["beam"] == green, "preset %s shows a rare Rot-touched item with a green beam" % n)
+		var l: Dictionary = p.evaluate(_item("legendary", rot))
+		_check(l["beam"] == Color.html("#ff8c1a"), "preset %s keeps the legendary beam on a Rot-touched legendary" % n)
+		_check(p.evaluate(_item("rare"))["beam"] != green, "preset %s gives plain items no green beam" % n)
+	_check(_preset("strict").evaluate(_item("rare"))["visibility"] == "hide", "strict still hides a plain rare")
+	_check(_preset("strict").evaluate(_item("rare", rot))["color"] == green, "strict shows a Rot-touched rare in green")
+	_check(_preset("default").evaluate(_item("common"))["visibility"] == "minimal", "default still dims plain common gear")
 
 
 func _t_normalize_garbage() -> void:

@@ -1,12 +1,28 @@
 {
  "version": 1,
  "name": "Show everything",
- "description": "Nothing hidden. Only colours and sizes by rarity.",
+ "description": "Nothing hidden. Only colours and sizes by rarity. Rot-touched items get a green beam.",
  "default": "show",
  "safety": {
   "never_hide_min_rarity": "legendary"
  },
  "rules": [
+  {
+   "name": "Rot-touched (green beam and minimap icon, keeps checking)",
+   "enabled": true,
+   "conditions": {
+    "rot_touched": true
+   },
+   "actions": {
+    "visibility": "show",
+    "beam": "#b0e050",
+    "minimap": {
+     "shape": "diamond",
+     "color": "#b0e050"
+    },
+    "continue": true
+   }
+  },
   {
    "name": "Legendary",
    "enabled": true,
@@ -96,6 +112,19 @@
     "visibility": "show",
     "color": "#8a8a8a",
     "size": "small"
+   }
+  },
+  {
+   "name": "Rot-touched below rare (green label)",
+   "enabled": true,
+   "conditions": {
+    "rot_touched": true,
+    "rarity_max": "uncommon"
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#b0e050",
+    "size": "large"
    }
   },
   {

@@ -9,6 +9,7 @@ extends RefCounted
 
 var mods := {}   # stat -> {flat, inc, more, src:{source:{flat,inc,more}}}
 var flags := {}  # special mechanics (keystones, legendary effects) -> count
+var operations := []  # typed corruption operations, each with its item source
 
 func add(stat: String, type: String, amount: float, source: String = "base") -> void:
 	var m = mods.get(stat)
@@ -32,6 +33,12 @@ func add(stat: String, type: String, amount: float, source: String = "base") -> 
 	s[type] += amount
 
 func add_mod(mod: Dictionary, source: String) -> void:
+	if mod.has("op"):
+		if preload("res://scripts/core/corruption_effects.gd").supports(str(mod["op"])):
+			var effect := mod.duplicate(true)
+			effect["source"] = source
+			operations.append(effect)
+		return
 	add(mod.get("stat", ""), mod.get("type", "flat"), float(mod.get("value", 0.0)), source)
 
 func add_flag(flag: String) -> void:

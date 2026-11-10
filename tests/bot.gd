@@ -107,7 +107,7 @@ func _spend_points(ch) -> void:
 		guard += 1
 		var best := ""
 		for n in Data.passive_list:
-			if ch.can_allocate(n["id"]) == "" and n["type"] != "keystone":
+			if ch.can_allocate(n["id"]) == "" and not (n["type"] in ["keystone", "mastery", "socket"]):
 				best = n["id"]
 				break
 		if best == "":

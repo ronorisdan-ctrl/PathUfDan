@@ -2,6 +2,7 @@ extends "res://scripts/ui/base_panel.gd"
 ## Merchant: buy gear, refill flasks, sell from the inventory (Shift+LMB or RMB).
 
 const ItemSlot = preload("res://scripts/ui/item_slot.gd")
+const Chrome = preload("res://scripts/ui/components/station_chrome.gd")
 
 var grid: GridContainer
 var slots := []
@@ -10,12 +11,13 @@ var gold_label: Label
 func _init() -> void:
 	place = "left"
 	build("Merchant Varga", Vector2(420, 460))
-	body.add_child(UIKit.label("\"Coin for steel, steel for coin. The dead don't haggle.\"", 12, UIKit.MUTED))
+	Chrome.apply(self)
+	body.add_child(Chrome.caption("\"Coin for steel, steel for coin. The dead don't haggle.\""))
 	grid = GridContainer.new()
 	grid.columns = 8
 	grid.add_theme_constant_override("h_separation", 4)
 	grid.add_theme_constant_override("v_separation", 4)
-	body.add_child(grid)
+	Chrome.inset(body, grid)
 	for i in 16:
 		var s = ItemSlot.new()
 		s.key = i
@@ -26,13 +28,16 @@ func _init() -> void:
 		slots.append(s)
 	gold_label = UIKit.label("", 14, Color("#e8c050"))
 	body.add_child(gold_label)
-	var h := HBoxContainer.new()
+	var h := HFlowContainer.new()
 	h.add_child(UIKit.button("Refill flasks (free)", _refill))
 	h.add_child(UIKit.button("New stock (%s)" % "25 gold", _reroll))
 	h.add_child(UIKit.button("Buy random rune", _buy_rune))
 	body.add_child(h)
-	body.add_child(UIKit.label("LMB an item to buy it. Sell with Shift+LMB or RMB in your inventory.", 11, UIKit.MUTED))
+	body.add_child(Chrome.caption("LMB an item to buy it. Sell with Shift+LMB or RMB in your inventory."))
 	Events.currency_changed.connect(refresh)
+
+func reposition() -> void:
+	Chrome.place_panel(self, Vector2(480, 460))
 
 func on_open() -> void:
 	if Game.vendor_stock.is_empty():

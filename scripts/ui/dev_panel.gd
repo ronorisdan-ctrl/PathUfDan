@@ -34,6 +34,9 @@ var elite_boxes := {}
 var spawn_count := 1
 var count_btns := []
 var abyss_spin: SpinBox
+var atlas_hex_edit: LineEdit
+var atlas_rot_spin: SpinBox
+var atlas_mech_pick: OptionButton
 var pet_tier_spin: SpinBox
 var pet_name_edit: LineEdit
 var time_slider: HSlider
@@ -319,6 +322,7 @@ func _build_items(v: VBoxContainer) -> void:
 	_btn(hc3, "Clear selected", "Set the chosen bag item back to 0%", func():
 		return Dev.clear_item_corruption(_corr_idx()))
 	_btn(hc3, "Clear all bag items", "Set every bag item back to 0%", Dev.clear_bag_corruption)
+	_btn(hc3, "Rot-touch bag items", "Endgame 2B: give every bag item a Rot-touched implicit (Rot 5 tier)", Dev.rot_touch_bag)
 	_head(v, "Bag")
 	var hb := _row(v, "")
 	var cb := UIKit.button("Clear bag", func():
@@ -382,6 +386,8 @@ func _build_dungeon(v: VBoxContainer) -> void:
 	var dl := []
 	for d in Data.dungeon_list:
 		dl.append(["T%d %s" % [int(d.get("tier", 1)), d["name"]], d["id"]])
+	for z in Data.zone_list:   # Endgame Phase 0: chamber-stitched zone spike
+		dl.append(["Zone spike: %s" % z["name"], z["id"]])
 	dungeon_pick = _option(hr, dl, 250)
 	hr.add_child(UIKit.label(" depth", 13))
 	depth_spin = _spin(hr, 1, 99, 1, 1, 64)
@@ -399,6 +405,28 @@ func _build_dungeon(v: VBoxContainer) -> void:
 	var ht := _row(v, "Teleport")
 	_btn(ht, "To cursor (F2)", "Teleport to where the mouse last was over the game", func(): return Dev.teleport_to(Dev.cursor()))
 	_btn(ht, "To exit portal", "Teleport to the exit portal (or the town portal before the boss is dead)", Dev.teleport_to_exit)
+	var hat := _row(v, "Atlas")
+	_btn(hat, "Unlock", "Unlock the Atlas of Ruin without killing Malgrath", Dev.atlas_unlock)
+	_btn(hat, "Reveal all", "Reveal every Atlas region", Dev.atlas_reveal_all)
+	_btn(hat, "Grant Easel kit", "+300 Glaze Flakes, +100 Pigment Dust, one Pigment of each modifier, one of each Varnish", Dev.atlas_grant)
+	var hrot := _row(v, "Atlas Rot")
+	atlas_hex_edit = LineEdit.new()
+	atlas_hex_edit.placeholder_text = "q,r"
+	atlas_hex_edit.text = "2,-1"
+	atlas_hex_edit.custom_minimum_size = Vector2(70, 0)
+	hrot.add_child(atlas_hex_edit)
+	atlas_rot_spin = _spin(hrot, 0, 5, 4, 1, 60)
+	_btn(hrot, "Set Rot", "Set this region's Rot (0 clears it and removes Restored)", func(): return Dev.atlas_set_rot(atlas_hex_edit.text, int(atlas_rot_spin.value)))
+	atlas_mech_pick = _option(hrot, [["Natural mechanic", ""], ["No mechanic", "none"], ["Glazed Elites", "glazed"], ["The Unfinished", "unfinished"], ["Collector's Wager", "wager"], ["Pentimento Vaults", "vault"]], 150)
+	_btn(hrot, "Force", "Force the zone mechanic of the next Atlas runs (Pigments still add theirs; not saved)", func(): return Dev.atlas_force_mechanic(_picked(atlas_mech_pick)))
+	_btn(hrot, "Open vaults", "Open every Pentimento Vault in this Atlas zone", func(): return Dev.atlas_open_vaults())
+	var hwd := _row(v, "Atlas Wardens")
+	_btn(hwd, "Grant shards", "+3 Ground Shards of every layer with a Warden", Dev.atlas_grant_shards)
+	_btn(hwd, "Summon at q,r", "Summon that ring's Warden at the region typed in the Atlas Rot box (marks it cleared, tops up shards)", func(): return Dev.atlas_summon_warden(atlas_hex_edit.text))
+	var hgd := _row(v, "Atlas Guild")
+	_btn(hgd, "+100 rep", "+100 Restorers' Guild reputation", func(): return Dev.atlas_guild_grant(100, 0))
+	_btn(hgd, "+10 Seals", "+10 Seals (one cache)", func(): return Dev.atlas_guild_grant(0, 10))
+	_btn(hgd, "Complete board", "Complete every unfinished contract (pays them) and refresh the board", Dev.atlas_guild_complete)
 	var hab := _row(v, "Abyss depth")
 	abyss_spin = _spin(hab, 1, 99, 5, 1, 70)
 	_btn(hab, "Descend", "Start the Endless Abyss at this depth", func(): return Dev.set_abyss_depth(int(abyss_spin.value)))

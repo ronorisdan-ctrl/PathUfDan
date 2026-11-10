@@ -753,6 +753,60 @@ const SPRITES := {
 		"....kkkkkkkk....",
 		"................",
 	],
+	"npc_restorer": [
+		"................",
+		"......kkkk......",
+		".....kZzzzk.....",
+		"....kZzzzzzk....",
+		"....khsssshk....",
+		"....kssxsxsk....",
+		"....khsssshk....",
+		"...kkzzyyzzkk.k.",
+		"..kzzzzyyzzzzkjk",
+		"..kszzzyyzzzskjk",
+		"...kzzzyyzzzk.jk",
+		"...kzzbBbBzzk.ek",
+		"...kzzzzzzzzk.k.",
+		"...kZZZZZZZZk...",
+		"....kkkkkkkk....",
+		"................",
+	],
+	"npc_collector": [
+		"................",
+		".....kkkkkk.....",
+		"....kPPPPPPk....",
+		"...kkkkkkkkkk...",
+		"....kssxsxsk....",
+		"....kSsssSsk....",
+		".....kSsssk.....",
+		"....kkPvvPkk..y.",
+		"...kPPPvvPPPkkyk",
+		"...kPPPvvPPPk.yk",
+		"...ksPPvvPPsk.Yk",
+		"....kPPyyPPk..k.",
+		"....kPPPPPPk....",
+		"....kPPkkPPk....",
+		"....kkk..kkk....",
+		"................",
+	],
+	"pentimento_wall": [
+		"kkkkkkkkkkkkkkkk",
+		"kqqcqqqqvqqqqcqk",
+		"kqcCcqqqqqqvqqqk",
+		"kqqcqqvvqqqqqqqk",
+		"kqqqqvPvqqcqqqqk",
+		"kqvqqqvqqcCcqqvk",
+		"kqqqqqqqqqcqqqqk",
+		"kqqcqqqvqqqqqcqk",
+		"kqcCcqvPvqqqcCck",
+		"kqqcqqqvqqqqqcqk",
+		"kqqqqqqqqvqqqqqk",
+		"kqvqqcqqvPvqqqqk",
+		"kqqqcCcqqvqqqvqk",
+		"kqqqqcqqqqqqqqqk",
+		"kQQQQQQQQQQQQQQk",
+		"kkkkkkkkkkkkkkkk",
+	],
 	"npc_drillmaster": [
 		"................",
 		"......kkkk......",
@@ -890,6 +944,8 @@ var soft_tex: Texture2D
 func _ready() -> void:
 	light_tex = _radial(128, 1.0)
 	soft_tex = _radial(64, 0.6)
+	load_render()
+	load_manifest()
 
 func _radial(size: int, power: float) -> Texture2D:
 	var g := Gradient.new()
@@ -1036,3 +1092,171 @@ func wall_tile(pal: String, top_only: bool) -> Texture2D:
 			img.set_pixel(x, y, c)
 	_cache[key] = ImageTexture.create_from_image(img)
 	return _cache[key]
+
+# ------------------------------------------------------------- sprite sheets (Phase V0)
+# New art is PNG sprite sheets described by data/art/sprites.json, drawn at 32 px per
+# cell and shown at ART_SCALE (0.5) inside the 16-unit gameplay grid, so with the camera's
+# zoom of 2 one art pixel is one screen pixel at 1280x720. See docs/adr/0001-art-scale.md.
+# Anything missing falls back to the ASCII art above (Art.sprite(fallback)).
+const RENDER_PATH := "res://data/render.json"
+const MANIFEST_PATH := "res://data/art/sprites.json"
+const ASSET_ROOT := "res://assets/"
+const PLACEHOLDER_ROOT := "res://assets/placeholders/"
+const AnimRules = preload("res://scripts/gfx/anim_rules.gd")
+
+var render := {}
+var ART_SCALE := 0.5             # loaded from data/render.json "art_scale"
+var manifest := {}
+var placeholders_in_game := false   # render.json, or --art-placeholders on the command line
+var force_fallback := false      # --art-fallback, or tests: ignore every sheet
+var art_errors := []
+var _defs := {}
+var _frames := {}
+
+func load_render() -> void:
+	render = _read_json(RENDER_PATH)
+	ART_SCALE = float(render.get("art_scale", 0.5))
+	placeholders_in_game = bool(render.get("placeholders_in_game", false))
+	var args := OS.get_cmdline_user_args()
+	if args.has("--art-placeholders"):
+		placeholders_in_game = true
+	if args.has("--art-fallback"):
+		force_fallback = true
+
+func load_manifest() -> void:
+	manifest = _read_json(MANIFEST_PATH)
+	if not manifest.has("sprites"):
+		manifest["sprites"] = {}
+	clear_sheet_cache()
+
+func clear_sheet_cache() -> void:
+	_defs.clear()
+	_frames.clear()
+
+func camera_zoom() -> float:
+	return float(render.get("camera_zoom", 2.0))
+
+func _read_json(path: String) -> Dictionary:
+	if not FileAccess.file_exists(path):
+		art_errors.append("missing " + path)
+		return {}
+	var f := FileAccess.open(path, FileAccess.READ)
+	var v = JSON.parse_string(f.get_as_text())
+	if typeof(v) != TYPE_DICTIONARY:
+		art_errors.append("bad json " + path)
+		return {}
+	return v
+
+## The manifest entry with defaults filled in (same rules as tools/art_common.py).
+func sprite_entry(id: String) -> Dictionary:
+	var sprites: Dictionary = manifest.get("sprites", {})
+	if not sprites.has(id):
+		return {}
+	var e: Dictionary = sprites[id]
+	var out: Dictionary = manifest.get("defaults", {}).duplicate(true)
+	for k in e:
+		if k != "anims":
+			out[k] = e[k]
+	out["id"] = id
+	if not out.has("frame"):
+		out["frame"] = [64, 64]
+	if not out.has("pivot"):
+		out["pivot"] = [int(out["frame"][0]) / 2, int(out["frame"][1]) - 6]
+	var anims := {}
+	var ea: Dictionary = e.get("anims", {})
+	for n in ea:
+		var a: Dictionary = {"fps": float(out.get("fps", 10)), "loop": false}
+		for k in ea[n]:
+			a[k] = ea[n][k]
+		if not a.has("file"):
+			a["file"] = "sprites/%s/%s/%s_%s.png" % [out.get("category", "misc"), id, id, n]
+		anims[n] = a
+	out["anims"] = anims
+	return out
+
+## First id in `ids` (e.g. [enemy id, sprite id]) that has usable sheet art, resolved with
+## loaded textures; {} when none (the caller keeps the old Sprite2D art).
+func sprite_def(ids) -> Dictionary:
+	if force_fallback:
+		return {}
+	if typeof(ids) == TYPE_STRING:
+		ids = [ids]
+	for id in ids:
+		var d := _resolve(str(id))
+		if not d.is_empty():
+			return d
+	return {}
+
+## Resolves one entry: per animation, real art at assets/<file>, else (when placeholders
+## are enabled) assets/placeholders/<file>. Usable when at least "idle" resolves.
+func _resolve(id: String, allow_placeholders := false) -> Dictionary:
+	var key := id + ("|ph" if (placeholders_in_game or allow_placeholders) else "")
+	if _defs.has(key):
+		return _defs[key]
+	var out := {}
+	var e := sprite_entry(id)
+	if not e.is_empty():
+		var fw := int(e["frame"][0])
+		var fh := int(e["frame"][1])
+		var rows := AnimRules.rows_needed(int(e.get("directions", 8)), bool(e.get("mirror", true)))
+		var anims := {}
+		var any_ph := false
+		for n in e["anims"]:
+			var a: Dictionary = e["anims"][n].duplicate()
+			var tex: Texture2D = null
+			var ph := false
+			var real: String = ASSET_ROOT + str(a["file"])
+			if ResourceLoader.exists(real):
+				tex = load(real)
+			elif placeholders_in_game or allow_placeholders:
+				var pp: String = PLACEHOLDER_ROOT + str(a["file"])
+				if ResourceLoader.exists(pp):
+					tex = load(pp)
+					ph = true
+			if tex == null:
+				continue
+			var nf := int(a.get("frames", 1))
+			if tex.get_width() < nf * fw or tex.get_height() < rows * fh:
+				art_errors.append("%s/%s: sheet %dx%d is smaller than %d frames x %d rows of %dx%d" % [id, n, tex.get_width(), tex.get_height(), nf, rows, fw, fh])
+				continue
+			a["tex"] = tex
+			a["placeholder"] = ph
+			any_ph = any_ph or ph
+			anims[n] = a
+		if anims.has("idle"):
+			out = e
+			out["anims"] = anims
+			out["rows"] = rows
+			out["placeholder"] = any_ph
+	_defs[key] = out
+	return out
+
+## Gallery / tests: resolve with placeholders allowed regardless of the in-game setting.
+func sprite_def_any(id: String) -> Dictionary:
+	return _resolve(id, true)
+
+## SpriteFrames for a resolved def: animation "<anim>_<row>", one AtlasTexture per frame.
+## Built once per def and shared by every actor using it.
+func sprite_frames_for(d: Dictionary) -> SpriteFrames:
+	var key := str(d.get("id", "")) + ("|ph" if d.get("placeholder", false) else "")
+	if _frames.has(key):
+		return _frames[key]
+	var sf := SpriteFrames.new()
+	if sf.has_animation("default"):
+		sf.remove_animation("default")
+	var fw := int(d["frame"][0])
+	var fh := int(d["frame"][1])
+	for n in d["anims"]:
+		var a: Dictionary = d["anims"][n]
+		for r in int(d.get("rows", 1)):
+			var an := "%s_%d" % [n, r]
+			sf.add_animation(an)
+			sf.set_animation_loop(an, bool(a.get("loop", false)))
+			sf.set_animation_speed(an, float(a.get("fps", 10)))
+			for f in int(a.get("frames", 1)):
+				var at := AtlasTexture.new()
+				at.atlas = a["tex"]
+				at.region = Rect2(f * fw, r * fh, fw, fh)
+				sf.add_frame(an, at)
+	_frames[key] = sf
+	return sf

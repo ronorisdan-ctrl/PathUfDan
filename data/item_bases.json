@@ -1694,6 +1694,11 @@
     "stat": "spell_damage",
     "type": "inc",
     "value": 16
+   },
+   {
+    "stat": "added_spell",
+    "type": "flat",
+    "value": 2
    }
   ],
   "base_tier": 2
@@ -1722,6 +1727,11 @@
     "stat": "spell_damage",
     "type": "inc",
     "value": 22
+   },
+   {
+    "stat": "added_spell",
+    "type": "flat",
+    "value": 11
    }
   ],
   "base_tier": 3
@@ -1750,6 +1760,11 @@
     "stat": "spell_damage",
     "type": "inc",
     "value": 26
+   },
+   {
+    "stat": "added_spell",
+    "type": "flat",
+    "value": 3
    }
   ],
   "base_tier": 2
@@ -1778,6 +1793,11 @@
     "stat": "spell_damage",
     "type": "inc",
     "value": 35
+   },
+   {
+    "stat": "added_spell",
+    "type": "flat",
+    "value": 12
    }
   ],
   "base_tier": 3
@@ -1811,6 +1831,11 @@
     "stat": "max_mana",
     "type": "flat",
     "value": 24
+   },
+   {
+    "stat": "added_spell",
+    "type": "flat",
+    "value": 4
    }
   ],
   "base_tier": 2
@@ -1844,6 +1869,11 @@
     "stat": "max_mana",
     "type": "flat",
     "value": 33
+   },
+   {
+    "stat": "added_spell",
+    "type": "flat",
+    "value": 18
    }
   ],
   "base_tier": 3

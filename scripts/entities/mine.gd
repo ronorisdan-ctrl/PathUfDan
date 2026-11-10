@@ -20,6 +20,8 @@ func setup(player, sk: Dictionary) -> void:
 	radius = float(sk.get("radius", 56)) * float(player.ch.final.get("area_mult", 1.0))
 	trigger = float(sk.get("trigger_radius", 36))
 	z_index = -1
+	if player.ch.stats.has_flag("master_trapper"):   # Phase 3b: traps arm instantly
+		arm_t = 0.0
 
 func _process(delta: float) -> void:
 	if level == null or owner_player == null or not is_instance_valid(owner_player):
@@ -28,7 +30,7 @@ func _process(delta: float) -> void:
 	blink += delta
 	life_t -= delta
 	if life_t <= 0:
-		expire()
+		retire()
 		return
 	if arm_t > 0:
 		arm_t -= delta
@@ -100,6 +102,13 @@ func detonate() -> void:
 	a.show_telegraph = false
 	a.position = global_position
 	level.floor_layer.add_child(a)
+	expire()
+
+## Timed out or replaced. Volatile Mechanisms: the trap goes off where it stands instead of fizzling.
+func retire() -> void:
+	if alive and owner_player != null and is_instance_valid(owner_player) and owner_player.ch.stats.has_flag("volatile_mechanisms"):
+		detonate()
+		return
 	expire()
 
 func expire() -> void:

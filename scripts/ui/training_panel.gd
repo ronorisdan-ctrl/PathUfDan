@@ -4,6 +4,7 @@ extends "res://scripts/ui/base_panel.gd"
 ## the dummies are spawned by the hub (Game.level.training_spawn). The History tab arrives later.
 
 const TrainingRules = preload("res://scripts/core/training_rules.gd")
+const Chrome = preload("res://scripts/ui/components/station_chrome.gd")
 
 var tab := "setup"
 var tab_btns := {}
@@ -26,7 +27,8 @@ var open_row := -1        # History row that is expanded (-1 = none)
 func _init() -> void:
 	place = "left"
 	build("Drillmaster Rook", Vector2(500, 470))
-	body.add_child(UIKit.label("\"Hit the dummy. The clock starts on your first blow.\"", 12, UIKit.MUTED))
+	Chrome.apply(self)
+	body.add_child(Chrome.caption("\"Hit the dummy. The clock starts on your first blow.\""))
 	var tabs := HBoxContainer.new()
 	body.add_child(tabs)
 	for t in [["setup", "Setup"], ["result", "Result"], ["history", "History"]]:
@@ -37,7 +39,9 @@ func _init() -> void:
 	# ---- Setup tab
 	setup_box = VBoxContainer.new()
 	setup_box.add_theme_constant_override("separation", 8)
-	body.add_child(setup_box)
+	var setup_scroll := Chrome.reading_scroll(body, 340)
+	setup_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	setup_scroll.add_child(setup_box)
 	var cfg: Dictionary = Data.training_cfg
 	var lab: Dictionary = cfg.get("labels", {})
 	var type_choices := []
@@ -67,33 +71,28 @@ func _init() -> void:
 	setup_box.add_child(actions)
 	note_label = UIKit.label("", 12, UIKit.MUTED)
 	note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	note_label.custom_minimum_size = Vector2(470, 0)
 	setup_box.add_child(note_label)
 	msg_label = UIKit.label("", 12, UIKit.GOLD)
 	msg_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	msg_label.custom_minimum_size = Vector2(470, 0)
 	setup_box.add_child(msg_label)
 	# ---- Result tab
 	result_box = VBoxContainer.new()
+	result_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(result_box)
-	var sc := ScrollContainer.new()
-	sc.custom_minimum_size = Vector2(470, 340)
-	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	result_box.add_child(sc)
-	result_label = UIKit.rich("", 450)
+	var sc := Chrome.reading_scroll(result_box, 300)
+	result_label = UIKit.rich()
+	result_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(result_label)
 	# ---- History tab
 	history_box = VBoxContainer.new()
+	history_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(history_box)
-	var hsc := ScrollContainer.new()
-	hsc.custom_minimum_size = Vector2(470, 300)
-	hsc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	history_box.add_child(hsc)
+	var hsc := Chrome.reading_scroll(history_box, 300)
 	history_list = VBoxContainer.new()
-	history_list.custom_minimum_size = Vector2(450, 0)
+	history_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	history_list.add_theme_constant_override("separation", 4)
 	hsc.add_child(history_list)
-	var hfoot := HBoxContainer.new()
+	var hfoot := HFlowContainer.new()
 	clear_btn = UIKit.button("Clear history", _ask_clear, 120)
 	hfoot.add_child(clear_btn)
 	history_note = UIKit.label("", 12, UIKit.MUTED)
@@ -101,11 +100,17 @@ func _init() -> void:
 	history_box.add_child(hfoot)
 	TrainingLog.result_ready.connect(func(_r): refresh())
 
+func reposition() -> void:
+	Chrome.place_panel(self, Vector2(560, 600))
+
 func _choice_row(title: String, key: String, choices: Array) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	var l := UIKit.label(title, 13, UIKit.MUTED)
 	l.custom_minimum_size = Vector2(120, 0)
 	row.add_child(l)
+	var options := HFlowContainer.new()
+	options.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(options)
 	var grp := ButtonGroup.new()
 	choice_btns[key] = {}
 	for c in choices:
@@ -115,7 +120,7 @@ func _choice_row(title: String, key: String, choices: Array) -> HBoxContainer:
 		b.button_group = grp
 		b.pressed.connect(_pick.bind(key, c[0]))
 		b.pressed.connect(func(): Sfx.play("ui", 0.0))
-		row.add_child(b)
+		options.add_child(b)
 		choice_btns[key][c[0]] = b
 	setup_box.add_child(row)
 	return row
@@ -142,6 +147,7 @@ func refresh() -> void:
 	if not visible:
 		return
 	setup_box.visible = tab == "setup"
+	setup_box.get_parent().visible = setup_box.visible
 	result_box.visible = tab == "result"
 	history_box.visible = tab == "history"
 	for t in tab_btns:
@@ -194,15 +200,14 @@ func _refresh_history() -> void:
 		var b := Button.new()
 		b.text = ("v  " if i == open_row else ">  ") + str(lines[0])
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.clip_text = true
-		b.custom_minimum_size = Vector2(440, 0)
 		b.add_theme_font_size_override("font_size", 12)
 		b.pressed.connect(_toggle_row.bind(i))
 		history_list.add_child(b)
-		history_list.add_child(UIKit.label("     " + str(lines[1]), 11, UIKit.MUTED))
+		Chrome.wrap_button(b, 470)
+		history_list.add_child(Chrome.caption(str(lines[1])))
 		if i == open_row:
 			var prev := TrainingRules.previous_comparable(e, h, i + 1)
-			var rt := UIKit.rich(TrainingRules.history_detail_text(e, delta, prev.get("snapshot", {}), cfg), 430)
+			var rt := UIKit.rich(TrainingRules.history_detail_text(e, delta, prev.get("snapshot", {}), cfg))
 			history_list.add_child(rt)
 
 func _toggle_row(i: int) -> void:

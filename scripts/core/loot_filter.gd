@@ -22,11 +22,11 @@ const SLOTS := ["weapon_1h", "weapon_2h", "offhand", "helm", "chest", "gloves",
 const VISIBILITY := ["show", "minimal", "hide"]
 const SIZES := {"small": 13, "normal": 16, "large": 20, "huge": 26}
 const MINIMAP_SHAPES := ["circle", "diamond", "square", "star"]
-const LIST_COND_KEYS := ["kind", "slot", "name_contains", "affix_any"]
+const LIST_COND_KEYS := ["kind", "slot", "name_contains", "affix_any", "rot_implicit_any"]
 const COND_KEYS := ["rarity_min", "rarity_max", "kind", "slot", "name_contains",
 	"ilvl_min", "ilvl_max", "ilvl_vs_player_min", "ilvl_vs_player_max",
 	"sockets_min", "affix_any", "affix_min_matches", "affix_count_min",
-	"is_upgrade", "tier_min", "tier_max"]
+	"is_upgrade", "tier_min", "tier_max", "rot_touched", "rot_implicit_any"]
 const ACTION_KEYS := ["visibility", "color", "size", "beam", "sound", "minimap", "continue"]
 
 ## Items used by the editor's dry run and by tests. Keys follow describe().
@@ -39,6 +39,8 @@ const SAMPLE_ITEMS := [
 	{"name": "Cracked Charm", "rarity": "common", "kind": "charm", "slot": "charm", "ilvl": 8, "sockets": 0},
 	{"name": "Ruby (Grade 2)", "rarity": "uncommon", "kind": "gem", "ilvl": 1},
 	{"name": "Rune of Echoes", "rarity": "rare", "kind": "rune", "ilvl": 1},
+	{"name": "Blighted Boots", "rarity": "uncommon", "kind": "gear", "slot": "boots", "ilvl": 50, "sockets": 0,
+		"rot_implicit": {"id": "rotting_hide", "tier": 2}},
 ]
 
 var filter: Dictionary = {}
@@ -155,9 +157,17 @@ func describe(item: Dictionary) -> Dictionary:
 		kind = "charm" if slot == "charm" else ("gem" if item.has("gem_type") else "gear")
 	return {
 		"rarity_i": ri, "kind": kind, "slot": slot, "ilvl": int(item.get("ilvl", 0)),
-		"sockets": sockets, "affixes": ids,
+		"sockets": sockets, "affixes": ids, "rot": _rot_id(item),
 		"text": (str(item.get("base_name", item.get("base", ""))) + " " + str(item.get("name", ""))).to_lower(),
 	}
+
+
+## Endgame 2B: the item's Rot-touched implicit id ("" when none).
+func _rot_id(item: Dictionary) -> String:
+	var r = item.get("rot_implicit")
+	if typeof(r) != TYPE_DICTIONARY:
+		return ""
+	return str(r.get("id", ""))
 
 
 func _match(c: Dictionary, d: Dictionary, item: Dictionary, ctx: Dictionary) -> bool:
@@ -198,6 +208,10 @@ func _match(c: Dictionary, d: Dictionary, item: Dictionary, ctx: Dictionary) -> 
 				n += 1
 		if n < int(c.get("affix_min_matches", 1)):
 			return false
+	if c.has("rot_touched") and (d["rot"] != "") != bool(c["rot_touched"]):
+		return false
+	if c.has("rot_implicit_any") and not (d["rot"] in c["rot_implicit_any"]):
+		return false
 	if c.has("tier_min") and int(ctx.get("tier", 0)) < int(c["tier_min"]):
 		return false
 	if c.has("tier_max") and int(ctx.get("tier", 0)) > int(c["tier_max"]):

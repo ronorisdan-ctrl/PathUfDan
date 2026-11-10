@@ -12,6 +12,7 @@ const DODGE_DIST := 85.0
 const DODGE_CD := 1.1
 
 var ch = null
+var flasks_used := 0          # flasks drunk this run (Endgame 2D wagers)
 var mana := 0.0
 var exec = SkillExec.new()
 var cooldowns := {}
@@ -53,13 +54,28 @@ var heal_mult := 1.0   # run modifiers can reduce recovery
 var invuln_t := 0.0
 var spell_count := 0
 var aura_t := 0.0
+var riposte_t := 0.0   # Iron Riposte internal cooldown
+# Phase 3 passive state
+var last_curse := []          # curse statuses of the last curse skill cast (Hexshot)
+var hexshot_cast := -2        # cast serial that already applied Hexshot
+var last_spell_type := ""     # damage type of the last spell cast (Spellblade)
+var spellblade_t := 0.0       # Spellblade internal cooldown
+var last_style := ""          # "melee" / "projectile" of the last skill used (Twin Disciplines)
+var twin_mult := 1.0          # Twin Disciplines multiplier for the current skill
+var second_wind_cd := 0.0
+var arcane_shell_cd := 0.0
+var feint_t := 0.0          # Phase 3b Feint: next melee hit crits while > 0
+var arrowstorm_n := 0       # Phase 3b Arrowstorm: projectile attack hits counted towards the next volley
+var thunder_n := 0          # Phase 3b Thunderhead: lightning spells cast
+var swing_skill_kind := ""   # visual only (sprite_anim.gd): "attack" or a spell kind
+var swing_impact := 0.0      # visual only: seconds into the current use when the hit lands
 
 func setup(character) -> void:
 	ch = character
 	faction = "player"
 	display_name = ch.char_name
 	setup_body(5.0, LAYER_PLAYER, LAYER_WALL | LAYER_ENEMY)
-	setup_sprite(Art.sprite(ch.class_def().get("sprite", "warrior")))
+	setup_sprite(Art.sprite(ch.class_def().get("sprite", "warrior")), 0.0, 1.0, [ch.class_id, ch.class_def().get("sprite", "warrior")])
 	weapon_sprite = Sprite2D.new()
 	weapon_sprite.z_index = 1
 	add_child(weapon_sprite)
@@ -70,7 +86,7 @@ func setup(character) -> void:
 	light.color = Color("#ffe8c8")
 	add_child(light)
 	cam = Camera2D.new()
-	cam.zoom = Vector2(2, 2)
+	cam.zoom = Vector2(Art.camera_zoom(), Art.camera_zoom())   # data/render.json (2)
 	cam.position_smoothing_enabled = true
 	cam.position_smoothing_speed = 9.0
 	add_child(cam)
@@ -175,11 +191,17 @@ func _physics_process(delta: float) -> void:
 	_update_camera(delta)
 
 func _tick_timers(delta: float) -> void:
+	ch.tick_corruption_cooldowns(delta)
 	busy -= delta
 	invuln_t -= delta
 	msg_cd -= delta
 	dodge_t -= delta
 	dodge_cd -= delta
+	riposte_t -= delta
+	spellblade_t -= delta
+	second_wind_cd -= delta
+	arcane_shell_cd -= delta
+	feint_t -= delta
 	if dash_t > 0:
 		dash_t -= delta
 		if dash_t <= 0:
@@ -212,7 +234,8 @@ func _tick_timers(delta: float) -> void:
 			pe["fn"].call()
 
 func _regen(delta: float) -> void:
-	heal(ch.final.get("life_regen", 0.0) * delta)
+	if not (ch.stats.has_flag("blood_frenzy") and life > max_life * 0.5):   # Blood Frenzy: no regeneration above half life
+		heal(ch.final.get("life_regen", 0.0) * delta)
 	var mm: float = ch.final.get("max_mana", 0)
 	mana = minf(mm, mana + ch.final.get("mana_regen", 0.0) * delta)
 
@@ -243,12 +266,24 @@ func mana_cost(sk: Dictionary) -> float:
 	var c: float = float(sk.get("cost", 0)) * ch.final.get("mana_cost_mult", 1.0)
 	if ch.stats.has_flag("hollow_crown") and mana >= ch.final.get("max_mana", 0) * 0.9:
 		c = 0.0
+	if ch.stats.has_flag("iron_riposte") and sk.get("behavior", "") in ["dash", "blink", "leap"]:
+		c *= 1.5
 	return c
+
+## Blood Frenzy: 4% more attack speed per bleeding enemy within 150 units (max 5).
+func frenzy_count() -> int:
+	if level == null or not ch.stats.has_flag("blood_frenzy"):
+		return 0
+	var n := 0
+	for e in level.hostiles_in_radius(global_position, 150.0, "player"):
+		if e.has_status("bleed"):
+			n += 1
+	return mini(n, 5)
 
 func use_time_for(sk: Dictionary) -> float:
 	match sk.get("kind", "spell"):
 		"attack":
-			return (1.0 / maxf(0.2, ch.final.get("weapon_aps", 1.2))) * float(sk.get("speed_mult", 1.0)) / ch.final.get("attack_speed_mult", 1.0)
+			return (1.0 / maxf(0.2, ch.final.get("weapon_aps", 1.2))) * float(sk.get("speed_mult", 1.0)) / ch.final.get("attack_speed_mult", 1.0) / (1.0 + 0.04 * frenzy_count())
 		"spell", "trap", "minion", "turret":
 			return float(sk.get("use_time", 0.6)) / ch.final.get("cast_speed_mult", 1.0)
 		_:
@@ -262,6 +297,8 @@ func use_block_reason(sk: Dictionary) -> String:
 	if not weapon_ok(sk):
 		return "Requires a %s weapon" % "/".join(sk.get("weapon_req", []))
 	var cost := mana_cost(sk)
+	if sk.get("deployable", "") == "turret" and ch.stats.has_flag("master_trapper"):
+		return "Master Trapper: you cannot deploy turrets"
 	if ch.stats.has_flag("blood_magic"):
 		if life <= cost + 1:
 			return "Not enough life"
@@ -302,10 +339,14 @@ func try_use_slot(i: int) -> bool:
 	swing_t = current_use_time
 	swing_dur = current_use_time
 	swing_kind = sk.get("behavior", "")
+	swing_skill_kind = sk.get("kind", "spell")   # visual only: picks the attack or cast animation
+	swing_impact = 0.0                            # skill_exec sets the melee hit delay (visual sync)
 	facing = signf(aim_pos.x - global_position.x) if absf(aim_pos.x - global_position.x) > 1 else facing
 	Combat.cast_serial += 1   # packets built during this cast carry the number (Training Grounds: targets hit per cast)
+	_before_skill(sk)
 	exec.execute(self, sk, aim_pos)
 	_on_skill_used(sk)
+	Events.player_skill_used.emit(sk["id"])
 	var b: String = sk.get("behavior", "")
 	if b in ["melee_arc", "dash"] or (b == "ground_aoe" and sk.get("at_self", false)):
 		Sfx.play("swing")
@@ -317,12 +358,41 @@ func try_use_slot(i: int) -> bool:
 
 const REPEATABLE := ["projectile", "ground_aoe", "nova", "chain", "beam", "melee_arc"]
 
+## "melee" / "projectile" / "" for Twin Disciplines.
+static func skill_style(sk: Dictionary) -> String:
+	var tags: Array = sk.get("tags", [])
+	if tags.has("melee"):
+		return "melee"
+	if tags.has("projectile"):
+		return "projectile"
+	return ""
+
+## Phase 3: state read by passives while this skill resolves (Spellblade, Twin Disciplines).
+func _before_skill(sk: Dictionary) -> void:
+	if sk.get("kind") == "spell" and sk.has("dmg_type"):
+		var t: String = sk["dmg_type"]
+		if ch.stats.has_flag("avatar_of_embers") and t in ["cold", "lightning"]:
+			t = "fire"
+		last_spell_type = t
+	var style := skill_style(sk)
+	if style != "":
+		twin_mult = 1.0 if last_style == "" else (0.9 if last_style == style else 1.25)
+		last_style = style
+
 ## Legendary effects that trigger on skill use (echoes, double shots, starfall).
 func _on_skill_used(sk: Dictionary) -> void:
 	var sb = ch.stats
 	var b: String = sk.get("behavior", "")
+	if sb.has_flag("tailwind") and b in ["dash", "leap", "blink"]:   # Phase 3: movement skills reset the dodge roll
+		dodge_cd = 0.0
+	if sb.has_flag("endless_quiver") and sk.get("kind") == "attack" and sk.get("tags", []).has("projectile") and randf() < 0.15:
+		schedule(0.15, exec.execute.bind(self, sk, aim_pos))   # Phase 3b Endless Quiver: fire again
 	if sk.get("kind") == "spell":
 		spell_count += 1
+		if sb.has_flag("thunderhead") and sk.get("dmg_type", "") == "lightning":   # Phase 3b
+			thunder_n += 1
+			if thunder_n % 4 == 0 and level != null and level.allow_combat:
+				_thunderhead(sk)
 		if sb.has_flag("echo") and b in REPEATABLE and randf() < 0.2:
 			schedule(0.22, exec.execute.bind(self, sk, aim_pos))
 		if sb.has_flag("starfall") and spell_count % 5 == 0 and level != null and level.allow_combat:
@@ -331,6 +401,30 @@ func _on_skill_used(sk: Dictionary) -> void:
 			schedule(0.45, _starfall.bind(at, sk))
 	elif sk.get("kind") == "attack" and b == "projectile" and sb.has_flag("double_shot") and ch.weapon_groups().has("firearm") and randf() < 0.25:
 		schedule(0.15, exec.execute.bind(self, sk, aim_pos))
+
+## Thunderhead: a bolt on the enemy nearest the target point, 150% of the spell's damage, always Shocks.
+func _thunderhead(sk: Dictionary) -> void:
+	var t = level.nearest_hostile(aim_pos, "player", 200.0)
+	if t == null:
+		return
+	var pk: Dictionary = Combat.player_packet(ch, sk, 1.5 * damage_more(sk))
+	pk["status"] = pk["status"] + [{"type": "shock", "chance": 100.0}]
+	var v = VFX.make("bolt", Vector2.ZERO, Color("#fff27a"), 0.25, 10)
+	v.points = PackedVector2Array([t.global_position + Vector2(0, -120), t.global_position + Vector2(0, -6)])
+	level.add_fx(v)
+	Combat.deal(pk, self, t, t.global_position)
+
+## Blade Dance: +1 stack (max 4) of 5% attack and movement speed, 3 seconds, refreshed on each stack.
+func blade_dance_stack() -> void:
+	var n := 1
+	for b in buffs:
+		if b["id"] == "blade_dance":
+			n = mini(4, int(b.get("stacks", 1)) + 1)
+			buffs.erase(b)
+			break
+	buffs.append({"id": "blade_dance", "t": 3.0, "stacks": n,
+			"mods": [{"stat": "attack_speed", "type": "inc", "value": 5 * n}, {"stat": "move_speed", "type": "inc", "value": 5 * n}]})
+	refresh_stats()
 
 func _starfall(at: Vector2, sk: Dictionary) -> void:
 	if level == null or not alive:
@@ -366,6 +460,8 @@ func damage_more(sk: Dictionary) -> float:
 		m *= 0.9
 	if sb.has_flag("bloodletter") and sk.get("kind") == "attack":
 		m *= 1.0 + 0.04 * mini(momentum, 10)
+	if sb.has_flag("twin_disciplines") and skill_style(sk) != "":
+		m *= twin_mult
 	return m
 
 func add_buff(id: String, mods: Array, duration: float) -> void:
@@ -404,7 +500,8 @@ func clear_summons() -> void:
 
 # ------------------------------------------------------------------ movement skills
 func start_dodge() -> void:
-	if dodge_cd > 0 or dodge_t > 0 or dash_t > 0:
+	var corruption_proc_allowed: bool = alive and input_enabled and not statuses.has("stun") and not statuses.has("freeze")
+	if dodge_cd > 0 or dodge_t > 0 or dash_t > 0 or ch.stats.has_flag("iron_riposte"):
 		return
 	if speed_mult() <= 0:
 		if not can_dodge_out_of_stun():
@@ -416,12 +513,24 @@ func start_dodge() -> void:
 		dodge_dir = Vector2.RIGHT * facing
 	dodge_t = DODGE_TIME
 	dodge_cd = DODGE_CD * (0.5 if ch.stats.has_flag("phantom_step") else 1.0) * (0.6 if ch.stats.has_flag("phantom_treads") else 1.0)
+	if corruption_proc_allowed and not ch.corruption_cooldowns.has("dodge_mana"):
+		var restored: float = ch.CorruptionEffects.total(ch.stats,"on_dodge_mana_pct_icd8s")
+		if restored > 0:
+			mana = minf(ch.final.get("max_mana",0),mana + ch.final.get("max_mana",0) * restored / 100.0)
+			ch.corruption_cooldowns["dodge_mana"] = 8.0
 	if ch.stats.has_flag("phantom_treads"):
 		add_buff("phantom_treads", [{"stat": "move_speed", "type": "inc", "value": 20}], 2.0)
 	if ch.stats.has_flag("phantom_step"):
 		add_buff("phantom_step", [{"stat": "damage", "type": "more", "value": 30}], 3.0)
 	if ch.stats.has_flag("wind_dancer"):
 		add_buff("wind_dance", [{"stat": "damage", "type": "more", "value": 40}, {"stat": "move_speed", "type": "inc", "value": 15}], 3.0)
+	if ch.stats.has_flag("feint"):
+		feint_t = 2.0
+	if ch.stats.has_flag("shadowstep") and level != null:
+		var pk := {"flags": ch.stats.flags.duplicate(), "status_dur": maxf(0.1, 1.0 + ch.stats.inc("status_duration") / 100.0), "faction": "player", "kind": "spell"}
+		for e in level.hostiles_in_radius(global_position, 60.0, "player"):
+			Combat.apply_status(e, {"type": "chill"}, {"cold": 1.0}, pk)
+		level.add_fx(VFX.make("nova", global_position, Color("#a0e0ff"), 0.35, 60))
 	busy = 0.0
 	pending.clear()
 	level.add_fx(VFX.make("dust", global_position, Color("#a09080"), 0.3, 10))
@@ -471,21 +580,25 @@ func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float
 	if block > 0 and randf() < block:
 		Combat.number(level, global_position, "Block", Color("#c0c8ff"))
 		Sfx.play("block")
-		_on_block()
+		_on_block(source)
 		return 0.0
 	var total := 0.0
 	for t in rolled:
 		var v: float = rolled[t]
 		if t == "physical":
+			if ch.stats.has_flag("blood_frenzy"):
+				v *= 1.1
 			v *= 1.0 - Combat.armour_reduction(f.get("armour", 0), v)
 		else:
-			v *= 1.0 - clampf(f.get("res_" + t, 0.0), -100, Combat.RES_CAP) / 100.0
+			v *= 1.0 - clampf(f.get("res_" + t, 0.0), -100, f.get("res_cap_" + t, Combat.RES_CAP)) / 100.0
 		total += v
 	var dr: float = f.get("damage_reduction", 0.0)
 	if ch.stats.has_flag("fortress") and still_t >= 1.0:
 		dr += 30.0
 	if ch.stats.has_flag("minion_shield"):
 		dr += minf(30.0, 5.0 * minions.size())
+	# Preserve existing temporary defences; corruption cannot add beyond the normal 60% cap.
+	dr += minf(ch.CorruptionEffects.total(ch.stats,"damage_reduction_vs_hit"), maxf(0.0,Combat.DR_CAP-dr))
 	dr = minf(dr, 75.0)
 	total *= (1.0 - dr / 100.0) * taken_mult()
 	if ch.stats.has_flag("thorns") and p.get("is_attack", false) and source != null and is_instance_valid(source) and source.alive and source.global_position.distance_to(global_position) < 48.0:
@@ -506,7 +619,19 @@ func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float
 	Events.player_damaged.emit(total)
 	if total > max_life * 0.1:
 		shake(2.0)
+	if total > 0 and alive:
+		_hit_passives(total)
 	return total
+
+## Phase 3 defensive notables that react to a hit you took.
+func _hit_passives(total: float) -> void:
+	var sb = ch.stats
+	if sb.has_flag("second_wind") and second_wind_cd <= 0.0 and life < max_life * 0.35:
+		second_wind_cd = 20.0
+		add_buff("second_wind", [{"stat": "life_regen", "type": "flat", "value": max_life * 0.05}], 4.0)
+	if sb.has_flag("arcane_shell") and arcane_shell_cd <= 0.0 and total >= max_life * 0.15:
+		arcane_shell_cd = 8.0
+		add_buff("arcane_shell", [{"stat": "damage_reduction", "type": "flat", "value": 20}], 3.0)
 
 ## Hit stun: rolled on the life actually lost. "Stun threshold" (inc) makes it harder.
 func _try_hit_stun(dmg: float) -> void:
@@ -529,7 +654,27 @@ func can_dodge_out_of_stun() -> bool:
 		return false
 	return stun_elapsed() >= float(Data.stun_cfg["kinds"]["player"].get("dodge_breaks_after", 0.15))
 
-func _on_block() -> void:
+func _on_block(source = null) -> void:
+	var sb = ch.stats
+	if sb.has_flag("counterweight"):
+		add_buff("counterweight", [{"stat": "melee_damage", "type": "inc", "value": 40}], 2.0)
+	if sb.has_flag("staggering_guard") and source != null and is_instance_valid(source) and source.alive and "is_boss" in source \
+			and source.global_position.distance_to(global_position) < 70.0:
+		Combat.apply_status(source, {"type": "stun"}, {}, {"status_dur": 1.0})
+	if sb.has_flag("iron_riposte") and riposte_t <= 0.0 and level != null:
+		riposte_t = 0.5
+		var rsk := {"id": "iron_riposte", "kind": "attack", "tags": ["attack", "melee"], "weapon_eff": 100}
+		var pk: Dictionary = Combat.player_packet(ch, rsk, damage_more(rsk))
+		var hit := 0
+		for e in level.hostiles_in_radius(global_position, 55.0, "player"):
+			Combat.deal(pk, self, e, global_position)
+			hit += 1
+		var v = VFX.make("slash", global_position + Vector2(0, -4), Color("#c0c8ff"), 0.2, 55)
+		v.angle = (source.global_position - global_position).angle() if source != null and is_instance_valid(source) else 0.0
+		v.arc = 360
+		level.add_fx(v)
+		if hit > 0:
+			register_hit()
 	if ch.stats.has_flag("retaliate"):
 		var dmg: float = 10.0 + ch.final.get("armour", 0) * 0.25
 		var pk := {"dmg": {"physical": [dmg * 0.8, dmg * 1.2]}, "crit_chance": 0.0, "crit_mult": 1.0, "faction": "player", "status": [{"type": "stun", "chance": 50.0}], "tags": [], "flags": {}}
@@ -551,12 +696,17 @@ func take_dot(amount: float, dtype: String) -> void:
 func add_status(type: String, duration: float, data: Dictionary) -> void:
 	if Dev.god():
 		return
+	if type in Combat.ELEMENTAL_AILMENTS:
+		if ch != null and ch.stats.has_flag("prismatic_soul"):
+			return
+		if ch != null and ch.stats.has_flag("elemental_warding"):
+			duration *= 0.5
 	super.add_status(type, duration, data)
 
 func dot_resist(dtype: String) -> float:
 	if dtype == "physical":
 		return 1.0
-	return 1.0 - clampf(ch.final.get("res_" + dtype, 0.0), -100, Combat.RES_CAP) / 100.0
+	return 1.0 - clampf(ch.final.get("res_" + dtype, 0.0), -100, ch.final.get("res_cap_" + dtype, Combat.RES_CAP)) / 100.0
 
 func die(_killer) -> void:
 	if not alive:
@@ -573,7 +723,14 @@ func die(_killer) -> void:
 func heal(amount: float) -> void:
 	super.heal(amount * heal_mult)
 
-func on_kill(e) -> void:
+func on_kill(e, killer = null) -> void:
+	var mana_pct: float = ch.CorruptionEffects.total(ch.stats,"on_elite_kill_mana_pct")
+	var credited: bool = killer == self or (is_instance_valid(killer) and "owner_player" in killer and killer.owner_player == self)
+	var receipt: String = "corruption_mana_" + str(get_instance_id())
+	if mana_pct > 0 and credited and (e.is_elite or e.is_boss) and not e.has_meta(receipt):
+		e.set_meta(receipt,true)
+		mana = minf(ch.final.get("max_mana",0),mana + ch.final.get("max_mana",0) * mana_pct / 100.0)
+	_kill_passives(e, killer)
 	heal(ch.final.get("life_on_kill", 0.0))
 	mana = minf(ch.final.get("max_mana", 0), mana + ch.final.get("mana_on_kill", 0.0))
 	for i in 2:
@@ -582,6 +739,43 @@ func on_kill(e) -> void:
 		for m in minions:
 			if is_instance_valid(m):
 				m.heal(m.max_life * 0.1)
+
+## Phase 2 on-kill notables. Reads the dying enemy's statuses (still present at this point).
+func _kill_passives(e, killer) -> void:
+	var sb = ch.stats
+	if sb.has_flag("blood_scent") and e.has_status("bleed"):
+		heal(max_life * 0.04)
+	if sb.has_flag("rallying_cry") and e.has_status("stun") and not cooldowns.is_empty():
+		var best := ""
+		for k in cooldowns:
+			if best == "" or cooldowns[k] < cooldowns[best]:
+				best = k
+		cooldowns.erase(best)
+	if sb.has_flag("funeral_pyre") and e.has_status("ignite"):
+		add_buff("funeral_pyre", [{"stat": "fire_damage", "type": "inc", "value": 20}, {"stat": "cast_speed", "type": "inc", "value": 10}], 3.0)
+	if level == null:
+		return
+	if sb.has_flag("virulence") and e.has_status("poison"):
+		var ps: Dictionary = e.statuses["poison"]
+		var o = level.nearest_hostile(e.global_position, "player", 90.0, {e.get_instance_id(): true})
+		if o != null:
+			o.add_status("poison", maxf(1.0, float(ps.get("t", 2.0))), {"dps": float(ps.get("dps", 0.0)), "dtype": "void"})
+	if sb.has_flag("frailty_bloom") and e.has_status("frailty"):
+		for o in level.hostiles_in_radius(e.global_position, 80.0, "player"):
+			if o != e:
+				o.add_status("frailty", 4.0, {})
+		level.add_fx(VFX.make("ring", e.global_position, Color("#c080ff"), 0.4, 80))
+	if sb.has_flag("marrow_feast") and killer != null and is_instance_valid(killer) and minions.has(killer):
+		killer.heal(killer.max_life * 0.2)
+	# Phase 3 death bursts
+	if sb.has_flag("overload") and e.has_status("shock"):
+		Combat.death_burst(self, level, e.global_position, 80.0, "lightning", e.max_life * 0.1, "shock", e, sb.flags)
+	if sb.has_flag("shatter") and e.has_status("freeze"):
+		Combat.death_burst(self, level, e.global_position, 60.0, "cold", e.max_life * 0.1, "chill", e, sb.flags)
+	if sb.has_flag("shockwave") and e.has_status("stun"):   # Phase 3b
+		Combat.death_burst(self, level, e.global_position, 70.0, "physical", e.max_life * 0.1, "stun", e, sb.flags)
+	if sb.has_flag("pyroclasm") and e.has_status("ignite"):
+		Combat.death_burst(self, level, e.global_position, 60.0, "fire", e.max_life * 0.1, "", e, sb.flags)
 
 func use_flask(i: int) -> void:
 	var infinite: bool = Dev.infinite_flasks()
@@ -592,6 +786,7 @@ func use_flask(i: int) -> void:
 		return
 	if not infinite:
 		ch.flask_charges[i] -= 1.0
+	flasks_used += 1   # Endgame 2D: the Collector's "Abstinence" wager
 	var fm: float = ch.final.get("flask_mult", 1.0)
 	if i == 0:
 		heal(max_life * 0.4 * fm)

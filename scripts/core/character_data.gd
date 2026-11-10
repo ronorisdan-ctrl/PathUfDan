@@ -5,8 +5,13 @@ extends RefCounted
 const StatBlock = preload("res://scripts/core/stat_block.gd")
 const PetRules = preload("res://scripts/core/pet_rules.gd")
 const StashRules = preload("res://scripts/core/stash_rules.gd")
+const TreeRules = preload("res://scripts/core/tree_rules.gd")
+const CorruptionSystem = preload("res://scripts/core/corruption_system.gd")
+const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
+const CorruptionEffects = preload("res://scripts/core/corruption_effects.gd")
+const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 
-const SAVE_VERSION := 3   # 2: adds the pets block; 3: stash tabs (stash_extra_tabs)
+const SAVE_VERSION := 5   # 2: adds the pets block; 3: stash tabs (stash_extra_tabs); 4: tree_version (full passive refund when the tree changes); 5: atlas (Endgame Phase 1A)
 const BAG_SIZE := 40
 const EQUIP_SLOTS := ["main_hand", "off_hand", "helmet", "chest", "gloves", "boots", "belt", "amulet", "ring1", "ring2", "charm"]
 const HOTBAR_SIZE := 7
@@ -20,6 +25,8 @@ var xp := 0
 var passive_points := 0
 var bonus_passive_points := 0
 var allocated := []
+var mastery_choices := {}   # Phase 4a: allocated mastery node id -> chosen option id
+var tree_gems := {}         # Phase 4b: allocated socket node id -> gem id ("ruby:2")
 var inventory := []
 var stash := []
 var stash_extra_tabs := 0   # extra stash tabs bought with gold (the first tab is free)
@@ -35,12 +42,27 @@ var skill_runes := {}       # skill id -> [rune ids]
 var spec_id := ""
 var spec_nodes := []
 var progress := {"bosses_killed": {}, "runs": 0, "deaths": 0, "highest_tier": 1}
+var atlas := {}            # Atlas of Ruin state (AtlasRules); {} until the Atlas is first opened
 var next_uid := 1
 var pets := {}              # pet id -> {"tier": int, "name": String}; upgrades belong to each pet
 var active_pet := ""        # which owned pet follows you ("" = none)
 var dev_used := false       # set by developer tools that change progress; shown as "(dev)" in the load menu
+var corruption_actions := {}  # committed confirmation IDs, persisted to reject replay after load
+var corruption_action_serial := 0
+var _corruption_busy := false
+var corruption_cooldowns := {}  # remaining game-time seconds; saved to prevent ICD reset on reload
 
 # runtime (not saved)
+const PRESET_SLOTS := 3      # Phase 5b
+const PRESET_FREE_LEVEL := 20
+var presets := [{}, {}, {}]  # Phase 5b: see preset_slot(); presets[active_preset] stays {}
+var active_preset := 0
+var presets_dropped := 0      # presets emptied on load because they were no longer legal
+var last_preset_missing := []  # gem ids the last switch_preset could not socket again
+var plan := []              # Phase 5b planner: ghost node ids, nearest to the web first
+var plan_choices := {}      # planned mastery id -> option id
+var plan_gems := {}         # socket id -> gem base id suggested by a build code
+var tree_refund := {}      # set by from_dict when the passive tree was reset: {from_version, reason, points}
 var stats = null          # StatBlock
 var active_buffs := []    # set by the player so every recalc includes temporary buffs
 var final := {}           # resolved numbers used by gameplay
@@ -60,6 +82,13 @@ func setup_new(cls: String, nm: String = "Dan") -> void:
 	char_name = nm
 	var cd := class_def()
 	allocated = [cd.get("start_passive", "")]
+	mastery_choices = {}
+	tree_gems = {}
+	presets = [{}, {}, {}]
+	active_preset = 0
+	plan = []
+	plan_choices = {}
+	plan_gems = {}
 	for base_id in cd.get("start_items", []):
 		var it = Loot.make_item(base_id, "common", 1)
 		if it.is_empty():
@@ -107,7 +136,18 @@ func add_xp(amount: int) -> void:
 	Events.xp_changed.emit()
 
 func total_passive_points() -> int:
-	return (level - 1) + bonus_passive_points
+	return (level - 1) + bonus_passive_points + abyss_passive_points()
+
+## Phase 3: +1 point per Endless Abyss milestone depth reached (data/passive_flags.json
+## abyss_point_depths). Derived from progress.abyss_best, so it is retroactive and never doubles.
+func abyss_passive_points(best: int = -1) -> int:
+	if best < 0:
+		best = int(progress.get("abyss_best", 0)) if typeof(progress) == TYPE_DICTIONARY else 0
+	var n := 0
+	for d in Data.passive_flags.get("abyss_point_depths", []):
+		if best >= int(d):
+			n += 1
+	return n
 
 func spent_passive_points() -> int:
 	var t := 0
@@ -134,9 +174,19 @@ func refresh_unlocks(announce: bool) -> void:
 func skill_level(skill_id: String) -> int:
 	var sd: Dictionary = Data.skills.get(skill_id, {})
 	var lvl := 1 + int(floor(float(level - int(sd.get("unlock_level", 1))) / 2.0))
+	var items := 0
 	if stats != null:
-		lvl += int(stats.value("skill_level"))
-	return clampi(lvl, 1, MAX_SKILL_LEVEL)
+		items = int(stats.value("skill_level"))
+		if sd.get("tags", []).has("spell"):
+			items += int(stats.value("spell_skill_level"))
+		if not sd.is_empty() and sd.get("class") == class_id and level >= int(sd.get("unlock_level", 1)):
+			lvl += CorruptionEffects.skill_levels(stats, sd)
+	# natural and corruption levels respect the cap; item levels may exceed it by caster.overcap
+	var over := int(Data.loot.get("caster", {}).get("overcap", 0))
+	var capped := clampi(lvl, 1, MAX_SKILL_LEVEL)
+	if over <= 0:
+		return clampi(lvl + items, 1, MAX_SKILL_LEVEL)
+	return clampi(mini(lvl + items, capped + items), 1, MAX_SKILL_LEVEL + over)
 
 # ---------------------------------------------------------------- passives
 func can_allocate(node_id: String) -> String:
@@ -150,23 +200,93 @@ func can_allocate(node_id: String) -> String:
 		return "Starting points cannot be allocated"
 	if int(n.get("cost", 1)) > available_passive_points():
 		return "Not enough passive points"
+	var ex := excluded_by(node_id)
+	if ex != "":
+		return "Cannot be taken with %s" % Data.passives[ex].get("name", ex)
 	for l in n.get("links", []):
 		if allocated.has(l):
 			return ""
 	return "Must connect to an allocated node"
 
-func allocate(node_id: String) -> bool:
+## option: the chosen effect when node_id is a mastery (required there, ignored elsewhere).
+func allocate(node_id: String, option: String = "") -> bool:
 	if can_allocate(node_id) != "":
 		return false
+	if is_mastery(node_id) and can_choose_mastery(node_id, option) != "":
+		return false
 	allocated.append(node_id)
+	if is_mastery(node_id):
+		mastery_choices[node_id] = option
 	recalc()
 	Events.passive_changed.emit()
 	return true
 
+# ---------------------------------------------------------------- masteries (Phase 4a)
+func is_mastery(node_id: String) -> bool:
+	return str(Data.passives.get(node_id, {}).get("type", "")) == "mastery"
+
+## The registry group of a mastery node ({} for other nodes).
+func mastery_group(node_id: String) -> Dictionary:
+	return Data.passive_flags.get("masteries", {}).get(str(Data.passives.get(node_id, {}).get("mastery", "")), {})
+
+func mastery_options(node_id: String) -> Array:
+	return mastery_group(node_id).get("options", [])
+
+func mastery_option(node_id: String, option: String) -> Dictionary:
+	return TreeRules.mastery_option(Data.passive_flags.get("masteries", {}), str(Data.passives.get(node_id, {}).get("mastery", "")), option)
+
+## The allocated mastery (other than except) that already holds option ("" = free).
+func option_taken_by(option: String, except: String = "") -> String:
+	for id in mastery_choices:
+		if id != except and allocated.has(id) and str(mastery_choices[id]) == option:
+			return id
+	return ""
+
+func can_choose_mastery(node_id: String, option: String) -> String:
+	if not is_mastery(node_id):
+		return "Not a mastery"
+	if option == "":
+		return "Choose an effect"
+	if mastery_option(node_id, option).is_empty():
+		return "Not an effect of this mastery"
+	var other := option_taken_by(option, node_id)
+	if other != "":
+		return "Already chosen at %s" % Data.passives[other].get("name", other)
+	return ""
+
+func mastery_change_cost() -> int:
+	return refund_cost()
+
+## Swap the effect of an allocated mastery; costs the refund price of one node.
+func change_mastery(node_id: String, option: String) -> String:
+	if not allocated.has(node_id) or not is_mastery(node_id):
+		return "Not an allocated mastery"
+	if str(mastery_choices.get(node_id, "")) == option:
+		return "Already chosen"
+	var why := can_choose_mastery(node_id, option)
+	if why != "":
+		return why
+	if gold < mastery_change_cost():
+		return "Changing costs %d gold" % mastery_change_cost()
+	gold -= mastery_change_cost()
+	mastery_choices[node_id] = option
+	recalc()
+	Events.passive_changed.emit()
+	Events.currency_changed.emit()
+	return ""
+
+## The allocated node that node_id is mutually exclusive with ("" = none).
+func excluded_by(node_id: String) -> String:
+	for x in Data.passives.get(node_id, {}).get("exclusive_with", []):
+		if allocated.has(x):
+			return x
+	return ""
+
 ## Shortest chain of unallocated nodes that connects node_id to the
 ## allocated web (ending with node_id). Empty if unreachable.
+## Routes never pass through nodes that are exclusive with the current web.
 func path_to(node_id: String) -> Array:
-	if allocated.has(node_id) or not Data.passives.has(node_id):
+	if allocated.has(node_id) or not Data.passives.has(node_id) or excluded_by(node_id) != "":
 		return []
 	var prev := {node_id: ""}
 	var queue := [node_id]
@@ -185,7 +305,7 @@ func path_to(node_id: String) -> Array:
 					path.append(c)
 				return path   # nearest-to-web first, target last
 			var ln: Dictionary = Data.passives[l]
-			if ln.get("type") in ["start", "keystone"]:
+			if ln.get("type") in TreeRules.NO_ROUTE or excluded_by(l) != "":
 				continue
 			prev[l] = cur
 			queue.append(l)
@@ -197,12 +317,16 @@ func path_cost(path: Array) -> int:
 		c += int(Data.passives[id].get("cost", 1))
 	return c
 
-func allocate_path(node_id: String) -> bool:
+func allocate_path(node_id: String, option: String = "") -> bool:
 	var path := path_to(node_id)
 	if path.is_empty() or path_cost(path) > available_passive_points():
 		return false
+	if is_mastery(node_id) and can_choose_mastery(node_id, option) != "":
+		return false
 	for id in path:
 		allocated.append(id)
+	if is_mastery(node_id):
+		mastery_choices[node_id] = option
 	recalc()
 	Events.passive_changed.emit()
 	return true
@@ -240,10 +364,429 @@ func refund(node_id: String) -> bool:
 		return false
 	gold -= refund_cost()
 	allocated.erase(node_id)
+	mastery_choices.erase(node_id)
+	_return_tree_gem(node_id)
 	recalc()
 	Events.passive_changed.emit()
 	Events.currency_changed.emit()
 	return true
+
+# ---------------------------------------------------------------- tree sockets (Phase 4b)
+func is_socket(node_id: String) -> bool:
+	return str(Data.passives.get(node_id, {}).get("type", "")) == "socket"
+
+func tree_socket_cfg() -> Dictionary:
+	return Data.passive_flags.get("tree_sockets", {})
+
+## Why gid cannot go into the socket node_id ("" = it can). A gem already in the socket is
+## swapped back to the pouch, so swapping needs only the new gem.
+func can_socket_tree_gem(node_id: String, gid: String) -> String:
+	if not is_socket(node_id):
+		return "Not a gem socket"
+	if not allocated.has(node_id):
+		return "Allocate the socket first"
+	if not Loot.gem_valid(gid):
+		return "Unknown gem"
+	if str(tree_gems.get(node_id, "")) == gid:
+		return "Already socketed"
+	if level < Loot.gem_req(gid):
+		return "Requires level %d" % Loot.gem_req(gid)
+	if int(gems.get(gid, 0)) <= 0:
+		return "You have no such gem"
+	return ""
+
+## Socket (or swap) a gem from the pouch into an allocated tree socket. Free.
+func socket_tree_gem(node_id: String, gid: String) -> String:
+	var why := can_socket_tree_gem(node_id, gid)
+	if why != "":
+		return why
+	_take_gem(gid)
+	_return_tree_gem(node_id)
+	tree_gems[node_id] = gid
+	recalc()
+	Events.passive_changed.emit()
+	return ""
+
+## Take the gem out of a tree socket back into the pouch. Free.
+func unsocket_tree_gem(node_id: String) -> String:
+	if not tree_gems.has(node_id):
+		return "The socket is empty"
+	_return_tree_gem(node_id)
+	recalc()
+	Events.passive_changed.emit()
+	return ""
+
+## Every socketed tree gem back to the pouch (used by full respecs).
+func clear_tree_gems() -> void:
+	for id in tree_gems.keys():
+		_return_tree_gem(id)
+
+func _return_tree_gem(node_id: String) -> void:
+	if tree_gems.has(node_id):
+		var gid := str(tree_gems[node_id])
+		tree_gems.erase(node_id)
+		if Loot.gem_valid(gid):
+			add_gem(gid)
+
+## {node_id: percent} radius boosts for an allocation (TreeRules.socket_boosts).
+func socket_boosts(passive_ids: Array) -> Dictionary:
+	if tree_gems.is_empty():
+		return {}
+	return TreeRules.socket_boosts(Data.passives, passive_ids, tree_gems, tree_socket_cfg(), Data.gems)
+
+## Phase 5a: "what does my tree do". Sums every allocated mod (socket boosts, mastery
+## effects and socket gem stats included) by stat and groups the sums by theme
+## (TreeRules.stat_theme). Returns {themes: {theme: [mod]}, order: [theme], keystones,
+## behaviours, masteries: [[node, option]], gems: [[socket, gem]], tags: {tag: count},
+## nodes, points}.
+func tree_summary(passive_ids = null) -> Dictionary:
+	var ids: Array = allocated if passive_ids == null else passive_ids
+	var boosts := socket_boosts(ids)
+	var sums := {}
+	var out := {"keystones": [], "behaviours": [], "masteries": [], "gems": [], "tags": {}, "nodes": 0, "points": 0}
+	for pid in ids:
+		var n: Dictionary = Data.passives.get(pid, {})
+		var ty := str(n.get("type", ""))
+		if n.is_empty():
+			continue
+		if ty == "start":   # the class start's stats count, the node itself does not
+			for m in n.get("mods", []):
+				TreeRules.sum_mod(sums, m)
+			continue
+		out["nodes"] += 1
+		out["points"] += int(n.get("cost", 1))
+		for tg in n.get("tags", []):
+			out["tags"][tg] = int(out["tags"].get(tg, 0)) + 1
+		var bm := 1.0 + float(boosts.get(pid, 0.0)) / 100.0
+		for m in n.get("mods", []):
+			TreeRules.sum_mod(sums, m, bm)
+		if ty == "keystone":
+			out["keystones"].append(pid)
+		elif not n.get("flags", []).is_empty():
+			out["behaviours"].append(pid)
+		if ty == "mastery":
+			var oid := str(mastery_choices.get(pid, ""))
+			out["masteries"].append([pid, oid])
+			for m in mastery_option(pid, oid).get("mods", []):
+				TreeRules.sum_mod(sums, m)
+		if ty == "socket" and tree_gems.has(pid):
+			out["gems"].append([pid, str(tree_gems[pid])])
+			for m in Loot.gem_mods(str(tree_gems[pid]), "tree"):
+				TreeRules.sum_mod(sums, m)
+	var themes := {}
+	for k in sums:
+		var m: Dictionary = sums[k]
+		if absf(float(m["value"])) < 0.01:
+			continue
+		var th := TreeRules.stat_theme(str(m["stat"]))
+		if not themes.has(th):
+			themes[th] = []
+		themes[th].append(m)
+	var order := []
+	for th in TreeRules.theme_order():
+		if themes.has(th):
+			themes[th].sort_custom(func(a, b): return str(a["stat"]) + str(a["type"]) < str(b["stat"]) + str(b["type"]))
+			order.append(th)
+	out["themes"] = themes
+	out["order"] = order
+	return out
+
+# ---------------------------------------------------------------- presets, planner, build codes (Phase 5b)
+## Presets: PRESET_SLOTS tree loadouts per character. The live tree (allocated,
+## mastery_choices, tree_gems) IS the active preset, so presets[active_preset] stays {};
+## the other slots hold {"allocated", "mastery_choices", "gems": {socket: gem id}} or {}.
+## Switching costs refund_cost() per node it removes (and per mastery whose effect changes);
+## free below PRESET_FREE_LEVEL. Switching to an empty slot copies the current tree (free).
+func preset_slot(i: int) -> Dictionary:
+	if i < 0 or i >= presets.size():
+		return {}
+	return presets[i]
+
+func preset_empty(i: int) -> bool:
+	return i != active_preset and preset_slot(i).is_empty()
+
+## Nodes in preset i (start excluded); the active preset counts the live tree.
+func preset_nodes(i: int) -> int:
+	if i == active_preset:
+		return allocated.size() - 1
+	return maxi(0, Array(preset_slot(i).get("allocated", [])).size() - 1)
+
+func _tree_snapshot() -> Dictionary:
+	var mc := {}
+	for id in mastery_choices:
+		if allocated.has(id):
+			mc[id] = mastery_choices[id]
+	return {"allocated": allocated.duplicate(), "mastery_choices": mc, "gems": tree_gems.duplicate()}
+
+## Live nodes the switch to preset i would take away, plus masteries whose effect changes.
+func preset_changes(i: int) -> int:
+	if i == active_preset or preset_empty(i):
+		return 0
+	var tgt: Dictionary = preset_slot(i)
+	var ta: Array = tgt.get("allocated", [])
+	var tc: Dictionary = tgt.get("mastery_choices", {})
+	var n := 0
+	for id in allocated:
+		if not ta.has(id):
+			n += 1
+		elif is_mastery(id) and str(tc.get(id, "")) != str(mastery_choices.get(id, "")):
+			n += 1
+	return n
+
+func preset_switch_cost(i: int) -> int:
+	if level < PRESET_FREE_LEVEL:
+		return 0
+	return preset_changes(i) * refund_cost()
+
+func can_switch_preset(i: int) -> String:
+	if i < 0 or i >= PRESET_SLOTS:
+		return "No such preset"
+	if i == active_preset:
+		return "Already using this preset"
+	if not preset_empty(i):
+		var tgt: Dictionary = preset_slot(i)
+		var start: String = class_def().get("start_passive", "")
+		var why := TreeRules.allocation_problem(Array(tgt.get("allocated", [])), start, total_passive_points(), Data.passives,
+			tgt.get("mastery_choices", {}), Data.passive_flags.get("masteries", {}))
+		if why != "":
+			return "That preset no longer fits (%s)" % why
+	if gold < preset_switch_cost(i):
+		return "Switching costs %d gold" % preset_switch_cost(i)
+	return ""
+
+## Switch the live tree to preset i. Socketed gems go back to the pouch; the target's gems
+## are socketed again when the pouch still holds them (missing ones end in last_preset_missing).
+func switch_preset(i: int) -> String:
+	var why := can_switch_preset(i)
+	if why != "":
+		return why
+	var cost := preset_switch_cost(i)
+	var tgt: Dictionary = preset_slot(i)
+	presets[active_preset] = _tree_snapshot()
+	presets[i] = {}
+	active_preset = i
+	last_preset_missing = []
+	gold -= cost
+	if not tgt.is_empty():
+		clear_tree_gems()
+		allocated = Array(tgt.get("allocated", [])).duplicate()
+		mastery_choices = Dictionary(tgt.get("mastery_choices", {})).duplicate()
+		var tg: Dictionary = tgt.get("gems", {})
+		for sid in tg:
+			var gid := str(tg[sid])
+			if allocated.has(sid) and is_socket(sid) and int(gems.get(gid, 0)) > 0 and level >= Loot.gem_req(gid):
+				_take_gem(gid)
+				tree_gems[sid] = gid
+			else:
+				last_preset_missing.append(gid)
+	_prune_plan()
+	recalc()
+	Events.passive_changed.emit()
+	Events.currency_changed.emit()
+	return ""
+
+## Planner: ghost nodes that cost nothing until "apply plan". plan keeps route order
+## (nearest to the web first); plan_choices holds planned mastery effects; plan_gems holds
+## socket -> gem base suggestions from an imported build code.
+func plan_has(id: String) -> bool:
+	return plan.has(id)
+
+func plan_points() -> int:
+	var c := 0
+	for id in plan:
+		c += int(Data.passives.get(id, {}).get("cost", 1))
+	return c
+
+func _plan_excluded(id: String) -> bool:
+	for x in Data.passives.get(id, {}).get("exclusive_with", []):
+		if allocated.has(x) or plan.has(x):
+			return true
+	return false
+
+func _plan_options_used(except: String = "") -> Dictionary:
+	var used := {}
+	for id in mastery_choices:
+		if allocated.has(id):
+			used[str(mastery_choices[id])] = true
+	for id in plan_choices:
+		if id != except and plan.has(id):
+			used[str(plan_choices[id])] = true
+	return used
+
+## Shortest chain of nodes (neither allocated nor planned) that joins id to the allocated
+## web or the plan, target last. Same routing rules as path_to.
+func plan_route(id: String) -> Array:
+	if allocated.has(id) or plan.has(id) or not Data.passives.has(id) or _plan_excluded(id):
+		return []
+	if Data.passives[id].get("type") == "start":
+		return []
+	var prev := {id: ""}
+	var queue := [id]
+	var qi := 0
+	while qi < queue.size():
+		var cur: String = queue[qi]
+		qi += 1
+		for l in Data.passives[cur].get("links", []):
+			if prev.has(l):
+				continue
+			if allocated.has(l) or plan.has(l):
+				var path := [cur]
+				var c: String = cur
+				while prev[c] != "":
+					c = prev[c]
+					path.append(c)
+				return path
+			var ln: Dictionary = Data.passives[l]
+			if ln.get("type") in TreeRules.NO_ROUTE or _plan_excluded(l):
+				continue
+			prev[l] = cur
+			queue.append(l)
+	return []
+
+## Why id cannot be planned with option ("" = it can).
+func can_plan(id: String, option: String = "") -> String:
+	if allocated.has(id):
+		return "Already allocated"
+	if plan.has(id):
+		return "Already planned"
+	if not Data.passives.has(id):
+		return "Unknown node"
+	if Data.passives[id].get("type") == "start":
+		return "Starting points cannot be planned"
+	if _plan_excluded(id):
+		return "Exclusive with an allocated or planned node"
+	if is_mastery(id):
+		if option == "" or mastery_option(id, option).is_empty():
+			return "Choose an effect"
+		if _plan_options_used().has(option):
+			return "That effect is already taken"
+	if plan_route(id).is_empty():
+		return "No route to that node"
+	return ""
+
+func plan_add(id: String, option: String = "") -> String:
+	var why := can_plan(id, option)
+	if why != "":
+		return why
+	for p in plan_route(id):
+		plan.append(p)
+	if is_mastery(id):
+		plan_choices[id] = option
+	Events.passive_changed.emit()
+	return ""
+
+## Remove id from the plan, and every planned node that no longer connects to the web.
+func plan_remove(id: String) -> bool:
+	if not plan.has(id):
+		return false
+	plan.erase(id)
+	_prune_plan()
+	Events.passive_changed.emit()
+	return true
+
+func clear_plan() -> void:
+	plan = []
+	plan_choices = {}
+	plan_gems = {}
+	Events.passive_changed.emit()
+
+## Drops planned nodes that are allocated, exclusive with the allocation, or cut off from it.
+func _prune_plan() -> void:
+	var r := TreeRules.sanitize_plan(plan, plan_choices, allocated, Data.passives, Data.passive_flags.get("masteries", {}), _alloc_options_used())
+	plan = r["nodes"]
+	plan_choices = r["choices"]
+	for sid in plan_gems.keys():
+		if not plan.has(sid) and not allocated.has(sid):
+			plan_gems.erase(sid)
+
+func _alloc_options_used() -> Dictionary:
+	var used := {}
+	for id in mastery_choices:
+		if allocated.has(id):
+			used[str(mastery_choices[id])] = true
+	return used
+
+## Allocate planned nodes, nearest first, as far as the points allow. Returns how many.
+func apply_plan() -> int:
+	var added := 0
+	var progress := true
+	while progress:
+		progress = false
+		for id in plan.duplicate():
+			if allocated.has(id) or can_allocate(id) != "":
+				continue
+			if is_mastery(id) and can_choose_mastery(id, str(plan_choices.get(id, ""))) != "":
+				continue
+			allocated.append(id)
+			if is_mastery(id):
+				mastery_choices[id] = str(plan_choices[id])
+			added += 1
+			progress = true
+	_prune_plan()
+	if added > 0:
+		recalc()
+	Events.passive_changed.emit()
+	return added
+
+## Build code of the live tree; with include_plan the planned nodes are part of it.
+func export_build_code(include_plan: bool = true) -> String:
+	var start: String = class_def().get("start_passive", "")
+	var ids := []
+	for id in allocated:
+		if id != start:
+			ids.append(id)
+	var mc := {}
+	for id in mastery_choices:
+		if allocated.has(id):
+			mc[id] = str(mastery_choices[id])
+	var g := {}
+	for sid in tree_gems:
+		g[sid] = str(tree_gems[sid]).get_slice(":", 0)
+	if include_plan:
+		for id in plan:
+			ids.append(id)
+		for id in plan_choices:
+			if plan.has(id):
+				mc[id] = str(plan_choices[id])
+		for sid in plan_gems:
+			if not g.has(sid):
+				g[sid] = str(plan_gems[sid])
+	return TreeRules.encode_build({"v": TreeRules.BUILD_FORMAT, "c": class_id, "t": TreeRules.tree_version(Data.passive_migrations), "n": ids, "m": mc, "g": g})
+
+## Import a build code as the plan (replacing it). Allocated nodes stay; illegal nodes are
+## dropped. Returns {"error", "planned", "dropped", "gems": [gem base ids suggested]}.
+func import_build_code(code: String) -> Dictionary:
+	var res := TreeRules.decode_build(code)
+	if res["error"] != "":
+		return {"error": res["error"], "planned": 0, "dropped": 0, "gems": []}
+	var d: Dictionary = res["data"]
+	if d["c"] != class_id:
+		return {"error": "This build is for a %s" % Data.classes.get(d["c"], {}).get("name", "different class"), "planned": 0, "dropped": 0, "gems": []}
+	var cur_tree := TreeRules.tree_version(Data.passive_migrations)
+	var ids := []
+	var mc := {}
+	for id in d["n"]:
+		var nid: String = id
+		if int(d["t"]) < cur_tree:
+			nid = TreeRules.migrate_id(id, int(d["t"]), Data.passive_migrations)
+		if nid != "":
+			ids.append(nid)
+			if d["m"].has(id):
+				mc[nid] = d["m"][id]
+	# a mastery already allocated with another effect keeps the current effect
+	var r := TreeRules.sanitize_plan(ids, mc, allocated, Data.passives, Data.passive_flags.get("masteries", {}), _alloc_options_used())
+	plan = r["nodes"]
+	plan_choices = r["choices"]
+	plan_gems = {}
+	var sugg := []
+	for sid in d["g"]:
+		var base := str(d["g"][sid])
+		if Data.gems.has(base) and is_socket(sid) and (plan.has(sid) or allocated.has(sid)):
+			plan_gems[sid] = base
+			sugg.append(base)
+	var dropped: int = r["dropped"].size() + (Array(d["n"]).size() - ids.size())
+	Events.passive_changed.emit()
+	return {"error": "", "planned": plan.size(), "dropped": dropped, "gems": sugg}
 
 # ---------------------------------------------------------------- skill runes
 ## Runes socket into a skill and change how it behaves (data/skill_runes.json).
@@ -342,6 +885,10 @@ func is_equipped(it) -> bool:
 	return false
 
 func socket_gem(it: Dictionary, idx: int, gid: String) -> String:
+	if it.get("destroyed", false):
+		return "This item was destroyed"
+	if CorruptionRules.is_maxed(it):
+		return "Corrupted: cannot edit sockets or gems"
 	if idx < 0 or idx >= Loot.item_sockets(it):
 		return "No such socket"
 	if Loot.socket_category(it) == "":
@@ -368,6 +915,10 @@ func unsocket_cost(gid: String) -> int:
 	return int(c[mini(Loot.gem_tier(gid), c.size() - 1)])
 
 func unsocket_gem(it: Dictionary, idx: int) -> String:
+	if it.get("destroyed", false):
+		return "This item was destroyed"
+	if CorruptionRules.is_maxed(it):
+		return "Corrupted: cannot edit sockets or gems"
 	var gl: Array = it.get("gems", [])
 	if idx < 0 or idx >= gl.size() or gl[idx] == "":
 		return "Socket is empty"
@@ -538,9 +1089,133 @@ func add_to_bag(item: Dictionary) -> bool:
 	var i := free_bag_slot()
 	if i < 0:
 		return false
+	if int(item.get("uid", 0)) <= 0:
+		item["uid"] = take_uid()
 	inventory[i] = item
 	Events.inventory_changed.emit()
 	return true
+
+func new_corruption_action_id() -> String:
+	corruption_action_serial += 1
+	return "corrupt:%d" % corruption_action_serial
+
+func tick_corruption_cooldowns(delta: float) -> void:
+	for key in corruption_cooldowns.keys():
+		corruption_cooldowns[key] = maxf(0.0, float(corruption_cooldowns[key]) - maxf(0.0, delta))
+		if corruption_cooldowns[key] <= 0:
+			corruption_cooldowns.erase(key)
+
+func corruption_cost() -> Dictionary:
+	var mat: Dictionary = Data.corruption_cfg.get("required_material", {})
+	var cost := {str(mat.get("id", "abyssal_brand")): int(mat.get("quantity", 1))}
+	var fee := int(Data.corruption_cfg.get("corruption_gold_fee", 0))
+	if fee > 0:
+		cost["gold"] = fee
+	return cost
+
+func corruption_item(uid: int):
+	var found = null
+	for it in inventory:
+		if it != null and int(it.get("uid", 0)) == uid:
+			if found != null:
+				return null  # ambiguous ownership fails closed
+			found = it
+	return found
+
+func corruption_refusal(uid: int, action_id: String = "") -> String:
+	if _corruption_busy:
+		return "A corruption action is already in progress"
+	if action_id != "" and corruption_actions.has(action_id):
+		return "This corruption confirmation was already used"
+	if uid <= 0:
+		return "Select an owned inventory item"
+	for it in equipment.values():
+		if it != null and int(it.get("uid", 0)) == uid:
+			return "Unequip this item before corrupting it"
+	var it = corruption_item(uid)
+	if it == null:
+		return "Item is missing, unowned or has a duplicate ID"
+	if is_locked(it):
+		return "Unlock this protected item before risking destruction"
+	for flag in Data.corruption_cfg.get("restricted_item_flags", []):
+		if it.get(flag, false) or Data.item_bases.get(it.get("base",""),{}).get(flag,false):
+			return "This item is restricted: " + str(flag)
+	var c = it.get("corruption", 0)
+	if not CorruptionSystem.numeric(c) or float(c) < 0:
+		return "Invalid item corruption value"
+	if float(c) >= 100:
+		return "Corrupted: this item can no longer be crafted"
+	if it.get("corrupted_prefix") != null or it.get("corrupted_suffix") != null:
+		return "This item already has corrupted implicits"
+	if not CorruptionSystem.validate(Data.corruption_cfg, Data.corruption_affixes).is_empty():
+		return "Corruption registry unavailable"
+	if CorruptionSystem.pool_for(it, Data.corruption_cfg) == "":
+		return "This item is not eligible equipment"
+	var p := CorruptionSystem.eligible(it, "prefix", Data.corruption_cfg, Data.corruption_affixes)
+	var s := CorruptionSystem.eligible(it, "suffix", Data.corruption_cfg, Data.corruption_affixes)
+	if p.is_empty() or s.is_empty() or CorruptionSystem.paired_prefixes(p, s, Data.corruption_cfg).is_empty():
+		return "Corruption pool unavailable for this item"
+	if not has_materials(corruption_cost()):
+		return "Need " + Loot.cost_text(corruption_cost())
+	return ""
+
+## Synchronous transaction: plan first, mutate without signals, persist, then notify.
+## On write failure restore the original item/resources and leave the confirmation unused.
+func corrupt_item(uid: int, action_id: String, random) -> Dictionary:
+	if action_id == "":
+		return {"err": "Missing corruption confirmation ID"}
+	var why := corruption_refusal(uid, action_id)
+	if why != "":
+		return {"err": why}
+	_corruption_busy = true
+	var original: Dictionary = corruption_item(uid)
+	var plan := CorruptionSystem.plan(original, Data.corruption_cfg, Data.corruption_affixes, random)
+	if plan["err"] != "":
+		_corruption_busy = false
+		return plan
+	var slot := -1
+	for i in inventory.size():
+		if inventory[i] != null and int(inventory[i].get("uid", 0)) == uid:
+			slot = i
+	var gold_before := gold
+	var mats_before := materials.duplicate(true)
+	var gems_before := gems.duplicate(true)
+	for key in corruption_cost():
+		if key == "gold":
+			gold -= int(corruption_cost()[key])
+		else:
+			materials[key] = int(materials.get(key, 0)) - int(corruption_cost()[key])
+	if plan["outcome"] == "destroyed":
+		# Same recovery policy as reclaim_gems; defer its signals until commit.
+		for gem in original.get("gems", []):
+			if gem != "" and Loot.gem_valid(gem):
+				gems[gem] = int(gems.get(gem, 0)) + 1
+		inventory[slot] = null
+	else:
+		inventory[slot] = plan["item"]
+	corruption_actions[action_id] = true
+	if Game.ch == self and not Game.testing and not Game.save_game():
+		inventory[slot] = original
+		gold = gold_before
+		materials = mats_before
+		gems = gems_before
+		corruption_actions.erase(action_id)
+		_corruption_busy = false
+		return {"err": "Could not save corruption; item and cost restored"}
+	if Game.ch == self and not Game.testing:
+		Game.autosave()  # manual save is authoritative; never autosave an aborted transaction
+	if plan["outcome"] == "destroyed":
+		original["gems"] = []
+		original["destroyed"] = true  # invalidate stale UI/callback references too
+	else:
+		original.clear()
+		original.merge(plan["item"], true)
+		inventory[slot] = original  # preserve dictionary references used by inventory UI
+	_corruption_busy = false
+	recalc()
+	Events.currency_changed.emit()
+	Events.inventory_changed.emit()
+	return {"err": "", "outcome": plan["outcome"], "item": inventory[slot], "uid": uid}
 
 func add_material(id: String, n: int) -> void:
 	materials[id] = int(materials.get(id, 0)) + n
@@ -750,7 +1425,8 @@ func recalc(buffs = null) -> void:
 	final = resolve(stats)
 	Events.stats_changed.emit()
 
-func build_stats(passive_ids: Array, buffs: Array = [], equip_override = null):
+## choices: mastery node id -> option id (null = this character's mastery_choices).
+func build_stats(passive_ids: Array, buffs: Array = [], equip_override = null, choices = null):
 	var sb = StatBlock.new()
 	var cd := class_def()
 	for k in cd.get("base_attributes", {}):
@@ -770,7 +1446,7 @@ func build_stats(passive_ids: Array, buffs: Array = [], equip_override = null):
 		if equip_restriction(it) != "":
 			continue  # items whose requirements are no longer met give nothing
 		for m in Loot.item_mods(it):
-			sb.add_mod(m, "equipment")
+			sb.add_mod(m, m.get("source", "equipment"))
 		if it.get("legendary_effect", "") != "":
 			sb.add_flag(it["legendary_effect"])
 	for sn in spec_nodes:
@@ -779,12 +1455,28 @@ func build_stats(passive_ids: Array, buffs: Array = [], equip_override = null):
 			sb.add_mod(m, "specialisation")
 		for f in nd.get("flags", []):
 			sb.add_flag(f)
+	var boosts := socket_boosts(passive_ids)
 	for pid in passive_ids:
 		var n: Dictionary = Data.passives.get(pid, {})
+		var bm := 1.0 + float(boosts.get(pid, 0.0)) / 100.0
 		for m in n.get("mods", []):
-			sb.add_mod(m, "passive")
+			var mm: Dictionary = m
+			if bm != 1.0 and str(m.get("type", "")) != "more":
+				mm = m.duplicate()
+				mm["value"] = float(m["value"]) * bm
+			sb.add_mod(mm, "passive")
 		for f in n.get("flags", []):
 			sb.add_flag(f)
+		if n.get("type", "") == "mastery":
+			var ch_map: Dictionary = mastery_choices if choices == null else choices
+			var o := mastery_option(pid, str(ch_map.get(pid, "")))
+			for m in o.get("mods", []):
+				sb.add_mod(m, "passive")
+			for f in o.get("flags", []):
+				sb.add_flag(f)
+		if n.get("type", "") == "socket" and tree_gems.has(pid):
+			for m in Loot.gem_mods(str(tree_gems[pid]), "tree"):
+				sb.add_mod(m, "passive")
 	for b in buffs:
 		for m in b.get("mods", []):
 			sb.add_mod(m, "buff")
@@ -810,7 +1502,11 @@ func resolve(sb, equip_override = null) -> Dictionary:
 	f["block_chance"] = clampf(sb.value("block_chance"), 0, 75)
 	f["damage_reduction"] = clampf(sb.value("damage_reduction"), 0, 60)
 	for r in ["fire", "cold", "lightning", "arcane", "void"]:
-		f["res_" + r] = clampf(sb.value("res_" + r), -100, 75)
+		var cap := 75.0
+		if r in ["fire", "cold", "lightning"]:
+			cap = minf(float(Data.corruption_cfg.get("max_elemental_resistance_absolute_safety_cap", 78)), cap + CorruptionEffects.total(sb,"maximum_elemental_resistance"))
+		f["res_cap_" + r] = cap
+		f["res_" + r] = clampf(sb.value("res_" + r), -100, cap)
 	f["move_speed"] = sb.value("move_speed")
 	f["attack_speed_mult"] = maxf(0.2, 1.0 + sb.inc("attack_speed") / 100.0) * sb.more("attack_speed")
 	f["cast_speed_mult"] = maxf(0.2, 1.0 + sb.inc("cast_speed") / 100.0) * sb.more("cast_speed")
@@ -845,18 +1541,18 @@ func resolve(sb, equip_override = null) -> Dictionary:
 	return f
 
 ## Stat preview used by the passive tree and item comparison.
-func preview_final(passive_ids: Array, equip_override = null) -> Dictionary:
-	return resolve(build_stats(passive_ids, active_buffs, equip_override), equip_override)
+func preview_final(passive_ids: Array, equip_override = null, choices = null) -> Dictionary:
+	return resolve(build_stats(passive_ids, active_buffs, equip_override, choices), equip_override)
 
 ## Average hit of a skill under hypothetical passives/equipment (for previews).
-func preview_skill_avg(skill_id: String, passive_ids: Array, equip_override = null) -> float:
+func preview_skill_avg(skill_id: String, passive_ids: Array, equip_override = null, choices = null) -> float:
 	var sk: Dictionary = resolved_skill(skill_id)
 	if sk.is_empty() or not (sk.has("weapon_eff") or sk.has("base_damage")):
 		return 0.0
 	var old_s = stats
 	var old_f := final
 	var old_eq := equipment
-	stats = build_stats(passive_ids, active_buffs, equip_override)
+	stats = build_stats(passive_ids, active_buffs, equip_override, choices)
 	final = resolve(stats, equip_override)
 	if equip_override != null:
 		equipment = equip_override
@@ -888,6 +1584,7 @@ func to_dict() -> Dictionary:
 		"version": SAVE_VERSION,
 		"name": char_name, "class": class_id, "level": level, "xp": xp,
 		"bonus_passive_points": bonus_passive_points,
+		"tree_version": TreeRules.tree_version(Data.passive_migrations),
 		"allocated": allocated, "inventory": inventory, "stash": stash, "stash_extra_tabs": stash_extra_tabs, "equipment": equipment,
 		"gold": gold, "materials": materials, "loadout": loadout, "unlocked_skills": unlocked_skills,
 		"flask_charges": flask_charges, "progress": progress, "next_uid": next_uid,
@@ -895,8 +1592,32 @@ func to_dict() -> Dictionary:
 		"gems": gems,
 		"pets": pets, "active_pet": active_pet,
 	}
+	var mc := {}
+	for id in mastery_choices:
+		if allocated.has(id):
+			mc[id] = mastery_choices[id]
+	if not mc.is_empty():
+		d["mastery_choices"] = mc   # Phase 4a; written only when set
+	if not tree_gems.is_empty():
+		d["tree_gems"] = tree_gems.duplicate()   # Phase 4b; written only when set
+	var ps := []
+	var any_preset := active_preset != 0
+	for i in PRESET_SLOTS:
+		ps.append({} if i == active_preset else preset_slot(i).duplicate(true))
+		any_preset = any_preset or not ps[i].is_empty()
+	if any_preset:
+		d["passive_presets"] = {"active": active_preset, "slots": ps}   # Phase 5b; written only when used
+	if not plan.is_empty():
+		d["tree_plan"] = {"nodes": plan.duplicate(), "choices": plan_choices.duplicate(), "gems": plan_gems.duplicate()}   # Phase 5b
 	if dev_used:
 		d["dev_used"] = true   # written only when set, so normal saves are unchanged
+	if not atlas.is_empty():
+		d["atlas"] = atlas.duplicate(true)   # v5; written only once the Atlas is opened
+	if not corruption_actions.is_empty():
+		d["corruption_actions"] = corruption_actions.duplicate()
+		d["corruption_action_serial"] = corruption_action_serial
+	if not corruption_cooldowns.is_empty():
+		d["corruption_cooldowns"] = corruption_cooldowns.duplicate()
 	return d
 
 func from_dict(d: Dictionary) -> void:
@@ -908,11 +1629,7 @@ func from_dict(d: Dictionary) -> void:
 	level = int(d.get("level", 1))
 	xp = int(d.get("xp", 0))
 	bonus_passive_points = int(d.get("bonus_passive_points", 0))
-	allocated = Array(d.get("allocated", []))
-	# drop passives removed from the data since the save was made
-	allocated = allocated.filter(func(id): return Data.passives.has(id))
-	if not allocated.has(class_def().get("start_passive", "")):
-		allocated.push_front(class_def().get("start_passive", ""))
+	_load_passives(d)
 	inventory = _fix_list(d.get("inventory", []), BAG_SIZE)
 	_load_stash(d, ver)
 	var eq: Dictionary = d.get("equipment", {})
@@ -941,6 +1658,8 @@ func from_dict(d: Dictionary) -> void:
 	for k in gd:
 		if Loot.gem_valid(k):
 			gems[k] = int(gd[k])
+	_load_tree_gems(d)
+	_load_presets_and_plan(d)
 	skill_runes = {}
 	var sr: Dictionary = d.get("skill_runes", {})
 	for k in sr:
@@ -951,6 +1670,22 @@ func from_dict(d: Dictionary) -> void:
 		spec_id = ""
 	spec_nodes = Array(d.get("spec_nodes", [])).filter(func(n): return Data.spec_nodes.has(n))
 	next_uid = int(d.get("next_uid", 1))
+	var saved_actions = d.get("corruption_actions", {})
+	corruption_actions = saved_actions.duplicate() if saved_actions is Dictionary else {}
+	corruption_action_serial = int(d.get("corruption_action_serial", 0))
+	corruption_cooldowns = {}
+	var saved_cooldowns = d.get("corruption_cooldowns", {})
+	if saved_cooldowns is Dictionary:
+		for key in saved_cooldowns:
+			if key == "dodge_mana" and CorruptionSystem.numeric(saved_cooldowns[key]):
+				corruption_cooldowns[key] = clampf(float(saved_cooldowns[key]),0,8)
+	# Older items could lack an ID. Preserve valid IDs and allocate above all existing ones.
+	for it in inventory + stash + equipment.values():
+		if it != null:
+			next_uid = maxi(next_uid, int(it.get("uid", 0)))
+	for it in inventory + stash + equipment.values():
+		if it != null and int(it.get("uid", 0)) <= 0:
+			it["uid"] = take_uid()
 	pets = {}
 	var pd = d.get("pets", {})
 	if typeof(pd) == TYPE_DICTIONARY:
@@ -962,8 +1697,132 @@ func from_dict(d: Dictionary) -> void:
 	if not pets.has(active_pet):
 		active_pet = ""
 	dev_used = bool(d.get("dev_used", false))   # optional field: older saves load as false
+	atlas = AtlasRules.sanitize(d.get("atlas", {}))   # v5; older saves have no Atlas yet
 	refresh_unlocks(false)
 	recalc()
+
+## Restores the passive allocation. Policy (Dan, 2026-11-04): if the save was made with an
+## older tree_version, or the allocation is no longer legal for any reason (missing or
+## disconnected nodes, too many points, exclusive pair), the whole tree is refunded for free
+## and tree_refund records why (Game shows a one-time message and keeps a .bak of the file).
+## Saves before version 4 carry no tree_version and count as tree version 1.
+func _load_passives(d: Dictionary) -> void:
+	tree_refund = {}
+	mastery_choices = {}
+	var start: String = class_def().get("start_passive", "")
+	var raw_choices := {}
+	var mc = d.get("mastery_choices", {})
+	if typeof(mc) == TYPE_DICTIONARY:
+		for k in mc:
+			raw_choices[str(k)] = str(mc[k])
+	var raw := []
+	for id in Array(d.get("allocated", [])):
+		raw.append(str(id))
+	var saved_tree := int(d.get("tree_version", 1))
+	var cur_tree := TreeRules.tree_version(Data.passive_migrations)
+	var problem := ""
+	if saved_tree < cur_tree:
+		problem = "passive tree updated (version %d -> %d)" % [saved_tree, cur_tree]
+	else:
+		if saved_tree > cur_tree:
+			push_warning("Save uses a newer passive tree (%d > %d)" % [saved_tree, cur_tree])
+		if not raw.has(start):
+			raw.push_front(start)   # older saves could miss it; not worth a refund
+		problem = TreeRules.allocation_problem(raw, start, total_passive_points(), Data.passives, raw_choices, Data.passive_flags.get("masteries", {}))
+	if problem == "":
+		allocated = raw
+		mastery_choices = raw_choices
+		return
+	var spent := 0
+	for id in raw:
+		if id != start and Data.passives.has(id):   # removed nodes give nothing back
+			spent += int(Data.passives[id].get("cost", 1))
+	allocated = [start]
+	if spent > 0:   # nothing to give back = nothing to tell the player
+		# ids: refunded nodes that still exist (Phase 5a: shown as "refunded" in the tree view)
+		var ids := []
+		for id in raw:
+			if id != start and Data.passives.has(id) and not ids.has(id):
+				ids.append(id)
+		tree_refund = {"from_version": saved_tree, "reason": problem, "points": spent, "ids": ids}
+
+## Phase 5b: presets and the plan. A tree refund (new tree_version or illegal allocation)
+## empties every preset and the plan, like the live tree; otherwise each preset is checked
+## with allocation_problem and an illegal one is emptied (counted in presets_dropped).
+func _load_presets_and_plan(d: Dictionary) -> void:
+	presets = [{}, {}, {}]
+	active_preset = 0
+	plan = []
+	plan_choices = {}
+	plan_gems = {}
+	presets_dropped = 0
+	var refunded := not tree_refund.is_empty() or int(d.get("tree_version", 1)) < TreeRules.tree_version(Data.passive_migrations)
+	var pp = d.get("passive_presets", {})
+	if typeof(pp) == TYPE_DICTIONARY:
+		active_preset = clampi(int(pp.get("active", 0)), 0, PRESET_SLOTS - 1)
+		var slots = pp.get("slots", [])
+		if typeof(slots) == TYPE_ARRAY:
+			var start: String = class_def().get("start_passive", "")
+			for i in mini(slots.size(), PRESET_SLOTS):
+				if i == active_preset or typeof(slots[i]) != TYPE_DICTIONARY or slots[i].is_empty():
+					continue
+				if refunded:
+					presets_dropped += 1
+					continue
+				var al := []
+				for id in Array(slots[i].get("allocated", [])):
+					al.append(str(id))
+				var mc := {}
+				var smc = slots[i].get("mastery_choices", {})
+				if typeof(smc) == TYPE_DICTIONARY:
+					for k in smc:
+						mc[str(k)] = str(smc[k])
+				var gm := {}
+				var sg = slots[i].get("gems", {})
+				if typeof(sg) == TYPE_DICTIONARY:
+					for k in sg:
+						if Loot.gem_valid(str(sg[k])):
+							gm[str(k)] = str(sg[k])
+				if TreeRules.allocation_problem(al, start, total_passive_points(), Data.passives, mc, Data.passive_flags.get("masteries", {})) != "":
+					presets_dropped += 1
+					continue
+				presets[i] = {"allocated": al, "mastery_choices": mc, "gems": gm}
+	var tp = d.get("tree_plan", {})
+	if refunded or typeof(tp) != TYPE_DICTIONARY:
+		return
+	var ids := []
+	for id in Array(tp.get("nodes", [])):
+		ids.append(str(id))
+	var pc := {}
+	var tpc = tp.get("choices", {})
+	if typeof(tpc) == TYPE_DICTIONARY:
+		for k in tpc:
+			pc[str(k)] = str(tpc[k])
+	plan = ids
+	plan_choices = pc
+	var tpg = tp.get("gems", {})
+	if typeof(tpg) == TYPE_DICTIONARY:
+		for k in tpg:
+			if Data.gems.has(str(tpg[k])):
+				plan_gems[str(k)] = str(tpg[k])
+	_prune_plan()
+
+## Phase 4b: gems kept in tree sockets. A gem whose socket is no longer allocated (for
+## example after a full tree refund) goes back to the pouch; unknown gem ids are dropped.
+## Must run after the allocation and the pouch are loaded.
+func _load_tree_gems(d: Dictionary) -> void:
+	tree_gems = {}
+	var tg = d.get("tree_gems", {})
+	if typeof(tg) != TYPE_DICTIONARY:
+		return
+	for k in tg:
+		var gid := str(tg[k])
+		if not Loot.gem_valid(gid):
+			continue
+		if allocated.has(str(k)) and is_socket(str(k)):
+			tree_gems[str(k)] = gid
+		else:
+			add_gem(gid)
 
 ## Restores the stash tabs. Version 2 and older saves held 60 slots of which only 56 were
 ## ever shown; StashRules.migrate_legacy rescues anything in the hidden four. The tab
@@ -999,14 +1858,18 @@ func _fix_item(it):
 	if not Data.item_bases.has(it.get("base", "")):
 		return null
 	# JSON turns ints into floats; normalise the integer fields
-	for k in ["ilvl", "req_level", "upgrade", "uid", "sockets", "corruption"]:
+	for k in ["ilvl", "req_level", "upgrade", "uid", "sockets"]:
 		if it.has(k):
 			it[k] = int(it[k])
+	if it.has("corruption") and CorruptionSystem.numeric(it["corruption"]):
+		it["corruption"] = int(it["corruption"])
 	if it.has("gems"):
 		var gl := []
 		for g in it["gems"]:
 			gl.append(g if (typeof(g) == TYPE_STRING and (g == "" or Loot.gem_valid(g))) else "")
 		it["gems"] = gl
+	CorruptionSystem.normalize_item(it, Data.corruption_cfg, Data.corruption_affixes)
+	preload("res://scripts/core/atlas_craft_rules.gd").normalize(it)   # Endgame 2B fields
 	return it
 
 # ---------------------------------------------------------------- stash tabs

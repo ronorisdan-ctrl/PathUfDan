@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bw5p05h3rwalx"
+
+[deps]
+
+files=["res://docs/passive_tree_audit_phase0.name.translation", "res://docs/passive_tree_audit_phase0.type.translation", "res://docs/passive_tree_audit_phase0.cluster.translation", "res://docs/passive_tree_audit_phase0.sector.translation", "res://docs/passive_tree_audit_phase0.generated.translation", "res://docs/passive_tree_audit_phase0.cost.translation", "res://docs/passive_tree_audit_phase0.links.translation", "res://docs/passive_tree_audit_phase0.dist.translation", "res://docs/passive_tree_audit_phase0.dist.translation", "res://docs/passive_tree_audit_phase0.dist.translation", "res://docs/passive_tree_audit_phase0.mods.translation", "res://docs/passive_tree_audit_phase0.flags.translation", "res://docs/passive_tree_audit_phase0.desc.translation", "res://docs/passive_tree_audit_phase0.behaviour.translation", "res://docs/passive_tree_audit_phase0.proposed.translation", "res://docs/passive_tree_audit_phase0.verdict.translation", "res://docs/passive_tree_audit_phase0.category.translation", "res://docs/passive_tree_audit_phase0.notes.translation", "res://docs/passive_tree_audit_phase0.your.translation"]
+
+source_file="res://docs/passive_tree_audit_phase0.csv"
+dest_files=["res://docs/passive_tree_audit_phase0.name.translation", "res://docs/passive_tree_audit_phase0.type.translation", "res://docs/passive_tree_audit_phase0.cluster.translation", "res://docs/passive_tree_audit_phase0.sector.translation", "res://docs/passive_tree_audit_phase0.generated.translation", "res://docs/passive_tree_audit_phase0.cost.translation", "res://docs/passive_tree_audit_phase0.links.translation", "res://docs/passive_tree_audit_phase0.dist.translation", "res://docs/passive_tree_audit_phase0.dist.translation", "res://docs/passive_tree_audit_phase0.dist.translation", "res://docs/passive_tree_audit_phase0.mods.translation", "res://docs/passive_tree_audit_phase0.flags.translation", "res://docs/passive_tree_audit_phase0.desc.translation", "res://docs/passive_tree_audit_phase0.behaviour.translation", "res://docs/passive_tree_audit_phase0.proposed.translation", "res://docs/passive_tree_audit_phase0.verdict.translation", "res://docs/passive_tree_audit_phase0.category.translation", "res://docs/passive_tree_audit_phase0.notes.translation", "res://docs/passive_tree_audit_phase0.your.translation"]
+
+[params]
+
+compress=true
+delimiter=0

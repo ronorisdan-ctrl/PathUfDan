@@ -1,12 +1,28 @@
 {
  "version": 1,
  "name": "Strict (epic+)",
- "description": "Only epic and legendary gear, gems, runes and upgrades. Everything else hidden (hold Alt to reveal).",
+ "description": "Only epic and legendary gear, gems, runes and upgrades. Everything else hidden (hold Alt to reveal). Rot-touched items get a green beam.",
  "default": "show",
  "safety": {
   "never_hide_min_rarity": "legendary"
  },
  "rules": [
+  {
+   "name": "Rot-touched (green beam and minimap icon, keeps checking)",
+   "enabled": true,
+   "conditions": {
+    "rot_touched": true
+   },
+   "actions": {
+    "visibility": "show",
+    "beam": "#b0e050",
+    "minimap": {
+     "shape": "diamond",
+     "color": "#b0e050"
+    },
+    "continue": true
+   }
+  },
   {
    "name": "Legendary",
    "enabled": true,
@@ -69,6 +85,19 @@
     "visibility": "show",
     "color": "#ff6ad5",
     "size": "normal"
+   }
+  },
+  {
+   "name": "Rot-touched gear below epic (green label)",
+   "enabled": true,
+   "conditions": {
+    "rot_touched": true,
+    "rarity_max": "rare"
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#b0e050",
+    "size": "large"
    }
   },
   {

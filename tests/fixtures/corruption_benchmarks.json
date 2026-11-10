@@ -1,0 +1,7 @@
+[
+  {"name":"Warrior melee","class":"warrior","skill":"cleave","prefix":"cw_ruinous","suffix":"cw_of_frenzy","mode":"attack"},
+  {"name":"Ranger projectile","class":"ranger","skill":"quick_shot","prefix":"cw_ruinous","suffix":"cw_of_frenzy","mode":"attack"},
+  {"name":"Ranger turret","class":"ranger","skill":"ballista_turret","prefix":"cw_iron_commanded","suffix":"cw_of_clockwork_fury","mode":"turret"},
+  {"name":"Mage spell","class":"mage","skill":"firebolt","prefix":"cw_embermarked","suffix":"cw_of_spellweaving","mode":"spell"},
+  {"name":"Mage summon","class":"mage","skill":"summon_skeletons","prefix":"cw_bonebound","suffix":null,"mode":"minion"}
+]

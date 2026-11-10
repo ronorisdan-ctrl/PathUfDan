@@ -2,6 +2,8 @@ extends "res://scripts/ui/base_panel.gd"
 ## Character sheet: attributes, offence (per equipped skill), defence,
 ## resistances, minions. Hover any row to see where the value comes from.
 
+const Chrome = preload("res://scripts/ui/components/panel_chrome.gd")
+
 var scroll: ScrollContainer
 var list: VBoxContainer
 var header: RichTextLabel
@@ -10,17 +12,22 @@ const SOURCE_NAMES := {"base": "Class base", "level": "Level growth", "equipment
 
 func _init() -> void:
 	place = "left"
-	build("Character", Vector2(400, 620))
-	header = UIKit.rich("", 380)
+	build("Character", Vector2(440, 640))
+	Chrome.apply(self)
+	header = UIKit.rich()
 	body.add_child(header)
 	scroll = ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(380, 520)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size.y = 200
+	Chrome.scroll_inset(scroll)
 	body.add_child(scroll)
 	list = VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
+	body.add_child(Chrome.Cabinet.caption("Hover a stat to inspect its sources"))
 	Events.stats_changed.connect(_on_stats)
+
+func reposition() -> void:
+	Chrome.place_panel(self, Vector2(440, 640))
 
 func _on_stats() -> void:
 	if visible:
@@ -32,8 +39,9 @@ func refresh() -> void:
 		return
 	var cd: Dictionary = ch.class_def()
 	var spn: String = Data.specs.get(ch.spec_id, {}).get("name", "")
-	header.text = "[font_size=16][color=#e8c890]%s[/color][/font_size]  Level %d %s%s\n[color=#8a8494]%s[/color]" % [ch.char_name, ch.level, cd.get("name", ""), (" - " + spn) if spn != "" else "", cd.get("identity", "")]
+	header.text = "[font_size=16][color=#e8c890]%s[/color][/font_size]  Level %d %s%s\n[color=#aaa594]%s[/color]" % [ch.char_name, ch.level, cd.get("name", ""), (" - " + spn) if spn != "" else "", cd.get("identity", "")]
 	for c in list.get_children():
+		list.remove_child(c)
 		c.queue_free()
 	var f: Dictionary = ch.final
 	_section("Attributes")
@@ -81,9 +89,15 @@ func refresh() -> void:
 	_row("Block Chance", "%d%%" % int(f["block_chance"]), "block_chance", "Blocked attacks deal no damage. Spells are blocked at half this chance. Cap 75%.")
 	_row("Damage Reduction", "%d%%" % int(f["damage_reduction"]), "damage_reduction", "Applied after armour and resistances. Cap 60% (75% with temporary effects).")
 	_row("Movement Speed", UIKit.fmt(f["move_speed"]), "move_speed", "")
-	_section("Resistances (cap 75%)")
+	_section("Resistances")
 	for r in [["fire", "Fire"], ["cold", "Ice"], ["lightning", "Lightning"], ["arcane", "Arcane"], ["void", "Void"]]:
-		_row(r[1] + " Resistance", "%d%%" % int(f["res_" + r[0]]), "res_" + r[0], "")
+		_row(r[1] + " Resistance", "%d%% / %d%% max" % [int(f["res_" + r[0]]),int(f.get("res_cap_" + r[0],75))], "res_" + r[0], "")
+	if not ch.stats.operations.is_empty():
+		_section("Corruption effects")
+		for effect in ch.stats.operations:
+			_row(str(effect.get("source","Corruption / Effect")).get_slice("/",1).strip_edges(), "equipped", "", ch.CorruptionEffects.describe(effect) + "\n" + str(effect.get("source","")))
+		if ch.CorruptionEffects.projectile_total(ch.stats) > 0:
+			_row("Corruption projectiles", "+%d / +%d" % [ch.CorruptionEffects.projectile_total(ch.stats),int(Data.corruption_cfg.get("corrupted_projectile_bonus_character_cap",2))], "", ch.CorruptionEffects.projectile_summary(ch.stats))
 	_section("Minions, Traps & Turrets")
 	_row("Minion damage", "+%d%%" % int(ch.stats.inc("minion_damage")), "minion_damage", "")
 	_row("Minion life", "+%d%%" % int(ch.stats.inc("minion_life")), "minion_life", "")
@@ -124,16 +138,23 @@ func _flag_desc(fl: String) -> String:
 	return ""
 
 func _section(t: String) -> void:
-	var l := UIKit.label(t, 15, UIKit.GOLD)
-	list.add_child(l)
+	var heading := HBoxContainer.new()
+	heading.add_child(Chrome.Cabinet.caption(t.to_upper()))
+	var line := HSeparator.new()
+	line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	heading.add_child(line)
+	list.add_child(heading)
 
 func _row(title: String, value: String, stat: String, extra: String) -> void:
 	var h := HBoxContainer.new()
 	h.mouse_filter = Control.MOUSE_FILTER_STOP
 	var a := UIKit.label(title, 13)
 	a.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	a.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	a.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var b := UIKit.label(value, 13, Color("#ffffff"))
+	b.custom_minimum_size.x = 136 if value != "" else 0
+	b.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.add_child(a)
 	h.add_child(b)

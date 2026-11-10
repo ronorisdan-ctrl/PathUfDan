@@ -4,6 +4,7 @@ extends "res://scripts/ui/base_panel.gd"
 ## town; switching (and dismissing) works anywhere from the pause menu.
 
 const PetRules = preload("res://scripts/core/pet_rules.gd")
+const Chrome = preload("res://scripts/ui/components/station_chrome.gd")
 
 var selected := ""
 var list_box: VBoxContainer
@@ -18,26 +19,21 @@ var rename_btn: Button
 func _init() -> void:
 	place = "left"
 	build("Pet Keeper Pip", Vector2(470, 620))
-	body.add_child(UIKit.label("\"Every adventurer needs a friend who carries things.\"", 12, UIKit.MUTED))
-	wallet = UIKit.rich("", 450)
-	body.add_child(wallet)
+	Chrome.apply(self)
+	body.add_child(Chrome.caption("\"Every adventurer needs a friend who carries things.\""))
+	wallet = UIKit.rich()
+	Chrome.inset(body, wallet)
 	where_label = UIKit.label("", 11, UIKit.MUTED)
 	where_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	where_label.custom_minimum_size = Vector2(450, 0)
 	body.add_child(where_label)
-	var sc := ScrollContainer.new()
-	sc.custom_minimum_size = Vector2(450, 230)
-	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	body.add_child(sc)
+	var sc := Chrome.reading_scroll(body, 130)
 	list_box = VBoxContainer.new()
 	list_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(list_box)
 	body.add_child(HSeparator.new())
-	var sc2 := ScrollContainer.new()
-	sc2.custom_minimum_size = Vector2(450, 170)
-	sc2.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	body.add_child(sc2)
-	info = UIKit.rich("", 430)
+	var sc2 := Chrome.reading_scroll(body, 120)
+	info = UIKit.rich()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc2.add_child(info)
 	var h := HBoxContainer.new()
 	upgrade_btn = UIKit.button("Upgrade", _upgrade)
@@ -57,6 +53,9 @@ func _init() -> void:
 	body.add_child(h2)
 	Events.currency_changed.connect(refresh)
 	Events.pet_changed.connect(refresh)
+
+func reposition() -> void:
+	Chrome.place_panel(self, Vector2(520, 660))
 
 static func in_town() -> bool:
 	return Game.level != null and is_instance_valid(Game.level) and bool(Game.level.get("is_town"))
@@ -85,7 +84,7 @@ func refresh() -> void:
 	for c in list_box.get_children():
 		c.queue_free()
 	for pd in Data.pet_list:
-		list_box.add_child(_row(pd, ch, town))
+		Chrome.inset(list_box, _row(pd, ch, town))
 	_refresh_info(ch, town)
 
 func _row(pd: Dictionary, ch, town: bool) -> Control:
@@ -104,7 +103,7 @@ func _row(pd: Dictionary, ch, town: bool) -> Control:
 		txt = "[color=#e0d8c8]%s[/color] [color=#8a8494](%s, tier %d)[/color]%s" % [ch.pet_name(id), pd["name"], ch.pet_tier(id), "  [color=#80e080]following[/color]" if ch.active_pet == id else ""]
 	else:
 		txt = "[color=#c8c0b0]%s[/color] [color=#8a8494]%s - %d gold[/color]" % [pd["name"], pd.get("group", ""), int(pd.get("price", 0))]
-	var l := UIKit.rich(txt, 250)
+	var l := UIKit.rich(txt)
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(l)
 	var info_b := UIKit.button(">" if selected == id else "Info", select.bind(id))

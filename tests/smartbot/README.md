@@ -23,6 +23,11 @@ Version string written to every row: `smartbot-1.0`.
 | `sb_hub.gd` | Town: gear score / equip, sell / salvage, crafting with a gold budget, vendor, gems, hotbar, runes, specialisation. |
 | `sb_planner.gd` | Passive-tree build planner (keystone targets + value-per-point frontier, using `CharacterData.path_to`). |
 | `sb_kit.gd` | Entry-kit generator (plausible character for a tier and level). |
+| `sb_gear.gd` | Phase B gear profiles `typical` / `geared`: economy model (runs per level, drops, materials), drop rolling, meter-aware crafting. |
+| `sb_builds.gd` | Phase B keystone build library (keystone, masteries, tree gem socket, spec, preferred skill tags). |
+| `build_analyser.py` | Plays every build per class and stage and writes `build_picks.json` (read by `--plan=auto`). |
+| `gear_compare.py` | Tables comparing `--kit_only` dumps of the gear profiles. |
+| `sb_endgame.gd` | Endgame 2E: the Collector's Wager (walk to the Collector, take/obey/hunt for a bet) and Pentimento Vaults (walls, traps, riddle sigils). Options `--wager=auto|<bet>|none`, `--stake=1-3`, `--vaults=0`, `--vault_type=`; see `docs/ENDGAME_PHASE2.md` 2E. |
 | `out/` | Results (has a `.gdignore` so the editor does not import CSVs as translations). |
 
 Game files touched: **none**. No hooks were needed: telegraphs, hazards, projectiles and boss
@@ -81,6 +86,8 @@ Several lines may append to the same CSV only when they run one after another
 | `--profile=` | `Competent` | `NoDodge`, `Competent`, `Expert` |
 | `--build=` | `balanced` | `balanced`, `glass`, `defensive` (section 4) |
 | `--no-gems` `--no-passives` `--no-dodge` `--no-crafting` | off | ablation toggles (section 7) |
+| `--gear=` | `legacy` | entry-kit gear profile: `legacy` (best of 3 natural drops per slot, unchanged), `typical` (drops and crafting of the runs a player needs to reach the level), `geared` (3x the farming; Atlas: Rot-touched drops and Fixative). See `docs/BOT_GEAR_PROFILES.md` |
+| `--plan=` | `none` (legacy) / `auto` | keystone build from `sb_builds.gd` (`w_earthbreaker`, `m_glacial`, ...), `auto` = the analyser's pick in `build_picks.json` for the class and stage, `none` = no keystone. Non-legacy runs add `gear-<profile>` and `plan-<id>` to the `flags` column and run id |
 | `--out=` | `res://tests/smartbot/out/results.csv` | CSV path (absolute paths work too) |
 | `--jobs=` | `1` | child processes run in parallel by the coordinator (one per character chain) |
 | `--ts=` | `1` | `Engine.time_scale` (section 6) |
@@ -119,6 +126,12 @@ Examples
 | `<name>_ckpt/<run_id>.json` | carry mode: character after run r (after the town visit), loaded by run r+1 |
 | `<name>_errors.txt` | output of child processes that failed |
 | `trace/<run_id>.txt` | with `--trace=1` |
+
+---------------------------------------------------------------------------------------------
+### 2e. Frozen baseline (passive tree plan)
+`baseline/tree_v1.csv` is the reference for every non-tree change: run `run_baseline.ps1`
+and compare with `compare_baseline.py` (exact match per run id). Rules and history:
+`baseline/BASELINES.md`.
 
 ---------------------------------------------------------------------------------------------
 ## 3. Skill profiles (behaviour only)
@@ -543,3 +556,12 @@ Game observations made while building (not changed):
 - The profiles are fixed behaviour definitions. Do not retune them to hit success rates.
   If a better parameter value produces worse results, look for a bot decision bug
   (section 3 lists the ones already fixed).
+
+## 15. Endgame options (Atlas runs)
+
+`--dungeon=atlas:q,r` with `--rot=N`, `--mechanic=<id>[,<id>...]` (comma list since 2E), `--pigments=`, `--varnish=`,
+`--warden=1` (Phases 1-2A). Phase 2E adds `--wager=auto|<bet id>|none` (a bet id is forced into the Collector's offer if
+the zone could offer it), `--stake=1|2|3`, `--vaults=0` (no detours for vaults), `--vault_type=treasure|trap|riddle`,
+`--hits` (trace every hit) and the profile flag `--set=group_perception:true` (off by default). The mage uses Blink as a
+dodge when walking and the roll cannot clear a perceived telegraph (notes `blinks:N`). Runner: `run_atlas_p2e.ps1`;
+summaries: `p2e_summary.py` (bets / vaults) and `p2e_trap.py`.

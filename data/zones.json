@@ -1,0 +1,463 @@
+{
+  "_doc": "Endgame zone biomes (docs/ENDGAME_PHASE0.md, ENDGAME_PHASE1.md). A zone def is a dungeon def (same keys, run by dungeon.gd) plus 'generator': 'zone' and a 'gen' block for scripts/world/zone_gen.gd. 'spike': true = startable from the dev panel. The Atlas (data/atlas.json) uses these as biome templates and overrides level, scaling, boss and modifiers per hex. 'summon_lifetime': max adds one non-boss summoner can create in a zone (0 = no cap).",
+  "zones": [
+    {
+      "id": "zone_overgrown_ruin",
+      "generator": "zone",
+      "spike": true,
+      "name": "Overgrown Ruin (zone biome)",
+      "tier": 3,
+      "min_level": 15,
+      "max_level": 26,
+      "desc": "Endgame biome: overgrown caves (cellular automata) and ruined halls (BSP), stitched into one open area.",
+      "gen": {
+        "macro_cols": 4,
+        "macro_rows": 3,
+        "macro_cell": 48,
+        "chambers": [
+          5,
+          7
+        ],
+        "chamber_size": [
+          30,
+          40
+        ],
+        "start_size": [
+          14,
+          16
+        ],
+        "bsp_share": 0.4,
+        "extra_links": 1,
+        "ca": {
+          "fill": 0.6,
+          "steps": 5,
+          "birth": 5,
+          "survive": 4,
+          "min_floor": 0.45
+        },
+        "bsp": {
+          "min_leaf": 12,
+          "margin": 1,
+          "room_fill": 0.8,
+          "corridor": 4,
+          "erode": 0.2,
+          "pillars": 0.015,
+          "min_floor": 0.4
+        },
+        "connector": {
+          "width": [
+            4,
+            6
+          ],
+          "bias": 0.72,
+          "max_steps": 900
+        },
+        "spawn_spacing": 7,
+        "min_chamber_floor": 420,
+        "chamber_margin": 3
+      },
+      "packs_per_room": [
+        5,
+        7
+      ],
+      "pack_size": [
+        3,
+        6
+      ],
+      "elite_chance": 0.3,
+      "elite_mods": [
+        1,
+        3
+      ],
+      "pool": [
+        {
+          "id": "shade_assassin",
+          "w": 18
+        },
+        {
+          "id": "rime_witch",
+          "w": 14
+        },
+        {
+          "id": "storm_acolyte",
+          "w": 12
+        },
+        {
+          "id": "bone_bulwark",
+          "w": 12
+        },
+        {
+          "id": "grave_caller",
+          "w": 12
+        },
+        {
+          "id": "ghoul",
+          "w": 16
+        },
+        {
+          "id": "abyssal_horror",
+          "w": 8
+        },
+        {
+          "id": "carrion_bat",
+          "w": 10
+        }
+      ],
+      "boss": "archon_velis",
+      "objective_pool": [
+        [
+          "mechanisms:3",
+          "boss"
+        ],
+        [
+          "relics:3",
+          "boss"
+        ],
+        [
+          "guardian",
+          "boss"
+        ],
+        [
+          "waves",
+          "boss"
+        ],
+        [
+          "boss"
+        ]
+      ],
+      "objectives": [
+        "boss"
+      ],
+      "hazards": [
+        "spikes",
+        "vent",
+        "miasma"
+      ],
+      "hazard_rooms": 0.5,
+      "hazards_per_room": [
+        2,
+        4
+      ],
+      "palette": "warren",
+      "mod_count": [
+        0,
+        0
+      ],
+      "rarity_bonus": 60,
+      "life_mult": 1.2,
+      "damage_mult": 1.12,
+      "resist_bonus": 10,
+      "ambient": "#644a40",
+      "wake_chambers": 1,
+      "wake_radius": 0,
+      "flow_reach": 160,
+      "summon_lifetime": 8
+    },
+    {
+      "id": "zone_ruined_nave",
+      "generator": "zone",
+      "spike": true,
+      "name": "Ruined Nave (zone biome)",
+      "tier": 3,
+      "min_level": 15,
+      "max_level": 26,
+      "desc": "Endgame biome: a collapsed cathedral nave. Mostly BSP halls and aisles with pillars, joined by wide breaches.",
+      "gen": {
+        "macro_cols": 4,
+        "macro_rows": 3,
+        "macro_cell": 48,
+        "chambers": [
+          5,
+          7
+        ],
+        "chamber_size": [
+          30,
+          40
+        ],
+        "start_size": [
+          14,
+          16
+        ],
+        "bsp_share": 0.85,
+        "extra_links": 1,
+        "ca": {
+          "fill": 0.6,
+          "steps": 5,
+          "birth": 5,
+          "survive": 4,
+          "min_floor": 0.45
+        },
+        "bsp": {
+          "min_leaf": 12,
+          "margin": 1,
+          "room_fill": 0.8,
+          "corridor": 4,
+          "erode": 0.12,
+          "pillars": 0.03,
+          "min_floor": 0.4
+        },
+        "connector": {
+          "width": [
+            4,
+            6
+          ],
+          "bias": 0.8,
+          "max_steps": 900
+        },
+        "spawn_spacing": 7,
+        "min_chamber_floor": 420,
+        "chamber_margin": 3
+      },
+      "packs_per_room": [
+        5,
+        7
+      ],
+      "pack_size": [
+        3,
+        6
+      ],
+      "elite_chance": 0.3,
+      "elite_mods": [
+        1,
+        3
+      ],
+      "pool": [
+        {
+          "id": "bone_bulwark",
+          "w": 16
+        },
+        {
+          "id": "shade_assassin",
+          "w": 14
+        },
+        {
+          "id": "storm_acolyte",
+          "w": 12
+        },
+        {
+          "id": "rime_witch",
+          "w": 10
+        },
+        {
+          "id": "abyssal_horror",
+          "w": 12
+        },
+        {
+          "id": "grave_caller",
+          "w": 10
+        },
+        {
+          "id": "ash_cultist",
+          "w": 12
+        },
+        {
+          "id": "grave_brute",
+          "w": 10
+        },
+        {
+          "id": "bone_archer",
+          "w": 8
+        }
+      ],
+      "boss": "iron_penitent",
+      "objective_pool": [
+        [
+          "mechanisms:3",
+          "boss"
+        ],
+        [
+          "relics:3",
+          "boss"
+        ],
+        [
+          "guardian",
+          "boss"
+        ],
+        [
+          "waves",
+          "boss"
+        ],
+        [
+          "boss"
+        ]
+      ],
+      "objectives": [
+        "boss"
+      ],
+      "hazards": [
+        "spikes",
+        "vent"
+      ],
+      "hazard_rooms": 0.5,
+      "hazards_per_room": [
+        2,
+        4
+      ],
+      "palette": "sanctum",
+      "mod_count": [
+        0,
+        0
+      ],
+      "rarity_bonus": 60,
+      "life_mult": 1.2,
+      "damage_mult": 1.12,
+      "resist_bonus": 10,
+      "ambient": "#584a68",
+      "wake_chambers": 1,
+      "wake_radius": 0,
+      "flow_reach": 160,
+      "summon_lifetime": 8
+    },
+    {
+      "id": "zone_flooded_catacomb",
+      "generator": "zone",
+      "spike": true,
+      "name": "Flooded Catacomb (zone biome)",
+      "tier": 3,
+      "min_level": 15,
+      "max_level": 26,
+      "desc": "Endgame biome: drowned burial caves. Cellular-automata grottoes only, joined by long winding tunnels, with an extra loop.",
+      "gen": {
+        "macro_cols": 4,
+        "macro_rows": 3,
+        "macro_cell": 48,
+        "chambers": [
+          5,
+          7
+        ],
+        "chamber_size": [
+          30,
+          40
+        ],
+        "start_size": [
+          14,
+          16
+        ],
+        "bsp_share": 0.0,
+        "extra_links": 2,
+        "ca": {
+          "fill": 0.58,
+          "steps": 5,
+          "birth": 5,
+          "survive": 4,
+          "min_floor": 0.45
+        },
+        "bsp": {
+          "min_leaf": 12,
+          "margin": 1,
+          "room_fill": 0.8,
+          "corridor": 4,
+          "erode": 0.2,
+          "pillars": 0.015,
+          "min_floor": 0.4
+        },
+        "connector": {
+          "width": [
+            4,
+            6
+          ],
+          "bias": 0.62,
+          "max_steps": 1100
+        },
+        "spawn_spacing": 7,
+        "min_chamber_floor": 420,
+        "chamber_margin": 3
+      },
+      "packs_per_room": [
+        5,
+        7
+      ],
+      "pack_size": [
+        3,
+        6
+      ],
+      "elite_chance": 0.3,
+      "elite_mods": [
+        1,
+        3
+      ],
+      "pool": [
+        {
+          "id": "ghoul",
+          "w": 20
+        },
+        {
+          "id": "bloater",
+          "w": 12
+        },
+        {
+          "id": "bone_archer",
+          "w": 14
+        },
+        {
+          "id": "carrion_bat",
+          "w": 12
+        },
+        {
+          "id": "rime_witch",
+          "w": 12
+        },
+        {
+          "id": "grave_caller",
+          "w": 10
+        },
+        {
+          "id": "abyssal_horror",
+          "w": 10
+        },
+        {
+          "id": "grave_brute",
+          "w": 10
+        }
+      ],
+      "boss": "warden",
+      "objective_pool": [
+        [
+          "mechanisms:3",
+          "boss"
+        ],
+        [
+          "relics:3",
+          "boss"
+        ],
+        [
+          "guardian",
+          "boss"
+        ],
+        [
+          "waves",
+          "boss"
+        ],
+        [
+          "boss"
+        ]
+      ],
+      "objectives": [
+        "boss"
+      ],
+      "hazards": [
+        "miasma",
+        "spikes"
+      ],
+      "hazard_rooms": 0.5,
+      "hazards_per_room": [
+        2,
+        4
+      ],
+      "palette": "crypt",
+      "mod_count": [
+        0,
+        0
+      ],
+      "rarity_bonus": 60,
+      "life_mult": 1.2,
+      "damage_mult": 1.12,
+      "resist_bonus": 10,
+      "ambient": "#4a5468",
+      "wake_chambers": 1,
+      "wake_radius": 0,
+      "flow_reach": 160,
+      "summon_lifetime": 8
+    }
+  ]
+}

@@ -29,6 +29,10 @@ var active := []         # threats the bot will act on this tick
 var serial := {}         # enemy id -> windup serial
 var last_state := {}     # enemy id -> last state
 var counters := {"seen": 0, "perceived": 0, "ignored_mistake": 0}
+## Phase 2E: telegraphs that appear together from one source (the 7 circles of an eruption, one
+## volley of a spiral, a pack's death explosions) are one thing on screen for a player: they share
+## ONE perception roll. group key -> [perceived, time]
+var groups := {}
 
 func setup(profile: Dictionary, r: RandomNumberGenerator) -> void:
 	prof = profile
@@ -39,6 +43,7 @@ func reset() -> void:
 	active.clear()
 	serial.clear()
 	last_state.clear()
+	groups.clear()
 
 # ------------------------------------------------------------------ scanning
 func _in_view(pp: Vector2, q: Vector2) -> bool:
@@ -63,13 +68,20 @@ func _register(key, th: Dictionary, pp: Vector2, anchor: Vector2) -> void:
 		old["rolled"] = true
 		old["seen_at"] = now
 		counters["seen"] += 1
-		var aw := float(prof.get("awareness", 1.0))
-		if old.get("kind", "") == "proj":
-			aw = aw * aw          # projectiles are harder to track than ground telegraphs
-		var perceived := rng.randf() < aw
-		if perceived and rng.randf() < float(prof.get("mistake_rate", 0.0)):
-			perceived = false
-			counters["ignored_mistake"] += 1
+		var g = old.get("group") if prof.get("group_perception", false) else null
+		var perceived := false
+		if g != null and groups.has(g):
+			perceived = groups[g][0]
+		else:
+			var aw := float(prof.get("awareness", 1.0))
+			if old.get("kind", "") == "proj":
+				aw = aw * aw          # projectiles are harder to track than ground telegraphs
+			perceived = rng.randf() < aw
+			if perceived and rng.randf() < float(prof.get("mistake_rate", 0.0)):
+				perceived = false
+				counters["ignored_mistake"] += 1
+			if g != null:
+				groups[g] = [perceived, now]
 		old["perceived"] = perceived
 		if perceived:
 			counters["perceived"] += 1
@@ -107,7 +119,8 @@ func scan(lv, p, t_now: float) -> void:
 				continue
 			var t0: float = now + maxf(0.0, c.delay - c.t)
 			_register(c.get_instance_id(), {"kind": "circle", "c": c.global_position, "r": c.radius + PR, "t0": t0, "t1": t0,
-				"w": _weight(c.source), "label": _label_for(c.source, "aoe"), "dmgf": dmg_frac(c.packet)}, pp, c.global_position)
+				"w": _weight(c.source), "label": _label_for(c.source, "aoe"), "dmgf": dmg_frac(c.packet),
+				"group": ["aoe", _src_id(c.source), int(round((now - c.t) * 20.0))]}, pp, c.global_position)
 		elif s == HazardScript:
 			_scan_hazard(c, pp)
 	# enemy and boss wind-ups / charges / dashes
@@ -124,7 +137,11 @@ func scan(lv, p, t_now: float) -> void:
 			continue
 		_register(c.get_instance_id(), {"kind": "proj", "q": q, "v": c.vel, "hitr": c.radius + PR + 2.0,
 			"rem": maxf(0.0, c.max_dist - c.traveled), "t0": now, "t1": now + 1.5, "w": _weight(c.source),
-			"label": _label_for(c.source, "projectile"), "dmgf": dmg_frac(c.packet)}, pp, q)
+			"label": _label_for(c.source, "projectile"), "dmgf": dmg_frac(c.packet),
+			"group": ["proj", _src_id(c.source), int(round((now - c.traveled / maxf(1.0, c.vel.length())) * 20.0))]}, pp, q)
+	for gk in groups.keys():
+		if now - float(groups[gk][1]) > 4.0:
+			groups.erase(gk)
 	# drop stale entries and build the actionable list
 	var react: float = float(prof.get("reaction_ms", 300.0)) / 1000.0
 	active.clear()
@@ -223,6 +240,9 @@ func pattern_name(b) -> String:
 		if b.patterns[n] == b.current:
 			return n
 	return ""
+
+func _src_id(src) -> int:
+	return src.get_instance_id() if typeof(src) != TYPE_NIL and is_instance_valid(src) else 0
 
 func _label_for(src, what: String) -> String:
 	if typeof(src) == TYPE_NIL:

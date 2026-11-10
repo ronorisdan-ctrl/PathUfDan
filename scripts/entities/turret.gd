@@ -47,9 +47,9 @@ func _physics_process(delta: float) -> void:
 		return
 	life_t -= delta
 	if life_t <= 0:
-		expire()
+		retire()
 		return
-	fire_t -= delta
+	fire_t -= delta * (1.25 if overclocked() else 1.0)
 	if fire_t <= 0:
 		var t = level.nearest_hostile(global_position, "player", rng_dist, {}, true)
 		if t != null:
@@ -80,6 +80,31 @@ func _fire(t) -> void:
 		p.position = global_position + Vector2(0, -6)
 		p.pierce = owner_player.ch.final.get("pierce", 0)
 		level.projectile_layer.add_child(p)
+
+## Overclock: turrets fire 25% faster while their owner stands within 120 units.
+func overclocked() -> bool:
+	return owner_player.ch.stats.has_flag("overclock") and owner_player.global_position.distance_to(global_position) <= 120.0
+
+## Timed out or replaced. Volatile Mechanisms: the turret explodes (one bolt's damage, radius 50).
+func retire() -> void:
+	if alive and level != null and owner_player != null and is_instance_valid(owner_player) and owner_player.ch.stats.has_flag("volatile_mechanisms"):
+		volatile_burst(self, level, owner_player, skill, 50.0)
+	expire()
+
+static func volatile_burst(node, lv, pl, sk: Dictionary, r: float) -> void:
+	var AoE = load("res://scripts/entities/aoe.gd")
+	var a = AoE.new()
+	a.level = lv
+	a.source = pl
+	a.packet = Combat.player_packet(pl.ch, sk)
+	a.faction = "player"
+	a.radius = r
+	a.delay = 0.05
+	a.style = "explosion"
+	a.color = Color("#ffb040")
+	a.show_telegraph = false
+	a.position = node.global_position
+	lv.floor_layer.add_child(a)
 
 func expire() -> void:
 	if not alive:

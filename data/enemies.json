@@ -578,7 +578,58 @@
   "boss": true,
   "attack": "boss",
   "category": "boss",
-  "detect": 420
+  "detect": 420,
+  "rot_mutations": [
+   {
+    "id": "drowned_hymn",
+    "name": "Drowned Hymn",
+    "desc": "Spirals of cold orbs between cleaves",
+    "add": {
+     "rot_spiral": {
+      "type": "spiral",
+      "w": 2,
+      "range": [
+       0,
+       360
+      ],
+      "windup": 0.8,
+      "count": 14,
+      "waves": 2,
+      "proj": "orb",
+      "proj_speed": 150,
+      "dtype": "cold",
+      "mult": 0.65
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "rising_tide",
+    "name": "Rising Tide",
+    "desc": "Eruptions from the start, five at a time",
+    "tune": {
+     "eruption": {
+      "count": 5
+     }
+    },
+    "unlock": [
+     "eruption"
+    ],
+    "phase": 0
+   },
+   {
+    "id": "undertow",
+    "name": "Undertow",
+    "desc": "Charges far more often and harder",
+    "tune": {
+     "charge": {
+      "cooldown": 3,
+      "mult": 1.6
+     }
+    },
+    "phase": 0
+   }
+  ]
  },
  {
   "id": "gravemaw",
@@ -693,7 +744,55 @@
   "boss": true,
   "attack": "boss",
   "category": "boss",
-  "detect": 420
+  "detect": 420,
+  "rot_mutations": [
+   {
+    "id": "deep_burrow",
+    "name": "Deep Burrow",
+    "desc": "Wider, harder burrow eruptions",
+    "tune": {
+     "burrow": {
+      "radius": 64,
+      "mult": 1.8
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "bone_rain",
+    "name": "Bone Rain",
+    "desc": "Calls down a barrage of bone",
+    "add": {
+     "rot_mortar": {
+      "type": "mortar",
+      "w": 2,
+      "range": [
+       0,
+       400
+      ],
+      "windup": 0.5,
+      "count": 8,
+      "radius": 32,
+      "interval": 0.22,
+      "mult": 0.8,
+      "color": "#c0a070"
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "bile_torrent",
+    "name": "Bile Torrent",
+    "desc": "Spits nine void orbs in a wide fan",
+    "tune": {
+     "spit": {
+      "count": 9,
+      "spread": 80
+     }
+    },
+    "phase": 0
+   }
+  ]
  },
  {
   "id": "archon_velis",
@@ -836,7 +935,55 @@
   "boss": true,
   "attack": "boss",
   "category": "boss",
-  "detect": 420
+  "detect": 420,
+  "rot_mutations": [
+   {
+    "id": "veil_step",
+    "name": "Veil Step",
+    "desc": "Teleports almost constantly",
+    "tune": {
+     "teleport": {
+      "cooldown": 2.5
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "rift_sigils",
+    "name": "Rift Sigils",
+    "desc": "Void sigils erupt under you",
+    "add": {
+     "rot_rift": {
+      "type": "eruption",
+      "w": 2,
+      "range": [
+       0,
+       360
+      ],
+      "windup": 0.5,
+      "count": 4,
+      "radius": 34,
+      "mult": 0.9,
+      "color": "#b060ff"
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "endless_spiral",
+    "name": "Endless Spiral",
+    "desc": "Spirals from the start, four waves long",
+    "tune": {
+     "spiral": {
+      "waves": 4
+     }
+    },
+    "unlock": [
+     "spiral"
+    ],
+    "phase": 0
+   }
+  ]
  },
  {
   "id": "iron_penitent",
@@ -952,7 +1099,58 @@
   "boss": true,
   "attack": "boss",
   "category": "boss",
-  "detect": 420
+  "detect": 420,
+  "rot_mutations": [
+   {
+    "id": "barrage",
+    "name": "Barrage",
+    "desc": "Twelve-shell mortar volleys",
+    "tune": {
+     "mortar": {
+      "count": 12,
+      "interval": 0.18
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "shrapnel",
+    "name": "Shrapnel",
+    "desc": "Sprays spirals of iron bolts",
+    "add": {
+     "rot_shrapnel": {
+      "type": "spiral",
+      "w": 2,
+      "range": [
+       0,
+       400
+      ],
+      "windup": 0.9,
+      "count": 16,
+      "waves": 2,
+      "proj": "bolt",
+      "proj_speed": 200,
+      "dtype": "physical",
+      "mult": 0.6
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "furnace_pulse",
+    "name": "Furnace Pulse",
+    "desc": "Shockwaves from the start; overheats less often",
+    "tune": {
+     "overheat": {
+      "cooldown": 20
+     }
+    },
+    "unlock": [
+     "shockwave"
+    ],
+    "phase": 0
+   }
+  ]
  },
  {
   "id": "malgrath",
@@ -1067,7 +1265,52 @@
   "boss": true,
   "attack": "boss",
   "category": "boss",
-  "detect": 420
+  "detect": 420,
+  "rot_mutations": [
+   {
+    "id": "greater_choir",
+    "name": "Greater Choir",
+    "desc": "Wards with six choristers",
+    "tune": {
+     "ward": {
+      "count": 6
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "hellfall",
+    "name": "Hellfall",
+    "desc": "Void meteors rain down",
+    "add": {
+     "rot_hellfall": {
+      "type": "mortar",
+      "w": 2,
+      "range": [
+       0,
+       400
+      ],
+      "windup": 0.5,
+      "count": 7,
+      "radius": 36,
+      "interval": 0.25,
+      "mult": 0.9,
+      "color": "#ff3060"
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "hunting_claw",
+    "name": "Hunting Claw",
+    "desc": "Charges and sings from the start",
+    "unlock": [
+     "charge",
+     "hymn"
+    ],
+    "phase": 0
+   }
+  ]
  },
  {
   "id": "stormheart",
@@ -1198,6 +1441,60 @@
   "boss": true,
   "attack": "boss",
   "category": "boss",
-  "detect": 420
+  "detect": 420,
+  "rot_mutations": [
+   {
+    "id": "thunderhead",
+    "name": "Thunderhead",
+    "desc": "Fourteen-strike storms",
+    "tune": {
+     "storm": {
+      "count": 14
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "overcharge_rush",
+    "name": "Overcharge Rush",
+    "desc": "Rushes you down with a lightning charge",
+    "add": {
+     "rot_rush": {
+      "type": "charge",
+      "w": 2,
+      "range": [
+       90,
+       300
+      ],
+      "windup": 0.6,
+      "speed": 440,
+      "mult": 1.4,
+      "cooldown": 5
+     }
+    },
+    "phase": 0
+   },
+   {
+    "id": "ground_arcs",
+    "name": "Ground Arcs",
+    "desc": "Lightning erupts beneath you",
+    "add": {
+     "rot_arcs": {
+      "type": "eruption",
+      "w": 2,
+      "range": [
+       0,
+       360
+      ],
+      "windup": 0.45,
+      "count": 5,
+      "radius": 30,
+      "mult": 0.8,
+      "color": "#a0e8ff"
+     }
+    },
+    "phase": 0
+   }
+  ]
  }
 ]

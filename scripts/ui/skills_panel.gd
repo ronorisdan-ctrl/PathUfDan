@@ -2,11 +2,16 @@ extends "res://scripts/ui/base_panel.gd"
 ## Active skill loadout. Select a hotbar slot, then pick a skill for it.
 ## Changes are allowed in town or when no enemy is nearby.
 
+const Chrome = preload("res://scripts/ui/components/panel_chrome.gd")
+const HUDStyle = preload("res://scripts/ui/components/hud_style.gd")
+
 var slot_bar: HBoxContainer
 var list: VBoxContainer
 var note: Label
 var selected_slot := 0
 var runes_label: RichTextLabel
+var scroll: ScrollContainer
+var rune_scroll: ScrollContainer
 
 class SkillIcon extends Control:
 	var sk := {}
@@ -19,35 +24,47 @@ class SkillIcon extends Control:
 			draw_rect(r, Color(0.1, 0.09, 0.1))
 		else:
 			load("res://scripts/ui/ui_kit.gd").draw_skill_icon(self, r, sk, dim)
-		draw_rect(r, Color("#ffd060") if sel else Color(0.35, 0.3, 0.25), false, 2.0 if sel else 1.0)
+		draw_rect(r.grow(-1), Color("#e4c781") if sel else Color("#66583b"), false, 2.0 if sel else 1.0)
+		if sel:
+			draw_line(Vector2(5, size.y - 5), size - Vector2(5, 5), Color("#e4c781"), 2)
 		if key_text != "":
-			draw_string_outline(ThemeDB.fallback_font, Vector2(3, 12), key_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, 3, Color.BLACK)
-			draw_string(ThemeDB.fallback_font, Vector2(3, 12), key_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("#f0e0b0"))
+			draw_string_outline(ThemeDB.fallback_font, Vector2(3, 12), key_text, HORIZONTAL_ALIGNMENT_LEFT, size.x - 6, 11, 3, Color.BLACK)
+			draw_string(ThemeDB.fallback_font, Vector2(3, 12), key_text, HORIZONTAL_ALIGNMENT_LEFT, size.x - 6, 11, Color("#f0e0b0"))
 
 func _init() -> void:
 	place = "center"
-	build("Skills", Vector2(640, 640))
-	body.add_child(UIKit.label("Hotbar - click a slot, then choose a skill below", 13, UIKit.MUTED))
+	build("Skills", Vector2(760, 660))
+	Chrome.apply(self)
+	body.add_child(Chrome.Cabinet.caption("HOTBAR  /  Click a slot, then choose a skill below"))
 	slot_bar = HBoxContainer.new()
 	slot_bar.add_theme_constant_override("separation", 8)
 	body.add_child(slot_bar)
-	note = UIKit.label("", 12, UIKit.MUTED)
+	note = UIKit.label("", 12, Chrome.Cabinet.MUTED)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD
-	note.custom_minimum_size.x = 600
 	body.add_child(note)
-	runes_label = UIKit.rich("", 600)
-	body.add_child(runes_label)
-	body.add_child(HSeparator.new())
-	var sc := ScrollContainer.new()
-	sc.custom_minimum_size = Vector2(610, 440)
-	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	body.add_child(sc)
+	rune_scroll = ScrollContainer.new()
+	rune_scroll.custom_minimum_size.y = 64
+	rune_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	rune_scroll.add_theme_stylebox_override("panel", Chrome.Cabinet.box(Color("#101310"), Color("#3e392d"), 4))
+	body.add_child(rune_scroll)
+	runes_label = UIKit.rich()
+	runes_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rune_scroll.add_child(runes_label)
+	scroll = ScrollContainer.new()
+	scroll.custom_minimum_size.y = 200
+	Chrome.scroll_inset(scroll)
+	body.add_child(scroll)
 	list = VBoxContainer.new()
+	list.add_theme_constant_override("separation", 8)
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	sc.add_child(list)
+	scroll.add_child(list)
+	body.add_child(Chrome.Cabinet.caption("Right-click a hotbar slot to clear it  /  Click a rune to remove it"))
 	Events.loadout_changed.connect(refresh)
 	Events.currency_changed.connect(refresh)
 	Events.skill_unlocked.connect(func(_s): refresh())
+
+func reposition() -> void:
+	Chrome.place_panel(self, Vector2(760, 660))
 
 func can_change() -> String:
 	var lv = Game.level
@@ -66,8 +83,11 @@ func refresh() -> void:
 	if ch == null or not visible:
 		return
 	for c in slot_bar.get_children():
+		slot_bar.remove_child(c)
 		c.queue_free()
-	var keys := ["LMB", "RMB", "Q", "E", "R", "T", "G"]
+	var keys := []
+	for i in 7:
+		keys.append(HUDStyle.key_label("skill_%d" % (i + 1)))
 	for i in keys.size():
 		var ic := SkillIcon.new()
 		ic.custom_minimum_size = Vector2(56, 56)
@@ -87,15 +107,19 @@ func refresh() -> void:
 	for rid in ch.runes:
 		owned.append("[color=%s]%s x%d[/color]" % [Data.skill_runes[rid]["color"], Data.skill_runes[rid]["name"].replace("Rune of ", "").replace(" Rune", ""), int(ch.runes[rid])])
 	runes_label.text = "Runes: " + (", ".join(owned) if owned.size() > 0 else "[color=#8a8494]none yet - they drop from monsters and the merchant sells them[/color]")
-	note.add_theme_color_override("font_color", UIKit.BAD if why != "" else UIKit.MUTED)
+	note.add_theme_color_override("font_color", UIKit.BAD if why != "" else Chrome.Cabinet.MUTED)
 	for c in list.get_children():
+		list.remove_child(c)
 		c.queue_free()
 	for sk in Data.skills_for_class(ch.class_id):
 		var unlocked: bool = ch.unlocked_skills.has(sk["id"])
+		var card := Chrome.Cabinet.inset()
 		var row := HBoxContainer.new()
+		card.add_child(row)
 		row.mouse_filter = Control.MOUSE_FILTER_STOP
 		var ic2 := SkillIcon.new()
 		ic2.custom_minimum_size = Vector2(44, 44)
+		ic2.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		ic2.sk = sk
 		ic2.dim = not unlocked
 		ic2.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -104,12 +128,12 @@ func refresh() -> void:
 		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var title := "%s  (Lv %d)" % [sk["name"], ch.skill_level(sk["id"])] if unlocked else "%s  - unlocks at level %d" % [sk["name"], int(sk.get("unlock_level", 1))]
-		var tl := UIKit.label(title, 14, UIKit.TEXT if unlocked else UIKit.MUTED)
+		var tl := UIKit.label(title, 14, UIKit.TEXT if unlocked else Chrome.Cabinet.MUTED)
+		tl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		tl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		v.add_child(tl)
-		var dl := UIKit.label(sk.get("desc", ""), 11, UIKit.MUTED)
+		var dl := UIKit.label(sk.get("desc", ""), 12, Chrome.Cabinet.MUTED)
 		dl.autowrap_mode = TextServer.AUTOWRAP_WORD
-		dl.custom_minimum_size.x = 420
 		dl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		v.add_child(dl)
 		row.add_child(v)
@@ -118,7 +142,7 @@ func refresh() -> void:
 			on.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			row.add_child(on)
 		if unlocked:
-			var sockets := HBoxContainer.new()
+			var sockets := HFlowContainer.new()
 			var cur: Array = ch.skill_runes.get(sk["id"], [])
 			for si in 3:
 				var b := Button.new()
@@ -142,7 +166,7 @@ func refresh() -> void:
 		row.gui_input.connect(_row_input.bind(sk["id"]))
 		row.mouse_entered.connect(func(): ui.show_tooltip(UIKit.skill_tooltip(ch.resolved_skill(sk["id"]), ch)))
 		row.mouse_exited.connect(func(): ui.hide_tooltip())
-		list.add_child(row)
+		list.add_child(card)
 
 func _unsocket(sid: String, idx: int) -> void:
 	var why := can_change()

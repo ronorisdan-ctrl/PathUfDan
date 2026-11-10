@@ -6,6 +6,8 @@ extends RefCounted
 ## UI panels call; only the confirmation dialogs (ui.ask) are skipped.
 
 const Planner = preload("res://tests/smartbot/sb_planner.gd")
+const Builds = preload("res://tests/smartbot/sb_builds.gd")
+const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
 
 var bot = null              # the smartbot node (for flags / logging)
 var build := "balanced"
@@ -13,6 +15,11 @@ var flags := {}             # no_gems, no_passives, no_crafting
 var planner = Planner.new()
 var main_skills := []       # damage skills used by the power score
 var log_lines := []
+# Phase B (docs/BOT_GEAR_PROFILES.md). With gear == "legacy" none of these change anything.
+var gear := "legacy"        # legacy | typical | geared
+var plan := {}              # keystone build plan (sb_builds.gd), {} = none
+var stage_def := {}         # {"armour", "res"}: generic enemy defence of the stage (non-legacy)
+var craft_rng := RandomNumberGenerator.new()   # crafting-corruption meter rolls (non-legacy)
 
 const SLOT_ORDER := ["main_hand", "chest", "off_hand", "helmet", "gloves", "boots", "belt", "amulet", "ring1", "ring2", "charm"]
 const WEIGHTS := {"balanced": [1.0, 1.0], "glass": [1.25, 0.8], "defensive": [0.8, 1.3]}
@@ -90,10 +97,38 @@ func skill_dps(ch, sid: String, alloc, eq, f: Dictionary, aoe: bool) -> float:
 	var w = (eq if eq != null else ch.equipment).get("main_hand")
 	if not weapon_ok_for(sk, w):
 		return 0.0
-	var avg: float = ch.preview_skill_avg(sid, alloc, eq)
+	var avg: float = ch.preview_skill_avg(sid, alloc, eq) if stage_def.is_empty() else mitigated_avg(ch, sk, alloc, eq)
 	var ut := use_time(sk, f)
 	var cd: float = float(sk.get("cooldown", 0)) * f.get("cdr_mult", 1.0)
 	return avg * targets_factor(sk, aoe) / maxf(ut, cd if cd > ut * 3.0 else ut)
+
+## Phase B: average hit after the stage's generic enemy defence (one armour value and one
+## resistance for fire, cold and lightning alike, so no element is favoured), with spell
+## penetration applied. Lets typical / geared bots value penetration and armour piercing.
+func mitigated_avg(ch, sk: Dictionary, alloc, eq) -> float:
+	var old_s = ch.stats
+	var old_f: Dictionary = ch.final
+	var old_eq: Dictionary = ch.equipment
+	ch.stats = ch.build_stats(alloc if alloc != null else ch.allocated, ch.active_buffs, eq)
+	ch.final = ch.resolve(ch.stats, eq)
+	if eq != null:
+		ch.equipment = eq
+	var p: Dictionary = Combat.player_packet(ch, sk)
+	ch.stats = old_s
+	ch.final = old_f
+	ch.equipment = old_eq
+	var pen: float = float(p.get("ele_pen", 0.0))
+	var R: float = float(stage_def.get("res", 0.0))
+	var t := 0.0
+	for k in p.get("dmg", {}):
+		var a: float = (p["dmg"][k][0] + p["dmg"][k][1]) * 0.5
+		if k == "physical":
+			a *= 1.0 - Combat.armour_reduction(float(stage_def.get("armour", 0.0)), maxf(1.0, a))
+		elif k in ["fire", "cold", "lightning"]:
+			a *= 1.0 - clampf(R - pen, -100.0, 90.0) / 100.0
+		t += a
+	var c: float = p.get("crit_chance", 0.0) / 100.0
+	return t * (1.0 + c * (p.get("crit_mult", 1.5) - 1.0))
 
 func power(ch, eq = null, alloc = null) -> Dictionary:
 	var al: Array = ch.allocated if alloc == null else alloc
@@ -270,6 +305,8 @@ func _try_craft(ch, op: String, it: Dictionary, ai: int, budget: Array) -> bool:
 	budget[0] -= int(cost.get("gold", 0))
 	var before := score(ch)
 	Loot.craft_apply(op, it, ai)
+	if gear != "legacy":
+		CorruptionRules.roll(it, op, craft_rng)     # same meter as the Blacksmith panel
 	ch.recalc()
 	Events.inventory_changed.emit()
 	L("CRAFT %s on %s (%s) cost %s, score %+.3f" % [Loot.craft_name(op), it.get("name", ""), it.get("slot", ""), Loot.cost_text(cost), score(ch) - before])
@@ -485,9 +522,14 @@ func choose_hotbar(ch) -> void:
 				sustain = 0.6
 			var cd := float(sk.get("cooldown", 0))
 			var cdpen := 0.4 if cd > 3.0 else 1.0
+			var pref := 1.0
+			if not plan.is_empty():
+				for tg in plan.get("tags", []):
+					if sk.get("tags", []).has(tg) or str(sk.get("dmg_type", "")) == tg:
+						pref = float(plan.get("prefer", Builds.PREFER))
 			if r == "damage" or r == "zone":
-				st.append([skill_dps(ch, sid, ch.allocated, null, f, false) * sustain * cdpen, sid])
-				aoe.append([skill_dps(ch, sid, ch.allocated, null, f, true) * sustain * cdpen, sid])
+				st.append([skill_dps(ch, sid, ch.allocated, null, f, false) * sustain * cdpen * pref, sid])
+				aoe.append([skill_dps(ch, sid, ch.allocated, null, f, true) * sustain * cdpen * pref, sid])
 		if not by_role.has(r):
 			by_role[r] = []
 		by_role[r].append([int(sk.get("unlock_level", 1)), sid])
@@ -497,6 +539,8 @@ func choose_hotbar(ch) -> void:
 		by_role[r].sort_custom(func(a, b): return a[0] > b[0])    # newest (strongest) first
 	var bar := []
 	var order: Array = ROLE_ORDER.get(ch.class_id, ROLE_ORDER["warrior"])
+	if not plan.get("roles", []).is_empty():
+		order = plan["roles"]
 	for r in order:
 		if bar.size() >= ch.HOTBAR_SIZE:
 			break
@@ -607,9 +651,11 @@ const SPECS := {
 func spec(ch) -> void:
 	if ch.level < ch.SPEC_LEVELS[0]:
 		return
-	var plan: Array = SPECS.get(ch.class_id, {}).get(build, ["", ""])
-	var sid: String = plan[0]
-	var cap: String = plan[1]
+	var sp: Array = SPECS.get(ch.class_id, {}).get(build, ["", ""])
+	if not plan.is_empty():
+		sp = [str(plan.get("spec", "")), "_best"]
+	var sid: String = sp[0]
+	var cap: String = sp[1]
 	if sid == "":
 		# element of the main damage skill decides the mage specialisation
 		var el := "fire"
@@ -617,11 +663,21 @@ func spec(ch) -> void:
 			el = Data.skills.get(main_skills[0], {}).get("dmg_type", "fire")
 		sid = {"fire": "pyromancer", "cold": "cryomancer", "lightning": "stormcaller"}.get(el, "arcanist")
 		cap = sid + cap
+	elif cap == "_best":
+		cap = sid + "_best"
+	# Phase B (Dan, audit decision 7): typical / geared bots re-pick the specialisation when
+	# the main skill (or the build) no longer matches it. Legacy keeps the first choice.
+	if gear != "legacy" and ch.spec_id != "" and ch.spec_id != sid and ch.gold >= ch.spec_reset_cost():
+		var old: String = ch.spec_id
+		if ch.reset_spec() == "":
+			L("SPEC reset %s (main skill / build now wants %s)" % [old, sid])
 	if ch.spec_id == "":
 		if ch.choose_spec(sid) == "":
 			L("SPEC chose %s" % sid)
 	if ch.spec_id == "":
 		return
+	if cap.ends_with("_best"):
+		cap = _best_capstone(ch)
 	var order := [ch.spec_id + "_1", ch.spec_id + "_2", ch.spec_id + "_3", ch.spec_id + "_4", cap]
 	for n in order:
 		if ch.spec_points_available() <= 0:
@@ -630,6 +686,50 @@ func spec(ch) -> void:
 			continue
 		if ch.alloc_spec(n):
 			L("SPEC node %s" % n)
+
+## The capstone (_5 or _6) the power score prefers, for build plans.
+func _best_capstone(ch) -> String:
+	var best: String = ch.spec_id + "_6"
+	var bv := -INF
+	for c in [ch.spec_id + "_5", ch.spec_id + "_6"]:
+		if not Data.spec_nodes.has(c):
+			continue
+		ch.spec_nodes.append(c)
+		ch.recalc()
+		var v := score(ch)
+		ch.spec_nodes.erase(c)
+		ch.recalc()
+		if v > bv:
+			bv = v
+			best = c
+	return best
+
+## Phase B: fill allocated passive-tree gem sockets with the best pouch gem (free to swap).
+func tree_gems(ch) -> void:
+	if gear == "legacy" or flags.get("no_gems", false):
+		return
+	for id in ch.allocated:
+		if not ch.is_socket(id):
+			continue
+		var cur: String = str(ch.tree_gems.get(id, ""))
+		var base := score(ch)
+		var best := ""
+		var best_g := 0.002
+		for gid in ch.gems.keys():
+			if int(ch.gems[gid]) <= 0 or Loot.gem_req(gid) > ch.level or gid == cur:
+				continue
+			if ch.socket_tree_gem(id, gid) != "":
+				continue
+			var g := score(ch) - base
+			if cur != "":
+				ch.socket_tree_gem(id, cur)
+			else:
+				ch.unsocket_tree_gem(id)
+			if g > best_g:
+				best_g = g
+				best = gid
+		if best != "" and ch.socket_tree_gem(id, best) == "":
+			L("TREE GEM %s -> %s (score +%.3f)" % [best, id, best_g])
 
 # ================================================================== full visit
 func passives(ch) -> void:
@@ -648,9 +748,12 @@ func town_visit(ch) -> void:
 	shop(ch)
 	craft(ch)
 	gems(ch)
+	tree_gems(ch)
 	equip_best(ch)
 	clear_bag(ch)
 	choose_hotbar(ch)
+	if gear != "legacy":
+		spec(ch)          # re-pick if the final hotbar changed the main skill's element
 	runes(ch)
 	ch.flask_charges = [3.0, 3.0]
 

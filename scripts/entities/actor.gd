@@ -7,6 +7,7 @@ const LAYER_PLAYER := 2
 const LAYER_ENEMY := 4
 const LAYER_MINION := 8
 const Stun = preload("res://scripts/combat/stun.gd")
+const SpriteAnim = preload("res://scripts/gfx/sprite_anim.gd")
 
 var level = null            # the Level node this actor lives in
 var faction := "enemy"
@@ -20,6 +21,8 @@ var is_elite := false
 var is_boss := false
 var statuses := {}          # type -> {"t": remaining, ...}
 var sprite: Sprite2D
+var anim = null             # SpriteAnim (sheet art from data/art/sprites.json), or null = old art
+var art_ids := []           # manifest ids tried for this actor, most specific first
 var shadow: Sprite2D
 var flash := 0.0
 var facing := 1.0
@@ -39,7 +42,9 @@ func setup_body(r: float, layer: int, mask: int) -> void:
 	cs.shape = sh
 	add_child(cs)
 
-func setup_sprite(tex: Texture2D, y_off: float = 0.0, sprite_scale: float = 1.0) -> void:
+## art_ids: manifest ids to try (e.g. [enemy id, sprite id]); the first with sheet art wins,
+## otherwise the old procedural texture `tex` is used exactly as before.
+func setup_sprite(tex: Texture2D, y_off: float = 0.0, sprite_scale: float = 1.0, ids: Array = []) -> void:
 	shadow = Sprite2D.new()
 	shadow.texture = Art.soft_tex
 	shadow.modulate = Color(0, 0, 0, 0.55)
@@ -51,12 +56,42 @@ func setup_sprite(tex: Texture2D, y_off: float = 0.0, sprite_scale: float = 1.0)
 	sprite.scale = Vector2(sprite_scale, sprite_scale)
 	sprite.offset = Vector2(0, -tex.get_height() / 2.0 + 2 + y_off)
 	add_child(sprite)
+	art_ids = ids
+	if not ids.is_empty():
+		var d: Dictionary = Art.sprite_def(ids)
+		if not d.is_empty():
+			anim = SpriteAnim.new()
+			anim.name = "SheetSprite"
+			add_child(anim)
+			anim.setup(d, self, sprite)
+
+## Height of the drawn figure above the origin (world units), for bars and labels.
+func visual_height() -> float:
+	if anim != null:
+		return anim.height_world()
+	if sprite != null and sprite.texture != null:
+		return float(sprite.texture.get_height()) * sprite.scale.y
+	return 18.0
 
 # ------------------------------------------------------------- status effects
 func add_status(type: String, duration: float, data: Dictionary) -> void:
 	if not alive:
 		return
 	var cur = statuses.get(type)
+	var ms := int(data.get("max_stacks", 1))
+	if ms > 1:   # stacking DoT (poison with Agonising Toxins / Venom Pact): each stack keeps its own dps and timer
+		if cur == null:
+			cur = {"t": 0.0, "tick": 0.0, "dps": 0.0, "dtype": data.get("dtype", "physical"), "stacks": []}
+			statuses[type] = cur
+		var st: Array = cur.get("stacks", [])
+		if st.is_empty() and cur.get("dps", 0.0) > 0.0:
+			st.append({"dps": float(cur["dps"]), "t": float(cur["t"])})   # an older single application becomes stack 1
+		st.append({"dps": float(data.get("dps", 0.0)), "t": duration})
+		while st.size() > ms:
+			st.pop_front()
+		cur["stacks"] = st
+		_restack(cur)
+		return
 	if cur == null:
 		var d := data.duplicate()
 		d["t"] = duration
@@ -69,6 +104,22 @@ func add_status(type: String, duration: float, data: Dictionary) -> void:
 
 func has_status(type: String) -> bool:
 	return statuses.has(type)
+
+func poison_stacks() -> int:
+	var s = statuses.get("poison")
+	if s == null:
+		return 0
+	return maxi(1, s.get("stacks", []).size())
+
+## Stacked status: dps = sum of live stacks, remaining time = the longest stack.
+func _restack(s: Dictionary) -> void:
+	var tot := 0.0
+	var tmax := 0.0
+	for k in s["stacks"]:
+		tot += float(k["dps"])
+		tmax = maxf(tmax, float(k["t"]))
+	s["dps"] = tot
+	s["t"] = tmax
 
 func taken_mult() -> float:
 	var m := 1.0
@@ -98,6 +149,13 @@ func tick_statuses(delta: float) -> void:
 	var expired := []
 	for k in statuses:
 		var s: Dictionary = statuses[k]
+		if s.has("stacks"):
+			for st in s["stacks"]:
+				st["t"] -= delta
+			s["stacks"] = s["stacks"].filter(func(st): return st["t"] > 0.0)
+			if not s["stacks"].is_empty():
+				_restack(s)
+				s["t"] += delta   # _restack set the post-tick time; the shared decrement below applies it once
 		s["t"] -= delta
 		if s.has("dps"):
 			s["tick"] += delta
@@ -214,6 +272,11 @@ func update_visual(delta: float, moving: bool) -> void:
 			c = c * Color(1.2, 1.2, 0.7)
 		sprite.modulate = c
 	sprite.flip_h = facing < 0
+	if anim != null:
+		# real animation: no fake bob or tilt (sprite_anim.gd copies modulate/visible)
+		sprite.position = Vector2.ZERO
+		sprite.rotation = 0
+		return
 	if moving:
 		sprite.position.y = -absf(sin(anim_t * 12.0)) * 1.5
 		sprite.rotation = sin(anim_t * 12.0) * 0.06

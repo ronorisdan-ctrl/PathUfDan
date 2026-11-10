@@ -1,6 +1,6 @@
 extends "res://scripts/world/level.gd"
 ## Ashfall Sanctuary - the safe hub: merchant, blacksmith, jeweller, stash,
-## skill altar, pet keeper, training dummy and the dungeon gate.
+## skill altar, pet keeper, training dummy, the Restorers' Guild (Atlas) and the dungeon gate.
 
 const Portal = preload("res://scripts/world/portal.gd")
 
@@ -57,6 +57,11 @@ func setup(ch) -> void:
 	var npc: Dictionary = Data.training_cfg.get("npc", {})
 	var npc_cell: Array = npc.get("cell", [14, 18])
 	_station(cell_center(Vector2i(int(npc_cell[0]), int(npc_cell[1]))), str(npc.get("name", "Drillmaster Rook")), "training", str(npc.get("sprite", "drillmaster")), Color(str(npc.get("color", "#e0a050"))))
+	# Restorers' Guild (Endgame 2C): the Commission Board, once the Atlas of Ruin is open
+	if preload("res://scripts/core/atlas_rules.gd").unlocked(ch):
+		var gn: Dictionary = Data.atlas_cfg.get("guild", {}).get("npc", {})
+		var gc: Array = gn.get("cell", [29, 16])
+		_station(cell_center(Vector2i(int(gc[0]), int(gc[1]))), str(gn.get("name", "Restorers' Guild")), "guild", str(gn.get("sprite", "npc_restorer")), Color(str(gn.get("color", "#e8d8a0"))))
 	add_ambient_particles(Color(0.9, 0.8, 0.7, 0.25))
 
 func _station(pos: Vector2, nm: String, kind: String, spr: String, col: Color) -> void:

@@ -71,6 +71,10 @@ func _ready() -> void:
 	await test_corruption()
 	await test_corruption_crafting()
 	await test_corruption_ui()
+	await load("res://tests/test_art.gd").new().run(self)   # Phase V0 art pipeline
+	await load("res://tests/test_passive_tree.gd").new().run(self)   # passive tree Phase 1
+	await load("res://tests/test_corruption_system.gd").new().run(self)
+	await load("res://tests/test_caster_itemisation.gd").new().run(self)   # caster itemisation
 	var summary := "==== %d passed, %d failed ====" % [passes, fails]
 	print("\n" + summary)
 	_log(summary)
@@ -471,13 +475,21 @@ func test_all_skills() -> void:
 				ch.recalc()
 			var life0 := _total_enemy_life(lv)
 			var used := 0
+			var summoned := false
 			for i in 3:
 				p.busy = 0
 				p.mana = 9999
 				p.cooldowns.clear()
 				p.auto_aim_override = e.global_position + Vector2(0, -4) if is_instance_valid(e) else p.global_position + Vector2(30, 0)
+				var previous_minions := []
+				for minion in p.minions:
+					if is_instance_valid(minion):
+						previous_minions.append(minion.get_instance_id())
 				if p.try_use_slot(0):
 					used += 1
+					for minion in p.minions:
+						if is_instance_valid(minion) and not minion.get_instance_id() in previous_minions:
+							summoned = true
 				await frames(25)
 			await frames(90)
 			check(used >= 1, "%s: %s can be used" % [cls, sk["id"]], p.use_block_reason(sk))
@@ -489,7 +501,8 @@ func test_all_skills() -> void:
 				ch.recalc()
 			var b: String = sk.get("behavior", "")
 			if b in ["summon"]:
-				check(p.minions.size() > 0, "%s: %s summons minions" % [cls, sk["id"]])
+				# Assert creation at the cast, independent of survival through the subsequent fight.
+				check(summoned, "%s: %s summons minions" % [cls, sk["id"]])
 			elif b == "deploy" or b == "zone":
 				check(p.deployables.size() > 0 or _total_enemy_life(lv) < life0, "%s: %s deploys" % [cls, sk["id"]])
 			elif b == "buff":
@@ -1848,7 +1861,7 @@ func test_stash() -> void:
 	var deep = _stash_test_item("epic", 12)
 	ch.stash[3 * 56 + 5] = deep
 	var d1: Dictionary = ch.to_dict()
-	check(int(d1["version"]) == 3 and int(d1["stash_extra_tabs"]) == 10, "stash: save is version 3 and records the bought tabs")
+	check(int(d1["version"]) >= 3 and int(d1["stash_extra_tabs"]) == 10, "stash: save is version 3+ and records the bought tabs")
 	var d2 = JSON.parse_string(JSON.stringify(d1))
 	Game.load_from_dict(d2)
 	var ch2 = Game.ch
@@ -3478,7 +3491,7 @@ func test_corruption() -> void:
 		check(R.craft_refusal(full, op) != "", "corruption: %s is refused at 100%%" % op)
 		check(R.craft_refusal({"corruption": 80}, op) == "", "corruption: %s is allowed at 80%%" % op)
 	for op in ["upgrade", "remove", "socket"]:
-		check(R.craft_refusal(full, op) == "", "corruption: %s is allowed at 100%%" % op)
+		check(R.craft_refusal(full, op) != "", "corruption: %s is sealed at 100%% (spec v1)" % op)
 	check(R.craft_refusal(full, "add") == "Corrupted: this item can no longer be crafted", "corruption: refusal text")
 	# ---- roll: one randf per rolling craft, none otherwise
 	var rng := RandomNumberGenerator.new()
@@ -3620,9 +3633,9 @@ func test_corruption_crafting() -> void:
 	for op in ["add", "reroll", "rarity"]:
 		check(Loot.craft_check(op, e, 0) == "Corrupted: this item can no longer be crafted", "corruption craft: %s is refused at 100%% with the clear message" % op)
 	for op in ["upgrade", "socket"]:
-		check(Loot.craft_check(op, e, 0) != "Corrupted: this item can no longer be crafted", "corruption craft: %s is not refused for corruption at 100%%" % op)
+		check(Loot.craft_check(op, e, 0) == "Corrupted: this item can no longer be crafted", "corruption craft: %s is sealed at 100%%" % op)
 	if not e["affixes"].is_empty():
-		check(Loot.craft_check("remove", e, 0) == "", "corruption craft: remove affix still works at 100%")
+		check(Loot.craft_check("remove", e, 0) != "", "corruption craft: remove affix is sealed at 100%")
 	# ---- a refused craft spends nothing
 	bs.select(e)
 	bs.op = "add"
@@ -3673,7 +3686,7 @@ func test_corruption_crafting() -> void:
 	var olditem := Loot.make_item(it["base"], "rare", 20)
 	olditem.erase("corruption")
 	check(R.get_level(olditem) == 0, "corruption persist: items without the field read as 0%")
-	check(CharDataT.SAVE_VERSION == 3, "corruption persist: SAVE_VERSION is unchanged (3)")
+	check(CharDataT.SAVE_VERSION == 5, "corruption persist: SAVE_VERSION is unchanged by corruption (4 since the passive tree Phase 1, 5 since the Atlas)")
 	# equipped item keeps its value
 	var eq := Loot.make_item("rusty_sword" if Data.item_bases.has("rusty_sword") else Data.item_base_list[0]["id"], "rare", 5)
 	R.set_level(eq, 100)
@@ -3895,7 +3908,7 @@ func test_corruption_ui() -> void:
 		var b3 = _corr_button_for(bs.op_box, nm)
 		check(b3 != null and b3.disabled and b3.tooltip_text == "Corrupted: this item can no longer be crafted", "corruption ui: %s is disabled at 100%% with the refusal as tooltip" % nm)
 	var bu = _corr_button_for(bs.op_box, "Upgrade Base")
-	check(bu != null and not bu.disabled, "corruption ui: Upgrade Base stays enabled at 100%")
+	check(bu != null and bu.disabled, "corruption ui: Upgrade Base is sealed at 100%")
 	check(bs.corr_bar.note_text() == "Corrupted: cannot be crafted", "corruption ui: the readout says the item is corrupted")
 	bs.op = "add"
 	bs.refresh()

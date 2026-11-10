@@ -10,6 +10,7 @@ extends RefCounted
 
 const Threat = preload("res://tests/smartbot/sb_threat.gd")
 const Hub = preload("res://tests/smartbot/sb_hub.gd")
+const Endgame = preload("res://tests/smartbot/sb_endgame.gd")
 
 ## Judgement shared by every avoiding profile: hits expected to cost less than TANK_FRAC of
 ## max life (after armour / resistances) are taken rather than giving up attack time, and
@@ -23,6 +24,7 @@ var prof := {}
 var flags := {}
 var rng: RandomNumberGenerator
 var threat = Threat.new()
+var eg = Endgame.new()        # Endgame 2E: Collector's Wager + Pentimento Vaults
 
 var lv = null
 var p = null
@@ -70,6 +72,7 @@ func setup(b, h, profile: Dictionary, fl: Dictionary, r: RandomNumberGenerator) 
 	flags = fl
 	rng = r
 	threat.setup(prof, rng)
+	eg.setup(self, str(b.A.get("wager", "")), int(b.A.get("stake", "1")), str(b.A.get("vaults", "1")))
 
 func begin(level, player) -> void:
 	lv = level
@@ -113,6 +116,7 @@ func begin(level, player) -> void:
 		Events.player_damaged.connect(_on_damaged)
 	if not Events.player_leveled.is_connected(_on_level):
 		Events.player_leveled.connect(_on_level)
+	eg.begin()
 	_update_reach()
 
 func end() -> void:
@@ -157,6 +161,10 @@ func _on_damaged(amount: float) -> void:
 				if _valid(e) and e.is_boss:
 					info = "boss %s st=%s t=%.2f kind=%s pat=%s charge=%.2f d=%.0f" % [e.display_name, e.state, e.state_t, e.attack_kind, str(e.current.get("type", "")), e.charge_t, e.global_position.distance_to(p.global_position)]
 			bot.trace("CONTACT %s dmg %.0f | %s | threats %d" % [label, amount, info, threat.reg.size()])
+	if bot.A.has("hits"):   # Phase 2E: one line per hit (what the bot knew about it)
+		bot.trace("HIT %s dmg %.0f life %.0f%% perceived=%s evaded=%s tanked=%.2f busy=%.2f roll_cd=%.2f active=%d" % [label, amount, 100.0 * p.life / maxf(1.0, p.max_life),
+			str(th.get("perceived", "?")) if not th.is_empty() else "-", str(evaded.has(th.get("key"))) if not th.is_empty() else "-",
+			float(th.get("dmgf", 0.0)) if not th.is_empty() else 0.0, p.busy, p.dodge_cd, threat.active.size()])
 	last_cause = label
 	last_dmg_t = t
 	var db: Dictionary = st["dmg_by"]
@@ -195,6 +203,7 @@ func tick(dt: float) -> void:
 			hub.choose_hotbar(ch)
 			_update_reach()
 	threat.scan(lv, p, t)
+	eg.tick(dt)
 	_finish_evaded(false)
 	think_t -= dt
 	if think_t <= 0:
@@ -205,16 +214,41 @@ func tick(dt: float) -> void:
 		mv = unstick_dir
 	var roll := false
 	var evading := false
+	var blink_slot := -1
+	var blink_aim := Vector2.ZERO
 	if prof["avoid_threats"] and not flags.get("no_dodge", false):
 		var r := _evade(mv)
 		mv = r["dir"]
 		roll = r["roll"]
 		evading = r["evading"]
+		blink_slot = int(r.get("blink", -1))
+		blink_aim = r.get("aim", Vector2.ZERO)
+	# Phase C: a build whose keystone pays for rolling (Wind Dancer) rolls to keep the buff up
+	# while fighting, as a player would. Never during an evade (that roll is chosen above).
+	if not roll and not evading and hub != null and str(hub.plan.get("buff_roll", "")) != "" and prof["use_roll"]:
+		var bid := str(hub.plan["buff_roll"])
+		if _valid(target) and not p.has_buff(bid) and p.dodge_cd <= 0 and p.dodge_t <= 0 and p.busy <= 0 and p.speed_mult() > 0:
+			var td: float = p.global_position.distance_to(target.global_position)
+			if td < 340.0 and lv.has_los(p.global_position, target.global_position):
+				if mv.length() < 0.1:
+					var aw := _away_dir(140.0)
+					var side: Vector2 = (target.global_position - p.global_position).normalized().orthogonal() * (1.0 if rng.randf() < 0.5 else -1.0)
+					mv = aw if aw.length() > 0.1 else side
+				roll = true
+				st["buff_rolls"] = int(st.get("buff_rolls", 0)) + 1
 	_set_move(mv)
 	if roll:
 		p.start_dodge()
 		st["dodge_rolls"] += 1
 		return
+	if blink_slot >= 0:
+		var bsk: Dictionary = p.skill_in_slot(blink_slot)
+		p.auto_aim_override = blink_aim
+		if p.try_use_slot(blink_slot):
+			st["blinks"] = int(st.get("blinks", 0)) + 1
+			var su0: Dictionary = st["skill_uses"]
+			su0[bsk["id"]] = int(su0.get(bsk["id"], 0)) + 1
+			return
 	var fleeing: bool = t < retreat_until and not ranged
 	if not fleeing and p.busy <= 0 and p.dash_t <= 0 and p.dodge_t <= 0:
 		_pick_skill()
@@ -269,20 +303,20 @@ func _think() -> void:
 func _flasks() -> void:
 	var lf: float = p.life / maxf(1.0, p.max_life)
 	var disc: float = prof["potion_discipline"]
-	var thr := 0.30 + 0.20 * disc
-	if t - flask_t > 0.6 and ch.flask_charges[0] >= 1.0:
+	var thr: float = eg.flask_threshold(0.30 + 0.20 * disc)
+	if t - flask_t > 0.6 and ch.flask_charges[0] >= 1.0 and eg.flask_ok():
 		var dots: bool = p.has_status("ignite") or p.has_status("bleed")
 		if lf < thr or (disc >= 0.9 and dots and lf < 0.7):
 			p.use_flask(0)
 			flask_t = t
 			st["potions"] += 1
 	var mm: float = ch.final.get("max_mana", 0.0)
-	if mm > 0 and p.mana < mm * 0.15 and ch.flask_charges[1] >= 1.0 and target != null and t - flask_t > 0.3:
+	if mm > 0 and p.mana < mm * 0.15 and ch.flask_charges[1] >= 1.0 and target != null and t - flask_t > 0.3 and eg.flask_ok():
 		p.use_flask(1)
 		flask_t = t
 		st["mana_potions"] += 1
 	# retreat when low and out of flasks
-	if lf < 0.3 and ch.flask_charges[0] < 1.0 and t > retreat_cd:
+	if lf < 0.3 and (ch.flask_charges[0] < 1.0 or not eg.flask_ok()) and t > retreat_cd:
 		retreat_until = t + 5.0
 		retreat_cd = t + 14.0
 		st["retreats"] += 1
@@ -403,6 +437,11 @@ func _movement() -> Vector2:
 			var pos: float = prof["positioning"]
 			var lo := lerpf(70.0, 120.0, pos)
 			var hi := 210.0
+			# Phase C: a build can ask for its own range band (Perfect Aim stands past 180 units)
+			var band: Array = hub.plan.get("standoff", []) if hub != null else []
+			if band.size() == 2:
+				lo = float(band[0])
+				hi = float(band[1])
 			var close := false
 			var my_speed: float = ch.final.get("move_speed", 100.0) * p.speed_mult()
 			for e in lv.enemies:
@@ -479,9 +518,12 @@ func _goal():
 		if wbest != null:
 			goal_kind = "waves"
 			return wbest.global_position
-	var lg = _loot_goal(160.0)
+	var lg = _loot_goal(160.0) if eg.loot_ok() else null
 	if lg != null:
 		return lg
+	var eg_goal = eg.goal()     # Endgame 2E: the Collector, vaults
+	if eg_goal != null:
+		return eg_goal
 	if lv.boss_dead:
 		return null
 	var br: Dictionary = lv.rooms[lv.layout["boss"]]
@@ -748,6 +790,19 @@ func _evade(want: Vector2) -> Dictionary:
 				best_c = c2
 				best = pl2
 				best_ev = ev2
+	# Phase 2E: Blink is a second dodge (a mage with Blink on the bar teleports out of a telegraph
+	# that walking and the roll cannot clear: roll on cooldown, boxed in, several circles at once)
+	if best_ev["hard"] > 0.0 and best_ev["dmg"] >= ROLL_FRAC and prof["use_roll"]:
+		var bl := _blink_escape(base, wn, margin, best_c)
+		if not bl.is_empty():
+			if dw["hard"] > 0.0:
+				for th in dw["keys"]:
+					var k = th["key"]
+					if not evaded.has(k):
+						evaded[k] = {"exp": float(th.get("t1", t)) + 0.4, "hit": false}
+						st["dodge_attempts"] += 1
+						bot.trace("DODGE blink %s (hit in %.2fs) -> %s" % [th.get("label", "?"), maxf(0.0, float(th.get("t0", t)) - t), "safe" if bl["hard"] <= 0.0 else "partial"])
+			return {"dir": Vector2.ZERO, "roll": false, "evading": true, "blink": bl["slot"], "aim": bl["to"]}
 	var hard: bool = dw["hard"] > 0.0
 	if hard and float(dw["dmg"]) < 0.15 and best_ev["dmg"] > float(dw["dmg"]) * 0.6 and best_ev["soft"] <= dw["soft"]:
 		return none      # no escape saves much: keep fighting instead of dancing in place
@@ -759,6 +814,40 @@ func _evade(want: Vector2) -> Dictionary:
 				st["dodge_attempts"] += 1
 				bot.trace("DODGE %s %s (hit in %.2fs) -> %s" % ["roll" if best["roll"] else "move", th.get("label", "?"), maxf(0.0, float(th.get("t0", t)) - t), "safe" if best_ev["hard"] <= 0.0 else "partial"])
 	return {"dir": best["dir"], "roll": best["roll"], "evading": hard}
+
+## Best Blink out of the current threats, or {} (no Blink ready, or none beats the walk/roll plan).
+func _blink_escape(base: Dictionary, wn: Vector2, margin: float, best_c: float) -> Dictionary:
+	var slot := -1
+	var sk := {}
+	for i in ch.HOTBAR_SIZE:
+		var s2: Dictionary = p.skill_in_slot(i)
+		if not s2.is_empty() and s2.get("behavior", "") == "blink" and p.use_block_reason(s2) == "" and eg.skill_ok(s2["id"]):
+			slot = i
+			sk = s2
+			break
+	if slot < 0 or p.busy > 0.0:
+		return {}
+	var pp: Vector2 = p.global_position
+	var rng_max := float(sk.get("max_range", 150))
+	var out := {}
+	for frac in [1.0, 0.6]:
+		for i in 16:
+			var d := Vector2.RIGHT.rotated(TAU * i / 16.0)
+			var to: Vector2 = lv.clamp_to_floor(pp, pp + d * rng_max * frac)
+			if to.distance_to(pp) < 40.0:
+				continue
+			var pl := base.duplicate()
+			pl["start"] = to
+			pl["dir"] = Vector2.ZERO
+			pl["reach"] = 0.0
+			pl["roll"] = false
+			pl["busy"] = p.use_time_for(sk)
+			var ev: Dictionary = threat.evaluate(pl, margin)
+			var c := _cost(pl, ev, wn) + 1.0 - (d.dot(wn) * 0.3 if wn != Vector2.ZERO else 0.0)
+			if c < best_c:
+				best_c = c
+				out = {"slot": slot, "to": to, "hard": ev["hard"]}
+	return out
 
 func _bodies() -> Array:
 	var out := []
@@ -820,7 +909,7 @@ func _pick_skill() -> void:
 	var opts := []
 	for i in ch.HOTBAR_SIZE:
 		var sk: Dictionary = p.skill_in_slot(i)
-		if sk.is_empty() or p.use_block_reason(sk) != "":
+		if sk.is_empty() or p.use_block_reason(sk) != "" or not eg.skill_ok(sk["id"]):
 			continue
 		var r := _skill_value(sk)
 		if r[0] > 0.0:

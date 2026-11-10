@@ -23,6 +23,8 @@ var rarity_list := []
 var materials := {}
 var passives := {}
 var passive_list := []
+var passive_flags := {}      # data/passive_flags.json: flag registry, tag vocabulary, budget
+var passive_migrations := {} # data/passive_migrations.json: tree_version + id history
 var dungeons := {}
 var dungeon_list := []
 var skill_runes := {}
@@ -44,8 +46,14 @@ var pet_list := []
 var pets := {}
 var stash_cfg := {}   # data/stash.json: tab size, tab price curve, tab cap
 var corruption_cfg := {}  # data/corruption.json: item corruption tuning
+var corruption_affixes := []
+var corruption_errors := []
 var dev_cfg := {}     # data/dev_tools.json: developer tools presets
 var training_cfg := {}  # data/training.json: Training Grounds tuning
+var zone_cfg := {}      # data/zones.json: endgame zone generator settings (Endgame Phase 0 spike)
+var zone_list := []
+var zones := {}
+var atlas_cfg := {}     # data/atlas.json: the Atlas of Ruin (Endgame Phase 1A)
 var load_errors := []
 
 func _ready() -> void:
@@ -65,6 +73,8 @@ func load_all() -> void:
 	rarity_list = loot.get("rarities", []); rarities = _index(rarity_list)
 	materials = loot.get("materials", {})
 	passive_list = _load("passive_tree"); passives = _index(passive_list)
+	passive_flags = _load("passive_flags")
+	passive_migrations = _load("passive_migrations")
 	dungeon_list = _load("dungeons"); dungeons = _index(dungeon_list)
 	dungeon_mod_list = _load("dungeon_mods"); dungeon_mods = _index(dungeon_mod_list)
 	skill_rune_list = _load("skill_runes"); skill_runes = _index(skill_rune_list)
@@ -86,8 +96,22 @@ func load_all() -> void:
 	pets = _index(pet_list)
 	stash_cfg = _load("stash")
 	corruption_cfg = _load("corruption")
+	var raw_corruption = _load("corruption_affixes")
+	corruption_affixes = raw_corruption if raw_corruption is Array else []
+	var corruption_system = preload("res://scripts/core/corruption_system.gd")
+	corruption_errors = corruption_system.validate(corruption_cfg, corruption_affixes)
+	if corruption_errors.is_empty():
+		corruption_errors = corruption_system.coverage_errors(corruption_cfg, corruption_affixes)
+	for err in corruption_errors:
+		load_errors.append("Corruption disabled: " + str(err))
 	dev_cfg = _load("dev_tools")
 	training_cfg = _load("training")
+	zone_cfg = _load("zones")
+	zone_list = zone_cfg.get("zones", []) if typeof(zone_cfg) == TYPE_DICTIONARY else []
+	zones = _index(zone_list)
+	atlas_cfg = _load("atlas")
+	if typeof(atlas_cfg) != TYPE_DICTIONARY:
+		atlas_cfg = {}
 	if load_errors.size() > 0:
 		push_error("Data load errors: " + str(load_errors))
 

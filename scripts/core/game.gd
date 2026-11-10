@@ -24,6 +24,8 @@ var training_in_tests := false   # training tests turn the Training Grounds on w
 var base_time_scale := 1.0   # world speed outside hit-stop (developer tools time scale)
 var save_dir := SAVE_DIR   # tests point this at a scratch folder
 var current_slot := 1
+var atlas_force_mechanic := ""   # Phase 1D: "" = natural roll, "none" = no mechanic, else a mechanic id (smartbot / tests / dev)
+var tree_notice := ""        # one-time message after a passive tree refund, shown when the next level loads
 
 const ACTIONS := {
 	"move_up": [KEY_W, KEY_UP], "move_down": [KEY_S, KEY_DOWN],
@@ -41,6 +43,12 @@ func _ready() -> void:
 	_fixed_fps = OS.get_cmdline_args().has("--fixed-fps") or OS.get_cmdline_user_args().has("--fixed-fps")
 	_setup_input()
 	load_settings()
+	Events.level_ready.connect(_show_tree_notice)
+
+func _show_tree_notice(_lv) -> void:
+	if tree_notice != "":
+		Events.message.emit(tree_notice, Color("#ffd060"))
+		tree_notice = ""
 
 # ------------------------------------------------------------------ hit-stop
 # A brief slow-motion freeze on impactful hits (crits, heavy hits, elite/boss kills).
@@ -220,6 +228,8 @@ func load_game(slot: int = -1) -> bool:
 		return false
 	if not load_from_dict(d):
 		return false
+	if not ch.tree_refund.is_empty():
+		_backup_before_tree_refund(slot, int(ch.tree_refund.get("from_version", 1)))
 	if slot == AUTOSAVE_SLOT:
 		# continue in the manual slot the autosave came from (or any free one)
 		var origin := int(d.get("slot", 0))
@@ -240,6 +250,9 @@ func select_filter_character(fresh: bool = false) -> void:
 func load_from_dict(d: Dictionary) -> bool:
 	ch = CharacterData.new()
 	ch.from_dict(d)
+	tree_notice = ""
+	if not ch.tree_refund.is_empty():
+		tree_notice = "The passive web has changed: your %d passive points have been refunded." % int(ch.tree_refund["points"])
 	vendor_stock = []
 	for it in d.get("vendor_stock", []):
 		var fixed = ch._fix_item(it)
@@ -247,6 +260,14 @@ func load_from_dict(d: Dictionary) -> bool:
 			vendor_stock.append(fixed)
 	carried_minions = 0
 	return true
+
+## Keeps the untouched file next to the save the first time a tree refund happens, so
+## the old allocation can be looked up (slot_03.json -> slot_03.json.tree1.bak).
+func _backup_before_tree_refund(slot: int, from_version: int) -> void:
+	var src := slot_path(slot)
+	var dst := "%s.tree%d.bak" % [src, from_version]
+	if FileAccess.file_exists(src) and not FileAccess.file_exists(dst):
+		DirAccess.copy_absolute(src, dst)
 
 ## Display info for a slot: {exists, corrupt, summary, saved_at, date}.
 func slot_info(slot: int) -> Dictionary:

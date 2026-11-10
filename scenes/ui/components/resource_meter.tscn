@@ -1,0 +1,40 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/resource_meter.gd" id="1"]
+[ext_resource type="Theme" path="res://assets/ui/themes/decaying_oil.tres" id="2"]
+
+[node name="ResourceMeter" type="PanelContainer"]
+custom_minimum_size = Vector2(320, 96)
+mouse_filter = 1
+texture_filter = 2
+theme = ExtResource("2")
+script = ExtResource("1")
+
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Caption" type="Label" parent="Content/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_type_variation = &"ResourceName"
+text = "LIFE"
+
+[node name="Readout" type="Label" parent="Content/Header"]
+layout_mode = 2
+mouse_filter = 2
+text = "740 / 1000"
+
+[node name="Bar" type="ProgressBar" parent="Content"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"LifeMeter"
+value = 74.0
+show_percentage = false

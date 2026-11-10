@@ -18,13 +18,17 @@
   "boss_rarity_bonus": 400,
   "class_bias": 0.7,
   "materials": {
+    "abyssal_brand": {"name": "Abyssal Brand", "color": "#db79e8", "weight": 0, "desc": "Permanently corrupts an unequipped item at the Blacksmith. May destroy it."},
     "scrap": {"name": "Scrap", "color": "#a08060", "weight": 50, "desc": "Salvaged metal. Used to upgrade equipment."},
     "iron_fragment": {"name": "Iron Fragment", "color": "#b0b8c8", "weight": 30, "desc": "Upgrades item base damage and defence."},
     "arcane_dust": {"name": "Arcane Dust", "color": "#a080ff", "weight": 18, "desc": "Rerolls an affix on an item."},
     "monster_core": {"name": "Monster Core", "color": "#e04060", "weight": 10, "desc": "Removes an affix from an item."},
     "elemental_essence": {"name": "Elemental Essence", "color": "#60e0c0", "weight": 8, "desc": "Raises an item's rarity."},
-    "catalyst": {"name": "Rare Catalyst", "color": "#ffd040", "weight": 4, "desc": "Adds an affix to an item with a free slot."}
+    "catalyst": {"name": "Rare Catalyst", "color": "#ffd040", "weight": 4, "desc": "Adds an affix to an item with a free slot."},
+    "glaze_flake": {"name": "Glaze Flake", "color": "#e0c890", "weight": 0, "desc": "Peeled from a Glazed Elite. Crafts Glazed Pigments at the Easel (Atlas of Ruin)."},
+    "pigment_dust": {"name": "Pigment Dust", "color": "#e06a4a", "weight": 0, "desc": "Scraped from a painted sketch. Crafts Unfinished Pigments at the Easel (Atlas of Ruin)."}
   },
+  "caster": {"_doc": "Caster itemisation (docs/CASTER_ITEMISATION.md). Flat added damage to spells is scaled by effectiveness = the spell's base-damage average / added_ref, clamped to eff_min..eff_max (a skill may set added_eff), x (1 + 4% per skill level). overcap: skill levels from items may exceed the natural skill level cap by this much; natural and corruption levels still stop at the cap.", "added_ref": 16.0, "eff_min": 0.4, "eff_max": 1.5, "overcap": 5},
   "rare_name_a": ["Grim", "Dread", "Hollow", "Ash", "Blood", "Storm", "Grave", "Rune", "Night", "Bone", "Dusk", "Wrath", "Gloom", "Iron", "Shadow", "Viper"],
   "rare_name_b": ["Bane", "Fang", "Song", "Ward", "Bite", "Veil", "Call", "Mark", "Shroud", "Grasp", "Spire", "Howl", "Brand", "Coil", "Thorn", "Hymn"]
 }

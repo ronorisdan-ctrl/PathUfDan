@@ -1,7 +1,7 @@
 {
  "version": 1,
  "name": "Balanced",
- "description": "Colours by rarity, highlights upgrades and 3-socket bases, dims common gear.",
+ "description": "Colours by rarity, highlights upgrades and 3-socket bases, dims common gear. Rot-touched items get a green beam.",
  "default": "show",
  "safety": {
   "never_hide_min_rarity": "legendary"
@@ -16,6 +16,22 @@
    },
    "actions": {
     "beam": "#ffffff",
+    "continue": true
+   }
+  },
+  {
+   "name": "Rot-touched (green beam and minimap icon, keeps checking)",
+   "enabled": true,
+   "conditions": {
+    "rot_touched": true
+   },
+   "actions": {
+    "visibility": "show",
+    "beam": "#b0e050",
+    "minimap": {
+     "shape": "diamond",
+     "color": "#b0e050"
+    },
     "continue": true
    }
   },
@@ -108,6 +124,19 @@
     "visibility": "show",
     "color": "#8a8a8a",
     "size": "small"
+   }
+  },
+  {
+   "name": "Rot-touched below rare (green label)",
+   "enabled": true,
+   "conditions": {
+    "rot_touched": true,
+    "rarity_max": "uncommon"
+   },
+   "actions": {
+    "visibility": "show",
+    "color": "#b0e050",
+    "size": "large"
    }
   },
   {

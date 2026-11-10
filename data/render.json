@@ -1,0 +1,14 @@
+{
+  "_doc": "Render scale and sprite-sheet defaults. See docs/adr/0001-art-scale.md. Gameplay never reads this file: changing it changes only how things look.",
+  "world_cell": 16,
+  "tile_px": 32,
+  "art_scale": 0.5,
+  "camera_zoom": 2.0,
+  "character_canvas": [64, 64],
+  "feet_y": 58,
+  "default_fps": 10,
+  "direction_hysteresis_deg": 8.0,
+  "move_anim_speed": 4.0,
+  "placeholders_in_game": false,
+  "palette": "res://assets/palette/dying_canvas.hex"
+}

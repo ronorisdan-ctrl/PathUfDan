@@ -34,6 +34,8 @@ var trace_f: FileAccess = null
 var done_ids := {}
 var cur_run_id := ""
 var t_run := 0.0
+var plan_id := ""            # Phase B keystone build in use ("" = none)
+const BuildsS = preload("res://tests/smartbot/sb_builds.gd")
 
 # ================================================================== args
 func _parse_args() -> void:
@@ -56,12 +58,22 @@ func _parse_args() -> void:
 	for f in ["no_gems", "no_passives", "no_dodge", "no_crafting"]:
 		if A.has(f):
 			flags[f] = true
+	# Phase B: --gear=legacy|typical|geared (default legacy), --plan=<build id>|auto|none
+	# (default: auto for typical / geared, none for legacy). See docs/BOT_GEAR_PROFILES.md.
+	if not A.has("gear"):
+		A["gear"] = "legacy"
+	if not A.has("plan"):
+		A["plan"] = "none" if A["gear"] == "legacy" else "auto"
 
 func _flag_str() -> String:
 	var parts := []
 	for f in ["no_gems", "no_passives", "no_dodge", "no_crafting"]:
 		if flags.get(f, false):
 			parts.append(f.replace("_", "-"))
+	if A.get("gear", "legacy") != "legacy":
+		parts.append("gear-" + str(A["gear"]))
+	if A.get("plan", "none") != "none" and plan_id != "":
+		parts.append("plan-" + plan_id)
 	return "|".join(parts) if not parts.is_empty() else "none"
 
 # ================================================================== seeding
@@ -160,6 +172,7 @@ func _ready() -> void:
 	prof = Profiles.get_profile(A["profile"], ov)
 	hub.setup(self, A["build"], flags)
 	kit.hub = hub
+	_setup_phase_b()
 	ctrl.setup(self, hub, prof, flags, rng)
 	main = MainScript.new()
 	add_child(main)
@@ -199,6 +212,31 @@ func _run_id(c: int, r: int, lvl: int) -> String:
 	var pn: String = A["profile"] + (("[" + String(A["set"]).replace(",", ";").replace(":", "=") + "]") if A.has("set") else "")
 	return "%s-%s-%s-T%d-L%d-s%s-%s-%s-ts%s-c%d-r%d" % [A["class"], A["build"], pn, int(A["tier"]), lvl, A["seed"], m, _flag_str(), A["ts"], c, r]
 
+# ================================================================== Phase B
+func _setup_phase_b() -> void:
+	hub.gear = str(A["gear"])
+	if not hub.gear in ["legacy", "typical", "geared"]:
+		push_error("--gear must be legacy, typical or geared")
+		hub.gear = "legacy"
+	var ring := 0
+	var did := _dungeon_id(int(A["tier"]))
+	if did.begins_with("atlas:"):
+		var AR = load("res://scripts/core/atlas_rules.gd")
+		ring = int(AR.ring_of(AR.parse(did.trim_prefix("atlas:"))))
+	kit.ring = ring
+	var p := str(A["plan"])
+	plan_id = ""
+	if p == "auto":
+		plan_id = BuildsS.pick(A["class"], int(A["tier"]), ring)
+	elif p != "none" and p != "":
+		plan_id = p
+	var b: Dictionary = BuildsS.get_build(plan_id)
+	if plan_id != "" and (b.is_empty() or b["class"] != A["class"]):
+		push_error("unknown build plan %s for %s" % [plan_id, A["class"]])
+		plan_id = ""
+		b = {}
+	hub.plan = b
+
 # ================================================================== kit-only
 func _kit_only() -> void:
 	var tier := int(A["tier"])
@@ -210,6 +248,9 @@ func _kit_only() -> void:
 		var info: Dictionary = kit.make(A["class"], tier, lvl, rng)
 		var d: Dictionary = Game.ch.to_dict()
 		d["kit_summary"] = _summary(Game.ch)
+		if info.has("gear"):
+			d["kit_summary"]["gear_model"] = info["gear"]
+		d["kit_summary"]["plan"] = plan_id
 		kits.append(d)
 		print("KIT %d %s L%d gear_power=%d %s" % [c, A["class"], info["level"], info["gear_power"], JSON.stringify(d["kit_summary"])])
 	var f := FileAccess.open(path, FileAccess.WRITE)
@@ -223,17 +264,44 @@ func _summary(ch) -> Dictionary:
 		if it != null:
 			eq[s] = "%s %s ilvl%d sockets=%d gems=%s" % [it.get("rarity", ""), it.get("name", ""), int(it.get("ilvl", 0)), Loot.item_sockets(it), str(it.get("gems", []))]
 	var pw: Dictionary = hub.power(ch)
-	return {"level": ch.level, "life": ch.final.get("max_life", 0), "dps_est": int(pw["dps"]), "ehp_est": int(pw["ehp"]), "gold": ch.gold,
+	# Phase B: comparable DPS for every gear profile: raw (no defence) and vs the stage's
+	# generic enemy defence (kit.stage_defence), whatever the bot's own score uses
+	var sd: Dictionary = hub.stage_def
+	hub.stage_def = {}
+	var pw_raw: Dictionary = hub.power(ch)
+	hub.stage_def = kit.stage_defence(int(A["tier"]), ch.level)
+	var pw_st: Dictionary = hub.power(ch)
+	hub.stage_def = sd
+	var f: Dictionary = ch.final
+	return {"dps_raw": int(pw_raw["dps"]), "dps_stage": int(pw_st["dps"]), "ehp_raw": int(pw_raw["ehp"]),
+		"res": [int(f.get("res_fire", 0)), int(f.get("res_cold", 0)), int(f.get("res_lightning", 0)), int(f.get("res_void", 0))],
+		"armour": int(f.get("armour", 0)), "evasion": int(f.get("evasion", 0)), "block": int(f.get("block_chance", 0)),
+		"points": ch.total_passive_points(), "mastery_choices": ch.mastery_choices, "tree_gems": ch.tree_gems,
+		"rarities": _rarities(ch), "level": ch.level, "life": ch.final.get("max_life", 0), "dps_est": int(pw["dps"]), "ehp_est": int(pw["ehp"]), "gold": ch.gold,
 		"passives": ch.allocated.size(), "keystones": hub.planner.keystones(ch), "spec": ch.spec_id, "spec_nodes": ch.spec_nodes,
 		"hotbar": ch.loadout, "runes": ch.skill_runes, "pouch": ch.gems, "equipment": eq}
+
+func _rarities(ch) -> Dictionary:
+	var rc := {}
+	for s in ch.equipment:
+		var it = ch.equipment[s]
+		if it != null:
+			rc[it.get("rarity", "")] = int(rc.get(it.get("rarity", ""), 0)) + 1
+	return rc
 
 # ================================================================== batch
 func _ckpt_path(c: int, r: int) -> String:
 	## character state after run r of chain c (after the town visit)
-	return "%s_ckpt/%s.json" % [out_path.get_basename(), _run_id(c, r, _level_for(int(A["tier"])))]
+	return "%s_ckpt/%s.json" % [out_path.get_basename(), _safe_fn(_run_id(c, r, _level_for(int(A["tier"]))))]
 
 func _row_path(rid: String) -> String:
-	return "%s_rows/%s.json" % [out_path.get_basename(), rid]
+	return "%s_rows/%s.json" % [out_path.get_basename(), _safe_fn(rid)]
+
+func _safe_fn(s: String) -> String:
+	## run ids hold "|" (e.g. "...gear-typical|plan-w_earthbreaker..."), which Windows forbids in file names
+	for ch in ["|", ":", "*", "?", "\"", "<", ">", "\\"]:
+		s = s.replace(ch, "_")
+	return s
 
 func _snapshot() -> Dictionary:
 	var d: Dictionary = Game.ch.to_dict()
@@ -465,6 +533,22 @@ func _debug_reachability(lv) -> void:
 			var mc: Vector2i = lv.to_cell(n2.global_position)
 			trace("REACH marker %s at %s floor=%s reachable=%s" % [k, str(mc), lv.cell(mc.x, mc.y) == 1, seen[mc.y * gw + mc.x] == 1])
 
+## --wager=<bet id> (Phase 2E): put that bet into the Collector's offer (win-rate measurements); the
+## bot's gold is topped up so any stake can be paid. A bet the zone could not offer (its mechanic is
+## missing, no elite left) is not forced.
+func _force_wager(lv, ch) -> void:
+	if not ("wager" in lv) or str(lv.wager.get("state", "")) != "offer":
+		return
+	var WV = load("res://scripts/core/wager_vault_rules.gd")
+	ch.gold = maxi(int(ch.gold), WV.stake(int(lv.monster_level), 3) * 2)
+	var id := str(A.get("wager", ""))
+	if id in ["", "auto", "none", "0"] or lv.wager["offers"].has(id) or WV.bet_info(id).is_empty():
+		return
+	if not WV.bet_ok(WV.bet_info(id), lv.mechanics, int(lv.wager.get("elites", 0)), int(lv.wager.get("ahead", -1))):
+		return
+	lv.wager["offers"][0] = id
+	lv.wager["lim"][id] = WV.limits(id, lv._boss_chamber_links(lv.collector_pos))
+
 func _one_run(c: int, r: int, run_seed: int, lvl: int) -> Dictionary:
 	var ch = Game.ch
 	var tier := int(A["tier"])
@@ -473,10 +557,55 @@ func _one_run(c: int, r: int, run_seed: int, lvl: int) -> Dictionary:
 	var deaths0 := int(ch.progress.get("deaths", 0))
 	hub.choose_hotbar(ch)
 	hub.runes(ch)
+	if did.begins_with("atlas:"):
+		# Atlas runs (Endgame Phase 1): fixed atlas seed 1, target hex revealed for the bot
+		var st: Dictionary = load("res://scripts/core/atlas_rules.gd").ensure(ch, 1)
+		var hk := did.trim_prefix("atlas:")
+		if not st["revealed"].has(hk):
+			st["revealed"].append(hk)
+		# --rot=N (Phase 1C): force the target hex's Rot (0 clears it); unset = the atlas's own Rot
+		if A.has("rot"):
+			var hx: Vector2i = load("res://scripts/core/atlas_rules.gd").parse(hk)
+			st["restored"].erase(hk)
+			if int(A["rot"]) > 0 and load("res://scripts/core/atlas_rules.gd").ring_of(hx) >= 2:
+				st["rot"][hk] = int(A["rot"])
+			else:
+				st["rot"].erase(hk)
+		# --pigments=glazed:thick_glaze,unfinished (Phase 1E): fresh Pigments slotted for every run (no mod = seeded)
+		var AR = load("res://scripts/core/atlas_rules.gd")
+		st["pigments"] = []
+		st["easel"] = []
+		for spec in str(A.get("pigments", "")).split(",", false):
+			var bits: PackedStringArray = spec.split(":")
+			var pg: Dictionary = AR.add_pigment(st, bits[0], bits[1] if bits.size() > 1 else "")
+			if not pg.is_empty():
+				AR.slot_pigment(st, st["pigments"].size() - 1)
+		# --varnish=thin_varnish,... (Phase 1E): slotted Varnishes (slot limits ignored)
+		st["varnish_slots"] = []
+		for vid in str(A.get("varnish", "")).split(",", false):
+			if not AR.varnish_info(vid).is_empty():
+				AR.add_varnish(st, vid)
+				st["varnish_slots"].append(vid)
+		# --warden=1 (Phase 2A): summon the target ring's Layer Warden at the target hex every run
+		if str(A.get("warden", "")) in ["1", "true", "yes"]:
+			var wh: Vector2i = AR.parse(hk)
+			if int(st["clears"].get(hk, 0)) <= 0:
+				st["clears"][hk] = 1
+			var wr: int = AR.ring_of(wh)
+			AR.add_shards(st, wr, AR.summon_cost())
+			AR.unsummon(st, wr)
+			AR.summon(st, wh)
+	# --mechanic=glazed|unfinished|none (Phase 1D): force the zone mechanic; unset = the hex's natural roll
+	Game.atlas_force_mechanic = str(A.get("mechanic", ""))
 	main.enter_dungeon(did, run_seed)
 	await get_tree().physics_frame
 	var lv = Game.level
 	var p = lv.player
+	_force_wager(lv, ch)
+	# --vault_type=trap|riddle|treasure (Phase 2E): every vault of the run is of that type (tuning runs)
+	if A.has("vault_type") and "vaults" in lv:
+		for v in lv.vaults:
+			v["type"] = str(A["vault_type"])
 	ctrl.begin(lv, p)
 	t_run = 0.0
 	var timeout := float(A["timeout"])
@@ -511,6 +640,25 @@ func _one_run(c: int, r: int, run_seed: int, lvl: int) -> Dictionary:
 			break
 		ctrl.tick(dt)
 	var notes := []
+	if "warden" in lv and int(lv.warden) > 0:
+		notes.append("warden:%d%s" % [int(lv.warden), "|ground" if lv.warden_result.get("ground", false) else ""])
+	if "rot" in lv and int(lv.rot) > 0:
+		notes.append("rot:%d%s" % [int(lv.rot), "|heart" if lv.def.get("heart", false) else ""])
+	if "mechanics" in lv and not lv.mechanics.is_empty():
+		var ms: Dictionary = lv.mech_stats
+		if lv.has_mech("glazed"):
+			notes.append("glazed:%d|kills:%d|peels:%d|shattered:%d|full:%d|flakes:%d|ttk10:%d" % [ms["glazed"], ms["glaze_kills"], ms["peels"], ms["shattered"], ms["full_peels"], ms["flakes"], int(round(10.0 * float(ms["ttk_sum"]) / maxf(1.0, float(ms["glaze_kills"]))))])
+		if lv.has_mech("unfinished"):
+			notes.append("unfinished:%d|painted:%d|filled:%d|dust:%d" % [ms["sketches"], ms["painted"], ms["filled"], ms["dust"]])
+		var pm: Dictionary = lv.def.get("pigment_mods", {})
+		if not pm.is_empty():
+			var pl := []
+			for k in pm:
+				pl.append("%s:%s" % [k, "+".join(pm[k])])
+			notes.append("pig:" + "/".join(pl))
+	notes.append_array(ctrl.eg.notes(outcome))   # Endgame 2E: wager / vault results
+	if int(ctrl.st.get("blinks", 0)) > 0:
+		notes.append("blinks:%d" % int(ctrl.st["blinks"]))
 	if outcome == "timeout":
 		for o in lv.objectives:
 			if not o["done"]:

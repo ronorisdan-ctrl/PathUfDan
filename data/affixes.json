@@ -1642,7 +1642,8 @@
   "slots": [
    "caster_weapon",
    "caster_offhand",
-   "amulet"
+   "amulet",
+   "gloves"
   ],
   "weight": 60,
   "tiers": [
@@ -2110,5 +2111,246 @@
    ]
   ],
   "stage4": true
+ },
+ {
+  "id": "searing",
+  "name": "Searing",
+  "kind": "prefix",
+  "group": "added_spell_fire",
+  "stat": "added_spell_fire",
+  "type": "flat",
+  "text": "Adds {v} Fire Damage to Spells",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    2,
+    4
+   ],
+   [
+    6,
+    5,
+    8
+   ],
+   [
+    14,
+    9,
+    14
+   ],
+   [
+    24,
+    15,
+    22
+   ],
+   [
+    32,
+    23,
+    30
+   ],
+   [
+    42,
+    31,
+    38
+   ]
+  ]
+ },
+ {
+  "id": "frigid",
+  "name": "Frigid",
+  "kind": "prefix",
+  "group": "added_spell_cold",
+  "stat": "added_spell_cold",
+  "type": "flat",
+  "text": "Adds {v} Cold Damage to Spells",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    2,
+    4
+   ],
+   [
+    6,
+    5,
+    8
+   ],
+   [
+    14,
+    9,
+    14
+   ],
+   [
+    24,
+    15,
+    22
+   ],
+   [
+    32,
+    23,
+    30
+   ],
+   [
+    42,
+    31,
+    38
+   ]
+  ]
+ },
+ {
+  "id": "crackling",
+  "name": "Crackling",
+  "kind": "prefix",
+  "group": "added_spell_lightning",
+  "stat": "added_spell_lightning",
+  "type": "flat",
+  "text": "Adds {v} Lightning Damage to Spells",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand"
+  ],
+  "weight": 80,
+  "tiers": [
+   [
+    1,
+    1,
+    5
+   ],
+   [
+    6,
+    2,
+    10
+   ],
+   [
+    14,
+    3,
+    17
+   ],
+   [
+    24,
+    5,
+    26
+   ],
+   [
+    32,
+    27,
+    35
+   ],
+   [
+    42,
+    36,
+    44
+   ]
+  ]
+ },
+ {
+  "id": "of_sorcery",
+  "name": "of Sorcery",
+  "kind": "suffix",
+  "group": "spell_skill_level",
+  "stat": "spell_skill_level",
+  "type": "flat",
+  "text": "+{v} to Level of all Spell Skills",
+  "slots": [
+   "caster_weapon",
+   "amulet"
+  ],
+  "weight": 30,
+  "tiers": [
+   [
+    24,
+    1,
+    1
+   ],
+   [
+    42,
+    2,
+    2
+   ]
+  ]
+ },
+ {
+  "id": "sorcerous",
+  "name": "Sorcerous",
+  "kind": "prefix",
+  "group": "spell_inc_gloves",
+  "stat": "spell_damage",
+  "type": "inc",
+  "text": "{v}% increased Spell Damage",
+  "slots": [
+   "gloves"
+  ],
+  "weight": 70,
+  "tiers": [
+   [
+    1,
+    6,
+    12
+   ],
+   [
+    6,
+    13,
+    22
+   ],
+   [
+    14,
+    23,
+    34
+   ],
+   [
+    32,
+    35,
+    46
+   ],
+   [
+    42,
+    47,
+    58
+   ]
+  ]
+ },
+ {
+  "id": "of_penetration",
+  "name": "of Penetration",
+  "kind": "suffix",
+  "group": "spell_penetration",
+  "stat": "spell_penetration",
+  "type": "flat",
+  "text": "Spells Penetrate {v}% Elemental Resistances",
+  "slots": [
+   "caster_weapon",
+   "caster_offhand",
+   "amulet"
+  ],
+  "weight": 50,
+  "tiers": [
+   [
+    14,
+    4,
+    6
+   ],
+   [
+    24,
+    7,
+    9
+   ],
+   [
+    32,
+    10,
+    12
+   ],
+   [
+    42,
+    13,
+    15
+   ]
+  ]
  }
 ]

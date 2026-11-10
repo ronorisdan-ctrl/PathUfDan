@@ -1,0 +1,300 @@
+{
+  "_doc": "Endgame Phase 1A: the Atlas of Ruin (docs/ENDGAME_PHASE1.md). Hex map in axial coords (q, r); the hub is the centre hex (ring 0). Each ring is one painting layer. A hex's biome, boss, vantage flag and base modifiers derive from hash(atlas_seed, q, r); only revealed hexes and clear counts are saved (character save key 'atlas'). Ring stats replace the biome zone def's tier scaling.",
+  "radius": 3,
+  "unlock_dungeon": "nightmare_vaults",
+  "unlock_text": "Defeat Malgrath in the Nightmare Vaults (Tier 5)",
+  "tier": 6,
+  "rings": [
+    {"ring": 1, "layer": "Varnish", "color": "#d8b46a", "level": 40, "life_mult": 1.5, "damage_mult": 1.32, "resist_bonus": 20, "rarity_bonus": 170, "mod_count": [1, 1], "elite_chance": 0.38},
+    {"ring": 2, "layer": "Craquelure", "color": "#b8875a", "level": 45, "life_mult": 1.62, "damage_mult": 1.4, "resist_bonus": 25, "rarity_bonus": 200, "mod_count": [1, 2], "elite_chance": 0.42},
+    {"ring": 3, "layer": "Pentimento", "color": "#8a6a9a", "level": 50, "life_mult": 1.75, "damage_mult": 1.48, "resist_bonus": 30, "rarity_bonus": 230, "mod_count": [2, 2], "elite_chance": 0.46}
+  ],
+  "biomes": [
+    {"zone": "zone_overgrown_ruin", "w": 1, "short": "Overgrown Ruin", "color": "#6e8a4a"},
+    {"zone": "zone_ruined_nave", "w": 1, "short": "Ruined Nave", "color": "#7a6a9a"},
+    {"zone": "zone_flooded_catacomb", "w": 1, "short": "Flooded Catacomb", "color": "#4a7a8a"}
+  ],
+  "biome_stray": 0.25,
+  "bosses": ["warden", "gravemaw", "archon_velis", "iron_penitent", "malgrath", "stormheart"],
+  "rot": {
+    "_doc": "Endgame Phase 1C: Rot, the spreading decay (docs/ENDGAME_PHASE1.md). Per-hex level 0-5, saved as atlas.rot {key: level}. A new atlas plants `sources` hexes at Rot `source_level` in rings >= min_ring. Each completed zone advances `fronts` (+1 per festered Heart since the last spread): a front adds +1 to the not-restored hex in rings >= min_ring that is a Rot hex or next to one, picked by a seeded score, while total Rot < cap_per_ring x rings revealed. Restored hexes never take Rot. Death in a zone adds +1 to that hex. levels[n-1] = the zone scaling at Rot n (heal = player life recovery multiplier, attack_speed = monster attack speed; Phase 1E tuning).",
+    "max": 5,
+    "min_ring": 2,
+    "sources": 2,
+    "source_level": 1,
+    "fronts": 2,
+    "cap_per_ring": 3,
+    "death_rot": 1,
+    "heart_at": 3,
+    "levels": [
+      {"rot": 1, "density": 1.1, "life_mult": 1.15, "damage_mult": 1.1, "reward": 15, "elite_mods": 0, "mutations": 0, "heal": 1.0, "attack_speed": 1.0},
+      {"rot": 2, "density": 1.2, "life_mult": 1.3, "damage_mult": 1.2, "reward": 35, "elite_mods": 1, "mutations": 0, "heal": 1.0, "attack_speed": 1.0},
+      {"rot": 3, "density": 1.3, "life_mult": 1.5, "damage_mult": 1.4, "reward": 60, "elite_mods": 1, "mutations": 1, "heal": 0.85, "attack_speed": 1.05},
+      {"rot": 4, "density": 1.4, "life_mult": 1.75, "damage_mult": 1.6, "reward": 90, "elite_mods": 1, "mutations": 2, "heal": 0.7, "attack_speed": 1.1},
+      {"rot": 5, "density": 1.5, "life_mult": 2.0, "damage_mult": 1.8, "reward": 130, "elite_mods": 1, "mutations": 3, "heal": 0.6, "attack_speed": 1.15}
+    ],
+    "heart": {"_doc": "At Rot >= heart_at the hex boss is the Heart of Rot: rot_mutations from its enemies.json entry (seeded order per hex), phase thresholds moved up by phase_shift, extra life.", "phase_shift": 0.06, "life_mult": 1.15, "light": "#9ad04a", "suffix": "Heart of Rot"},
+    "harvest": {"_doc": "Harvest (fester) payout per Rot level n: a guaranteed legendary, gold = monster level x gold_per_level x n, n x material_rolls materials, (n - 2) gems, n - 2 extra rares. The hex keeps its Rot and the next spread gets +1 front.", "gold_per_level": 30, "material_rolls": 3, "extra_front": 1},
+    "colors": {"stain": "#4a2a12", "restored": "#e8c060", "heart": "#d8e070", "forecast": "#d8e070"}
+  },
+  "vantage": {"min_ring": 2, "chance": 0.15, "reveal": 2},
+  "mechanics": {
+    "_doc": "Endgame Phase 1D zone mechanics (docs/ENDGAME_PHASE1.md). Each Atlas run rolls one natural mechanic at natural_chance, seeded by (atlas seed, hex, clear count), so the panel shows the next run's mechanic. Pigments (1E) will guarantee one.",
+    "natural_chance": 0.3,
+    "list": [
+      {"id": "glazed", "name": "Glazed Elites", "weight": 1, "color": "#e0c890", "desc": "Elites wear layers of glaze, one per modifier. Each poise break peels the outer layer: the modifier is gone and a Glaze Flake drops."},
+      {"id": "unfinished", "name": "The Unfinished", "weight": 1, "color": "#e06a4a", "desc": "Some packs are only sketches: immune until painted with the status colours on their outline (or slowly by any hits). Painted sketches drop loot as one rank higher and Pigment Dust."},
+      {"id": "wager", "name": "The Collector's Wager", "minor": true, "chance": 0.2, "color": "#c89be8", "desc": "A gaunt art collector waits mid-zone and offers 3 bets on your own play. Stake gold at 1x, 2x or 3x; a win pays the stake back with profit plus materials, a loss costs only the stake."},
+      {"id": "vault", "name": "Pentimento Vaults", "minor": true, "chance": 0.2, "color": "#8fc4d8", "desc": "Shimmering walls hide painted-over rooms. Damage the wall to scrape it away; its plaque tells you first whether it holds Treasure, a Trap (elite ambush, double loot) or a Riddle (strike the sigils in order)."}
+    ],
+    "minor_doc": "Endgame Phase 2D: 'minor' mechanics (wager, vault) never take the main natural roll; each rolls on its own at `chance` (x the Blooming Varnish multiplier), seeded by (atlas seed, hex, clear count), so a zone can have Glazed/Unfinished plus a Wager and Vaults.",
+    "glazed": {
+      "_doc": "elite_chance_mult on the zone's elite chance; every elite is glazed with layers = its modifiers, raised to min_layers (extra random modifiers) and capped at max_layers. Burst poise: a hit adds damage / max life / fill_fraction x 100 (big hits up to big_hit_multiplier); a stun or freeze adds stun_poise; the bar drains decay_per_sec all the time, so only fast damage or frequent stuns fill it. 100 = peel the outer layer (1 Flake), then stagger s and peel_immunity s of poise immunity. On death the remaining layers shatter into Flakes: all if killed within shatter_fast s of the first hit, none after shatter_slow s, linear between. Every layer gone (peeled + shattered): +full_bonus Flakes, +1 per 2 Rot, +full_rarity_bonus rarity.",
+      "elite_chance_mult": 1.5,
+      "min_layers": 2,
+      "max_layers": 4,
+      "fill_fraction": 0.2,
+      "big_hit_start": 0.05,
+      "big_hit_full": 0.15,
+      "big_hit_multiplier": 1.75,
+      "decay_per_sec": 25.0,
+      "stun_poise": 60,
+      "peel_immunity": 1.0,
+      "stagger": 0.4,
+      "shatter_fast": 3.0,
+      "shatter_slow": 10.0,
+      "full_bonus": 1,
+      "full_rarity_bonus": 150
+    },
+    "unfinished": {
+      "_doc": "pack_chance of packs (at least min_packs) are sketched. Each pack needs `colours` status colours (+1 at Rot >= extra_colour_rot or ring >= extra_colour_ring, max max_colours), seeded per pack. A sketch takes no life damage; the right status (from any source) fills its colour, and every hit or DoT tick also adds to a neutral raw fill (damage it would have taken / max life); raw_fill reached = painted. Painted by colour: loot as one rank higher (normal -> elite rolls, elite -> + elite_rarity_bonus) and dust Pigment Dust (elites x elite_dust). Painted by raw fill: rank-up loot only.",
+      "pack_chance": 0.35,
+      "min_packs": 3,
+      "colours": 1,
+      "extra_colour_rot": 3,
+      "extra_colour_ring": 3,
+      "max_colours": 2,
+      "raw_fill": 0.6,
+      "dot_raw_mult": 0.5,
+      "dust": 1,
+      "elite_dust": 2,
+      "filled_dust_chance": 0.25,
+      "elite_rarity_bonus": 150,
+      "palette": [
+        {"id": "vermilion", "name": "Vermilion", "color": "#e8452c", "statuses": ["ignite"]},
+        {"id": "ultramarine", "name": "Ultramarine", "color": "#3a62e0", "statuses": ["chill", "freeze"]},
+        {"id": "verdigris", "name": "Verdigris", "color": "#3fb08a", "statuses": ["poison"]},
+        {"id": "lead_white", "name": "Lead White", "color": "#f2f0e6", "statuses": ["shock"]},
+        {"id": "madder", "name": "Madder", "color": "#b0284a", "statuses": ["bleed", "stun"]}
+      ]
+    },
+    "wager": {
+      "_doc": "Endgame Phase 2D: the Collector stands in a mid-depth chamber. Interact to see `offers` bets (seeded per run, only bets the zone supports). One bet per zone. The stake (gold) = round(stake_per_level x zone level) x stake multiplier and is taken when you accept. Win: gold back = stake x (1 + odds) x (1 + rot_bonus x Rot), plus materials_per_mult x mult random materials, flakes_per_mult x mult Glaze Flakes, dust_per_mult x mult Pigment Dust, and at 3x a rare item at +rare_rarity rarity. Loss (condition broken, time out, death, or the zone boss dying first for 'next elite'/'count' bets): the stake is gone. Placeholders in text: {time} {count} {skills} {life}. boss_rush time = base_time + per_chamber x chambers from the Collector to the boss arena. Phase 2E (bot-tuned to ~60% Competent wins where a bet has a number to tune; odds set for about +15% expected gold): Unscathed allows max_hits hits; Frenzy is only offered with min_monsters monsters in the chambers from the Collector onward (Unscathed needs an elite there); Archaeology and Colourist are timed (count bets with a `time` lose when it runs out); Archaeology is refused once no sealed vault is left. Abstinence (~87%) and Economy of Means (1 skill, ~93%) have no number to tune and pay low odds instead.",
+      "offers": 3,
+      "stake_per_level": 20,
+      "mults": [1, 2, 3],
+      "rot_bonus": 0.1,
+      "materials_per_mult": 2,
+      "flakes_per_mult": 8,
+      "dust_per_mult": 2,
+      "rare_at": 3,
+      "rare_rarity": 300,
+      "bets": [
+        {"id": "unscathed", "name": "Unscathed", "text": "Slay the next elite taking no more than {hits} hits", "odds": 0.95, "max_hits": 5, "needs_elites": true, "w": 2},
+        {"id": "boss_rush", "name": "Against the Clock", "text": "Slay the zone boss within {time} seconds", "odds": 0.7, "base_time": 12, "per_chamber": 8, "w": 2},
+        {"id": "few_skills", "name": "Economy of Means", "text": "Slay the zone boss using only {skills} skill", "odds": 0.25, "max_skills": 1, "w": 2},
+        {"id": "frenzy", "name": "Frenzy", "text": "Slay {count} monsters within {time} seconds", "odds": 1.0, "count": 25, "time": 38, "min_monsters": 35, "w": 2},
+        {"id": "abstinence", "name": "Abstinence", "text": "Slay the zone boss without drinking a flask", "odds": 0.3, "w": 1},
+        {"id": "iron_will", "name": "Iron Will", "text": "Slay the zone boss without dropping below {life}% life", "odds": 0.9, "life_pct": 70, "w": 1},
+        {"id": "flaking", "name": "Flaking", "text": "Peel {count} glaze layers before the zone boss dies", "odds": 0.6, "count": 7, "needs_mech": "glazed", "w": 2},
+        {"id": "colourist", "name": "Colourist", "text": "Paint {count} sketches within {time} seconds", "odds": 0.65, "count": 10, "time": 75, "needs_mech": "unfinished", "w": 2},
+        {"id": "archaeology", "name": "Archaeology", "text": "Open {count} Pentimento Vault within {time} seconds", "odds": 0.9, "count": 1, "time": 40, "needs_mech": "vault", "w": 2}
+      ]
+    },
+    "vault": {
+      "_doc": "Endgame Phase 2D: `count` vaults per zone (+1 at ring >= extra_ring or Rot >= extra_rot, max max). Each is a pocket (pocket x pocket cells) carved into solid rock behind a chamber wall, reached by a mouth (mouth cells deep, 2 wide) sealed by a shimmering wall. The wall is an object with `life` base life (scaled like a monster of the zone level and Rot); destroying it opens the vault. Type seeded per vault by weight (the plaque shows it). Treasure: a cache. Trap: `trap.elites` elites + a pack inside, aggro, loot x trap.loot_mult; the cache drops when the last trap monster dies. Riddle: `riddle.sigils` sigils in the pocket, strike them in the plaque's order; a wrong sigil resets the order and wakes riddle.wrong_pack monsters; solved = the cache + riddle.bonus_rares rares. Every opened vault also rolls a Ground Shard of the ring's layer at shard_chance + shard_rot_bonus x Rot. Vaults opened after the boss dies still pay out but do not count for contracts.",
+      "count": 1,
+      "extra_ring": 3,
+      "extra_rot": 3,
+      "max": 2,
+      "life": 90,
+      "pocket": 5,
+      "mouth": 2,
+      "color": "#8fc4d8",
+      "types": [
+        {"id": "treasure", "name": "Treasure", "w": 45, "color": "#ffd060", "desc": "A loot cache."},
+        {"id": "trap", "name": "Trap", "w": 35, "color": "#ff6060", "desc": "An elite ambush; its monsters drop double loot, then a cache."},
+        {"id": "riddle", "name": "Riddle", "w": 20, "color": "#80c0ff", "desc": "Strike the sigils in the order on the plaque for a richer cache."}
+      ],
+      "cache": {"rares": 2, "rarity": 300, "rares_per_2_rot": 1, "gems": 1, "materials": 3, "gold_per_level": 15, "legendary_chance": 0.08},
+      "trap": {"elites": 3, "elite_mods": [2, 3], "pack": true, "loot_mult": 2.0},
+      "riddle": {"sigils": 3, "wrong_pack": true, "bonus_rares": 1, "names": [["Crimson", "#d84a3a"], ["Ochre", "#d8a040"], ["Verdigris", "#3fb08a"]]},
+      "shard_chance": 0.08,
+      "shard_rot_bonus": 0.02
+    }
+  },
+  "pigments": {
+    "_doc": "Endgame Phase 1E: Pigments (docs/ENDGAME_PHASE1.md). Crafted at the Easel from the mechanic's own material; kept in atlas.pigments (stock) and atlas.easel (slotted, in order). Each slotted Pigment that fits the zone's slot count guarantees its mechanic, adds its modifier and `reward`% quantity/rarity/XP, and spends 1 charge on entering; a death in the zone spends death_charges more. Slots: `slots` base, +1 in rings >= extra_slot_ring or a Restored region, max max_slots. A modifier is seeded per craft (atlas seed + craft count); the same modifier twice stacks.",
+    "slots": 1,
+    "extra_slot_ring": 3,
+    "max_slots": 2,
+    "charges": 4,
+    "death_charges": 1,
+    "stock_cap": 12,
+    "reward": 10,
+    "list": [
+      {"id": "glazed", "name": "Glazed Pigment", "material": "glaze_flake", "cost": 120},
+      {"id": "unfinished", "name": "Unfinished Pigment", "material": "pigment_dust", "cost": 30}
+    ],
+    "mods": {
+      "glazed": [
+        {"id": "thick_glaze", "name": "Thick", "desc": "Elites wear +1 glaze layer (up to 5); a full peel gives +1 Flake.", "min_layers": 1, "max_layers": 1, "full_bonus": 1},
+        {"id": "crowded_glaze", "name": "Crowded", "desc": "Elites are 25% more common; Glaze Flakes from peels +1.", "elite_chance_mult": 1.25, "peel_flakes": 1},
+        {"id": "hardened_glaze", "name": "Hardened", "desc": "Glaze poise fills 25% slower; fully peeled elites drop +150 rarity more.", "fill_fraction": 1.25, "full_rarity_bonus": 150},
+        {"id": "biting_glaze", "name": "Biting", "desc": "Glazed elites deal 20% more damage; every shattered layer gives +1 Flake.", "elite_damage": 1.2, "shatter_flakes": 1}
+      ],
+      "unfinished": [
+        {"id": "two_tone", "name": "Two-Tone", "desc": "Sketches need +1 colour (up to 3); colour-painted sketches drop +1 Dust.", "colours": 1, "max_colours": 1, "dust": 1},
+        {"id": "crowded_sketch", "name": "Crowded", "desc": "15% more packs are sketches; painted sketches drop +100 rarity.", "pack_chance": 0.15, "painted_rarity": 100},
+        {"id": "stubborn_sketch", "name": "Stubborn", "desc": "Raw fill needs 85% of life instead of 60%; filled-in sketches always drop Dust.", "raw_fill": 0.25, "filled_dust_chance": 1.0},
+        {"id": "vivid_sketch", "name": "Vivid", "desc": "Sketches deal 20% more damage; a status paints its colour and adds 15% raw fill.", "sketch_damage": 1.2, "status_raw": 0.15}
+      ]
+    }
+  },
+  "varnish": {
+    "_doc": "Endgame Phase 1E: Varnish slots, the light version of the Easel board. Varnishes are rule-changers (a bonus with a penalty) that edit zone parameters only, never character stats. They drop from Hearts of Rot: guaranteed on Harvest, restore_chance on Restore. Kept as counts in atlas.varnish; atlas.varnish_slots holds the slotted ids (one of each). Slots: `slots` base + 1 per ring fully cleared, max max_slots. Slotted Varnishes are never used up.",
+    "slots": 1,
+    "max_slots": 3,
+    "restore_chance": 0.34,
+    "list": [
+      {"id": "thin_varnish", "name": "Thin Varnish", "desc": "Rot spreads 1 fewer front (at least 1), but a Heart of Rot only appears from Rot 4.", "fronts": -1, "heart_at": 1},
+      {"id": "dense_varnish", "name": "Dense Varnish", "desc": "Packs are 25% larger and drop 20% more items, but elites are 30% rarer.", "density": 1.25, "reward": 20, "elite_mult": 0.7},
+      {"id": "lacquer_varnish", "name": "Lacquered Varnish", "desc": "Elites are 50% more common with +1 modifier, but packs are 15% smaller.", "elite_mult": 1.5, "elite_mods": 1, "density": 0.85},
+      {"id": "binder_varnish", "name": "Binding Varnish", "desc": "Pigments you craft have +2 charges, but you can slot only 1 Pigment per zone.", "pigment_charges": 2, "pigment_slots_max": 1},
+      {"id": "bloom_varnish", "name": "Blooming Varnish", "desc": "Natural zone mechanics roll twice as often, but monsters deal 10% more damage.", "natural_mult": 2.0, "damage_mult": 1.1},
+      {"id": "greed_varnish", "name": "Greedy Varnish", "desc": "Rot rewards are 50% higher, but dying in a zone adds +1 more Rot.", "rot_reward_mult": 1.5, "death_rot": 1}
+    ]
+  },
+  "fixative": {
+    "_doc": "Endgame 2B. Blacksmith craft 'Apply Fixative': lowers an item's crafting corruption by `reduce` (never below 0). At most `max_uses` per item (item field `fixative`). Refused at 100% (sealed) and on Abyssal-Brand corrupted items. Exempt from the corruption roll. Cost: `flakes` Glaze Flakes + gold_base + gold_per_ilvl x item level.",
+    "reduce": 25, "max_uses": 2, "flakes": 60, "gold_base": 20, "gold_per_ilvl": 3
+  },
+  "rot_touched": {
+    "_doc": "Endgame 2B. Item drops in an Atlas zone at Rot 4+ may be Rot-touched: one extra implicit (item field `rot_implicit` {id, tier, mods}) with a bonus and a drawback. chance by Rot level; tier 1 at Rot 4, tier 2 at Rot 5. Each pool entry: tiers[t-1] = [bonus min, bonus max, drawback]; bonus/drawback = {stat, type}. Own seeded stream; never rolled outside Atlas Rot zones.",
+    "chance": {"4": 0.10, "5": 0.25},
+    "tier": {"4": 1, "5": 2},
+    "color": "#b0e050",
+    "pool": [
+      {"id": "festering_might", "name": "Festering Might", "weight": 1, "bonus": {"stat": "damage", "type": "inc"}, "drawback": {"stat": "max_life", "type": "inc"}, "tiers": [[12, 18, -5], [18, 25, -6]]},
+      {"id": "rotting_hide", "name": "Rotting Hide", "weight": 1, "bonus": {"stat": "damage_reduction", "type": "flat"}, "drawback": {"stat": "move_speed", "type": "inc"}, "tiers": [[2, 3, -5], [3, 4, -6]]},
+      {"id": "spore_bloom", "name": "Spore Bloom", "weight": 1, "bonus": {"stat": "dot_damage", "type": "inc"}, "drawback": {"stat": "crit_multi", "type": "flat"}, "tiers": [[20, 30, -10], [30, 40, -12]]},
+      {"id": "gnawing_hunger", "name": "Gnawing Hunger", "weight": 1, "bonus": {"stat": "life_on_hit", "type": "flat"}, "drawback": {"stat": "mana_cost", "type": "inc"}, "tiers": [[3, 5, 8], [5, 8, 10]]},
+      {"id": "blighted_fortune", "name": "Blighted Fortune", "weight": 1, "bonus": {"stat": "item_rarity", "type": "inc"}, "drawback": {"stat": "res_void", "type": "flat"}, "tiers": [[15, 22, -10], [22, 30, -12]]},
+      {"id": "carrion_appetite", "name": "Carrion Appetite", "weight": 1, "bonus": {"stat": "damage_vs_elite", "type": "inc"}, "drawback": {"stat": "life_regen", "type": "inc"}, "tiers": [[20, 28, -15], [28, 36, -20]]}
+    ]
+  },
+  "guild": {
+    "_doc": "Endgame Phase 2C: the Commission Board and the Restorers' Guild (docs/ENDGAME_PHASE2.md). A hub NPC holds `slots` contracts (+1 at rank 4). Contracts progress only from completed Atlas zones (credited when the zone boss dies; the Heart choice is credited when made). A completed contract pays rep (reputation) and seals at once; its slot shows done until the board refreshes every `refresh_every` completed zones (done contracts replaced, `rerolls` free rerolls and the vendor limit reset). Contract rewards: rep = round(rep x need + rep_base), seals = max(1, round(seals x need + seals_base)). `cache_cost` Seals open one of the `cache_offer` caches on offer (+1 at rank 4), seeded per cache opened. Ranks are reached by total reputation; `unlocks`: board, vendor (Pigments for gold, `per_refresh` per refresh), fixative (the Blacksmith's Apply Fixative), slot4, cache4. State: atlas.guild (per character).",
+    "name": "Restorers' Guild",
+    "npc": {"name": "Restorer Ottilie", "sprite": "npc_restorer", "cell": [29, 16], "color": "#e8d8a0"},
+    "slots": 3,
+    "max_slots": 4,
+    "refresh_every": 5,
+    "rerolls": 1,
+    "cache_cost": 10,
+    "cache_offer": 3,
+    "seal_cap": 99,
+    "colors": {"rep": "#e8c060", "seal": "#d8b46a", "done": "#80e080"},
+    "ranks": [
+      {"rank": 1, "name": "Apprentice", "rep": 0, "unlocks": ["board"], "desc": "The Commission Board and Seal caches."},
+      {"rank": 2, "name": "Journeyman", "rep": 60, "unlocks": ["vendor"], "desc": "The Guild sells Pigments for gold."},
+      {"rank": 3, "name": "Restorer", "rep": 195, "unlocks": ["fixative"], "desc": "The Blacksmith can apply Fixative."},
+      {"rank": 4, "name": "Master Restorer", "rep": 400, "unlocks": ["slot4", "cache4"], "desc": "A 4th contract slot; Seal caches offer 4 choices."}
+    ],
+    "contracts": [
+      {"id": "zones", "text": "Complete %d Atlas zones", "stat": "zones", "need": [3, 5], "rep": 3, "seals": 0.4, "w": 3},
+      {"id": "ring2", "text": "Complete %d zones in ring 2 or deeper", "stat": "zones", "min_ring": 2, "need": [2, 4], "rep": 4, "seals": 0.5, "w": 2, "req": {"ring": 2}},
+      {"id": "ring3", "text": "Complete %d zones in ring 3", "stat": "zones", "min_ring": 3, "need": [2, 3], "rep": 5, "seals": 0.6, "w": 2, "req": {"ring": 3}},
+      {"id": "rot2", "text": "Complete %d zones at Rot 2 or higher", "stat": "zones", "min_rot": 2, "need": [2, 3], "rep": 5, "seals": 0.6, "w": 2, "req": {"rot": 2}},
+      {"id": "hearts", "text": "Slay %d Hearts of Rot", "stat": "hearts", "need": [1, 2], "rep": 9, "seals": 1.0, "w": 2, "req": {"rot": 2}},
+      {"id": "restore", "text": "Restore %d region", "stat": "restore", "need": [1, 1], "rep": 10, "seals": 1.0, "w": 1, "req": {"rot": 2}},
+      {"id": "harvest", "text": "Harvest %d Heart of Rot", "stat": "harvest", "need": [1, 1], "rep": 10, "seals": 1.5, "w": 1, "req": {"rot": 2}},
+      {"id": "peels", "text": "Peel %d glaze layers off Glazed Elites", "stat": "peels", "need": [6, 12], "rep": 1, "seals": 0.15, "w": 1},
+      {"id": "painted", "text": "Paint %d sketches of The Unfinished", "stat": "painted", "need": [8, 14], "rep": 0.8, "seals": 0.12, "w": 1},
+      {"id": "elites", "text": "Slay %d elites in Atlas zones", "stat": "elites", "need": [10, 18], "rep": 0.6, "seals": 0.1, "w": 2},
+      {"id": "pigment", "text": "Complete %d zones with a Pigment slotted", "stat": "pigment_zones", "need": [2, 3], "rep": 4, "seals": 0.6, "w": 1, "req": {"clears": 5}},
+      {"id": "warden", "text": "Defeat %d Layer Warden", "stat": "wardens", "need": [1, 1], "rep": 15, "seals": 3, "w": 1, "req": {"wardens": true}},
+      {"id": "wager_win", "text": "Win %d Collector's Wagers", "stat": "wagers_won", "need": [1, 2], "rep": 8, "seals": 1.2, "w": 1, "req": {"clears": 3}},
+      {"id": "wager_3x", "text": "Win %d Collector's Wagers at 3x stakes", "stat": "wager_3x", "need": [1, 1], "rep": 14, "seals": 2.5, "w": 1, "req": {"clears": 8}},
+      {"id": "vaults", "text": "Open %d Pentimento Vaults", "stat": "vaults", "need": [1, 3], "rep": 4, "seals": 0.6, "w": 1, "req": {"clears": 3}},
+      {"id": "vault_trap", "text": "Clear %d Trap Vaults", "stat": "trap_vaults", "need": [1, 1], "rep": 8, "seals": 1.2, "w": 1, "req": {"clears": 5}},
+      {"id": "vault_riddle", "text": "Solve %d Riddle Vaults", "stat": "riddle_vaults", "need": [1, 1], "rep": 9, "seals": 1.3, "w": 1, "req": {"clears": 5}},
+      {"id": "kills", "text": "Slay %d monsters in Atlas zones", "stat": "kills", "need": [250, 450], "rep": 0.02, "seals": 0.003, "w": 2},
+      {"id": "rot_elites", "text": "Slay %d elites in zones at Rot 2 or higher", "stat": "elites", "min_rot": 2, "need": [8, 14], "rep": 0.9, "seals": 0.15, "w": 1, "req": {"rot": 2}},
+      {"id": "bosses", "text": "Defeat %d zone bosses", "stat": "bosses", "need": [3, 6], "rep": 3, "seals": 0.4, "w": 2},
+      {"id": "boss_fast", "text": "Defeat %d zone bosses within 20 seconds of waking them", "stat": "bosses", "max_boss_time": 20, "need": [1, 3], "rep": 5, "seals": 0.7, "w": 1},
+      {"id": "streak", "text": "Complete %d Atlas zones in a row without dying", "stat": "zones", "streak": true, "need": [3, 5], "rep": 4.5, "seals": 0.7, "w": 1},
+      {"id": "fast_zone", "text": "Complete %d zones in under 4 minutes", "stat": "zones", "max_time": 240, "need": [2, 3], "rep": 4.5, "seals": 0.7, "w": 1},
+      {"id": "two_pigments", "text": "Complete %d zones with 2 Pigments slotted", "stat": "zones", "min_pigments": 2, "need": [1, 2], "rep": 7, "seals": 1.0, "w": 1, "req": {"ring": 3, "clears": 10}},
+      {"id": "rot4", "text": "Complete %d zones at Rot 4 or higher", "stat": "zones", "min_rot": 4, "need": [1, 2], "rep": 8, "seals": 1.2, "w": 1, "req": {"rot": 4}}
+    ],
+    "caches": [
+      {"id": "weapon", "name": "Armoury Cache", "desc": "3 weapons or off-hands: 2 rares and one with +400 rarity.", "w": 1, "slots": ["main_hand", "off_hand"], "items": 3, "rarity": 400},
+      {"id": "armour", "name": "Wardrobe Cache", "desc": "3 armour pieces: 2 rares and one with +400 rarity.", "w": 1, "slots": ["helmet", "chest", "gloves", "boots"], "items": 3, "rarity": 400},
+      {"id": "jewellery", "name": "Jewel Case", "desc": "3 rings, amulets, belts or charms: 2 rares and one with +400 rarity.", "w": 1, "slots": ["ring", "amulet", "belt", "charm"], "items": 3, "rarity": 400},
+      {"id": "crafting", "name": "Restorer's Satchel", "desc": "40 Glaze Flakes, 10 Pigment Dust and 6 crafting materials.", "w": 1, "materials": {"glaze_flake": 40, "pigment_dust": 10}, "random_materials": 6},
+      {"id": "gems", "name": "Gem Pouch", "desc": "3 gems and 2 crafting materials.", "w": 1, "gems": 3, "random_materials": 2},
+      {"id": "gold", "name": "Patron's Purse", "desc": "120 gold per reward level.", "w": 1, "gold_per_level": 120}
+    ],
+    "vendor": {"per_refresh": 2, "list": [{"id": "glazed", "gold": 1500}, {"id": "unfinished", "gold": 1000}]}
+  },
+  "wardens": {
+    "_doc": "Endgame Phase 2A: Layer Wardens (docs/ENDGAME_PHASE2.md). Each ring has a Warden: an upgraded existing boss. Clearing a region of that ring can drop a Ground Shard of its layer (kept in atlas.shards, per ring). With `summon_cost` shards the player summons the Warden at any cleared region of that ring (atlas.summons); the next run there fights the Warden instead of the hex boss (no Heart). Shards are spent only on victory. A Warden kill drops a Ground Pigment of its layer: always on the first kill, then `ground_chance`, guaranteed after `ground_pity` dry kills. The first kill of each Warden also gives +1 passive point. Ground Pigments are banked for the pinnacle (any `pinnacle_need` of 6 layers, Phase 3).",
+    "summon_cost": 3,
+    "shard_cap": 9,
+    "shard_chance": 0.45,
+    "shard_rot_bonus": 0.1,
+    "shard_pity": 2,
+    "heart_shard": true,
+    "ground_chance": 0.34,
+    "ground_pity": 3,
+    "pinnacle_need": 4,
+    "layers_total": 6,
+    "passive_point": true,
+    "level_bonus": 2,
+    "reward": {"legendary": 1, "rares": 2, "rarity": 300, "gold_per_level": 40},
+    "colors": {"shard": "#e8d8a0", "summon": "#ffe070"},
+    "rings": [
+      {"ring": 1, "boss": "warden", "title": "the Varnish Warden", "shard": "Varnish Shard", "ground": "Ground Varnish",
+       "light": "#e8c870", "life_mult": 4.5, "damage_mult": 1.3, "signature": "glaze_tide",
+       "desc": "Sir Morcant, sealed under the first coat. Glaze tides and lacquer volleys; hardens at 30% life.",
+       "add": {
+         "glaze_tide": {"type": "ring", "w": 2, "range": [0, 150], "windup": 1.15, "radius": 130, "mult": 1.4, "color": "#e8c870"},
+         "lacquer_fan": {"type": "fan", "w": 2, "range": [0, 360], "windup": 0.75, "count": 9, "spread": 90, "proj": "orb", "proj_speed": 170, "dtype": "cold", "mult": 0.7}
+       },
+       "unlock": [["glaze_tide", 0], ["lacquer_fan", 1]],
+       "tune": {"charge": {"cooldown": 4}},
+       "final_phase": {"at": 0.3, "add": ["eruption", "lacquer_fan"], "attack_speed": 1.2, "speed": 1.15, "tint": "#e8c870", "message": "The varnish cracks - Sir Morcant hardens!"}},
+      {"ring": 2, "boss": "gravemaw", "title": "the Craquelure Warden", "shard": "Craquelure Shard", "ground": "Ground Craquelure",
+       "light": "#d0a070", "life_mult": 4.5, "damage_mult": 1.3, "signature": "fault_lines",
+       "desc": "The Gravemaw, living in the cracks. Fault lines split the floor; falling flakes at 25% life.",
+       "add": {
+         "fault_lines": {"type": "eruption", "w": 3, "range": [0, 360], "windup": 0.45, "count": 7, "radius": 28, "mult": 0.85, "color": "#c09060"},
+         "flaking": {"type": "mortar", "w": 2, "range": [0, 420], "windup": 0.5, "count": 10, "radius": 28, "interval": 0.18, "mult": 0.75, "color": "#d8c0a0"}
+       },
+       "unlock": [["fault_lines", 0]],
+       "tune": {"burrow": {"cooldown": 4.5}},
+       "final_phase": {"at": 0.25, "add": ["flaking"], "attack_speed": 1.2, "speed": 1.25, "tint": "#d0a070", "message": "The ground splits beneath the Gravemaw!"}},
+      {"ring": 3, "boss": "archon_velis", "title": "the Pentimento Warden", "shard": "Pentimento Shard", "ground": "Ground Pentimento",
+       "light": "#a080c0", "life_mult": 4.5, "damage_mult": 1.3, "signature": "underpainting",
+       "desc": "Archon Velis, painted over and painted again. Underpainting spirals and ghost sigils; peels back her image at 15% life.",
+       "add": {
+         "underpainting": {"type": "spiral", "w": 2, "range": [0, 360], "windup": 0.8, "count": 12, "waves": 3, "proj": "orb", "proj_speed": 130, "dtype": "void", "mult": 0.6},
+         "ghost_sigils": {"type": "eruption", "w": 2, "range": [0, 360], "windup": 0.5, "count": 5, "radius": 32, "mult": 0.9, "color": "#a080c0"}
+       },
+       "unlock": [["underpainting", 0], ["ghost_sigils", 1]],
+       "tune": {"teleport": {"cooldown": 3.5}},
+       "final_phase": {"at": 0.15, "add": [], "attack_speed": 1.35, "tint": "#d0b0ff", "message": "Velis peels back her own image!"}}
+    ]
+  }
+}

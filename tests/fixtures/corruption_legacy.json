@@ -1,0 +1,9 @@
+{
+  "version": 3, "name": "Legacy corruption fixture", "class": "warrior", "level": 42,
+  "next_uid": 15,
+  "inventory": [
+    {"base": "rusted_sword", "uid": 14, "name": "Old sword", "slot": "main_hand", "rarity": "rare", "ilvl": 42, "req_level": 1, "affixes": [], "corruption": 37},
+    {"base": "rusted_sword", "uid": 15, "name": "Old sealed Legendary", "slot": "main_hand", "rarity": "legendary", "ilvl": 42, "req_level": 1, "affixes": [], "corruption": 100, "legendary_effect": "worldsplitter", "sockets": 1, "gems": ["ruby:0"]}
+  ],
+  "materials": {"scrap": 4}, "gold": 80
+}

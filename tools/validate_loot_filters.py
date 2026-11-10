@@ -12,8 +12,16 @@ KINDS = ["gear", "charm", "gem", "rune", "material", "other"]
 SLOTS = ["weapon_1h", "weapon_2h", "offhand", "helm", "chest", "gloves", "boots", "belt", "ring", "amulet", "charm"]
 COND = {"rarity_min", "rarity_max", "kind", "slot", "name_contains", "ilvl_min", "ilvl_max",
         "ilvl_vs_player_min", "ilvl_vs_player_max", "sockets_min", "affix_any", "affix_min_matches",
-        "affix_count_min", "is_upgrade", "tier_min", "tier_max"}
+        "affix_count_min", "is_upgrade", "tier_min", "tier_max", "rot_touched", "rot_implicit_any"}
 ACT = {"visibility", "color", "size", "beam", "sound", "minimap", "continue"}
+def ROT_IDS():
+    """Rot-touched implicit ids from data/atlas.json (Endgame 2B); empty if unreadable."""
+    try:
+        d = json.load(open(os.path.join(os.path.dirname(__file__), "..", "data", "atlas.json"), encoding="utf-8"))
+        return {e["id"] for e in d.get("rot_touched", {}).get("pool", [])}
+    except Exception:
+        return set()
+
 HEX = re.compile(r"^#?([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
 
 def check(path):
@@ -38,6 +46,11 @@ def check(path):
             if k in c and c[k] not in RAR: out.append("ERROR: " + t + "bad " + k)
         if "kind" in c and not set(c["kind"]) <= set(KINDS): out.append("ERROR: " + t + "bad kind")
         if "slot" in c and not set(c["slot"]) <= set(SLOTS): out.append("ERROR: " + t + "bad slot")
+        if "rot_touched" in c and not isinstance(c["rot_touched"], bool): out.append("ERROR: " + t + "rot_touched must be true/false")
+        if "rot_implicit_any" in c:
+            ids = ROT_IDS()
+            for x in c["rot_implicit_any"]:
+                if ids and x not in ids: out.append("WARN: " + t + "unknown Rot-touched id " + str(x))
         if a.get("visibility", "show") not in VIS: out.append("ERROR: " + t + "bad visibility")
         if a.get("size", "normal") not in SIZES: out.append("ERROR: " + t + "bad size")
         for k in ("color", "beam"):

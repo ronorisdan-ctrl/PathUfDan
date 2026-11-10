@@ -1,0 +1,860 @@
+{
+ "picks": {
+  "warrior": {
+   "T3": "w_earthbreaker",
+   "T6": "w_earthbreaker",
+   "R3": "w_earthbreaker"
+  },
+  "ranger": {
+   "T3": "r_glass",
+   "T6": "r_glass",
+   "R3": "r_glass"
+  },
+  "mage": {
+   "T3": "m_embers",
+   "T6": "m_embers",
+   "R3": "m_embers"
+  }
+ },
+ "evidence": {
+  "warrior": {
+   "T3": {
+    "pick": "w_earthbreaker",
+    "vs_none": "gain",
+    "gear": "typical",
+    "runs": 10,
+    "stage_best": "w_earthbreaker",
+    "results": {
+     "none": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 94.0,
+      "taken": 1024.7,
+      "dps_est": 1289.5,
+      "ehp_est": 1370.9,
+      "keystones": [],
+      "spec": "weapon_master(2)",
+      "hotbar": "heavy_strike|cleave|adrenaline_surge|last_stand|battle_leap|war_cry|berserker_rage"
+     },
+     "w_earthbreaker": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 69.3,
+      "taken": 580.9,
+      "dps_est": 1894.3,
+      "ehp_est": 1092.8,
+      "keystones": [
+       "p3b_eb_cap"
+      ],
+      "spec": "earthbreaker(2)",
+      "hotbar": "heavy_strike|ground_slam|adrenaline_surge|last_stand|battle_leap|war_cry|berserker_rage"
+     },
+     "w_momentum": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 92.9,
+      "taken": 944.4,
+      "dps_est": 1419.8,
+      "ehp_est": 1262.4,
+      "keystones": [
+       "ks_momentum"
+      ],
+      "spec": "weapon_master(2)",
+      "hotbar": "heavy_strike|cleave|adrenaline_surge|last_stand|battle_leap|war_cry|berserker_rage"
+     },
+     "w_riposte": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 83.1,
+      "taken": 762.4,
+      "dps_est": 1445.2,
+      "ehp_est": 1405.0,
+      "keystones": [
+       "p2_ks_riposte"
+      ],
+      "spec": "juggernaut(2)",
+      "hotbar": "heavy_strike|cleave|adrenaline_surge|last_stand|battle_leap|war_cry|berserker_rage"
+     },
+     "w_executioner": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 80.4,
+      "taken": 801.9,
+      "dps_est": 1533.0,
+      "ehp_est": 1101.0,
+      "keystones": [
+       "xe_ks"
+      ],
+      "spec": "berserker(2)",
+      "hotbar": "heavy_strike|cleave|adrenaline_surge|last_stand|battle_leap|war_cry|berserker_rage"
+     }
+    }
+   },
+   "T6": {
+    "pick": "w_earthbreaker",
+    "vs_none": "no clear gain",
+    "gear": "typical",
+    "runs": 10,
+    "stage_best": "w_earthbreaker",
+    "results": {
+     "none": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 53.6,
+      "taken": 918.9,
+      "dps_est": 8229.4,
+      "ehp_est": 6210.1,
+      "keystones": [],
+      "spec": "weapon_master(5)",
+      "hotbar": "heavy_strike|cleave|avatar_of_war|last_stand|battle_leap|war_cry|adrenaline_surge"
+     },
+     "w_earthbreaker": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 49.5,
+      "taken": 868.5,
+      "dps_est": 10402.0,
+      "ehp_est": 5893.0,
+      "keystones": [
+       "p3b_eb_cap"
+      ],
+      "spec": "earthbreaker(5)",
+      "hotbar": "heavy_strike|ground_slam|avatar_of_war|last_stand|battle_leap|war_cry|adrenaline_surge"
+     },
+     "w_momentum": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 57.5,
+      "taken": 1080.6,
+      "dps_est": 7986.4,
+      "ehp_est": 7453.3,
+      "keystones": [
+       "ks_momentum"
+      ],
+      "spec": "weapon_master(5)",
+      "hotbar": "heavy_strike|cleave|avatar_of_war|last_stand|battle_leap|war_cry|adrenaline_surge"
+     },
+     "w_riposte": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 55.7,
+      "taken": 737.8,
+      "dps_est": 7889.1,
+      "ehp_est": 12178.6,
+      "keystones": [
+       "p2_ks_riposte"
+      ],
+      "spec": "juggernaut(5)",
+      "hotbar": "heavy_strike|cleave|avatar_of_war|last_stand|battle_leap|war_cry|adrenaline_surge"
+     },
+     "w_executioner": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 51.7,
+      "taken": 1006.9,
+      "dps_est": 12209.5,
+      "ehp_est": 5504.6,
+      "keystones": [
+       "xe_ks"
+      ],
+      "spec": "berserker(5)",
+      "hotbar": "heavy_strike|cleave|avatar_of_war|last_stand|battle_leap|war_cry|adrenaline_surge"
+     }
+    }
+   },
+   "R3": {
+    "pick": "w_earthbreaker",
+    "vs_none": "gain",
+    "gear": "typical",
+    "runs": 10,
+    "stage_best": "w_earthbreaker",
+    "results": {
+     "none": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 157.0,
+      "taken": 5064.7,
+      "dps_est": 7432.6,
+      "ehp_est": 7966.5,
+      "keystones": [],
+      "spec": "weapon_master(5)",
+      "hotbar": "heavy_strike|cleave|avatar_of_war|last_stand|battle_leap|war_cry|adrenaline_surge"
+     },
+     "w_earthbreaker": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 129.9,
+      "taken": 3287.4,
+      "dps_est": 8784.2,
+      "ehp_est": 7344.0,
+      "keystones": [
+       "p3b_eb_cap"
+      ],
+      "spec": "earthbreaker(5)",
+      "hotbar": "heavy_strike|ground_slam|avatar_of_war|last_stand|battle_leap|war_cry|adrenaline_surge"
+     },
+     "w_momentum": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 159.1,
+      "taken": 5475.5,
+      "dps_est": 8249.2,
+      "ehp_est": 8760.2,
+      "keystones": [
+       "ks_momentum"
+      ],
+      "spec": "weapon_master(5)",
+      "hotbar": "cleave|ground_slam|avatar_of_war|last_stand|battle_leap|war_cry|adrenaline_surge"
+     },
+     "w_riposte": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 194.1,
+      "taken": 5336.8,
+      "dps_est": 7566.6,
+      "ehp_est": 13949.0,
+      "keystones": [
+       "p2_ks_riposte"
+      ],
+      "spec": "juggernaut(5)",
+      "hotbar": "cleave|ground_slam|avatar_of_war|last_stand|battle_leap|war_cry|adrenaline_surge"
+     },
+     "w_executioner": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 157.9,
+      "taken": 5970.1,
+      "dps_est": 10168.0,
+      "ehp_est": 7225.2,
+      "keystones": [
+       "xe_ks"
+      ],
+      "spec": "berserker(5)",
+      "hotbar": "cleave|ground_slam|avatar_of_war|last_stand|battle_leap|war_cry|adrenaline_surge"
+     }
+    }
+   }
+  },
+  "ranger": {
+   "T3": {
+    "pick": "r_machinist",
+    "vs_none": "no clear gain",
+    "gear": "typical",
+    "runs": 10,
+    "stage_best": "r_machinist",
+    "results": {
+     "none": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 109.4,
+      "taken": 236.4,
+      "dps_est": 1391.4,
+      "ehp_est": 821.1,
+      "keystones": [],
+      "spec": "deadeye(2)",
+      "hotbar": "quick_shot|sniper_round|hunters_focus|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_perfect_aim": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 126.6,
+      "taken": 395.8,
+      "dps_est": 1143.5,
+      "ehp_est": 795.4,
+      "keystones": [
+       "ks_perfect_aim"
+      ],
+      "spec": "deadeye(2)",
+      "hotbar": "quick_shot|sniper_round|hunters_focus|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_machinist": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 113.9,
+      "taken": 317.7,
+      "dps_est": 255.7,
+      "ehp_est": 775.9,
+      "keystones": [
+       "ks_automaton"
+      ],
+      "spec": "machinist(2)",
+      "hotbar": "quick_shot|frost_turret|tesla_turret|sniper_round|hunters_focus|smoke_bomb|lightning_trap"
+     },
+     "r_trapper": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 115.6,
+      "taken": 356.9,
+      "dps_est": 264.8,
+      "ehp_est": 810.7,
+      "keystones": [
+       "p3b_tr_cap"
+      ],
+      "spec": "trapper(2)",
+      "hotbar": "quick_shot|lightning_trap|poison_trap|cluster_bomb|hunters_focus|smoke_bomb|marked_prey"
+     },
+     "r_wind": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 139.0,
+      "taken": 403.7,
+      "dps_est": 1006.1,
+      "ehp_est": 855.3,
+      "keystones": [
+       "xw_ks"
+      ],
+      "spec": "wraith_hunter(2)",
+      "hotbar": "quick_shot|sniper_round|hunters_focus|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_far_aim": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 118.4,
+      "taken": 225.7,
+      "dps_est": 1154.5,
+      "ehp_est": 798.5,
+      "keystones": [
+       "ks_perfect_aim"
+      ],
+      "spec": "deadeye(2)",
+      "hotbar": "quick_shot|sniper_round|hunters_focus|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_wind_roll": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 119.3,
+      "taken": 363.2,
+      "dps_est": 1263.4,
+      "ehp_est": 869.8,
+      "keystones": [
+       "xw_ks"
+      ],
+      "spec": "wraith_hunter(2)",
+      "hotbar": "quick_shot|sniper_round|hunters_focus|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_glass": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 115.9,
+      "taken": 194.6,
+      "dps_est": 1385.1,
+      "ehp_est": 621.3,
+      "keystones": [
+       "ks_glass"
+      ],
+      "spec": "deadeye(2)",
+      "hotbar": "quick_shot|sniper_round|hunters_focus|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     }
+    }
+   },
+   "T6": {
+    "pick": "r_perfect_aim",
+    "vs_none": "no clear gain",
+    "gear": "typical",
+    "runs": 10,
+    "stage_best": "r_perfect_aim",
+    "results": {
+     "none": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 50.6,
+      "taken": 174.5,
+      "dps_est": 13999.9,
+      "ehp_est": 3016.3,
+      "keystones": [],
+      "spec": "deadeye(5)",
+      "hotbar": "quick_shot|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_perfect_aim": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 51.9,
+      "taken": 167.4,
+      "dps_est": 14310.7,
+      "ehp_est": 2967.7,
+      "keystones": [
+       "ks_perfect_aim"
+      ],
+      "spec": "deadeye(5)",
+      "hotbar": "quickdraw|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_machinist": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 59.0,
+      "taken": 148.0,
+      "dps_est": 3818.0,
+      "ehp_est": 3045.7,
+      "keystones": [
+       "ks_automaton"
+      ],
+      "spec": "machinist(5)",
+      "hotbar": "quickdraw|frost_turret|tesla_turret|sniper_round|deadeye|smoke_bomb|lightning_trap"
+     },
+     "r_trapper": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 68.5,
+      "taken": 342.0,
+      "dps_est": 2615.3,
+      "ehp_est": 2866.3,
+      "keystones": [
+       "p3b_tr_cap"
+      ],
+      "spec": "trapper(5)",
+      "hotbar": "quickdraw|lightning_trap|poison_trap|sniper_round|deadeye|smoke_bomb|marked_prey"
+     },
+     "r_wind": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 58.1,
+      "taken": 256.3,
+      "dps_est": 14742.5,
+      "ehp_est": 3409.3,
+      "keystones": [
+       "xw_ks"
+      ],
+      "spec": "wraith_hunter(5)",
+      "hotbar": "quickdraw|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_far_aim": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 53.9,
+      "taken": 135.4,
+      "dps_est": 15915.3,
+      "ehp_est": 2985.1,
+      "keystones": [
+       "ks_perfect_aim"
+      ],
+      "spec": "deadeye(5)",
+      "hotbar": "quick_shot|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_wind_roll": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 62.1,
+      "taken": 262.7,
+      "dps_est": 12080.9,
+      "ehp_est": 3322.8,
+      "keystones": [
+       "xw_ks"
+      ],
+      "spec": "wraith_hunter(5)",
+      "hotbar": "quickdraw|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_glass": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 55.9,
+      "taken": 180.2,
+      "dps_est": 18106.6,
+      "ehp_est": 2094.8,
+      "keystones": [
+       "ks_glass"
+      ],
+      "spec": "deadeye(5)",
+      "hotbar": "quickdraw|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     }
+    }
+   },
+   "R3": {
+    "pick": "r_wind",
+    "vs_none": "no clear gain",
+    "gear": "typical",
+    "runs": 10,
+    "stage_best": "r_wind",
+    "results": {
+     "none": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 120.3,
+      "taken": 698.8,
+      "dps_est": 13207.7,
+      "ehp_est": 3569.1,
+      "keystones": [],
+      "spec": "deadeye(5)",
+      "hotbar": "quick_shot|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_perfect_aim": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 126.1,
+      "taken": 420.1,
+      "dps_est": 14696.5,
+      "ehp_est": 3333.4,
+      "keystones": [
+       "ks_perfect_aim"
+      ],
+      "spec": "deadeye(5)",
+      "hotbar": "quick_shot|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_machinist": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 203.0,
+      "taken": 864.6,
+      "dps_est": 2841.6,
+      "ehp_est": 3554.4,
+      "keystones": [
+       "ks_automaton"
+      ],
+      "spec": "machinist(5)",
+      "hotbar": "quickdraw|frost_turret|tesla_turret|sniper_round|deadeye|smoke_bomb|lightning_trap"
+     },
+     "r_trapper": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 180.7,
+      "taken": 1082.2,
+      "dps_est": 2263.4,
+      "ehp_est": 3473.4,
+      "keystones": [
+       "p3b_tr_cap"
+      ],
+      "spec": "trapper(5)",
+      "hotbar": "quick_shot|lightning_trap|poison_trap|sniper_round|deadeye|smoke_bomb|marked_prey"
+     },
+     "r_wind": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 118.5,
+      "taken": 450.6,
+      "dps_est": 13527.1,
+      "ehp_est": 3589.7,
+      "keystones": [
+       "xw_ks"
+      ],
+      "spec": "wraith_hunter(5)",
+      "hotbar": "quick_shot|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_far_aim": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 133.8,
+      "taken": 541.7,
+      "dps_est": 14816.3,
+      "ehp_est": 3279.3,
+      "keystones": [
+       "ks_perfect_aim"
+      ],
+      "spec": "deadeye(5)",
+      "hotbar": "quick_shot|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_wind_roll": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 145.2,
+      "taken": 563.6,
+      "dps_est": 16773.1,
+      "ehp_est": 3529.9,
+      "keystones": [
+       "xw_ks"
+      ],
+      "spec": "wraith_hunter(5)",
+      "hotbar": "quick_shot|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     },
+     "r_glass": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 124.9,
+      "taken": 405.2,
+      "dps_est": 21805.8,
+      "ehp_est": 2187.6,
+      "keystones": [
+       "ks_glass"
+      ],
+      "spec": "deadeye(5)",
+      "hotbar": "quick_shot|sniper_round|deadeye|frost_turret|smoke_bomb|lightning_trap|marked_prey"
+     }
+    }
+   }
+  },
+  "mage": {
+   "T3": {
+    "pick": "m_embers",
+    "vs_none": "gain",
+    "gear": "typical",
+    "runs": 10,
+    "stage_best": "m_embers",
+    "results": {
+     "none": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 103.3,
+      "taken": 223.4,
+      "dps_est": 757.8,
+      "ehp_est": 769.9,
+      "keystones": [],
+      "spec": "cryomancer(2)",
+      "hotbar": "disintegration_beam|lightning_bolt|army_of_the_damned|blink|mark_of_ruin|static_field|fireball"
+     },
+     "m_glacial": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 127.1,
+      "taken": 263.3,
+      "dps_est": 696.8,
+      "ehp_est": 751.3,
+      "keystones": [
+       "p3b_fw_cap"
+      ],
+      "spec": "cryomancer(2)",
+      "hotbar": "ice_lance|blizzard|army_of_the_damned|blink|mark_of_ruin|static_field|frostbolt"
+     },
+     "m_embers": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 88.0,
+      "taken": 159.9,
+      "dps_est": 649.1,
+      "ehp_est": 724.6,
+      "keystones": [
+       "p2_ks_embers"
+      ],
+      "spec": "pyromancer(2)",
+      "hotbar": "inferno|fireball|army_of_the_damned|blink|mark_of_ruin|static_field|firebolt"
+     },
+     "m_convergence": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 101.5,
+      "taken": 221.1,
+      "dps_est": 767.4,
+      "ehp_est": 764.9,
+      "keystones": [
+       "ks_convergence"
+      ],
+      "spec": "stormcaller(2)",
+      "hotbar": "lightning_bolt|inferno|army_of_the_damned|blink|mark_of_ruin|static_field|ice_lance"
+     },
+     "m_legion": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 121.3,
+      "taken": 161.3,
+      "dps_est": 236.0,
+      "ehp_est": 725.8,
+      "keystones": [
+       "p2_ks_legion"
+      ],
+      "spec": "summoner(2)",
+      "hotbar": "fireball|army_of_the_damned|summon_bone_golem|summon_storm_wisp|chain_lightning|blink|disintegration_beam"
+     }
+    }
+   },
+   "T6": {
+    "pick": "m_embers",
+    "vs_none": "gain",
+    "gear": "typical",
+    "runs": 10,
+    "stage_best": "m_embers",
+    "results": {
+     "none": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 75.0,
+      "taken": 533.3,
+      "dps_est": 5200.3,
+      "ehp_est": 2617.1,
+      "keystones": [],
+      "spec": "stormcaller(5)",
+      "hotbar": "disintegration_beam|lightning_bolt|army_of_the_damned|archmage_ascension|blink|mark_of_ruin|static_field"
+     },
+     "m_glacial": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 72.5,
+      "taken": 278.9,
+      "dps_est": 4135.1,
+      "ehp_est": 3031.8,
+      "keystones": [
+       "p3b_fw_cap"
+      ],
+      "spec": "cryomancer(5)",
+      "hotbar": "blizzard|ice_lance|army_of_the_damned|archmage_ascension|blink|mark_of_ruin|static_field"
+     },
+     "m_embers": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 65.9,
+      "taken": 122.4,
+      "dps_est": 7946.4,
+      "ehp_est": 2420.3,
+      "keystones": [
+       "p2_ks_embers"
+      ],
+      "spec": "pyromancer(5)",
+      "hotbar": "inferno|fireball|army_of_the_damned|archmage_ascension|blink|mark_of_ruin|static_field"
+     },
+     "m_convergence": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 77.1,
+      "taken": 464.9,
+      "dps_est": 6756.0,
+      "ehp_est": 2475.9,
+      "keystones": [
+       "ks_convergence"
+      ],
+      "spec": "stormcaller(5)",
+      "hotbar": "disintegration_beam|lightning_bolt|army_of_the_damned|archmage_ascension|blink|mark_of_ruin|static_field"
+     },
+     "m_legion": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 96.8,
+      "taken": 576.0,
+      "dps_est": 1866.7,
+      "ehp_est": 2428.7,
+      "keystones": [
+       "p2_ks_legion"
+      ],
+      "spec": "summoner(5)",
+      "hotbar": "fireball|army_of_the_damned|summon_bone_golem|summon_storm_wisp|lightning_bolt|archmage_ascension|blink"
+     }
+    }
+   },
+   "R3": {
+    "pick": "m_embers",
+    "vs_none": "no clear gain",
+    "gear": "typical",
+    "runs": 10,
+    "stage_best": "m_embers",
+    "results": {
+     "none": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 152.5,
+      "taken": 588.5,
+      "dps_est": 7061.6,
+      "ehp_est": 2941.7,
+      "keystones": [],
+      "spec": "stormcaller(5)",
+      "hotbar": "lightning_bolt|ice_lance|army_of_the_damned|archmage_ascension|blink|mark_of_ruin|static_field"
+     },
+     "m_glacial": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 155.0,
+      "taken": 729.3,
+      "dps_est": 4315.4,
+      "ehp_est": 3420.2,
+      "keystones": [
+       "p3b_fw_cap"
+      ],
+      "spec": "cryomancer(5)",
+      "hotbar": "blizzard|ice_lance|army_of_the_damned|archmage_ascension|blink|mark_of_ruin|static_field"
+     },
+     "m_embers": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 152.3,
+      "taken": 779.7,
+      "dps_est": 10952.2,
+      "ehp_est": 2882.7,
+      "keystones": [
+       "p2_ks_embers"
+      ],
+      "spec": "pyromancer(5)",
+      "hotbar": "fireball|inferno|army_of_the_damned|archmage_ascension|blink|mark_of_ruin|static_field"
+     },
+     "m_convergence": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 156.2,
+      "taken": 563.6,
+      "dps_est": 7193.2,
+      "ehp_est": 2962.7,
+      "keystones": [
+       "ks_convergence"
+      ],
+      "spec": "stormcaller(5)",
+      "hotbar": "lightning_bolt|ice_lance|army_of_the_damned|archmage_ascension|blink|mark_of_ruin|static_field"
+     },
+     "m_legion": {
+      "runs": 10,
+      "wins": 10,
+      "deaths": 0,
+      "clear": 192.0,
+      "taken": 415.2,
+      "dps_est": 2364.4,
+      "ehp_est": 2942.0,
+      "keystones": [
+       "p2_ks_legion"
+      ],
+      "spec": "summoner(5)",
+      "hotbar": "lightning_bolt|army_of_the_damned|summon_bone_golem|summon_storm_wisp|ice_lance|archmage_ascension|blink"
+     }
+    }
+   }
+  }
+ },
+ "class_pick": {
+  "warrior": {
+   "build": "w_earthbreaker",
+   "mean_relative_clear": 0.829
+  },
+  "ranger": {
+   "build": "r_glass",
+   "mean_relative_clear": 1.068
+  },
+  "mage": {
+   "build": "m_embers",
+   "mean_relative_clear": 0.91
+  }
+ }
+}

@@ -6,3 +6,21 @@ tests/smartbot/out/tg_*
 tests/screens_out_training/
 tests/screens_out_inventory_preview/
 tests/ui_preview_*.log
+tests/screens_out_phase0/
+tests/screens_out_hud/
+tests/art_only_results.txt
+tests/tree_only_results.txt
+tools/__pycache__/
+assets/incoming/
+assets/_backup/
+tests/corruption*.log
+tests/.corruption_save_test/
+tests/screens_out_tree_p4b/
+# generated outputs (smartbot runs, test logs, editor backups)
+tests/smartbot/out/
+tests/smartbot/__pycache__/
+tests/smartbot/jobs.txt.bak
+tests/*_results.txt
+tests/*.log
+tests/zone_out/
+data/nppBackup/

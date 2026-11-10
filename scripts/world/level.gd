@@ -42,6 +42,20 @@ var interactables := []   # {pos, name, kind, radius}
 var flow := PackedInt32Array()
 var flow_origin := Vector2i(-999, -999)
 var flow_timer := 0.0
+var summon_lifetime := 0       # zones: max adds one non-boss summoner may create (0 = no cap)
+# Endgame zones (Phase 0 spike): chamber id per cell (255 = none) and chamber links. When set,
+# the flow field only spreads through the player's chamber and the chambers linked to it, so
+# its cost stays bounded however large the zone is. Empty = whole grid (dungeons, hub).
+var cell_zone := PackedByteArray()
+var zone_adj := []
+var flow_reach := 90
+var flow_us := 0          # duration of the last flow-field build (microseconds; bench/tests)
+var flow_us_max := 0
+var _flow_q := PackedInt32Array()
+# zones: per chamber, a walkable map (1 = floor) of that chamber plus its linked chambers;
+# built once, patched by set_cell (arena seal), so a chamber change costs nothing
+var _regions := []
+var tile_chunk := 0       # >0: draw the grid in chunks of this many cells (zones)
 var _unstick_t := 0.0
 var kills := 0
 var rng := RandomNumberGenerator.new()
@@ -70,6 +84,8 @@ func init_grid(w: int, h: int) -> void:
 func set_cell(x: int, y: int, v: int) -> void:
 	if x >= 0 and y >= 0 and x < gw and y < gh:
 		grid[y * gw + x] = v
+		if _regions.size() > 0:
+			_patch_regions(y * gw + x)
 
 func cell(x: int, y: int) -> int:
 	if x < 0 or y < 0 or x >= gw or y >= gh:
@@ -98,6 +114,8 @@ func build_world() -> void:
 	tile_drawer.z_index = -10
 	tile_drawer.level = self
 	add_child(tile_drawer)
+	if tile_chunk > 0:
+		_build_tile_chunks()
 	add_child(floor_layer)
 	add_child(entity_layer)
 	add_child(projectile_layer)
@@ -109,6 +127,28 @@ func build_world() -> void:
 	var cm := CanvasModulate.new()
 	cm.color = ambient
 	add_child(cm)
+
+## Zones: tile_drawer becomes a parent of chunk drawers (tile_chunk cells square) so only
+## the chunks on screen are drawn each frame. Same variant rolls as the whole-grid draw.
+func _build_tile_chunks() -> void:
+	var rv := PackedFloat32Array()
+	rv.resize(gw * gh)
+	var r := RandomNumberGenerator.new()
+	r.seed = 1234
+	for y in gh:
+		for x in gw:
+			rv[y * gw + x] = r.randf()
+	tile_drawer.chunked = true     # the parent only holds the chunks
+	for cy in range(0, gh, tile_chunk):
+		for cx in range(0, gw, tile_chunk):
+			var ch = load("res://scripts/world/tile_drawer.gd").new()
+			ch.level = self
+			ch.area = Rect2i(cx, cy, mini(tile_chunk, gw - cx), mini(tile_chunk, gh - cy))
+			ch.rvals = rv
+			tile_drawer.add_child(ch)
+
+func separation_pool() -> Array:
+	return enemies
 
 func _near_floor(x: int, y: int) -> bool:
 	for dy in range(-1, 2):
@@ -382,28 +422,94 @@ func _compute_flow(origin: Vector2i) -> void:
 	flow_origin = origin
 	if flow.size() != gw * gh:
 		flow.resize(gw * gh)
+	var t0 := Time.get_ticks_usec()
 	flow.fill(-1)
 	if cell(origin.x, origin.y) != FLOOR:
 		return
-	var queue := [origin]
-	flow[origin.y * gw + origin.x] = 0
+	# zones: walk only the region (floor of the player's chamber + linked chambers); the
+	# region is rebuilt when the player changes chamber or the grid changes (arena seal)
+	var walk := grid
+	var floor_v := FLOOR
+	if cell_zone.size() == gw * gh:
+		var pc: int = cell_zone[origin.y * gw + origin.x]
+		if pc < _regions.size():
+			walk = _regions[pc]
+			floor_v = 1
+	# integer-index BFS (same distances as a Vector2i BFS, about 3x faster in GDScript)
+	var n_cells := gw * gh
+	if _flow_q.size() != n_cells:
+		_flow_q.resize(n_cells)
+	var o := origin.y * gw + origin.x
+	flow[o] = 0
+	_flow_q[0] = o
 	var head := 0
-	var maxd := 90
-	var dirs := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
-	while head < queue.size():
-		var c: Vector2i = queue[head]
+	var tail := 1
+	var maxd := flow_reach
+	while head < tail:
+		var i: int = _flow_q[head]
 		head += 1
-		var d: int = flow[c.y * gw + c.x]
+		var d: int = flow[i]
 		if d >= maxd:
 			continue
-		for o in dirs:
-			var n: Vector2i = c + o
-			if n.x < 0 or n.y < 0 or n.x >= gw or n.y >= gh:
-				continue
-			var idx := n.y * gw + n.x
-			if grid[idx] == FLOOR and flow[idx] < 0:
-				flow[idx] = d + 1
-				queue.append(n)
+		var x := i % gw
+		var nd := d + 1
+		var j := i + 1
+		if x < gw - 1 and walk[j] == floor_v and flow[j] < 0:
+			flow[j] = nd
+			_flow_q[tail] = j
+			tail += 1
+		j = i - 1
+		if x > 0 and walk[j] == floor_v and flow[j] < 0:
+			flow[j] = nd
+			_flow_q[tail] = j
+			tail += 1
+		j = i + gw
+		if j < n_cells and walk[j] == floor_v and flow[j] < 0:
+			flow[j] = nd
+			_flow_q[tail] = j
+			tail += 1
+		j = i - gw
+		if j >= 0 and walk[j] == floor_v and flow[j] < 0:
+			flow[j] = nd
+			_flow_q[tail] = j
+			tail += 1
+	flow_us = Time.get_ticks_usec() - t0
+	flow_us_max = maxi(flow_us_max, flow_us)
+
+## Zones: build the per-chamber walkable maps once (after the grid and chamber map exist).
+func index_zone_cells() -> void:
+	var lists := []
+	for k in zone_adj.size():
+		lists.append([])
+	for i in cell_zone.size():
+		var k: int = cell_zone[i]
+		if k < lists.size() and grid[i] == FLOOR:
+			lists[k].append(i)
+	_regions = []
+	for k in zone_adj.size():
+		var r := PackedByteArray()
+		r.resize(gw * gh)
+		r.fill(0)
+		var ids := [k]
+		for n in zone_adj[k]:
+			ids.append(int(n))
+		for c in ids:
+			for i in lists[c]:
+				r[i] = 1
+		_regions.append(r)
+
+func _patch_regions(i: int) -> void:
+	var k: int = cell_zone[i] if i < cell_zone.size() else 255
+	if k >= zone_adj.size():
+		return
+	var v := 1 if grid[i] == FLOOR else 0
+	var ids := [k]
+	for n in zone_adj[k]:
+		ids.append(int(n))
+	for c in ids:
+		var r: PackedByteArray = _regions[c]
+		r[i] = v
+		_regions[c] = r
 
 func flow_dir(pos: Vector2) -> Vector2:
 	if flow.size() != gw * gh:
@@ -440,11 +546,17 @@ func flow_value(c: Vector2i) -> int:
 func _on_enemy_killed(e, killer) -> void:
 	if e.level != self or player == null:
 		return
+	if "def" in e and e.def.get("object", false):   # Endgame 2D: a vault wall is no monster (no kill, XP or loot)
+		on_enemy_killed(e)
+		return
 	kills += 1
 	var ch = player.ch
 	ch.add_xp(int(e.xp_value * xp_bonus()))
-	player.on_kill(e)
-	var drops: Array = Loot.roll_drops(e.mlevel, e.loot_mult * loot_bonus(), e.is_elite or e.is_miniboss, e.is_boss, ch.class_id, ch.final.get("item_rarity", 0.0) + rarity_bonus())
+	player.on_kill(e, killer)
+	# Endgame Phase 1D: a painted sketch drops as one rank higher; glaze / sketch rewards add rarity
+	var rank_up: bool = "loot_rank_up" in e and e.loot_rank_up
+	var extra_rarity: float = float(e.loot_rarity_extra) if "loot_rarity_extra" in e else 0.0
+	var drops: Array = Loot.roll_drops(e.mlevel, e.loot_mult * loot_bonus(), e.is_elite or e.is_miniboss or rank_up, e.is_boss, ch.class_id, ch.final.get("item_rarity", 0.0) + rarity_bonus() + extra_rarity, corruption_drop_context())
 	for d in drops:
 		spawn_drop(d, e.global_position)
 	# legendary on-kill effects
@@ -467,6 +579,9 @@ func _on_enemy_killed(e, killer) -> void:
 
 func loot_bonus() -> float:
 	return 1.0
+
+func corruption_drop_context() -> Dictionary:
+	return {}  # no brands from hub/test/unknown content
 
 func rarity_bonus() -> float:
 	return 0.0
@@ -491,6 +606,10 @@ func _effect_burst(pos: Vector2, dmg: Dictionary, col: Color, r: float) -> void:
 	a.position = pos
 	floor_layer.add_child(a)
 
+## Hook for every item that drops on the floor (dungeon.gd: Rot-touched implicits, Endgame 2B).
+func _on_item_drop(_it: Dictionary) -> void:
+	pass
+
 func spawn_drop(d: Dictionary, pos: Vector2) -> void:
 	var n = LootDrop.new()
 	n.level = self
@@ -499,6 +618,7 @@ func spawn_drop(d: Dictionary, pos: Vector2) -> void:
 			if d["item"].is_empty():
 				return
 			d["item"]["uid"] = player.ch.take_uid()
+			_on_item_drop(d["item"])
 			n.setup_item(d["item"])
 		"gold":
 			n.setup_gold(int(d["amount"]))

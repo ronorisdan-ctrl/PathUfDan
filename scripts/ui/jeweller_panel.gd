@@ -3,6 +3,7 @@ extends "res://scripts/ui/base_panel.gd"
 ## combine three gems of a grade into one of the next grade.
 
 var selected = null
+const Chrome = preload("res://scripts/ui/components/station_chrome.gd")
 var item_text: RichTextLabel
 var socket_box: VBoxContainer
 var pouch_box: VBoxContainer
@@ -12,30 +13,31 @@ var buy_btn: Button
 func _init() -> void:
 	place = "left"
 	build("Jeweller Mira", Vector2(440, 560))
-	body.add_child(UIKit.label("Select an item in your inventory or equipment.", 12, UIKit.MUTED))
-	var sc := ScrollContainer.new()
-	sc.custom_minimum_size = Vector2(420, 120)
-	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	body.add_child(sc)
-	item_text = UIKit.rich("", 400)
+	Chrome.apply(self)
+	body.add_child(Chrome.caption("Select an item in your inventory or equipment."))
+	var sc := Chrome.reading_scroll(body, 100)
+	item_text = UIKit.rich()
+	item_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(item_text)
 	body.add_child(UIKit.label("Sockets", 13, UIKit.GOLD))
 	socket_box = VBoxContainer.new()
-	body.add_child(socket_box)
+	var sockets := Chrome.reading_scroll(body, 110)
+	socket_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sockets.add_child(socket_box)
 	body.add_child(UIKit.label("Gem pouch", 13, UIKit.GOLD))
-	var sc2 := ScrollContainer.new()
-	sc2.custom_minimum_size = Vector2(420, 190)
-	sc2.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	body.add_child(sc2)
+	var sc2 := Chrome.reading_scroll(body, 120)
 	pouch_box = VBoxContainer.new()
 	pouch_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc2.add_child(pouch_box)
-	gold_label = UIKit.rich("", 420)
-	body.add_child(gold_label)
+	gold_label = UIKit.rich()
+	Chrome.inset(body, gold_label)
 	buy_btn = UIKit.button("Buy a random gem", _buy_gem)
 	body.add_child(buy_btn)
 	Events.currency_changed.connect(refresh)
 	Events.inventory_changed.connect(refresh)
+
+func reposition() -> void:
+	Chrome.place_panel(self, Vector2(480, 660))
 
 func on_close() -> void:
 	selected = null
@@ -76,7 +78,11 @@ func refresh() -> void:
 				b = UIKit.button("Socket %d: %s - remove (%d gold)" % [i + 1, Loot.gem_name(g), ch.unsocket_cost(g)], _unsocket.bind(i))
 				b.modulate = Loot.gem_color(g).lerp(Color.WHITE, 0.5)
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			if Loot.CorruptionRules.is_maxed(selected):
+				b.disabled = true
+				b.tooltip_text = "Corrupted: cannot edit sockets or gems"
 			socket_box.add_child(b)
+			Chrome.wrap_button(b)
 	# gem pouch
 	var ids: Array = ch.gems.keys()
 	ids.sort_custom(func(a, b):
@@ -84,10 +90,10 @@ func refresh() -> void:
 			return Loot.gem_tier(a) > Loot.gem_tier(b)
 		return a < b)
 	if ids.is_empty():
-		pouch_box.add_child(UIKit.label("No gems yet - they drop from monsters (more from elites and bosses).", 12, UIKit.MUTED))
+		pouch_box.add_child(Chrome.caption("No gems yet - they drop from monsters (more from elites and bosses)."))
 	for gid in ids:
 		var row := HBoxContainer.new()
-		var l := UIKit.rich("[color=#%s]%s[/color] x%d" % [Loot.gem_color(gid).to_html(false), Loot.gem_name(gid), int(ch.gems[gid])], 200)
+		var l := UIKit.rich("[color=#%s]%s[/color] x%d" % [Loot.gem_color(gid).to_html(false), Loot.gem_name(gid), int(ch.gems[gid])])
 		l.tooltip_text = Loot.gem_summary(gid) + "\nRequires level %d" % Loot.gem_req(gid)
 		l.mouse_filter = Control.MOUSE_FILTER_PASS
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL

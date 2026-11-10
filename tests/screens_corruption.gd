@@ -102,6 +102,49 @@ func _ready() -> void:
 	bs.scroll.scroll_vertical = 100000
 	await shot("blacksmith_100_buttons")
 	ui.close("blacksmith")
+	# Spec v1 irreversible action and dedicated implicit display.
+	var target: Dictionary = Loot.roll_item_of(base,"rare",42)
+	target["uid"] = ch.take_uid()
+	ch.add_to_bag(target)
+	ch.materials["abyssal_brand"] = 3
+	var chooser := RandomNumberGenerator.new()
+	for sample in 1000:
+		chooser.seed = sample
+		if chooser.randi_range(0,9999) >= 9600:
+			bs.corr_rng.seed = sample
+			break
+	ui.open_station("blacksmith")
+	bs.select(target)
+	bs.op = "corrupt"
+	bs.refresh()
+	await bs._show_preview()
+	await shot("corrupt_action_preview")
+	bs._craft()
+	await shot("corrupt_irreversible_confirmation")
+	ui._on_confirm()
+	await shot("corrupt_result")
+	ui.close("blacksmith")
+	var sealed: Dictionary = Loot.make_unique("widowmaker",42)
+	sealed["uid"] = ch.take_uid()
+	sealed["corruption"] = 100
+	sealed["corruption_roll_version"] = 1
+	var CS = preload("res://scripts/core/corruption_system.gd")
+	var CI: Dictionary = CS.registry_index(Data.corruption_affixes)
+	var test_rng = preload("res://tests/test_corruption_system.gd").SequenceRng.new([90,8])
+	sealed["corrupted_prefix"] = CS.roll_affix(CI["cw_splintered_fate"],42,Data.corruption_cfg,test_rng)
+	sealed["corrupted_suffix"] = CS.roll_affix(CI["cw_of_frenzy"],42,Data.corruption_cfg,test_rng)
+	await tip(ui,sealed,"corruption_legendary_double")
+	get_window().size = Vector2i(960,540)
+	await frames(8)
+	ui.open_station("blacksmith")
+	bs.select(target if not target.get("destroyed",false) else sealed)
+	bs.op = "corrupt"
+	bs.refresh()
+	bs.scroll.scroll_vertical = 100000
+	await shot("corruption_low_resolution_960x540")
+	ui.close("blacksmith")
+	get_window().size = Vector2i(1280,720)
+	await frames(4)
 	# dev panel
 	Game.dev_in_tests = true
 	Game.settings["dev_tools"] = true

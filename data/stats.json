@@ -72,5 +72,11 @@
   "life_on_hit": {"name": "Life gained per Hit", "group": "utility"},
   "flask_effect": {"name": "Flask Effect", "group": "utility", "inc_only": true},
   "item_rarity": {"name": "Item Rarity", "group": "utility", "inc_only": true},
-  "skill_level": {"name": "Additional Skill Levels", "group": "utility"}
+  "skill_level": {"name": "Additional Skill Levels", "group": "utility"},
+  "added_spell_fire": {"name": "Added Fire Damage to Spells", "group": "offence"},
+  "added_spell_cold": {"name": "Added Cold Damage to Spells", "group": "offence"},
+  "added_spell_lightning": {"name": "Added Lightning Damage to Spells", "group": "offence"},
+  "added_spell": {"name": "Added Spell Damage", "group": "offence"},
+  "spell_penetration": {"name": "Spell Elemental Penetration", "group": "offence", "pct": true},
+  "spell_skill_level": {"name": "Additional Spell Skill Levels", "group": "utility"}
 }

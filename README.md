@@ -101,9 +101,10 @@ Every item has a corruption meter (0-100%, shown as "Corruption: N%" on every to
 Blacksmith window and as a small red marker on 100% items in the bag and stashes). Three Blacksmith
 crafts roll for it: **Add Affix**, **Reroll Affix** (one chosen affix per click) and **Raise Rarity**. The
 craft is always applied in full first; then one roll at 60% adds 25% corruption (Dan's tuning, 2026-10-29). At 100%
-those three crafts are refused (nothing is spent) and their buttons are disabled, so every item gets at least
-4 rolling crafts and about 6.7 on average (a negative binomial). Upgrade Base, Remove Affix and Add Socket never roll and still work
-at 100%, as do equipping, selling, salvaging, locking, stashing and the Destroy sweep. Because a blank base
+all crafting and socket/gem editing are refused (nothing is spent). Items that reach the seal through normal
+crafting get at least 4 rolling crafts and about 6.7 on average (a negative binomial). Upgrade Base, Remove Affix
+and Add Socket never gain corruption, but honor the 100% seal. Equipping, selling, salvaging, locking, stashing
+and the Destroy sweep remain available. Because a blank base
 may run out of crafts before it reaches a perfect roll, a base that already has good affixes matters. The
 Blacksmith asks to confirm every craft and adds a warning when the item is above 60% corruption.
 
@@ -114,6 +115,12 @@ change and it survives save/load, the personal stash and the shared stash. The B
 random number generator for the roll; it never touches the global, Combat or Loot streams, and bots and
 the smartbot (which call the craft functions directly) never roll corruption. Developer tools (F1, Items)
 can set or clear the value on bag items and mark the save as dev-used.
+
+**Corrupt Item** at the Blacksmith spends one **Abyssal Brand** on an owned, unequipped item below 100%.
+Outcomes: 15% destroy, 25% no modifier, 56% one corrupted prefix/suffix, 4% both. Every survivor becomes
+permanently sealed at 100%. All 82 data-driven corruption families are implemented with separate implicit
+slots, three ordinary tiers and individually gated exceptional effects. Existing Legendary properties and
+gems survive; destruction recovers gems once. See [corruption implementation and compatibility decisions](docs/CORRUPTION_SYSTEM.md).
 
 ## Architecture
 
@@ -138,7 +145,11 @@ scripts/entities/     Player, enemy, boss (data-driven attack patterns + phases)
 scripts/world/        Level base (grid, flow-field pathing, LoS, loot), hub, dungeon, generator
 scripts/ui/           HUD, panels (inventory, character, passives, skills, vendor,
                       blacksmith, stash, dungeon gate, pause, death), menus, tooltips
-scripts/gfx/art.gd    Original pixel art as palette grids, tiles, light textures (autoload Art)
+scripts/gfx/art.gd    Original pixel art as palette grids, tiles, light textures (autoload Art);
+                      also loads data/render.json and the sprite-sheet manifest data/art/sprites.json
+scripts/gfx/          sprite_anim.gd (sheet animation for actors), anim_rules.gd (directions, sync)
+assets/               new art: palette, sprite sheets, placeholders (see docs/ART_STYLE_GUIDE.md)
+tools/                python helpers: art_ingest, validate_art, make_placeholder_sheets, make_asset_list
 tests/                Headless acceptance tests, screenshot capture, balance bot
 ```
 
@@ -165,15 +176,31 @@ godot --headless --fixed-fps 60 --path . res://tests/items_crafting_only.tscn   
 godot --path . res://tests/screens_corruption.tscn -- /tmp/corruption             # corruption screenshots (needs a display)
 godot --headless --fixed-fps 60 --path . res://tests/train_only.tscn -- world    # Training Grounds checks only (~160, about 1 minute)
 godot --path . res://tests/screens_training.tscn -- /tmp/training                 # Training Grounds screenshots (needs a display)
+godot --headless --fixed-fps 60 --path . res://tests/art_only.tscn               # art pipeline checks only (~100, about 1 minute)
+godot --headless --fixed-fps 60 --path . res://tests/tree_only.tscn              # passive tree validator, save migration, flag behaviours, masteries (~740, under a minute)
+godot --path . res://tests/art_gallery.tscn                                       # art gallery: every sheet, animation and direction (F6 in the editor)
+godot --path . res://tests/screens_art.tscn -- /tmp/art                           # gallery pages + one combat shot per tier (needs a display)
+python tools/validate_art.py                                                      # sprite manifest vs files (needs Pillow)
 ```
+
+### Art pipeline (Phase V0)
+
+New art is PNG sprite sheets described by `data/art/sprites.json`, drawn at 32 px per cell and
+shown at half scale inside the 16-unit gameplay grid (`data/render.json`, see
+`docs/adr/0001-art-scale.md`), so gameplay numbers don't change. Each actor uses its sheets when
+they exist and its old ASCII sprite otherwise. Placeholder sheets for the warrior, ranger, mage
+and ghoul are in `assets/placeholders/`; they show in the gallery, and in game only when
+`"placeholders_in_game"` is true in `data/render.json` or Godot runs with `-- --art-placeholders`
+(`-- --art-fallback` forces the old art). Making and handing over art:
+`docs/ART_STYLE_GUIDE.md`; what's still needed, with prompts: `docs/ART_ASSET_LIST.md`.
 
 ## Implemented in this slice
 
 * Main menu, class selection with previews, settings, versioned save/load with 10 manual save slots and a rolling autosave (`user://saves/slot_01.json` ... `slot_10.json`, `autosave.json`). A save from the old single-file build (`user://pathofdan_save.json`) is imported into the first free slot once; the old file is left untouched. The autosave updates when you return to the hub, when you enter a dungeon, and every 2 minutes in the hub.
 * Warrior, Ranger, Mage with distinct attributes, equipment restrictions, starting gear and 80 skills (Warrior 24, Ranger 26, Mage 30), unlocked by level; 7-slot hotbar with cooldowns; dodge roll; flasks.
 * Warrior one-hand + shield (block) or two-handers; Ranger bows/firearms, mines and turrets; Mage elemental spells, blink and skeleton summons that follow you, path around walls, attack, die and carry over between areas.
-* Passive web: 203 nodes in 21 named clusters (14 keystones), three class starts linked by hybrid roads, a central hub and an outer Wanderer's Road joining six outer clusters (Sanguine Rites, Prismatic Ward, Windwalker, Executioner's Path, Mind Fortress, Void Communion) so every keystone is reachable by every class. Pan/zoom, search box, cluster labels, click any reachable node to allocate the whole route (previewed in blue), stat-change previews, gold-cost refunds that never disconnect the tree.
-* Loot: 129 item bases, 52 affixes with tiers, 5 rarities, item comparison tooltips with stat deltas, loot filter, sorting, selling, salvaging, stash, merchant stock.
+* Passive web: 203 nodes in 21 named clusters (14 keystones), three class starts linked by hybrid roads, a central hub and an outer Wanderer's Road joining six outer clusters (Sanguine Rites, Prismatic Ward, Windwalker, Executioner's Path, Mind Fortress, Void Communion) so every keystone is reachable by every class. Pan/zoom, search box, cluster labels, click any reachable node to allocate the whole route (previewed in blue), stat-change previews, gold-cost refunds that never disconnect the tree. Every node is tagged and keystones state their drawback (Mind over Matter gets one in Phase 2); the tree is generated from `data/tree_src/` by `tools/gen_clusters.py` and checked by a validator, and saves record a tree version so a changed tree refunds all points for free (see [passive tree data rules](docs/PASSIVE_TREE_DATA.md)).
+* Loot: 129 item bases, 58 affixes with tiers (incl. flat added damage, +spell levels and elemental penetration for spells), 5 rarities, item comparison tooltips with stat deltas, loot filter, sorting, selling, salvaging, stash, merchant stock.
 * Crafting: upgrade base, reroll / add / remove affix, raise rarity, add socket, salvage - each with costs, preview and confirmation. Add, reroll and raise rarity roll for item corruption (see Crafting corruption).
 * Sockets and gems: gear rolls 0-3 sockets (by slot; more likely at higher item level). 8 gem types x 4 grades (Chipped, Flawed, Polished, Flawless); each gem gives different stats in a weapon, armour or jewellery. The Jeweller (hub) sockets and removes gems, combines 3 into the next grade and sells random gems. Gems drop from monsters and return to you when an item is sold, salvaged or destroyed.
 * Charms: 10 charm bases for the charm slot with charm-only affixes (damage reduction, cooldown recovery, flask effect, life on kill, +1 to all skills and more).
@@ -188,13 +215,14 @@ godot --path . res://tests/screens_training.tscn -- /tmp/training               
 * Statuses: ignite, chill, freeze, shock (scaling magnitude), bleed, poison, stun, intimidate, frailty, marked, snare, agony; execute and range-based damage conditions.
 * Elite modifiers (10) including damage shields, summoners and blinkers.
 * Combat feedback: damage numbers, crits, hit flash, screen shake, telegraphs, status tints (ignite, chill, shock, bleed, stun).
+* Art pipeline (V0): sprite-sheet manifest, runtime animation for the player, enemies, bosses and minions (8 or 4 directions with mirroring and hysteresis; attack, cast and dodge stretched to gameplay timing with the impact frame on the hit; idle, run, hit, death), fallback to the old art for anything missing, ingest / validate / placeholder / asset-list tools, art gallery and screenshot scene, style guide. Smartbot results are byte-identical with the art on or off.
 * Training Grounds: Drillmaster Rook, single-target and three-dummy AoE DPS tests (10 s / 30 s, All sources or Player only, three defence profiles, Tight or Spread), per-skill attribution (statuses, minions, turrets and traps are credited to the skill that caused them), Result and History tabs with comparable-result deltas and build snapshots. Nothing in it changes gameplay or the save format.
 
 ## Known limitations / next steps
 
-* Crafting corruption: drops start at 0% (`drop_start` is in the data file for later), there is no way to cleanse corruption, the 50% chance does not rise as corruption grows, legendaries cannot be crafted so their corruption only shows on the tooltip, and the numbers are tuned by feel (60% chance, +25% step: 4 rolling crafts minimum, about 6.7 on average); the affix pools still make good items easy, which Dan plans to fix by adding weaker affixes. The tooltip bar is solid block characters because Godot 4.0 text boxes have no background colour tag.
+* Corruption: normal crafting retains its 60%/+25 gain tuning. The irreversible Brand action has fixed 15/25/56/4 outcomes and supports Legendary gear. Its Training Grounds matrix and economic scenarios are recorded in `docs/`; real dungeon clear-time and sustained economy tuning still require player telemetry. The tooltip bar uses solid block characters because Godot 4.0 text boxes have no background colour tag.
 * Training Grounds history is kept in memory for the session only (lost when the game closes); a per-character file is a possible later addition. The T3/T6 defence profiles use the tier's dungeon data (a spawn-weighted average of its normal enemies, or its boss) at your character's level, not a specific enemy. Passive and item procs that carry no skill are listed under "Other". There is no mortal-mode dummy and no damage-taken or movement measurement yet.
 * Higher tiers are tuned with the autoplay bot (which never dodges); expect to refine numbers after real play.
 * Skill catalogue is 80 of ~146 listed skills. New skills are mostly JSON entries using existing behaviours; channelled and transform skills need new behaviours.
 * Sound effects are procedural; no music yet; no controller bindings yet (all input goes through the input map, so adding a pad is a binding change).
-* Art is original placeholder-quality pixel art generated in code; swapping in hand-drawn sprite sheets is a change to `art.gd` only.
+* Art is still the original 16 px pixel art generated in code. The V0 pipeline is in place but no real sprite sheets exist yet (only labelled placeholders). Not done yet: weapon layer art, death animations for enemies (they still vanish at once), corpses, tiles, VFX, icons and UI art (phases V1-V6). Turrets, mines, pets, NPCs and the training dummy keep their old sprites until their phase. New 48 px figures are about 1.5x taller than today's sprites; collision is unchanged, so packs overlap more visually (to review with the first real art).

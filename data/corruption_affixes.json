@@ -1,0 +1,3161 @@
+[
+  {
+    "id": "cw_ruinous",
+    "name": "Ruinous",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "attack_weapon"
+    ],
+    "group": "cw_ruinous",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "attack_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 8,
+        "max": 10
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 11,
+        "max": 13
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 14,
+        "max": 16
+      }
+    ]
+  },
+  {
+    "id": "cw_grave_hewn",
+    "name": "Grave-Hewn",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "attack_weapon"
+    ],
+    "group": "cw_grave_hewn",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "physical_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 10,
+        "max": 13
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 14,
+        "max": 17
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 18,
+        "max": 21
+      }
+    ]
+  },
+  {
+    "id": "cw_embermarked",
+    "name": "Embermarked",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "weapon"
+    ],
+    "group": "cw_embermarked",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "fire_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 10,
+        "max": 13
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 14,
+        "max": 17
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 18,
+        "max": 21
+      }
+    ]
+  },
+  {
+    "id": "cw_frostscarred",
+    "name": "Frostscarred",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "weapon"
+    ],
+    "group": "cw_frostscarred",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "cold_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 10,
+        "max": 13
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 14,
+        "max": 17
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 18,
+        "max": 21
+      }
+    ]
+  },
+  {
+    "id": "cw_stormbranded",
+    "name": "Stormbranded",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "weapon"
+    ],
+    "group": "cw_stormbranded",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "lightning_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 10,
+        "max": 13
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 14,
+        "max": 17
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 18,
+        "max": 21
+      }
+    ]
+  },
+  {
+    "id": "cw_voidcarved",
+    "name": "Voidcarved",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 70,
+    "eligible_any_tags": [
+      "weapon"
+    ],
+    "group": "cw_voidcarved",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "void_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 6,
+        "max": 9
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 10,
+        "max": 13
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 14,
+        "max": 17
+      }
+    ]
+  },
+  {
+    "id": "cw_rift_woven",
+    "name": "Rift-Woven",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "caster_weapon"
+    ],
+    "group": "cw_rift_woven",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "arcane_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 6,
+        "max": 9
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 10,
+        "max": 13
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 14,
+        "max": 17
+      }
+    ]
+  },
+  {
+    "id": "cw_executioners",
+    "name": "Executioner’s",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 70,
+    "eligible_any_tags": [
+      "attack_weapon"
+    ],
+    "group": "cw_executioners",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "damage_vs_elite",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 4,
+        "max": 6
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 7,
+        "max": 9
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 10,
+        "max": 12
+      }
+    ]
+  },
+  {
+    "id": "cw_bonebound",
+    "name": "Bonebound",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 70,
+    "eligible_any_tags": [
+      "caster_weapon"
+    ],
+    "group": "cw_bonebound",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "minion_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 7,
+        "max": 10
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 11,
+        "max": 14
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 15,
+        "max": 18
+      }
+    ]
+  },
+  {
+    "id": "cw_iron_commanded",
+    "name": "Iron-Commanded",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 65,
+    "eligible_any_tags": [
+      "ranged_weapon",
+      "caster_weapon"
+    ],
+    "group": "cw_iron_commanded",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "turret_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 7,
+        "max": 10
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 11,
+        "max": 14
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 15,
+        "max": 18
+      }
+    ]
+  },
+  {
+    "id": "cw_saboteurs",
+    "name": "Saboteur’s",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 65,
+    "eligible_any_tags": [
+      "ranged_weapon"
+    ],
+    "group": "cw_saboteurs",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "trap_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 7,
+        "max": 10
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 11,
+        "max": 14
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 15,
+        "max": 18
+      }
+    ]
+  },
+  {
+    "id": "cw_shepherds",
+    "name": "Shepherd’s",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "signature",
+    "family_weight": 35,
+    "eligible_any_tags": [
+      "caster_weapon"
+    ],
+    "group": "active_minion_limit",
+    "min_item_level": 30,
+    "phase": 3,
+    "effects": [
+      {
+        "stat": "minion_limit",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "fixed_value": 1
+  },
+  {
+    "id": "cw_war_saints",
+    "name": "War-Saint’s",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "mythic",
+    "family_weight": 25,
+    "eligible_any_tags": [
+      "melee_weapon"
+    ],
+    "group": "cw_war_saints",
+    "min_item_level": 40,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "tagged_skill_level:melee",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "cw_war_saints",
+    "fixed_value": 1
+  },
+  {
+    "id": "cw_apostates",
+    "name": "Apostate’s",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "mythic",
+    "family_weight": 25,
+    "eligible_any_tags": [
+      "caster_weapon"
+    ],
+    "group": "cw_apostates",
+    "min_item_level": 40,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "tagged_skill_level:spell",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "cw_apostates",
+    "fixed_value": 1
+  },
+  {
+    "id": "cw_splintered_fate",
+    "name": "Splintered Fate",
+    "pool": "weapon",
+    "side": "prefix",
+    "rarity_class": "mythic",
+    "family_weight": 15,
+    "eligible_any_tags": [
+      "bow",
+      "firearm"
+    ],
+    "group": "additional_projectile",
+    "min_item_level": 40,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "tagged_projectile_count:weapon_attack",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "cw_splintered_fate",
+    "fixed_value": 1
+  },
+  {
+    "id": "cw_of_frenzy",
+    "name": "of Frenzy",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "attack_weapon"
+    ],
+    "group": "cw_of_frenzy",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "attack_speed",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 4,
+        "max": 5
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 6,
+        "max": 7
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 8,
+        "max": 8
+      }
+    ]
+  },
+  {
+    "id": "cw_of_spellweaving",
+    "name": "of Spellweaving",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "caster_weapon"
+    ],
+    "group": "cw_of_spellweaving",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "cast_speed",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 4,
+        "max": 5
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 6,
+        "max": 7
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 8,
+        "max": 8
+      }
+    ]
+  },
+  {
+    "id": "cw_of_ruin",
+    "name": "of Ruin",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "attack_weapon",
+      "caster_weapon"
+    ],
+    "group": "cw_of_ruin",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "crit_multi",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 7,
+        "max": 9
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 10,
+        "max": 12
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 13,
+        "max": 15
+      }
+    ]
+  },
+  {
+    "id": "cw_of_precision",
+    "name": "of Precision",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "attack_weapon",
+      "caster_weapon"
+    ],
+    "group": "cw_of_precision",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "crit_chance",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 4,
+        "max": 6
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 7,
+        "max": 9
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 10,
+        "max": 12
+      }
+    ]
+  },
+  {
+    "id": "cw_of_long_hunt",
+    "name": "of the Long Hunt",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "ranged_weapon"
+    ],
+    "group": "cw_of_long_hunt",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "projectile_speed",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 9,
+        "max": 11
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 12,
+        "max": 14
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 15,
+        "max": 17
+      }
+    ]
+  },
+  {
+    "id": "cw_of_red_wound",
+    "name": "of the Red Wound",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 65,
+    "eligible_any_tags": [
+      "melee_weapon",
+      "ranged_weapon"
+    ],
+    "group": "cw_of_red_wound",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "bleed_chance",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 3,
+        "max": 5
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 6,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 9,
+        "max": 11
+      }
+    ]
+  },
+  {
+    "id": "cw_of_shattered_focus",
+    "name": "of Shattered Focus",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 70,
+    "eligible_any_tags": [
+      "weapon"
+    ],
+    "group": "cw_of_shattered_focus",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "area",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 3,
+        "max": 5
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 6,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 9,
+        "max": 11
+      }
+    ]
+  },
+  {
+    "id": "cw_of_clockwork_fury",
+    "name": "of Clockwork Fury",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 65,
+    "eligible_any_tags": [
+      "ranged_weapon",
+      "caster_weapon"
+    ],
+    "group": "cw_of_clockwork_fury",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "turret_speed",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 4,
+        "max": 6
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 7,
+        "max": 9
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 10,
+        "max": 12
+      }
+    ]
+  },
+  {
+    "id": "cw_of_lingering_agony",
+    "name": "of Lingering Agony",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "weapon"
+    ],
+    "group": "cw_of_lingering_agony",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "status_duration",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 8
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 13,
+        "max": 16
+      }
+    ]
+  },
+  {
+    "id": "cw_of_reclamation",
+    "name": "of Reclamation",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "signature",
+    "family_weight": 55,
+    "eligible_any_tags": [
+      "attack_weapon"
+    ],
+    "group": "cw_of_reclamation",
+    "min_item_level": 30,
+    "phase": 3,
+    "effects": [
+      {
+        "stat": "life_on_hit",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "fixed_value": 3
+  },
+  {
+    "id": "cw_of_fracturing",
+    "name": "of Fracturing",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "signature",
+    "family_weight": 50,
+    "eligible_any_tags": [
+      "bow",
+      "firearm"
+    ],
+    "group": "extra_pierce",
+    "min_item_level": 30,
+    "phase": 3,
+    "effects": [
+      {
+        "stat": "pierce",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "fixed_value": 1
+  },
+  {
+    "id": "cw_of_second_echo",
+    "name": "of the Second Echo",
+    "pool": "weapon",
+    "side": "suffix",
+    "rarity_class": "mythic",
+    "family_weight": 15,
+    "eligible_any_tags": [
+      "ranged_weapon",
+      "caster_weapon"
+    ],
+    "group": "extra_chain",
+    "min_item_level": 40,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "chain",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "cw_of_second_echo",
+    "fixed_value": 1
+  },
+  {
+    "id": "ca_hollowhearted",
+    "name": "Hollowhearted",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_hollowhearted",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "max_life",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 4,
+        "max": 5
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 6,
+        "max": 7
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 8,
+        "max": 8
+      }
+    ]
+  },
+  {
+    "id": "ca_voidfilled",
+    "name": "Voidfilled",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_voidfilled",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "max_mana",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 6
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 7,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 9,
+        "max": 9
+      }
+    ]
+  },
+  {
+    "id": "ca_threefold",
+    "name": "Threefold",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 90,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_threefold",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "res_fire",
+        "type": "flat",
+        "value_source": "tier_roll"
+      },
+      {
+        "stat": "res_cold",
+        "type": "flat",
+        "value_source": "tier_roll"
+      },
+      {
+        "stat": "res_lightning",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 3,
+        "max": 3
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 4,
+        "max": 4
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 5,
+        "max": 5
+      }
+    ]
+  },
+  {
+    "id": "ca_runebound",
+    "name": "Runebound",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_runebound",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 3,
+        "max": 5
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 6,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 9,
+        "max": 11
+      }
+    ]
+  },
+  {
+    "id": "ca_blood_oathed",
+    "name": "Blood-Oathed",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_blood_oathed",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "physical_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 7
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 8,
+        "max": 10
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 11,
+        "max": 13
+      }
+    ]
+  },
+  {
+    "id": "ca_prismatic",
+    "name": "Prismatic",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_prismatic",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "elemental_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 7
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 8,
+        "max": 10
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 11,
+        "max": 13
+      }
+    ]
+  },
+  {
+    "id": "ca_grave_sworn",
+    "name": "Grave-Sworn",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 70,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_grave_sworn",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "minion_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 8
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 13,
+        "max": 16
+      }
+    ]
+  },
+  {
+    "id": "ca_dread_touched",
+    "name": "Dread-Touched",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 70,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_dread_touched",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "void_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      },
+      {
+        "stat": "arcane_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 4,
+        "max": 6
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 7,
+        "max": 9
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 10,
+        "max": 12
+      }
+    ]
+  },
+  {
+    "id": "ca_soul_shepherd",
+    "name": "Soul Shepherd",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "signature",
+    "family_weight": 45,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "active_minion_limit",
+    "min_item_level": 30,
+    "phase": 3,
+    "effects": [
+      {
+        "stat": "minion_limit",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "fixed_value": 1
+  },
+  {
+    "id": "ca_master_constructs",
+    "name": "Master of Constructs",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "signature",
+    "family_weight": 45,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_master_constructs",
+    "min_item_level": 30,
+    "phase": 3,
+    "effects": [
+      {
+        "stat": "turret_limit",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "fixed_value": 1
+  },
+  {
+    "id": "ca_forbidden_knowledge",
+    "name": "Forbidden Knowledge",
+    "pool": "amulet",
+    "side": "prefix",
+    "rarity_class": "mythic",
+    "family_weight": 10,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_forbidden_knowledge",
+    "min_item_level": 40,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "skill_level:active",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "ca_forbidden_knowledge",
+    "fixed_value": 1
+  },
+  {
+    "id": "ca_of_hastened_rituals",
+    "name": "of Hastened Rituals",
+    "pool": "amulet",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_of_hastened_rituals",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "cooldown_recovery",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 6
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 7,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 9,
+        "max": 10
+      }
+    ]
+  },
+  {
+    "id": "ca_of_covetous",
+    "name": "of the Covetous",
+    "pool": "amulet",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_of_covetous",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "item_rarity",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 13,
+        "max": 16
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 17,
+        "max": 20
+      }
+    ]
+  },
+  {
+    "id": "ca_of_returning_spirits",
+    "name": "of Returning Spirits",
+    "pool": "amulet",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_of_returning_spirits",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "life_on_kill",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 6
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 7,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 9,
+        "max": 10
+      }
+    ]
+  },
+  {
+    "id": "ca_of_unbroken_will",
+    "name": "of Unbroken Will",
+    "pool": "amulet",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_of_unbroken_will",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "mana_regen",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 8
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 13,
+        "max": 16
+      }
+    ]
+  },
+  {
+    "id": "ca_of_final_blow",
+    "name": "of the Final Blow",
+    "pool": "amulet",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 65,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_of_final_blow",
+    "min_item_level": 1,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "conditional_inc_damage:target_below_35pct_life",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "requires_feature": "ca_of_final_blow",
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 7
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 8,
+        "max": 10
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 11,
+        "max": 13
+      }
+    ]
+  },
+  {
+    "id": "ca_of_brutal_precision",
+    "name": "of Brutal Precision",
+    "pool": "amulet",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_of_brutal_precision",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "crit_multi",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 7
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 8,
+        "max": 10
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 11,
+        "max": 13
+      }
+    ]
+  },
+  {
+    "id": "ca_of_forbidden_momentum",
+    "name": "of Forbidden Momentum",
+    "pool": "amulet",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 65,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_of_forbidden_momentum",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "move_speed",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 2,
+        "max": 2
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 3,
+        "max": 3
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 4,
+        "max": 4
+      }
+    ]
+  },
+  {
+    "id": "ca_of_affliction",
+    "name": "of Affliction",
+    "pool": "amulet",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_of_affliction",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "dot_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 8
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 13,
+        "max": 16
+      }
+    ]
+  },
+  {
+    "id": "ca_of_stolen_moments",
+    "name": "of Stolen Moments",
+    "pool": "amulet",
+    "side": "suffix",
+    "rarity_class": "signature",
+    "family_weight": 35,
+    "eligible_any_tags": [
+      "amulet"
+    ],
+    "group": "ca_of_stolen_moments",
+    "min_item_level": 30,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "on_elite_kill_mana_pct",
+        "type": "proc",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "ca_of_stolen_moments",
+    "fixed_value": 3
+  },
+  {
+    "id": "ce_blood_sealed",
+    "name": "Blood-Sealed",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "chest",
+      "belt",
+      "shield"
+    ],
+    "group": "ce_blood_sealed",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "max_life",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 3,
+        "max": 3
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 4,
+        "max": 4
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 5,
+        "max": 5
+      }
+    ]
+  },
+  {
+    "id": "ce_ironbound",
+    "name": "Ironbound",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "helmet",
+      "chest",
+      "shield"
+    ],
+    "group": "ce_ironbound",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "armour",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 13,
+        "max": 16
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 17,
+        "max": 20
+      }
+    ]
+  },
+  {
+    "id": "ce_ghostwoven",
+    "name": "Ghostwoven",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "helmet",
+      "chest",
+      "boots"
+    ],
+    "group": "ce_ghostwoven",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "evasion",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 13,
+        "max": 16
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 17,
+        "max": 20
+      }
+    ]
+  },
+  {
+    "id": "ce_ward_touched",
+    "name": "Ward-Touched",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "chest",
+      "ring",
+      "shield",
+      "caster_offhand"
+    ],
+    "group": "ce_ward_touched",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "res_arcane",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 6
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 7,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 9,
+        "max": 10
+      }
+    ]
+  },
+  {
+    "id": "ce_abyss_warded",
+    "name": "Abyss-Warded",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "chest",
+      "ring",
+      "shield",
+      "caster_offhand"
+    ],
+    "group": "ce_abyss_warded",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "res_void",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 6
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 7,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 9,
+        "max": 10
+      }
+    ]
+  },
+  {
+    "id": "ce_stoneblood",
+    "name": "Stoneblood",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 80,
+    "eligible_any_tags": [
+      "helmet",
+      "chest",
+      "belt"
+    ],
+    "group": "ce_stoneblood",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "stun_threshold",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 6,
+        "max": 9
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 10,
+        "max": 13
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 14,
+        "max": 17
+      }
+    ]
+  },
+  {
+    "id": "ce_gravekeepers",
+    "name": "Gravekeeper’s",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "helmet",
+      "caster_offhand"
+    ],
+    "group": "ce_gravekeepers",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "minion_life",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 6,
+        "max": 9
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 10,
+        "max": 13
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 14,
+        "max": 17
+      }
+    ]
+  },
+  {
+    "id": "ce_fletchers",
+    "name": "Fletcher’s",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 80,
+    "eligible_any_tags": [
+      "gloves",
+      "quiver"
+    ],
+    "group": "ce_fletchers",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "projectile_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 8
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 13,
+        "max": 16
+      }
+    ]
+  },
+  {
+    "id": "ce_battleworn",
+    "name": "Battleworn",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "gloves",
+      "shield"
+    ],
+    "group": "ce_battleworn",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "melee_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 8
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 13,
+        "max": 16
+      }
+    ]
+  },
+  {
+    "id": "ce_arcane_fed",
+    "name": "Arcane-Fed",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "helmet",
+      "caster_offhand"
+    ],
+    "group": "ce_arcane_fed",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "spell_damage",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 8
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 13,
+        "max": 16
+      }
+    ]
+  },
+  {
+    "id": "ce_soulfilled",
+    "name": "Soulfilled",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "charm"
+    ],
+    "group": "ce_soulfilled",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "max_mana",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 2,
+        "max": 2
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 3,
+        "max": 3
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 4,
+        "max": 4
+      }
+    ]
+  },
+  {
+    "id": "ce_heartbound",
+    "name": "Heartbound",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "charm"
+    ],
+    "group": "ce_heartbound",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "max_life",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 2,
+        "max": 2
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 3,
+        "max": 3
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 4,
+        "max": 4
+      }
+    ]
+  },
+  {
+    "id": "ce_dreadward",
+    "name": "Dreadward",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "specialized",
+    "family_weight": 65,
+    "eligible_any_tags": [
+      "charm"
+    ],
+    "group": "ce_dreadward",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "res_void",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 3,
+        "max": 3
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 5,
+        "max": 5
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 7,
+        "max": 7
+      }
+    ]
+  },
+  {
+    "id": "ce_deathless",
+    "name": "Death’s Apprentice",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "signature",
+    "family_weight": 40,
+    "eligible_any_tags": [
+      "caster_offhand"
+    ],
+    "group": "active_minion_limit",
+    "min_item_level": 30,
+    "phase": 3,
+    "effects": [
+      {
+        "stat": "minion_limit",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "fixed_value": 1
+  },
+  {
+    "id": "ce_of_deathless",
+    "name": "of the Deathless",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "signature",
+    "family_weight": 45,
+    "eligible_any_tags": [
+      "helmet"
+    ],
+    "group": "ce_of_deathless",
+    "min_item_level": 30,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "conditional_minion_damage:player_below_35pct_life",
+        "type": "inc",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "ce_of_deathless",
+    "fixed_value": 15
+  },
+  {
+    "id": "ce_grasping_shadows",
+    "name": "Grasping Shadows",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "mythic",
+    "family_weight": 20,
+    "eligible_any_tags": [
+      "gloves"
+    ],
+    "group": "extra_pierce",
+    "min_item_level": 40,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "tagged_pierce:projectile_attack",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "ce_grasping_shadows",
+    "fixed_value": 1
+  },
+  {
+    "id": "ce_sovereigns",
+    "name": "Sovereign’s",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "mythic",
+    "family_weight": 10,
+    "eligible_any_tags": [
+      "shield"
+    ],
+    "group": "ce_sovereigns",
+    "min_item_level": 40,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "maximum_elemental_resistance",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "ce_sovereigns",
+    "fixed_value": 1
+  },
+  {
+    "id": "ce_bastions",
+    "name": "Bastion’s",
+    "pool": "equipment",
+    "side": "prefix",
+    "rarity_class": "signature",
+    "family_weight": 25,
+    "eligible_any_tags": [
+      "chest"
+    ],
+    "group": "ce_bastions",
+    "min_item_level": 30,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "damage_reduction_vs_hit",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "ce_bastions",
+    "fixed_value": 2
+  },
+  {
+    "id": "ce_of_quickstep",
+    "name": "of Quickstep",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "boots"
+    ],
+    "group": "ce_of_quickstep",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "move_speed",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 2,
+        "max": 3
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 4,
+        "max": 5
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 6,
+        "max": 7
+      }
+    ]
+  },
+  {
+    "id": "ce_of_haste",
+    "name": "of Haste",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "gloves"
+    ],
+    "group": "ce_of_haste",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "attack_speed",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 3,
+        "max": 4
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 5,
+        "max": 6
+      }
+    ]
+  },
+  {
+    "id": "ce_of_invocations",
+    "name": "of Invocations",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "gloves",
+      "caster_offhand"
+    ],
+    "group": "ce_of_invocations",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "cast_speed",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 3,
+        "max": 4
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 5,
+        "max": 6
+      }
+    ]
+  },
+  {
+    "id": "ce_of_retaliation",
+    "name": "of Retaliation",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "shield"
+    ],
+    "group": "ce_of_retaliation",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "block_chance",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 2,
+        "max": 2
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 3,
+        "max": 3
+      }
+    ]
+  },
+  {
+    "id": "ce_of_overflowing_mana",
+    "name": "of Overflowing Mana",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "ring",
+      "caster_offhand"
+    ],
+    "group": "ce_of_overflowing_mana",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "mana_regen",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 8
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 9,
+        "max": 12
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 13,
+        "max": 16
+      }
+    ]
+  },
+  {
+    "id": "ce_of_greed",
+    "name": "of Greed",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "ring",
+      "belt",
+      "charm"
+    ],
+    "group": "ce_of_greed",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "item_rarity",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 3,
+        "max": 5
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 6,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 9,
+        "max": 11
+      }
+    ]
+  },
+  {
+    "id": "ce_of_unseen_arrows",
+    "name": "of Unseen Arrows",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 80,
+    "eligible_any_tags": [
+      "quiver"
+    ],
+    "group": "ce_of_unseen_arrows",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "projectile_speed",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 6,
+        "max": 9
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 10,
+        "max": 13
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 14,
+        "max": 17
+      }
+    ]
+  },
+  {
+    "id": "ce_of_restored_blood",
+    "name": "of Restored Blood",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "ring",
+      "belt",
+      "charm"
+    ],
+    "group": "ce_of_restored_blood",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "life_on_kill",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 2,
+        "max": 3
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 4,
+        "max": 5
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 6,
+        "max": 7
+      }
+    ]
+  },
+  {
+    "id": "ce_of_watchful",
+    "name": "of the Watchful",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "helmet",
+      "caster_offhand",
+      "charm"
+    ],
+    "group": "ce_of_watchful",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "cooldown_recovery",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 2,
+        "max": 3
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 4,
+        "max": 5
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 6,
+        "max": 7
+      }
+    ]
+  },
+  {
+    "id": "ce_of_prepared_strikes",
+    "name": "of Prepared Strikes",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "specialized",
+    "family_weight": 75,
+    "eligible_any_tags": [
+      "gloves",
+      "quiver"
+    ],
+    "group": "ce_of_prepared_strikes",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "crit_chance",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 3,
+        "max": 5
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 6,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 9,
+        "max": 11
+      }
+    ]
+  },
+  {
+    "id": "ce_of_steadfastness",
+    "name": "of Steadfastness",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "chest",
+      "boots"
+    ],
+    "group": "ce_of_steadfastness",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "stun_threshold",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 5
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 8,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 11,
+        "max": 11
+      }
+    ]
+  },
+  {
+    "id": "ce_of_bulwark",
+    "name": "of the Bulwark",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 90,
+    "eligible_any_tags": [
+      "shield",
+      "chest"
+    ],
+    "group": "ce_of_bulwark",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "res_fire",
+        "type": "flat",
+        "value_source": "tier_roll"
+      },
+      {
+        "stat": "res_cold",
+        "type": "flat",
+        "value_source": "tier_roll"
+      },
+      {
+        "stat": "res_lightning",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 2,
+        "max": 2
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 3,
+        "max": 3
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 4,
+        "max": 4
+      }
+    ]
+  },
+  {
+    "id": "ce_of_winters_passage",
+    "name": "of Winter’s Passage",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "boots"
+    ],
+    "group": "ce_of_winters_passage",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "res_cold",
+        "type": "flat",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 3,
+        "max": 3
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 5,
+        "max": 5
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 7,
+        "max": 7
+      }
+    ]
+  },
+  {
+    "id": "ce_of_quiet_thought",
+    "name": "of Quiet Thought",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "common",
+    "family_weight": 100,
+    "eligible_any_tags": [
+      "helmet"
+    ],
+    "group": "ce_of_quiet_thought",
+    "min_item_level": 1,
+    "phase": 2,
+    "effects": [
+      {
+        "stat": "mana_regen",
+        "type": "inc",
+        "value_source": "tier_roll"
+      }
+    ],
+    "fixed_tier": false,
+    "tiers": [
+      {
+        "tier": 3,
+        "min_item_level": 1,
+        "min": 5,
+        "max": 5
+      },
+      {
+        "tier": 2,
+        "min_item_level": 28,
+        "min": 8,
+        "max": 8
+      },
+      {
+        "tier": 1,
+        "min_item_level": 40,
+        "min": 11,
+        "max": 11
+      }
+    ]
+  },
+  {
+    "id": "ce_of_second_wind",
+    "name": "of the Second Wind",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "signature",
+    "family_weight": 35,
+    "eligible_any_tags": [
+      "boots"
+    ],
+    "group": "ce_of_second_wind",
+    "min_item_level": 30,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "on_dodge_mana_pct_icd8s",
+        "type": "proc",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "ce_of_second_wind",
+    "fixed_value": 10
+  },
+  {
+    "id": "ce_of_endless_preparation",
+    "name": "of Endless Preparation",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "signature",
+    "family_weight": 25,
+    "eligible_any_tags": [
+      "belt"
+    ],
+    "group": "ce_of_endless_preparation",
+    "min_item_level": 30,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "trap_limit",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "ce_of_endless_preparation",
+    "fixed_value": 1
+  },
+  {
+    "id": "ce_of_relentless",
+    "name": "of the Relentless",
+    "pool": "equipment",
+    "side": "suffix",
+    "rarity_class": "mythic",
+    "family_weight": 15,
+    "eligible_any_tags": [
+      "quiver"
+    ],
+    "group": "additional_projectile",
+    "min_item_level": 40,
+    "phase": 4,
+    "effects": [
+      {
+        "op": "tagged_projectile_count:bow_attack",
+        "type": "flat",
+        "value_source": "fixed"
+      }
+    ],
+    "fixed_tier": true,
+    "requires_feature": "ce_of_relentless",
+    "fixed_value": 1
+  }
+]

@@ -1,0 +1,1975 @@
+{
+ "_about": "Source for the generated part of data/passive_tree.json. Edit this, then run tools/gen_clusters.py. Ids are stable: never reuse or renumber them.",
+ "geometry": {
+  "center_r": 1130,
+  "ks_r": 1380,
+  "ring_r": 120,
+  "ring_step_deg": -45
+ },
+ "clusters": [
+  {
+   "prefix": "xs",
+   "name": "Sanguine Rites",
+   "angle": 90,
+   "ring": [
+    {
+     "name": "Blood Drinker",
+     "type": "notable",
+     "mods": [
+      {
+       "stat": "physical_damage",
+       "type": "inc",
+       "value": 12
+      }
+     ],
+     "desc": "2% of hit damage you deal is leeched as life.",
+     "flags": [
+      "vampiric"
+     ],
+     "tags": [
+      "life",
+      "physical",
+      "sustain"
+     ]
+    },
+    {
+     "name": "Sanguine Study",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "physical_damage",
+       "type": "inc",
+       "value": 6
+      }
+     ],
+     "tags": [
+      "physical"
+     ]
+    },
+    {
+     "name": "Open Veins",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "bleed_chance",
+       "type": "flat",
+       "value": 8
+      },
+      {
+       "stat": "dot_damage",
+       "type": "inc",
+       "value": 15
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "bleed",
+      "dot",
+      "physical"
+     ]
+    },
+    {
+     "name": "Sanguine Focus",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "bleed_chance",
+       "type": "flat",
+       "value": 4
+      }
+     ],
+     "tags": [
+      "bleed",
+      "physical"
+     ]
+    },
+    {
+     "name": "Sanguine Practice",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "physical_damage",
+       "type": "inc",
+       "value": 6
+      }
+     ],
+     "tags": [
+      "physical"
+     ]
+    },
+    {
+     "name": "Sanguine Lore",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "life_on_hit",
+       "type": "flat",
+       "value": 1
+      }
+     ],
+     "tags": [
+      "life",
+      "sustain"
+     ]
+    },
+    {
+     "name": "Iron Blood",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "max_life",
+       "type": "inc",
+       "value": 6
+      },
+      {
+       "stat": "life_regen",
+       "type": "flat",
+       "value": 2
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "life"
+     ]
+    },
+    {
+     "name": "Sanguine Insight",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "physical_damage",
+       "type": "inc",
+       "value": 6
+      }
+     ],
+     "tags": [
+      "physical"
+     ]
+    }
+   ],
+   "keystone": {
+    "name": "Crimson Dance",
+    "mods": [
+     {
+      "stat": "bleed_chance",
+      "type": "flat",
+      "value": 20
+     },
+     {
+      "stat": "damage",
+      "type": "more",
+      "value": -10
+     }
+    ],
+    "desc": "Your bleeds deal 60% more damage and last 50% longer. Your hits deal 10% less damage.",
+    "flags": [
+     "crimson_dance"
+    ],
+    "tags": [
+     "bleed",
+     "generic",
+     "physical"
+    ],
+    "drawback": "Your hits deal 10% less damage."
+   },
+   "paths": [
+    {
+     "group": "0",
+     "from": "w_brutal",
+     "to_ring": 5,
+     "nodes": [
+      {
+       "name": "Sanguine Path",
+       "mods": [
+        {
+         "stat": "physical_damage",
+         "type": "inc",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "physical"
+       ]
+      },
+      {
+       "name": "Sanguine Path",
+       "mods": [
+        {
+         "stat": "life_on_hit",
+         "type": "flat",
+         "value": 1
+        }
+       ],
+       "tags": [
+        "life",
+        "sustain"
+       ]
+      },
+      {
+       "name": "Sanguine Path",
+       "mods": [
+        {
+         "stat": "bleed_chance",
+         "type": "flat",
+         "value": 4
+        }
+       ],
+       "tags": [
+        "bleed",
+        "physical"
+       ]
+      }
+     ]
+    },
+    {
+     "group": "1",
+     "from": "r_deadeye",
+     "to_ring": 3,
+     "nodes": [
+      {
+       "name": "Sanguine Path",
+       "mods": [
+        {
+         "stat": "life_on_hit",
+         "type": "flat",
+         "value": 1
+        }
+       ],
+       "tags": [
+        "life",
+        "sustain"
+       ]
+      },
+      {
+       "name": "Sanguine Path",
+       "mods": [
+        {
+         "stat": "bleed_chance",
+         "type": "flat",
+         "value": 4
+        }
+       ],
+       "tags": [
+        "bleed",
+        "physical"
+       ]
+      },
+      {
+       "name": "Sanguine Path",
+       "mods": [
+        {
+         "stat": "physical_damage",
+         "type": "inc",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "physical"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "prefix": "xp",
+   "name": "Prismatic Ward",
+   "angle": -30,
+   "ring": [
+    {
+     "name": "Elemental Warding",
+     "type": "notable",
+     "mods": [
+      {
+       "stat": "res_fire",
+       "type": "flat",
+       "value": 8
+      },
+      {
+       "stat": "res_cold",
+       "type": "flat",
+       "value": 8
+      },
+      {
+       "stat": "res_lightning",
+       "type": "flat",
+       "value": 8
+      }
+     ],
+     "desc": "Ignite, Chill, Freeze and Shock on you last 50% shorter. +8% fire, cold and lightning resistance.",
+     "tags": [
+      "resist",
+      "ignite",
+      "chill",
+      "freeze",
+      "shock",
+      "defence"
+     ],
+     "flags": [
+      "elemental_warding"
+     ],
+     "rev": 3
+    },
+    {
+     "name": "Prismatic Study",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "res_cold",
+       "type": "flat",
+       "value": 6
+      }
+     ],
+     "tags": [
+      "cold",
+      "resist"
+     ]
+    },
+    {
+     "name": "Storm Shell",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "res_lightning",
+       "type": "flat",
+       "value": 10
+      },
+      {
+       "stat": "lightning_damage",
+       "type": "inc",
+       "value": 12
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "lightning",
+      "resist"
+     ]
+    },
+    {
+     "name": "Prismatic Focus",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "elemental_damage",
+       "type": "inc",
+       "value": 5
+      }
+     ],
+     "tags": [
+      "elemental"
+     ]
+    },
+    {
+     "name": "Prismatic Practice",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "res_fire",
+       "type": "flat",
+       "value": 6
+      }
+     ],
+     "tags": [
+      "fire",
+      "resist"
+     ]
+    },
+    {
+     "name": "Prismatic Lore",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "res_cold",
+       "type": "flat",
+       "value": 6
+      }
+     ],
+     "tags": [
+      "cold",
+      "resist"
+     ]
+    },
+    {
+     "name": "Hearthguard",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "res_fire",
+       "type": "flat",
+       "value": 10
+      },
+      {
+       "stat": "res_cold",
+       "type": "flat",
+       "value": 10
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "cold",
+      "fire",
+      "resist"
+     ]
+    },
+    {
+     "name": "Prismatic Insight",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "elemental_damage",
+       "type": "inc",
+       "value": 5
+      }
+     ],
+     "tags": [
+      "elemental"
+     ]
+    }
+   ],
+   "keystone": {
+    "name": "Prismatic Soul",
+    "mods": [
+     {
+      "stat": "res_fire",
+      "type": "flat",
+      "value": 25
+     },
+     {
+      "stat": "res_cold",
+      "type": "flat",
+      "value": 25
+     },
+     {
+      "stat": "res_lightning",
+      "type": "flat",
+      "value": 25
+     },
+     {
+      "stat": "elemental_damage",
+      "type": "more",
+      "value": 15
+     },
+     {
+      "stat": "armour",
+      "type": "more",
+      "value": -40
+     },
+     {
+      "stat": "evasion",
+      "type": "more",
+      "value": -40
+     }
+    ],
+    "desc": "You cannot be Ignited, Chilled, Frozen or Shocked. +25% fire, cold and lightning resistance and 15% more elemental damage. You cannot inflict Ignite, Chill, Freeze or Shock, and you have 40% less armour and evasion.",
+    "tags": [
+     "armour",
+     "chill",
+     "cold",
+     "defence",
+     "elemental",
+     "evasion",
+     "fire",
+     "freeze",
+     "ignite",
+     "lightning",
+     "resist",
+     "shock"
+    ],
+    "drawback": "You cannot inflict Ignite, Chill, Freeze or Shock. 40% less armour and evasion.",
+    "flags": [
+     "prismatic_soul"
+    ],
+    "rev": 3,
+    "exclusive_with": [
+     "p2_ks_embers",
+     "p3b_fw_cap"
+    ]
+   },
+   "paths": [
+    {
+     "group": "0",
+     "from": "h_rm3",
+     "to_ring": 4,
+     "nodes": [
+      {
+       "name": "Prismatic Path",
+       "mods": [
+        {
+         "stat": "res_cold",
+         "type": "flat",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "cold",
+        "resist"
+       ]
+      },
+      {
+       "name": "Prismatic Path",
+       "mods": [
+        {
+         "stat": "res_lightning",
+         "type": "flat",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "lightning",
+        "resist"
+       ]
+      },
+      {
+       "name": "Prismatic Path",
+       "mods": [
+        {
+         "stat": "elemental_damage",
+         "type": "inc",
+         "value": 5
+        }
+       ],
+       "tags": [
+        "elemental"
+       ]
+      }
+     ]
+    },
+    {
+     "group": "1",
+     "from": "m_command",
+     "to_ring": 3,
+     "nodes": [
+      {
+       "name": "Prismatic Path",
+       "mods": [
+        {
+         "stat": "res_lightning",
+         "type": "flat",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "lightning",
+        "resist"
+       ]
+      },
+      {
+       "name": "Prismatic Path",
+       "mods": [
+        {
+         "stat": "elemental_damage",
+         "type": "inc",
+         "value": 5
+        }
+       ],
+       "tags": [
+        "elemental"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "prefix": "xw",
+   "name": "Windwalker",
+   "angle": 30,
+   "ring": [
+    {
+     "name": "Tailwind",
+     "type": "notable",
+     "mods": [
+      {
+       "stat": "move_speed",
+       "type": "inc",
+       "value": 8
+      },
+      {
+       "stat": "cooldown_recovery",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "desc": "Using a movement skill (dash, leap or blink) resets your dodge roll cooldown. 8% increased movement speed and cooldown recovery.",
+     "tags": [
+      "mobility",
+      "dodge",
+      "cooldown"
+     ],
+     "flags": [
+      "tailwind"
+     ],
+     "rev": 3
+    },
+    {
+     "name": "Windwalker Study",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "evasion",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "tags": [
+      "defence",
+      "evasion"
+     ]
+    },
+    {
+     "name": "Gale Steps",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "move_speed",
+       "type": "inc",
+       "value": 6
+      },
+      {
+       "stat": "evasion",
+       "type": "inc",
+       "value": 15
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "defence",
+      "evasion",
+      "mobility",
+      "speed"
+     ]
+    },
+    {
+     "name": "Windwalker Focus",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "move_speed",
+       "type": "inc",
+       "value": 3
+      }
+     ],
+     "tags": [
+      "mobility",
+      "speed"
+     ]
+    },
+    {
+     "name": "Windwalker Practice",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "evasion",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "tags": [
+      "defence",
+      "evasion"
+     ]
+    },
+    {
+     "name": "Windwalker Lore",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "attack_speed",
+       "type": "inc",
+       "value": 3
+      }
+     ],
+     "tags": [
+      "attack",
+      "speed"
+     ]
+    },
+    {
+     "name": "Flurry",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "attack_speed",
+       "type": "inc",
+       "value": 8
+      },
+      {
+       "stat": "projectile_speed",
+       "type": "inc",
+       "value": 10
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "attack",
+      "projectile",
+      "speed"
+     ]
+    },
+    {
+     "name": "Windwalker Insight",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "evasion",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "tags": [
+      "defence",
+      "evasion"
+     ]
+    }
+   ],
+   "keystone": {
+    "name": "Wind Dancer",
+    "mods": [],
+    "desc": "Dodge rolling grants Wind Dance for 3 seconds: 40% more damage and 15% increased movement speed. Without Wind Dance your hits deal 10% less damage.",
+    "flags": [
+     "wind_dancer"
+    ],
+    "tags": [
+     "dodge",
+     "mobility"
+    ],
+    "drawback": "Without Wind Dance your hits deal 10% less damage."
+   },
+   "paths": [
+    {
+     "group": "0",
+     "from": "r_crit2",
+     "to_ring": 4,
+     "nodes": [
+      {
+       "name": "Windwalker Path",
+       "mods": [
+        {
+         "stat": "evasion",
+         "type": "inc",
+         "value": 8
+        }
+       ],
+       "tags": [
+        "defence",
+        "evasion"
+       ]
+      },
+      {
+       "name": "Windwalker Path",
+       "mods": [
+        {
+         "stat": "attack_speed",
+         "type": "inc",
+         "value": 3
+        }
+       ],
+       "tags": [
+        "attack",
+        "speed"
+       ]
+      }
+     ]
+    },
+    {
+     "group": "1",
+     "from": "r_engineer",
+     "to_ring": 3,
+     "nodes": [
+      {
+       "name": "Windwalker Path",
+       "mods": [
+        {
+         "stat": "attack_speed",
+         "type": "inc",
+         "value": 3
+        }
+       ],
+       "tags": [
+        "attack",
+        "speed"
+       ]
+      },
+      {
+       "name": "Windwalker Path",
+       "mods": [
+        {
+         "stat": "move_speed",
+         "type": "inc",
+         "value": 3
+        }
+       ],
+       "tags": [
+        "mobility",
+        "speed"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "prefix": "xe",
+   "name": "Executioner's Path",
+   "angle": 150,
+   "ring": [
+    {
+     "name": "Deathblow",
+     "type": "notable",
+     "mods": [
+      {
+       "stat": "crit_multi",
+       "type": "flat",
+       "value": 20
+      },
+      {
+       "stat": "life_on_kill",
+       "type": "flat",
+       "value": 4
+      }
+     ],
+     "desc": "Killing an enemy with a critical strike grants 20% increased critical strike chance and 10% increased attack and cast speed for 3 seconds. +20% critical strike multiplier, +4 life on kill.",
+     "tags": [
+      "crit",
+      "execute",
+      "speed"
+     ],
+     "flags": [
+      "deathblow"
+     ],
+     "rev": 3
+    },
+    {
+     "name": "Executioner's Study",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "damage_vs_elite",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "tags": [
+      "elite"
+     ]
+    },
+    {
+     "name": "Headsman",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "damage_vs_elite",
+       "type": "inc",
+       "value": 20
+      },
+      {
+       "stat": "two_handed_damage",
+       "type": "inc",
+       "value": 10
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "elite",
+      "melee",
+      "two_hand"
+     ]
+    },
+    {
+     "name": "Executioner's Focus",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "crit_chance",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "tags": [
+      "crit"
+     ]
+    },
+    {
+     "name": "Executioner's Practice",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "damage_vs_elite",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "tags": [
+      "elite"
+     ]
+    },
+    {
+     "name": "Executioner's Lore",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "crit_multi",
+       "type": "flat",
+       "value": 6
+      }
+     ],
+     "tags": [
+      "crit"
+     ]
+    },
+    {
+     "name": "Precise Cuts",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "crit_chance_flat",
+       "type": "flat",
+       "value": 1
+      },
+      {
+       "stat": "crit_chance",
+       "type": "inc",
+       "value": 12
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "crit"
+     ]
+    },
+    {
+     "name": "Executioner's Insight",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "damage_vs_elite",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "tags": [
+      "elite"
+     ]
+    }
+   ],
+   "keystone": {
+    "name": "Executioner's Creed",
+    "mods": [
+     {
+      "stat": "crit_multi",
+      "type": "flat",
+      "value": -30
+     }
+    ],
+    "desc": "Hits against enemies below 35% life are always critical strikes. -30% critical strike multiplier.",
+    "flags": [
+     "executioner"
+    ],
+    "tags": [
+     "crit",
+     "execute"
+    ],
+    "drawback": "-30% critical strike multiplier."
+   },
+   "paths": [
+    {
+     "group": "0",
+     "from": "w_life3",
+     "to_ring": 4,
+     "nodes": [
+      {
+       "name": "Executioner's Path",
+       "mods": [
+        {
+         "stat": "damage_vs_elite",
+         "type": "inc",
+         "value": 8
+        }
+       ],
+       "tags": [
+        "elite"
+       ]
+      },
+      {
+       "name": "Executioner's Path",
+       "mods": [
+        {
+         "stat": "crit_multi",
+         "type": "flat",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "crit"
+       ]
+      }
+     ]
+    },
+    {
+     "group": "1",
+     "from": "w_bulwark",
+     "to_ring": 5,
+     "nodes": [
+      {
+       "name": "Executioner's Path",
+       "mods": [
+        {
+         "stat": "crit_multi",
+         "type": "flat",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "crit"
+       ]
+      },
+      {
+       "name": "Executioner's Path",
+       "mods": [
+        {
+         "stat": "crit_chance",
+         "type": "inc",
+         "value": 8
+        }
+       ],
+       "tags": [
+        "crit"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "prefix": "xa",
+   "name": "Mind Fortress",
+   "angle": -150,
+   "ring": [
+    {
+     "name": "Arcane Shell",
+     "type": "notable",
+     "mods": [
+      {
+       "stat": "max_mana",
+       "type": "inc",
+       "value": 10
+      },
+      {
+       "stat": "damage_reduction",
+       "type": "flat",
+       "value": 3
+      }
+     ],
+     "desc": "Taking a hit of at least 15% of your maximum life grants Arcane Shell: +20% damage reduction for 3 seconds (8 second cooldown). 10% increased maximum mana, +3% damage reduction.",
+     "tags": [
+      "defence",
+      "mana"
+     ],
+     "flags": [
+      "arcane_shell"
+     ],
+     "rev": 3
+    },
+    {
+     "name": "Mind Study",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "armour",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "tags": [
+      "armour",
+      "defence"
+     ]
+    },
+    {
+     "name": "Runic Plating",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "armour",
+       "type": "inc",
+       "value": 20
+      },
+      {
+       "stat": "damage_reduction",
+       "type": "flat",
+       "value": 2
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "armour",
+      "defence"
+     ]
+    },
+    {
+     "name": "Mind Focus",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "max_mana",
+       "type": "inc",
+       "value": 6
+      }
+     ],
+     "tags": [
+      "mana"
+     ]
+    },
+    {
+     "name": "Mind Practice",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "armour",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "tags": [
+      "armour",
+      "defence"
+     ]
+    },
+    {
+     "name": "Mind Lore",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "wil",
+       "type": "flat",
+       "value": 5
+      }
+     ],
+     "tags": [
+      "attribute"
+     ]
+    },
+    {
+     "name": "Deep Wells",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "max_mana",
+       "type": "inc",
+       "value": 12
+      },
+      {
+       "stat": "mana_regen",
+       "type": "inc",
+       "value": 15
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "mana"
+     ]
+    },
+    {
+     "name": "Mind Insight",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "armour",
+       "type": "inc",
+       "value": 8
+      }
+     ],
+     "tags": [
+      "armour",
+      "defence"
+     ]
+    }
+   ],
+   "keystone": {
+    "name": "Mind over Matter",
+    "mods": [
+     {
+      "stat": "max_mana",
+      "type": "inc",
+      "value": 25
+     },
+     {
+      "stat": "mana_regen",
+      "type": "more",
+      "value": -30
+     }
+    ],
+    "desc": "30% of damage taken is removed from your mana before your life. 30% less mana regeneration.",
+    "flags": [
+     "mind_over_matter"
+    ],
+    "tags": [
+     "defence",
+     "mana"
+    ],
+    "drawback": "30% less mana regeneration."
+   },
+   "paths": [
+    {
+     "group": "0",
+     "from": "h_mw3",
+     "to_ring": 4,
+     "nodes": [
+      {
+       "name": "Mind Path",
+       "mods": [
+        {
+         "stat": "armour",
+         "type": "inc",
+         "value": 8
+        }
+       ],
+       "tags": [
+        "armour",
+        "defence"
+       ]
+      },
+      {
+       "name": "Mind Path",
+       "mods": [
+        {
+         "stat": "wil",
+         "type": "flat",
+         "value": 5
+        }
+       ],
+       "tags": [
+        "attribute"
+       ]
+      },
+      {
+       "name": "Mind Path",
+       "mods": [
+        {
+         "stat": "max_mana",
+         "type": "inc",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "mana"
+       ]
+      }
+     ]
+    },
+    {
+     "group": "1",
+     "from": "m_flame",
+     "to_ring": 5,
+     "nodes": [
+      {
+       "name": "Mind Path",
+       "mods": [
+        {
+         "stat": "wil",
+         "type": "flat",
+         "value": 5
+        }
+       ],
+       "tags": [
+        "attribute"
+       ]
+      },
+      {
+       "name": "Mind Path",
+       "mods": [
+        {
+         "stat": "max_mana",
+         "type": "inc",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "mana"
+       ]
+      },
+      {
+       "name": "Mind Path",
+       "mods": [
+        {
+         "stat": "armour",
+         "type": "inc",
+         "value": 8
+        }
+       ],
+       "tags": [
+        "armour",
+        "defence"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "prefix": "xv",
+   "name": "Void Communion",
+   "angle": -90,
+   "ring": [
+    {
+     "name": "Abyssal Gaze",
+     "type": "notable",
+     "mods": [
+      {
+       "stat": "void_damage",
+       "type": "inc",
+       "value": 12
+      },
+      {
+       "stat": "arcane_damage",
+       "type": "inc",
+       "value": 12
+      }
+     ],
+     "desc": "Void and arcane hits have a 15% chance to inflict Frailty for 4 seconds. 12% increased void and arcane damage.",
+     "tags": [
+      "void",
+      "arcane",
+      "frailty"
+     ],
+     "flags": [
+      "abyssal_gaze"
+     ],
+     "rev": 3
+    },
+    {
+     "name": "Void Study",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "status_duration",
+       "type": "inc",
+       "value": 5
+      }
+     ],
+     "tags": [
+      "ailment"
+     ]
+    },
+    {
+     "name": "Whispering Dark",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "void_damage",
+       "type": "inc",
+       "value": 15
+      },
+      {
+       "stat": "dot_damage",
+       "type": "inc",
+       "value": 10
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "dot",
+      "void"
+     ]
+    },
+    {
+     "name": "Void Focus",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "void_damage",
+       "type": "inc",
+       "value": 6
+      }
+     ],
+     "tags": [
+      "void"
+     ]
+    },
+    {
+     "name": "Void Practice",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "status_duration",
+       "type": "inc",
+       "value": 5
+      }
+     ],
+     "tags": [
+      "ailment"
+     ]
+    },
+    {
+     "name": "Void Lore",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "res_void",
+       "type": "flat",
+       "value": 6
+      }
+     ],
+     "tags": [
+      "resist",
+      "void"
+     ]
+    },
+    {
+     "name": "Lingering Curse",
+     "type": "greater",
+     "mods": [
+      {
+       "stat": "status_duration",
+       "type": "inc",
+       "value": 15
+      },
+      {
+       "stat": "status_chance",
+       "type": "flat",
+       "value": 5
+      }
+     ],
+     "desc": "",
+     "tags": [
+      "ailment"
+     ]
+    },
+    {
+     "name": "Void Insight",
+     "type": "minor",
+     "mods": [
+      {
+       "stat": "status_duration",
+       "type": "inc",
+       "value": 5
+      }
+     ],
+     "tags": [
+      "ailment"
+     ]
+    }
+   ],
+   "keystone": {
+    "name": "Void Pact",
+    "mods": [
+     {
+      "stat": "status_duration",
+      "type": "inc",
+      "value": 30
+     },
+     {
+      "stat": "max_life",
+      "type": "more",
+      "value": -10
+     }
+    ],
+    "desc": "Hits against enemies suffering any ailment deal 25% more damage. 30% increased ailment duration. 10% less maximum life.",
+    "flags": [
+     "void_pact"
+    ],
+    "tags": [
+     "ailment",
+     "life"
+    ],
+    "drawback": "10% less maximum life."
+   },
+   "paths": [
+    {
+     "group": "0",
+     "from": "m_flow",
+     "to_ring": 4,
+     "nodes": [
+      {
+       "name": "Void Path",
+       "mods": [
+        {
+         "stat": "status_duration",
+         "type": "inc",
+         "value": 5
+        }
+       ],
+       "tags": [
+        "ailment"
+       ]
+      },
+      {
+       "name": "Void Path",
+       "mods": [
+        {
+         "stat": "res_void",
+         "type": "flat",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "resist",
+        "void"
+       ]
+      }
+     ]
+    },
+    {
+     "group": "1",
+     "from": "m_command",
+     "to_ring": 5,
+     "nodes": [
+      {
+       "name": "Void Path",
+       "mods": [
+        {
+         "stat": "res_void",
+         "type": "flat",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "resist",
+        "void"
+       ]
+      },
+      {
+       "name": "Void Path",
+       "mods": [
+        {
+         "stat": "void_damage",
+         "type": "inc",
+         "value": 6
+        }
+       ],
+       "tags": [
+        "void"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "road": {
+  "cluster": "Wanderer's Road",
+  "arcs": [
+   {
+    "from": "xe_r3",
+    "to": "xs_r6",
+    "nodes": [
+     {
+      "mods": [
+       {
+        "stat": "dex",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -776,
+      "y": 706,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo0_1",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "vit",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -588,
+      "y": 901,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo0_3",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "wil",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -367,
+      "y": 1039,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo0_5",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "str",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -245,
+      "y": 1088,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo0_6",
+      "rev": 3
+     }
+    ]
+   },
+   {
+    "from": "xs_r2",
+    "to": "xw_r5",
+    "nodes": [
+     {
+      "mods": [
+       {
+        "stat": "int",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 245,
+      "y": 1088,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo1_1",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "agi",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 482,
+      "y": 977,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo1_3",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "str",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 686,
+      "y": 810,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo1_5",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "dex",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 776,
+      "y": 706,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo1_6",
+      "rev": 3
+     }
+    ]
+   },
+   {
+    "from": "xw_r2",
+    "to": "xp_r5",
+    "nodes": [
+     {
+      "mods": [
+       {
+        "stat": "vit",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 1065,
+      "y": 331,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo2_1",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "wil",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 1088,
+      "y": 72,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo2_3",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "dex",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 1044,
+      "y": -189,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo2_5",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "int",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 1000,
+      "y": -319,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo2_6",
+      "rev": 3
+     }
+    ]
+   },
+   {
+    "from": "xp_r2",
+    "to": "xv_r6",
+    "nodes": [
+     {
+      "mods": [
+       {
+        "stat": "agi",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 824,
+      "y": -769,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo3_1",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "str",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 620,
+      "y": -943,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo3_3",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "int",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 383,
+      "y": -1059,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo3_5",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "vit",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": 254,
+      "y": -1098,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo3_6",
+      "rev": 3
+     }
+    ]
+   },
+   {
+    "from": "xv_r3",
+    "to": "xa_r6",
+    "nodes": [
+     {
+      "mods": [
+       {
+        "stat": "wil",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -224,
+      "y": -1025,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo4_1",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "dex",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -487,
+      "y": -960,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo4_3",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "vit",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -716,
+      "y": -837,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo4_5",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "agi",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -820,
+      "y": -756,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo4_6",
+      "rev": 3
+     }
+    ]
+   },
+   {
+    "from": "xa_r3",
+    "to": "xe_r6",
+    "nodes": [
+     {
+      "mods": [
+       {
+        "stat": "str",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -1000,
+      "y": -319,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo5_1",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "int",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -1075,
+      "y": -58,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo5_3",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "agi",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -1083,
+      "y": 201,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo5_5",
+      "rev": 3
+     },
+     {
+      "mods": [
+       {
+        "stat": "wil",
+        "type": "flat",
+        "value": 6
+       }
+      ],
+      "x": -1065,
+      "y": 331,
+      "tags": [
+       "attribute"
+      ],
+      "id": "xo5_6",
+      "rev": 3
+     }
+    ]
+   }
+  ]
+ }
+}

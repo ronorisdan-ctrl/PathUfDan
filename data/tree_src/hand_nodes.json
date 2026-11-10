@@ -1,0 +1,6223 @@
+[
+ {
+  "id": "w_start",
+  "name": "Warrior's Oath",
+  "type": "start",
+  "x": -364,
+  "y": 210,
+  "cost": 0,
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 5
+   },
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "links": [
+   "w_mel1",
+   "w_arm1",
+   "w_life1",
+   "h_wr1",
+   "h_mw5",
+   "c_w1"
+  ],
+  "desc": "Warrior starting point",
+  "class": "warrior",
+  "cluster": "Origins",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "r_start",
+  "name": "Ranger's Path",
+  "type": "start",
+  "x": 364,
+  "y": 210,
+  "cost": 0,
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 5
+   },
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "links": [
+   "r_prj1",
+   "r_trap1",
+   "r_eva1",
+   "h_wr5",
+   "h_rm1",
+   "c_r1"
+  ],
+  "desc": "Ranger starting point",
+  "class": "ranger",
+  "cluster": "Origins",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "m_start",
+  "name": "Mage's Sigil",
+  "type": "start",
+  "x": 0,
+  "y": -420,
+  "cost": 0,
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 5
+   },
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "links": [
+   "m_sp1",
+   "m_min1",
+   "m_mana1",
+   "h_rm5",
+   "h_mw1",
+   "c_m1"
+  ],
+  "desc": "Mage starting point",
+  "class": "mage",
+  "cluster": "Origins",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "w_mel1",
+  "name": "Weapon Training",
+  "type": "minor",
+  "x": -373,
+  "y": 344,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "w_start",
+   "w_mel2"
+  ],
+  "cluster": "Weapon Master",
+  "tags": [
+   "melee"
+  ]
+ },
+ {
+  "id": "w_mel2",
+  "name": "Weapon Training",
+  "type": "minor",
+  "x": -395,
+  "y": 406,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "w_mel1",
+   "w_2h",
+   "w_1h"
+  ],
+  "cluster": "Weapon Master",
+  "tags": [
+   "melee"
+  ]
+ },
+ {
+  "id": "w_2h",
+  "name": "Heavy Grip",
+  "type": "notable",
+  "x": -417,
+  "y": 467,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "two_handed_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "w_mel2",
+   "w_mel3",
+   "p4_m_melee"
+  ],
+  "cluster": "Weapon Master",
+  "tags": [
+   "melee",
+   "two_hand"
+  ]
+ },
+ {
+  "id": "w_mel3",
+  "name": "Weapon Training",
+  "type": "minor",
+  "x": -440,
+  "y": 529,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "w_2h",
+   "w_brutal",
+   "p2_bf_a"
+  ],
+  "cluster": "Weapon Master",
+  "tags": [
+   "melee"
+  ]
+ },
+ {
+  "id": "w_brutal",
+  "name": "Brutal Force",
+  "type": "notable",
+  "x": -462,
+  "y": 591,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "w_mel3",
+   "ks_momentum",
+   "p3b_eb_t1"
+  ],
+  "cluster": "Weapon Master",
+  "tags": [
+   "melee",
+   "crit",
+   "stun",
+   "freeze"
+  ],
+  "flags": [
+   "brutal_force"
+  ],
+  "desc": "Melee hits against Stunned or Frozen enemies are always critical strikes. 12% increased melee damage, 5% increased attack speed.",
+  "rev": 3
+ },
+ {
+  "id": "ks_momentum",
+  "name": "Overwhelming Momentum",
+  "type": "keystone",
+  "x": -415,
+  "y": 719,
+  "cost": 2,
+  "mods": [],
+  "links": [
+   "w_brutal"
+  ],
+  "flags": [
+   "momentum"
+  ],
+  "desc": "Each consecutive hit within 2s grants 3% more damage, up to 20 stacks. Stacks are lost when you stop attacking. You deal 10% less damage with your first hit.",
+  "cluster": "Weapon Master",
+  "tags": [
+   "attack",
+   "melee"
+  ],
+  "drawback": "You deal 10% less damage with your first hit, and stacks are lost when you stop attacking."
+ },
+ {
+  "id": "w_1h",
+  "name": "Duelist's Edge",
+  "type": "notable",
+  "x": -532,
+  "y": 373,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "one_handed_damage",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "w_mel2",
+   "p4_s_w_in"
+  ],
+  "cluster": "Weapon Master",
+  "tags": [
+   "crit",
+   "melee",
+   "one_hand"
+  ]
+ },
+ {
+  "id": "w_arm1",
+  "name": "Thick Hide",
+  "type": "minor",
+  "x": -479,
+  "y": 171,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "w_start",
+   "w_arm2"
+  ],
+  "cluster": "Iron Bastion",
+  "tags": [
+   "armour",
+   "defence"
+  ]
+ },
+ {
+  "id": "w_arm2",
+  "name": "Thick Hide",
+  "type": "minor",
+  "x": -542,
+  "y": 167,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "w_arm1",
+   "w_blk1"
+  ],
+  "cluster": "Iron Bastion",
+  "tags": [
+   "armour",
+   "defence"
+  ]
+ },
+ {
+  "id": "w_blk1",
+  "name": "Shield Discipline",
+  "type": "notable",
+  "x": -606,
+  "y": 163,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "block_chance",
+    "type": "flat",
+    "value": 3
+   }
+  ],
+  "links": [
+   "w_arm2",
+   "w_arm3",
+   "p2_ir_a",
+   "p4_m_bulwark"
+  ],
+  "cluster": "Iron Bastion",
+  "tags": [
+   "block",
+   "defence"
+  ]
+ },
+ {
+  "id": "w_arm3",
+  "name": "Thick Hide",
+  "type": "minor",
+  "x": -670,
+  "y": 160,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "w_blk1",
+   "w_bulwark"
+  ],
+  "cluster": "Iron Bastion",
+  "tags": [
+   "armour",
+   "defence"
+  ]
+ },
+ {
+  "id": "w_bulwark",
+  "name": "Bulwark Mastery",
+  "type": "greater",
+  "x": -734,
+  "y": 156,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "block_chance",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 15
+   }
+  ],
+  "links": [
+   "w_arm3",
+   "ks_fortress",
+   "p3b_du_t1"
+  ],
+  "flags": [
+   "bulwark"
+  ],
+  "desc": "Blocking a hit grants 15% damage reduction for 2 seconds",
+  "cluster": "Iron Bastion",
+  "tags": [
+   "armour",
+   "block",
+   "defence"
+  ]
+ },
+ {
+  "id": "ks_fortress",
+  "name": "Fortress of Flesh",
+  "type": "keystone",
+  "x": -829,
+  "y": 29,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": -15
+   }
+  ],
+  "links": [
+   "w_bulwark"
+  ],
+  "flags": [
+   "fortress"
+  ],
+  "desc": "While stationary for 1 second, gain 30% damage reduction. 15% reduced movement speed.",
+  "cluster": "Iron Bastion",
+  "tags": [
+   "defence",
+   "mobility",
+   "speed",
+   "stationary"
+  ],
+  "drawback": "15% reduced movement speed."
+ },
+ {
+  "id": "w_life1",
+  "name": "Iron Flesh",
+  "type": "minor",
+  "x": -462,
+  "y": 267,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "w_start",
+   "w_life2"
+  ],
+  "cluster": "Vitality",
+  "tags": [
+   "life"
+  ]
+ },
+ {
+  "id": "w_life2",
+  "name": "Iron Flesh",
+  "type": "minor",
+  "x": -525,
+  "y": 303,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "w_life1",
+   "w_life3"
+  ],
+  "cluster": "Vitality",
+  "tags": [
+   "life"
+  ]
+ },
+ {
+  "id": "w_life3",
+  "name": "Second Wind",
+  "type": "notable",
+  "x": -589,
+  "y": 340,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 8
+   },
+   {
+    "stat": "life_regen",
+    "type": "flat",
+    "value": 1.5
+   }
+  ],
+  "links": [
+   "w_life2"
+  ],
+  "cluster": "Vitality",
+  "tags": [
+   "life",
+   "sustain",
+   "defence"
+  ],
+  "flags": [
+   "second_wind"
+  ],
+  "desc": "When a hit leaves you below 35% life, recover 20% of your maximum life over 4 seconds (20 second cooldown). 8% increased maximum life, +1.5 life regeneration.",
+  "rev": 3
+ },
+ {
+  "id": "r_prj1",
+  "name": "Fletching",
+  "type": "minor",
+  "x": 373,
+  "y": 344,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "r_start",
+   "r_prj2"
+  ],
+  "cluster": "Marksman",
+  "tags": [
+   "projectile"
+  ]
+ },
+ {
+  "id": "r_prj2",
+  "name": "Fletching",
+  "type": "minor",
+  "x": 395,
+  "y": 406,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "r_prj1",
+   "r_pspd",
+   "r_gun"
+  ],
+  "cluster": "Marksman",
+  "tags": [
+   "projectile"
+  ]
+ },
+ {
+  "id": "r_pspd",
+  "name": "Swift Flight",
+  "type": "notable",
+  "x": 417,
+  "y": 467,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_speed",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "bow_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_prj2",
+   "r_prj3",
+   "p4_m_proj_r"
+  ],
+  "cluster": "Marksman",
+  "tags": [
+   "bow",
+   "projectile"
+  ]
+ },
+ {
+  "id": "r_prj3",
+  "name": "Fletching",
+  "type": "minor",
+  "x": 440,
+  "y": 529,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "r_pspd",
+   "r_deadeye",
+   "p2_vn_a"
+  ],
+  "cluster": "Marksman",
+  "tags": [
+   "projectile"
+  ]
+ },
+ {
+  "id": "r_deadeye",
+  "name": "Deadeye Mastery",
+  "type": "notable",
+  "x": 462,
+  "y": 591,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "pierce",
+    "type": "flat",
+    "value": 1
+   },
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_prj3",
+   "ks_perfect_aim",
+   "p3b_ba_t1"
+  ],
+  "cluster": "Marksman",
+  "tags": [
+   "projectile",
+   "range",
+   "snare"
+  ],
+  "flags": [
+   "deadeye_mastery"
+  ],
+  "desc": "Projectile hits against enemies more than 160 units away Snare them for 1.5 seconds. +1 pierce, 8% increased projectile damage.",
+  "rev": 3
+ },
+ {
+  "id": "ks_perfect_aim",
+  "name": "Perfect Aim",
+  "type": "keystone",
+  "x": 415,
+  "y": 719,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 50
+   }
+  ],
+  "links": [
+   "r_deadeye"
+  ],
+  "flags": [
+   "perfect_aim"
+  ],
+  "desc": "Projectile hits against enemies further than 180 units deal 30% more damage. Hits against enemies closer than 100 units deal 30% less damage. +50% increased critical chance.",
+  "cluster": "Marksman",
+  "tags": [
+   "crit",
+   "projectile",
+   "range"
+  ],
+  "drawback": "Projectile hits against enemies closer than 100 units deal 30% less damage."
+ },
+ {
+  "id": "r_gun",
+  "name": "Powder Craft",
+  "type": "notable",
+  "x": 532,
+  "y": 373,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "firearm_damage",
+    "type": "inc",
+    "value": 14
+   },
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": 10
+   }
+  ],
+  "links": [
+   "r_prj2",
+   "p4_s_r_in"
+  ],
+  "cluster": "Marksman",
+  "tags": [
+   "crit",
+   "firearm",
+   "projectile"
+  ]
+ },
+ {
+  "id": "r_trap1",
+  "name": "Tinkerer",
+  "type": "minor",
+  "x": 479,
+  "y": 171,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "r_start",
+   "r_tur1"
+  ],
+  "cluster": "Engineer",
+  "tags": [
+   "deployable",
+   "trap"
+  ]
+ },
+ {
+  "id": "r_tur1",
+  "name": "Tinkerer",
+  "type": "minor",
+  "x": 542,
+  "y": 167,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "turret_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "r_trap1",
+   "r_trap2"
+  ],
+  "cluster": "Engineer",
+  "tags": [
+   "deployable"
+  ]
+ },
+ {
+  "id": "r_trap2",
+  "name": "Blast Charges",
+  "type": "notable",
+  "x": 606,
+  "y": 163,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_tur1",
+   "r_tur2",
+   "p2_cw_a",
+   "p4_m_deploy"
+  ],
+  "cluster": "Engineer",
+  "tags": [
+   "area",
+   "deployable",
+   "trap"
+  ]
+ },
+ {
+  "id": "r_tur2",
+  "name": "Tinkerer",
+  "type": "minor",
+  "x": 670,
+  "y": 160,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "turret_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "r_trap2",
+   "r_engineer"
+  ],
+  "cluster": "Engineer",
+  "tags": [
+   "deployable"
+  ]
+ },
+ {
+  "id": "r_engineer",
+  "name": "Engineer's Doctrine",
+  "type": "notable",
+  "x": 734,
+  "y": 156,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "turret_limit",
+    "type": "flat",
+    "value": 1
+   },
+   {
+    "stat": "turret_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "r_tur2",
+   "ks_automaton",
+   "p3b_tr_t1"
+  ],
+  "cluster": "Engineer",
+  "tags": [
+   "deployable",
+   "trap",
+   "shock",
+   "lightning"
+  ],
+  "flags": [
+   "engineers_doctrine"
+  ],
+  "desc": "Turret and trap hits have a 15% chance to Shock. +1 turret limit, 10% increased turret damage.",
+  "rev": 3
+ },
+ {
+  "id": "ks_automaton",
+  "name": "Automaton Doctrine",
+  "type": "keystone",
+  "x": 829,
+  "y": 29,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "turret_damage",
+    "type": "more",
+    "value": 70
+   },
+   {
+    "stat": "turret_limit",
+    "type": "flat",
+    "value": -1
+   }
+  ],
+  "links": [
+   "r_engineer"
+  ],
+  "flags": [
+   "automaton"
+  ],
+  "desc": "Turrets deal 70% more damage. You can have 1 fewer turret (minimum 1).",
+  "cluster": "Engineer",
+  "tags": [
+   "deployable"
+  ],
+  "drawback": "You can have 1 fewer turret (minimum 1)."
+ },
+ {
+  "id": "r_eva1",
+  "name": "Fleet Footed",
+  "type": "minor",
+  "x": 462,
+  "y": 267,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_start",
+   "r_crit1"
+  ],
+  "cluster": "Shadow",
+  "tags": [
+   "defence",
+   "evasion"
+  ]
+ },
+ {
+  "id": "r_crit1",
+  "name": "Keen Eye",
+  "type": "minor",
+  "x": 525,
+  "y": 303,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "r_eva1",
+   "r_crit2"
+  ],
+  "cluster": "Shadow",
+  "tags": [
+   "crit"
+  ]
+ },
+ {
+  "id": "r_crit2",
+  "name": "Killer Instinct",
+  "type": "notable",
+  "x": 589,
+  "y": 340,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": 20
+   },
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "r_crit1"
+  ],
+  "cluster": "Shadow",
+  "tags": [
+   "crit",
+   "chill",
+   "freeze"
+  ],
+  "flags": [
+   "killer_instinct"
+  ],
+  "desc": "Critical strikes against Chilled enemies Freeze them. +20% critical strike multiplier, 10% increased critical strike chance.",
+  "rev": 3
+ },
+ {
+  "id": "m_sp1",
+  "name": "Spellweaving",
+  "type": "minor",
+  "x": -111,
+  "y": -495,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "m_start",
+   "m_sp2"
+  ],
+  "cluster": "Elementalist",
+  "tags": [
+   "spell"
+  ]
+ },
+ {
+  "id": "m_sp2",
+  "name": "Spellweaving",
+  "type": "minor",
+  "x": -154,
+  "y": -545,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "m_sp1",
+   "m_ele",
+   "m_storm"
+  ],
+  "cluster": "Elementalist",
+  "tags": [
+   "spell"
+  ]
+ },
+ {
+  "id": "m_ele",
+  "name": "Elemental Attunement",
+  "type": "notable",
+  "x": -196,
+  "y": -595,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "m_sp2",
+   "m_fire1",
+   "p4_m_elem_m",
+   "p4_s_m_in"
+  ],
+  "cluster": "Elementalist",
+  "tags": [
+   "elemental"
+  ]
+ },
+ {
+  "id": "m_fire1",
+  "name": "Kindling",
+  "type": "minor",
+  "x": -239,
+  "y": -645,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "fire_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "m_ele",
+   "m_flame",
+   "p2_em_a"
+  ],
+  "cluster": "Elementalist",
+  "tags": [
+   "fire"
+  ]
+ },
+ {
+  "id": "m_flame",
+  "name": "Pyroclasm",
+  "type": "notable",
+  "x": -281,
+  "y": -695,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "fire_damage",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "ignite_chance",
+    "type": "flat",
+    "value": 10
+   }
+  ],
+  "links": [
+   "m_fire1",
+   "ks_convergence"
+  ],
+  "cluster": "Elementalist",
+  "tags": [
+   "fire",
+   "ignite",
+   "area"
+  ],
+  "flags": [
+   "pyroclasm"
+  ],
+  "desc": "Ignited enemies explode when they die, dealing 10% of their maximum life as fire damage to enemies within 60 units. 12% increased fire damage, +10% chance to ignite.",
+  "rev": 3
+ },
+ {
+  "id": "m_storm",
+  "name": "Stormcaller",
+  "type": "notable",
+  "x": -57,
+  "y": -648,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "m_sp2",
+   "p3b_ts_t1"
+  ],
+  "cluster": "Elementalist",
+  "tags": [
+   "lightning",
+   "speed",
+   "spell"
+  ]
+ },
+ {
+  "id": "ks_convergence",
+  "name": "Elemental Convergence",
+  "type": "keystone",
+  "x": -415,
+  "y": -719,
+  "cost": 2,
+  "mods": [],
+  "links": [
+   "m_flame"
+  ],
+  "flags": [
+   "convergence"
+  ],
+  "desc": "Hitting a chilled or shocked enemy with fire, or a burning enemy with ice or lightning, deals 35% more damage. 10% less damage against enemies with no status ailment.",
+  "cluster": "Elementalist",
+  "tags": [
+   "ailment",
+   "elemental"
+  ],
+  "drawback": "10% less damage against enemies with no status ailment."
+ },
+ {
+  "id": "m_min1",
+  "name": "Dark Pact",
+  "type": "minor",
+  "x": 91,
+  "y": -500,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "minion_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "m_start",
+   "m_min2"
+  ],
+  "cluster": "Necromancy",
+  "tags": [
+   "minion"
+  ]
+ },
+ {
+  "id": "m_min2",
+  "name": "Dark Pact",
+  "type": "minor",
+  "x": 127,
+  "y": -553,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "minion_life",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "m_min1",
+   "m_minl"
+  ],
+  "cluster": "Necromancy",
+  "tags": [
+   "minion"
+  ]
+ },
+ {
+  "id": "m_minl",
+  "name": "Bone Binding",
+  "type": "notable",
+  "x": 162,
+  "y": -607,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "minion_life",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "minion_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "m_min2",
+   "m_min3",
+   "p4_m_minion"
+  ],
+  "cluster": "Necromancy",
+  "tags": [
+   "minion"
+  ]
+ },
+ {
+  "id": "m_min3",
+  "name": "Dark Pact",
+  "type": "minor",
+  "x": 197,
+  "y": -660,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "minion_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "m_minl",
+   "m_command",
+   "p2_lg_a"
+  ],
+  "cluster": "Necromancy",
+  "tags": [
+   "minion"
+  ]
+ },
+ {
+  "id": "m_command",
+  "name": "Commander Mastery",
+  "type": "notable",
+  "x": 232,
+  "y": -713,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "minion_limit",
+    "type": "flat",
+    "value": 1
+   },
+   {
+    "stat": "minion_speed",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "m_min3",
+   "ks_one_mind",
+   "p3b_fw_t1"
+  ],
+  "cluster": "Necromancy",
+  "tags": [
+   "minion",
+   "crit"
+  ],
+  "flags": [
+   "commanders_edge"
+  ],
+  "desc": "Your minions use your critical strike chance increases and critical strike multiplier. +1 minion limit, 8% increased minion speed.",
+  "rev": 3
+ },
+ {
+  "id": "ks_one_mind",
+  "name": "One Mind",
+  "type": "keystone",
+  "x": 415,
+  "y": -719,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "minion_damage",
+    "type": "more",
+    "value": 60
+   },
+   {
+    "stat": "minion_life",
+    "type": "more",
+    "value": 30
+   },
+   {
+    "stat": "damage",
+    "type": "more",
+    "value": -30
+   }
+  ],
+  "links": [
+   "m_command"
+  ],
+  "flags": [
+   "one_mind"
+  ],
+  "desc": "Minions deal 60% more damage and have 30% more life. Your own spells and attacks deal 30% less damage.",
+  "cluster": "Necromancy",
+  "tags": [
+   "generic",
+   "minion"
+  ],
+  "drawback": "Your own spells and attacks deal 30% less damage."
+ },
+ {
+  "id": "m_mana1",
+  "name": "Deep Wells",
+  "type": "minor",
+  "x": 0,
+  "y": -533,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "m_start",
+   "m_mana2"
+  ],
+  "cluster": "Arcane Flow",
+  "tags": [
+   "mana"
+  ]
+ },
+ {
+  "id": "m_mana2",
+  "name": "Deep Wells",
+  "type": "minor",
+  "x": 0,
+  "y": -607,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "mana_regen",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "m_mana1",
+   "m_flow"
+  ],
+  "cluster": "Arcane Flow",
+  "tags": [
+   "mana"
+  ]
+ },
+ {
+  "id": "m_flow",
+  "name": "Rift Step",
+  "type": "notable",
+  "x": 0,
+  "y": -680,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "mana_regen",
+    "type": "inc",
+    "value": 15
+   },
+   {
+    "stat": "mana_cost",
+    "type": "inc",
+    "value": -8
+   }
+  ],
+  "links": [
+   "m_mana2"
+  ],
+  "cluster": "Arcane Flow",
+  "tags": [
+   "mana",
+   "mobility",
+   "snare",
+   "arcane"
+  ],
+  "flags": [
+   "rift_step"
+  ],
+  "desc": "Blink Snares enemies within 60 units of where you leave and where you arrive, for 2 seconds. 15% increased mana regeneration, 8% reduced mana cost.",
+  "rev": 3
+ },
+ {
+  "id": "h_wr1",
+  "name": "Agile Strikes",
+  "type": "minor",
+  "x": -289,
+  "y": 345,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "w_start",
+   "h_wr2"
+  ],
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "h_wr2",
+  "name": "Quick Hands",
+  "type": "minor",
+  "x": -159,
+  "y": 437,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "h_wr1",
+   "h_wr3"
+  ],
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "attack",
+   "speed"
+  ]
+ },
+ {
+  "id": "h_wr3",
+  "name": "Hunter-Knight",
+  "type": "notable",
+  "x": 0,
+  "y": 470,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 5
+   },
+   {
+    "stat": "attack_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "h_wr2",
+   "h_wr4",
+   "p3_hk_1"
+  ],
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "attack",
+   "marked",
+   "melee",
+   "projectile",
+   "crit"
+  ],
+  "flags": [
+   "hunter_knight"
+  ],
+  "desc": "Melee hits have a 20% chance to Mark enemies that are not Marked, for 2 seconds. Projectile hits against Marked enemies have +15% critical strike chance. 5% increased attack speed, 6% increased attack damage.",
+  "rev": 3
+ },
+ {
+  "id": "h_wr4",
+  "name": "Quick Hands",
+  "type": "minor",
+  "x": 159,
+  "y": 437,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "h_wr3",
+   "h_wr5"
+  ],
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "attack",
+   "speed"
+  ]
+ },
+ {
+  "id": "h_wr5",
+  "name": "Agile Strikes",
+  "type": "minor",
+  "x": 289,
+  "y": 345,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "h_wr4",
+   "r_start"
+  ],
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "h_rm1",
+  "name": "Charged Shafts",
+  "type": "minor",
+  "x": 443,
+  "y": 78,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "r_start",
+   "h_rm2"
+  ],
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "h_rm2",
+  "name": "Elemental Edge",
+  "type": "minor",
+  "x": 458,
+  "y": -81,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "h_rm1",
+   "h_rm3"
+  ],
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "elemental"
+  ]
+ },
+ {
+  "id": "h_rm3",
+  "name": "Hexshot",
+  "type": "notable",
+  "x": 407,
+  "y": -235,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 6
+   },
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "h_rm2",
+   "h_rm4",
+   "p3_hs_1"
+  ],
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "projectile",
+   "frailty",
+   "marked",
+   "agony",
+   "elemental"
+  ],
+  "flags": [
+   "hexshot"
+  ],
+  "desc": "The first projectile hit of each skill use applies the last curse you cast to the enemy hit. 6% increased elemental and projectile damage.",
+  "rev": 3
+ },
+ {
+  "id": "h_rm4",
+  "name": "Elemental Edge",
+  "type": "minor",
+  "x": 299,
+  "y": -356,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "h_rm3",
+   "h_rm5"
+  ],
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "elemental"
+  ]
+ },
+ {
+  "id": "h_rm5",
+  "name": "Charged Shafts",
+  "type": "minor",
+  "x": 154,
+  "y": -423,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "h_rm4",
+   "m_start"
+  ],
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "h_mw1",
+  "name": "Battle Scholar",
+  "type": "minor",
+  "x": -154,
+  "y": -423,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "m_start",
+   "h_mw2"
+  ],
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "h_mw2",
+  "name": "Sanguine Arts",
+  "type": "minor",
+  "x": -299,
+  "y": -356,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   },
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "h_mw1",
+   "h_mw3"
+  ],
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "life",
+   "mana"
+  ]
+ },
+ {
+  "id": "h_mw3",
+  "name": "Spellblade",
+  "type": "notable",
+  "x": -407,
+  "y": -235,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 6
+   },
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "h_mw2",
+   "h_mw4",
+   "ks_blood",
+   "p3_sb_1"
+  ],
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "melee",
+   "spell",
+   "elemental",
+   "chill",
+   "shock",
+   "ignite"
+  ],
+  "flags": [
+   "spellblade"
+  ],
+  "desc": "Melee hits release a burst (50 units) of your last spell's element for 30% of the hit's damage: fire ignites, cold chills, lightning shocks. 0.6 second cooldown. 6% increased spell and melee damage.",
+  "rev": 3
+ },
+ {
+  "id": "h_mw4",
+  "name": "Sanguine Arts",
+  "type": "minor",
+  "x": -458,
+  "y": -81,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   },
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "h_mw3",
+   "h_mw5"
+  ],
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "life",
+   "mana"
+  ]
+ },
+ {
+  "id": "h_mw5",
+  "name": "Battle Scholar",
+  "type": "minor",
+  "x": -443,
+  "y": 78,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "h_mw4",
+   "w_start"
+  ],
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "ks_blood",
+  "name": "Blood for Power",
+  "type": "keystone",
+  "x": -497,
+  "y": -287,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "damage",
+    "type": "inc",
+    "value": 15
+   },
+   {
+    "stat": "mana_regen",
+    "type": "more",
+    "value": -100
+   }
+  ],
+  "links": [
+   "h_mw3"
+  ],
+  "flags": [
+   "blood_magic"
+  ],
+  "desc": "Skills cost Life instead of Mana. 15% increased damage. You have no mana regeneration.",
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "generic",
+   "life",
+   "mana"
+  ],
+  "drawback": "Skills cost Life instead of Mana, and you have no mana regeneration."
+ },
+ {
+  "id": "c_core",
+  "name": "Heart of the Web",
+  "type": "notable",
+  "x": 0,
+  "y": 0,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "damage",
+    "type": "inc",
+    "value": 8
+   },
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "c_w3",
+   "c_r3",
+   "c_m3",
+   "c_dot1",
+   "c_res1",
+   "ks_glass"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "generic",
+   "life"
+  ]
+ },
+ {
+  "id": "c_w1",
+  "name": "Endurance",
+  "type": "minor",
+  "x": -273,
+  "y": 157,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "w_start",
+   "c_w2",
+   "p2_wh_a"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "life"
+  ]
+ },
+ {
+  "id": "c_w2",
+  "name": "Grit",
+  "type": "minor",
+  "x": -182,
+  "y": 105,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "links": [
+   "c_w1",
+   "c_w3"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "c_w3",
+  "name": "Endurance",
+  "type": "minor",
+  "x": -91,
+  "y": 52,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "c_w2",
+   "c_core"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "life"
+  ]
+ },
+ {
+  "id": "c_r1",
+  "name": "Focus",
+  "type": "minor",
+  "x": 273,
+  "y": 157,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_start",
+   "c_r2",
+   "p2_de_a"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "crit"
+  ]
+ },
+ {
+  "id": "c_r2",
+  "name": "Nimble",
+  "type": "minor",
+  "x": 182,
+  "y": 105,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "agi",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "links": [
+   "c_r1",
+   "c_r3"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "c_r3",
+  "name": "Focus",
+  "type": "minor",
+  "x": 91,
+  "y": 52,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "c_r2",
+   "c_core"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "crit"
+  ]
+ },
+ {
+  "id": "c_m1",
+  "name": "Lore",
+  "type": "minor",
+  "x": 0,
+  "y": -315,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "m_start",
+   "c_m2"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "mana"
+  ]
+ },
+ {
+  "id": "c_m2",
+  "name": "Insight",
+  "type": "minor",
+  "x": 0,
+  "y": -210,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "wil",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "links": [
+   "c_m1",
+   "c_m3",
+   "p2_hx_a"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "attribute"
+  ]
+ },
+ {
+  "id": "c_m3",
+  "name": "Lore",
+  "type": "minor",
+  "x": 0,
+  "y": -105,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "c_m2",
+   "c_core"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "mana"
+  ]
+ },
+ {
+  "id": "c_dot1",
+  "name": "Lingering Pain",
+  "type": "minor",
+  "x": 70,
+  "y": 70,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dot_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "c_core",
+   "c_dot2"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "dot"
+  ]
+ },
+ {
+  "id": "c_dot2",
+  "name": "Festering Wounds",
+  "type": "notable",
+  "x": 130,
+  "y": 120,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "dot_damage",
+    "type": "inc",
+    "value": 15
+   },
+   {
+    "stat": "status_chance",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 15
+   }
+  ],
+  "links": [
+   "c_dot1"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "ailment",
+   "dot",
+   "snare",
+   "marked"
+  ],
+  "flags": [
+   "festering_wounds"
+  ],
+  "desc": "Bleed, ignite and poison you inflict on Snared or Marked enemies last 50% longer. 15% increased damage over time, +6% status chance, 15% increased ailment duration.",
+  "rev": 3
+ },
+ {
+  "id": "c_res1",
+  "name": "Warded",
+  "type": "minor",
+  "x": -70,
+  "y": 70,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_void",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "links": [
+   "c_core",
+   "c_res2"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "cold",
+   "fire",
+   "lightning",
+   "resist",
+   "void"
+  ]
+ },
+ {
+  "id": "c_res2",
+  "name": "Warded",
+  "type": "minor",
+  "x": -130,
+  "y": 120,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "res_fire",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 6
+   },
+   {
+    "stat": "res_void",
+    "type": "flat",
+    "value": 6
+   }
+  ],
+  "links": [
+   "c_res1"
+  ],
+  "cluster": "Heart of the Web",
+  "tags": [
+   "cold",
+   "fire",
+   "lightning",
+   "resist",
+   "void"
+  ]
+ },
+ {
+  "id": "ks_glass",
+  "name": "Glass Cannon",
+  "type": "keystone",
+  "x": 0,
+  "y": -110,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "damage",
+    "type": "more",
+    "value": 40
+   },
+   {
+    "stat": "max_life",
+    "type": "more",
+    "value": -40
+   }
+  ],
+  "links": [
+   "c_core"
+  ],
+  "flags": [
+   "glass_cannon"
+  ],
+  "desc": "You deal 40% more damage. You have 40% less maximum life.",
+  "cluster": "Heart of the Web",
+  "tags": [
+   "generic",
+   "life"
+  ],
+  "drawback": "You have 40% less maximum life."
+ },
+ {
+  "id": "p2_bf_a",
+  "name": "Opened Veins",
+  "type": "notable",
+  "x": -340,
+  "y": 560,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "bleed_chance",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "links": [
+   "w_mel3",
+   "p2_bf_b",
+   "p4_m_bleed_w"
+  ],
+  "flags": [
+   "opened_veins"
+  ],
+  "desc": "Melee critical strikes always inflict Bleed. +5% chance to inflict Bleed.",
+  "cluster": "Bloodrage",
+  "tags": [
+   "bleed",
+   "crit",
+   "melee"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_bf_b",
+  "name": "Blood Scent",
+  "type": "notable",
+  "x": -270,
+  "y": 640,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p2_bf_a",
+   "p2_ks_frenzy"
+  ],
+  "flags": [
+   "blood_scent"
+  ],
+  "desc": "Killing a bleeding enemy restores 4% of your maximum life. 8% increased physical damage.",
+  "cluster": "Bloodrage",
+  "tags": [
+   "bleed",
+   "life",
+   "sustain"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_ks_frenzy",
+  "name": "Blood Frenzy",
+  "type": "keystone",
+  "x": -200,
+  "y": 720,
+  "cost": 2,
+  "mods": [],
+  "links": [
+   "p2_bf_b"
+  ],
+  "flags": [
+   "blood_frenzy"
+  ],
+  "desc": "Each bleeding enemy within 150 units grants 4% more attack speed (up to 5). You take 10% more physical damage. No life regeneration while above 50% life.",
+  "cluster": "Bloodrage",
+  "tags": [
+   "attack",
+   "bleed",
+   "speed"
+  ],
+  "rev": 2,
+  "drawback": "You take 10% more physical damage, and you do not regenerate life while above 50% life.",
+  "exclusive_with": [
+   "p2_ks_riposte"
+  ]
+ },
+ {
+  "id": "p2_ir_a",
+  "name": "Counterweight",
+  "type": "notable",
+  "x": -620,
+  "y": 70,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "block_chance",
+    "type": "flat",
+    "value": 2
+   }
+  ],
+  "links": [
+   "w_blk1",
+   "p2_ir_b"
+  ],
+  "flags": [
+   "counterweight"
+  ],
+  "desc": "Blocking grants 40% increased melee damage for 2 seconds. +2% block chance.",
+  "cluster": "Riposte",
+  "tags": [
+   "block",
+   "melee"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_ir_b",
+  "name": "Staggering Guard",
+  "type": "notable",
+  "x": -640,
+  "y": -20,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p2_ir_a",
+   "p2_ks_riposte"
+  ],
+  "flags": [
+   "staggering_guard"
+  ],
+  "desc": "Blocking a hit stuns the attacker if it is within 70 units. 10% increased armour.",
+  "cluster": "Riposte",
+  "tags": [
+   "armour",
+   "block",
+   "stun"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_ks_riposte",
+  "name": "Iron Riposte",
+  "type": "keystone",
+  "x": -660,
+  "y": -110,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "block_chance",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p2_ir_b"
+  ],
+  "flags": [
+   "iron_riposte"
+  ],
+  "desc": "Blocking triggers a free counterattack that hits all enemies within 55 units with your weapon (0.5s cooldown). +5% block chance. You cannot dodge roll; movement skills cost 50% more.",
+  "cluster": "Riposte",
+  "tags": [
+   "attack",
+   "block",
+   "melee"
+  ],
+  "rev": 2,
+  "drawback": "You cannot dodge roll, and movement skills cost 50% more.",
+  "exclusive_with": [
+   "p2_ks_frenzy"
+  ]
+ },
+ {
+  "id": "p2_wh_a",
+  "name": "Rallying Cry",
+  "type": "notable",
+  "x": -300,
+  "y": 60,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cooldown_recovery",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "c_w1",
+   "p2_wh_b"
+  ],
+  "flags": [
+   "rallying_cry"
+  ],
+  "desc": "Killing a stunned enemy resets the skill with the shortest remaining cooldown. 5% increased cooldown recovery.",
+  "cluster": "War Herald",
+  "tags": [
+   "cooldown",
+   "stun"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_wh_b",
+  "name": "Herald's Voice",
+  "type": "notable",
+  "x": -330,
+  "y": -30,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "stun_threshold",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p2_wh_a"
+  ],
+  "flags": [
+   "war_herald"
+  ],
+  "desc": "Buff skills last 50% longer and stun enemies within 70 units when used. 10% increased stun threshold.",
+  "cluster": "War Herald",
+  "tags": [
+   "stun",
+   "utility"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_cw_a",
+  "name": "Volatile Mechanisms",
+  "type": "notable",
+  "x": 620,
+  "y": 70,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_trap2",
+   "p2_cw_b"
+  ],
+  "flags": [
+   "volatile_mechanisms"
+  ],
+  "desc": "Turrets explode when they expire or are replaced; traps go off instead of fizzling. 8% increased trap damage.",
+  "cluster": "Clockwork",
+  "tags": [
+   "area",
+   "deployable",
+   "trap"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_cw_b",
+  "name": "Overclock",
+  "type": "notable",
+  "x": 640,
+  "y": -20,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "turret_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p2_cw_a",
+   "p2_ks_clockwork"
+  ],
+  "flags": [
+   "overclock"
+  ],
+  "desc": "Turrets fire 25% faster while you are within 120 units of them. 8% increased turret damage.",
+  "cluster": "Clockwork",
+  "tags": [
+   "deployable",
+   "speed"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_ks_clockwork",
+  "name": "Clockwork Mind",
+  "type": "keystone",
+  "x": 660,
+  "y": -110,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "turret_limit",
+    "type": "flat",
+    "value": 2
+   }
+  ],
+  "links": [
+   "p2_cw_b"
+  ],
+  "flags": [
+   "clockwork_mind"
+  ],
+  "desc": "+2 maximum turrets. Turret and trap hits use your weapon's critical chance if it is higher. Your other hits deal 30% less damage.",
+  "cluster": "Clockwork",
+  "tags": [
+   "crit",
+   "deployable",
+   "trap"
+  ],
+  "rev": 2,
+  "drawback": "Your own hits (not turrets, traps or minions) deal 30% less damage.",
+  "exclusive_with": [
+   "p3b_tr_cap"
+  ]
+ },
+ {
+  "id": "p2_vn_a",
+  "name": "Agonising Toxins",
+  "type": "notable",
+  "x": 340,
+  "y": 560,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dot_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "r_prj3",
+   "p2_vn_b",
+   "p4_m_afflict"
+  ],
+  "flags": [
+   "agonising_toxins"
+  ],
+  "desc": "Your hits have 10% chance to poison. Your poisons stack up to 3 times; an enemy with 3 stacks suffers Agony. 8% increased damage over time.",
+  "cluster": "Venom",
+  "tags": [
+   "agony",
+   "dot",
+   "poison"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_vn_b",
+  "name": "Virulence",
+  "type": "notable",
+  "x": 270,
+  "y": 640,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p2_vn_a",
+   "p2_ks_venom"
+  ],
+  "flags": [
+   "virulence"
+  ],
+  "desc": "When a poisoned enemy dies, its poison spreads to the nearest enemy within 90 units. 8% increased status duration.",
+  "cluster": "Venom",
+  "tags": [
+   "dot",
+   "poison"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_ks_venom",
+  "name": "Venom Pact",
+  "type": "keystone",
+  "x": 200,
+  "y": 720,
+  "cost": 2,
+  "mods": [],
+  "links": [
+   "p2_vn_b"
+  ],
+  "flags": [
+   "venom_pact"
+  ],
+  "desc": "Your hits have 20% chance to poison. Poisons stack (up to 20) and last 40% longer. Your hits cannot be critical strikes.",
+  "cluster": "Venom",
+  "tags": [
+   "ailment",
+   "dot",
+   "poison"
+  ],
+  "rev": 2,
+  "drawback": "Your hits cannot be critical strikes."
+ },
+ {
+  "id": "p2_de_a",
+  "name": "Marked for Death",
+  "type": "notable",
+  "x": 300,
+  "y": 60,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "c_r1",
+   "p2_de_b"
+  ],
+  "flags": [
+   "marked_for_death"
+  ],
+  "desc": "Projectile critical strikes Mark the enemy for 2 seconds. Critical strikes against Marked enemies also hit one enemy nearby. 10% increased critical chance.",
+  "cluster": "Deadeye",
+  "tags": [
+   "crit",
+   "marked",
+   "projectile"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_de_b",
+  "name": "Shadowstep",
+  "type": "notable",
+  "x": 330,
+  "y": -30,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p2_de_a"
+  ],
+  "flags": [
+   "shadowstep"
+  ],
+  "desc": "Dodge rolling releases a frost nova that chills enemies within 60 units. 10% increased evasion.",
+  "cluster": "Deadeye",
+  "tags": [
+   "chill",
+   "dodge",
+   "evasion"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_em_a",
+  "name": "Funeral Pyre",
+  "type": "notable",
+  "x": -320,
+  "y": -600,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "fire_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "m_fire1",
+   "p2_em_b"
+  ],
+  "flags": [
+   "funeral_pyre"
+  ],
+  "desc": "Killing an ignited enemy grants 20% increased fire damage and 10% increased cast speed for 3 seconds. 8% increased fire damage.",
+  "cluster": "Embers",
+  "tags": [
+   "fire",
+   "ignite",
+   "speed"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_em_b",
+  "name": "Searing Insight",
+  "type": "notable",
+  "x": -390,
+  "y": -560,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "ignite_chance",
+    "type": "flat",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p2_em_a",
+   "p2_ks_embers"
+  ],
+  "flags": [
+   "searing_insight"
+  ],
+  "desc": "Hits against ignited enemies have +25% critical strike chance. +5% chance to ignite.",
+  "cluster": "Embers",
+  "tags": [
+   "crit",
+   "fire",
+   "ignite"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_ks_embers",
+  "name": "Avatar of Embers",
+  "type": "keystone",
+  "x": -460,
+  "y": -520,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "ignite_chance",
+    "type": "flat",
+    "value": 20
+   }
+  ],
+  "links": [
+   "p2_em_b"
+  ],
+  "flags": [
+   "avatar_of_embers"
+  ],
+  "desc": "Cold and lightning damage of your skills is converted to fire. +20% chance to ignite. You cannot chill, freeze or shock: those chances ignite instead.",
+  "cluster": "Embers",
+  "tags": [
+   "elemental",
+   "fire",
+   "ignite"
+  ],
+  "rev": 2,
+  "drawback": "You cannot chill, freeze or shock.",
+  "exclusive_with": [
+   "xp_ks",
+   "p3b_fw_cap"
+  ]
+ },
+ {
+  "id": "p2_lg_a",
+  "name": "Marrow Feast",
+  "type": "notable",
+  "x": 320,
+  "y": -600,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "minion_life",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "m_min3",
+   "p2_lg_b"
+  ],
+  "flags": [
+   "marrow_feast"
+  ],
+  "desc": "When one of your minions kills an enemy, it recovers 20% of its life. 10% increased minion life.",
+  "cluster": "Legion",
+  "tags": [
+   "minion",
+   "sustain"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_lg_b",
+  "name": "Necrotic Orders",
+  "type": "notable",
+  "x": 390,
+  "y": -560,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "minion_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p2_lg_a",
+   "p2_ks_legion"
+  ],
+  "flags": [
+   "necrotic_orders"
+  ],
+  "desc": "Minion hits have 20% chance to inflict Frailty. 8% increased minion damage.",
+  "cluster": "Legion",
+  "tags": [
+   "frailty",
+   "minion"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_ks_legion",
+  "name": "Legion of Bone",
+  "type": "keystone",
+  "x": 460,
+  "y": -520,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "minion_limit",
+    "type": "flat",
+    "value": 2
+   },
+   {
+    "stat": "minion_life",
+    "type": "more",
+    "value": -30
+   },
+   {
+    "stat": "damage",
+    "type": "more",
+    "value": -20
+   }
+  ],
+  "links": [
+   "p2_lg_b"
+  ],
+  "flags": [
+   "legion_of_bone"
+  ],
+  "desc": "+2 maximum minions. Minions explode when they die, dealing 40% of their life as physical damage nearby. Minions have 30% less life; your own hits deal 20% less damage.",
+  "cluster": "Legion",
+  "tags": [
+   "area",
+   "minion"
+  ],
+  "rev": 2,
+  "drawback": "Minions have 30% less life, and your own hits deal 20% less damage."
+ },
+ {
+  "id": "p2_hx_a",
+  "name": "Frailty Bloom",
+  "type": "notable",
+  "x": 90,
+  "y": -250,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "c_m2",
+   "p2_hx_b"
+  ],
+  "flags": [
+   "frailty_bloom"
+  ],
+  "desc": "When an enemy with Frailty dies, Frailty spreads to enemies within 80 units. 8% increased status duration.",
+  "cluster": "Hex",
+  "tags": [
+   "ailment",
+   "frailty"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p2_hx_b",
+  "name": "Hexblight",
+  "type": "notable",
+  "x": 170,
+  "y": -280,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dot_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p2_hx_a"
+  ],
+  "flags": [
+   "hexblight"
+  ],
+  "desc": "Hits against enemies with Frailty or Snare have 25% chance to inflict Agony. 8% increased damage over time.",
+  "cluster": "Hex",
+  "tags": [
+   "agony",
+   "dot",
+   "frailty",
+   "snare"
+  ],
+  "rev": 2
+ },
+ {
+  "id": "p3_hk_1",
+  "name": "Hunting Steel",
+  "type": "minor",
+  "x": 0,
+  "y": 545,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 5
+   },
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "h_wr3",
+   "p3_hk_2"
+  ],
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "melee",
+   "projectile"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hk_2",
+  "name": "Tracker",
+  "type": "minor",
+  "x": 0,
+  "y": 620,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3_hk_1",
+   "p3_hk_a",
+   "p3_hk_b"
+  ],
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "attribute"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hk_a",
+  "name": "Pinning Shot",
+  "type": "notable",
+  "x": -75,
+  "y": 690,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3_hk_2",
+   "p3_hk_3",
+   "p4_s_wr"
+  ],
+  "flags": [
+   "pinning_shot"
+  ],
+  "desc": "Projectile hits against Marked enemies Snare them for 1.5 seconds. 8% increased projectile damage.",
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "projectile",
+   "marked",
+   "snare"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hk_b",
+  "name": "Run Them Down",
+  "type": "notable",
+  "x": 75,
+  "y": 690,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3_hk_2",
+   "p3_hk_3",
+   "p4_s_wr"
+  ],
+  "flags": [
+   "run_them_down"
+  ],
+  "desc": "Melee hits against Snared or Chilled enemies have +20% critical strike chance. 8% increased melee damage.",
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "melee",
+   "crit",
+   "snare",
+   "chill"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hk_3",
+  "name": "Hunting Steel",
+  "type": "minor",
+  "x": 0,
+  "y": 760,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3_hk_a",
+   "p3_hk_b",
+   "p3_hk_ks"
+  ],
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "attack",
+   "speed"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hk_ks",
+  "name": "Twin Disciplines",
+  "type": "keystone",
+  "x": 0,
+  "y": 840,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "attack_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3_hk_3",
+   "p3_hk_4"
+  ],
+  "flags": [
+   "twin_disciplines"
+  ],
+  "desc": "Using a melee skill after a projectile skill, or a projectile skill after a melee skill, makes it deal 25% more damage. Using the same kind twice in a row makes it deal 10% less. 10% increased attack damage.",
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "attack",
+   "melee",
+   "projectile"
+  ],
+  "rev": 3,
+  "drawback": "Repeating a melee or projectile skill deals 10% less damage."
+ },
+ {
+  "id": "p3_hk_4",
+  "name": "Tracker",
+  "type": "minor",
+  "x": 0,
+  "y": 925,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3_hk_ks",
+   "xs_r4"
+  ],
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "attribute"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hs_1",
+  "name": "Conductive Fletching",
+  "type": "minor",
+  "x": 495,
+  "y": -205,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 5
+   },
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "h_rm3",
+   "p3_hs_2"
+  ],
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "lightning",
+   "projectile"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hs_2",
+  "name": "Hedge Scholar",
+  "type": "minor",
+  "x": 585,
+  "y": -225,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3_hs_1",
+   "p3_hs_a",
+   "p3_hs_b"
+  ],
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "attribute"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hs_a",
+  "name": "Charged Quiver",
+  "type": "notable",
+  "x": 665,
+  "y": -285,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3_hs_2",
+   "p3_hs_3",
+   "p4_s_rm"
+  ],
+  "flags": [
+   "charged_quiver"
+  ],
+  "desc": "Projectile hits have a 15% chance to Shock. 10% increased lightning damage.",
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "projectile",
+   "shock",
+   "lightning"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hs_b",
+  "name": "Overload",
+  "type": "notable",
+  "x": 665,
+  "y": -180,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3_hs_2",
+   "p3_hs_3",
+   "p4_s_rm"
+  ],
+  "flags": [
+   "overload"
+  ],
+  "desc": "Killing a Shocked enemy Shocks every enemy within 80 units and deals 10% of its maximum life to them as lightning damage. 8% increased lightning damage.",
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "shock",
+   "lightning",
+   "area"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hs_3",
+  "name": "Conductive Fletching",
+  "type": "minor",
+  "x": 745,
+  "y": -235,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "elemental_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3_hs_a",
+   "p3_hs_b",
+   "p3_hs_ks"
+  ],
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "elemental"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_hs_ks",
+  "name": "Spell Archer",
+  "type": "keystone",
+  "x": 835,
+  "y": -250,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "more",
+    "value": -15
+   }
+  ],
+  "links": [
+   "p3_hs_3"
+  ],
+  "flags": [
+   "spell_archer"
+  ],
+  "desc": "Increases to spell damage also apply to your projectile attacks. 15% less attack speed.",
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "projectile",
+   "spell",
+   "bow",
+   "firearm"
+  ],
+  "rev": 3,
+  "drawback": "15% less attack speed."
+ },
+ {
+  "id": "p3_sb_1",
+  "name": "Runed Steel",
+  "type": "minor",
+  "x": -495,
+  "y": -205,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 5
+   },
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "h_mw3",
+   "p3_sb_2"
+  ],
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "melee",
+   "spell"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_sb_2",
+  "name": "Battle Scholar",
+  "type": "minor",
+  "x": -585,
+  "y": -225,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "str",
+    "type": "flat",
+    "value": 4
+   },
+   {
+    "stat": "int",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3_sb_1",
+   "p3_sb_a",
+   "p3_sb_b"
+  ],
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "attribute"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_sb_a",
+  "name": "Rime Edge",
+  "type": "notable",
+  "x": -665,
+  "y": -285,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cold_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3_sb_2",
+   "p3_sb_3",
+   "p4_s_mw"
+  ],
+  "flags": [
+   "rime_edge"
+  ],
+  "desc": "Melee hits against Chilled enemies have a 25% chance to Freeze them. 10% increased cold damage.",
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "melee",
+   "chill",
+   "freeze",
+   "cold"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_sb_b",
+  "name": "Shatter",
+  "type": "notable",
+  "x": -665,
+  "y": -180,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cold_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3_sb_2",
+   "p3_sb_3",
+   "p4_s_mw"
+  ],
+  "flags": [
+   "shatter"
+  ],
+  "desc": "Killing a Frozen enemy shatters it: enemies within 60 units are Chilled and take 10% of its maximum life as cold damage. 8% increased cold damage.",
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "freeze",
+   "chill",
+   "cold",
+   "area"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_sb_3",
+  "name": "Runed Steel",
+  "type": "minor",
+  "x": -745,
+  "y": -235,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cold_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3_sb_a",
+   "p3_sb_b",
+   "p3_sb_ks"
+  ],
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "cold"
+  ],
+  "rev": 3
+ },
+ {
+  "id": "p3_sb_ks",
+  "name": "Battlemage's Covenant",
+  "type": "keystone",
+  "x": -835,
+  "y": -250,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "more",
+    "value": -15
+   }
+  ],
+  "links": [
+   "p3_sb_3"
+  ],
+  "flags": [
+   "battlemage"
+  ],
+  "desc": "Increases to spell damage also apply to your melee attacks, and increases to melee damage also apply to your spells. 15% less maximum life.",
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "melee",
+   "spell",
+   "life"
+  ],
+  "rev": 3,
+  "drawback": "15% less maximum life."
+ },
+ {
+  "id": "p3b_eb_t1",
+  "name": "Heavy Footing",
+  "type": "minor",
+  "x": -528,
+  "y": 688,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "w_brutal",
+   "p3b_eb_t2"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "melee"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_t2",
+  "name": "Ground Shaker",
+  "type": "minor",
+  "x": -566,
+  "y": 790,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_eb_t1",
+   "xo0_3"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "area"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_r0",
+  "name": "Tectonic Grip",
+  "type": "minor",
+  "x": -706,
+  "y": 983,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "two_handed_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "xo0_3",
+   "p3b_eb_r9"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "two_hand"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_r1",
+  "name": "Bedrock",
+  "type": "minor",
+  "x": -673,
+  "y": 1036,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_eb_r2"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "armour"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_r2",
+  "name": "Shatterstone",
+  "type": "minor",
+  "x": -677,
+  "y": 1097,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 4
+   },
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "p3b_eb_r3",
+   "p3b_eb_r1"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "area",
+   "melee"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_r3",
+  "name": "Tremor Lines",
+  "type": "notable",
+  "x": -717,
+  "y": 1145,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_eb_r4",
+   "p3b_eb_r2"
+  ],
+  "flags": [
+   "tremor_lines"
+  ],
+  "desc": "Slam hits Snare enemies for 1.5 seconds. Stuns you inflict on Snared enemies last 50% longer. 8% increased area.",
+  "cluster": "Earthbreaker",
+  "tags": [
+   "melee",
+   "area",
+   "snare",
+   "stun"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_r4",
+  "name": "Seismic Force",
+  "type": "minor",
+  "x": -777,
+  "y": 1160,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_eb_r5",
+   "p3b_eb_r3"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "physical"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_r5",
+  "name": "Mountain's Weight",
+  "type": "greater",
+  "x": -834,
+  "y": 1137,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "two_handed_damage",
+    "type": "inc",
+    "value": 10
+   },
+   {
+    "stat": "stun_threshold",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_eb_r6",
+   "p3b_eb_r4",
+   "p3b_eb_tip",
+   "p3b_eb_cap"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "two_hand",
+   "defence"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_r6",
+  "name": "Crushing Blows",
+  "type": "minor",
+  "x": -867,
+  "y": 1084,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_eb_r7",
+   "p3b_eb_r5"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "melee"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_r7",
+  "name": "Shockwave",
+  "type": "notable",
+  "x": -863,
+  "y": 1023,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_eb_r8",
+   "p3b_eb_r6"
+  ],
+  "flags": [
+   "shockwave"
+  ],
+  "desc": "Killing a Stunned enemy releases a shockwave: enemies within 70 units take 10% of its maximum life as physical damage and are Stunned. 8% increased melee damage.",
+  "cluster": "Earthbreaker",
+  "tags": [
+   "melee",
+   "area",
+   "stun",
+   "physical"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_r8",
+  "name": "Stone Skin",
+  "type": "minor",
+  "x": -823,
+  "y": 975,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 6
+   },
+   {
+    "stat": "vit",
+    "type": "flat",
+    "value": 3
+   }
+  ],
+  "links": [
+   "p3b_eb_r9",
+   "p3b_eb_r7"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "armour",
+   "attribute"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_r9",
+  "name": "Rumble",
+  "type": "minor",
+  "x": -763,
+  "y": 960,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_eb_r0",
+   "p3b_eb_r8"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "area"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_tip",
+  "name": "Fault Line",
+  "type": "greater",
+  "x": -879,
+  "y": 1190,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 10
+   },
+   {
+    "stat": "physical_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_eb_r5"
+  ],
+  "cluster": "Earthbreaker",
+  "tags": [
+   "area",
+   "physical"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_eb_cap",
+  "name": "Earthbreaker",
+  "type": "keystone",
+  "x": -770,
+  "y": 1060,
+  "cost": 2,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "more",
+    "value": -20
+   }
+  ],
+  "links": [
+   "p3b_eb_r5"
+  ],
+  "flags": [
+   "earthbreaker"
+  ],
+  "desc": "Slam skills deal 35% more damage and always Stun the enemies they hit. 20% less attack speed.",
+  "cluster": "Earthbreaker",
+  "tags": [
+   "melee",
+   "area",
+   "stun"
+  ],
+  "rev": 4,
+  "drawback": "20% less attack speed."
+ },
+ {
+  "id": "p3b_du_t1",
+  "name": "Light Step",
+  "type": "minor",
+  "x": -820,
+  "y": 120,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "w_bulwark",
+   "p3b_du_t2"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "mobility"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_t2",
+  "name": "Fencer's Wrist",
+  "type": "minor",
+  "x": -905,
+  "y": 90,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "one_handed_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_du_t1",
+   "p3b_du_r0"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "one_hand"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_r0",
+  "name": "Quick Hands",
+  "type": "minor",
+  "x": -930,
+  "y": 20,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "p3b_du_t2",
+   "p3b_du_r1",
+   "p3b_du_r9"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "attack",
+   "speed"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_r1",
+  "name": "Keen Edge",
+  "type": "minor",
+  "x": -986,
+  "y": 2,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_du_r2",
+   "p3b_du_r0"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "crit"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_r2",
+  "name": "Footwork",
+  "type": "minor",
+  "x": -1020,
+  "y": -46,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_du_r3",
+   "p3b_du_r1"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "evasion"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_r3",
+  "name": "Feint",
+  "type": "notable",
+  "x": -1020,
+  "y": -104,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_du_r4",
+   "p3b_du_r2"
+  ],
+  "flags": [
+   "feint"
+  ],
+  "desc": "After a dodge roll, your next melee hit within 2 seconds is a critical strike. 10% increased critical strike chance.",
+  "cluster": "Duelist",
+  "tags": [
+   "dodge",
+   "crit",
+   "melee"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_r4",
+  "name": "Precision",
+  "type": "minor",
+  "x": -986,
+  "y": -152,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_du_r5",
+   "p3b_du_r3"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "crit"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_r5",
+  "name": "Blademaster's Poise",
+  "type": "greater",
+  "x": -930,
+  "y": -170,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "one_handed_damage",
+    "type": "inc",
+    "value": 10
+   },
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3b_du_r6",
+   "p3b_du_r4",
+   "p3b_du_tip",
+   "p3b_du_cap"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "one_hand",
+   "speed"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_r6",
+  "name": "Lunge",
+  "type": "minor",
+  "x": -874,
+  "y": -152,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "melee_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_du_r7",
+   "p3b_du_r5"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "melee"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_r7",
+  "name": "Single Combat",
+  "type": "notable",
+  "x": -840,
+  "y": -104,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "damage_vs_elite",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_du_r8",
+   "p3b_du_r6",
+   "p4_s_w_out"
+  ],
+  "flags": [
+   "single_combat"
+  ],
+  "desc": "Melee hits against an enemy with no other enemy within 110 units Mark it for 3 seconds. 10% increased damage against elites and bosses.",
+  "cluster": "Duelist",
+  "tags": [
+   "melee",
+   "marked",
+   "elite"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_r8",
+  "name": "Sidestep",
+  "type": "minor",
+  "x": -840,
+  "y": -46,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 6
+   },
+   {
+    "stat": "dex",
+    "type": "flat",
+    "value": 3
+   }
+  ],
+  "links": [
+   "p3b_du_r9",
+   "p3b_du_r7"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "evasion",
+   "attribute"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_r9",
+  "name": "Cut Deep",
+  "type": "minor",
+  "x": -874,
+  "y": 2,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "one_handed_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_du_r0",
+   "p3b_du_r8"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "one_hand"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_tip",
+  "name": "Swordsman's Focus",
+  "type": "greater",
+  "x": -930,
+  "y": -240,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 12
+   },
+   {
+    "stat": "crit_multi",
+    "type": "flat",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_du_r5"
+  ],
+  "cluster": "Duelist",
+  "tags": [
+   "crit"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_du_cap",
+  "name": "Blade Dance",
+  "type": "notable",
+  "x": -930,
+  "y": -75,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_du_r5"
+  ],
+  "flags": [
+   "blade_dance"
+  ],
+  "desc": "Melee critical strikes grant a stack of Blade Dance for 3 seconds: 5% increased attack speed and movement speed per stack (up to 4). 6% increased attack speed.",
+  "cluster": "Duelist",
+  "tags": [
+   "melee",
+   "crit",
+   "speed"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_t1",
+  "name": "Nocking",
+  "type": "minor",
+  "x": 528,
+  "y": 688,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "r_deadeye",
+   "p3b_ba_t2"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "projectile"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_t2",
+  "name": "Draw Weight",
+  "type": "minor",
+  "x": 590,
+  "y": 770,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "bow_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_ba_t1",
+   "xo1_5"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "bow"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_r0",
+  "name": "Rapid Draw",
+  "type": "minor",
+  "x": 736,
+  "y": 943,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "xo1_5",
+   "p3b_ba_r9"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "attack",
+   "speed"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_r1",
+  "name": "Fletcher's Eye",
+  "type": "minor",
+  "x": 703,
+  "y": 996,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_speed",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_ba_r2"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "projectile"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_r2",
+  "name": "Volley Drill",
+  "type": "minor",
+  "x": 707,
+  "y": 1057,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_ba_r3",
+   "p3b_ba_r1"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "projectile"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_r3",
+  "name": "Volley Fire",
+  "type": "notable",
+  "x": 747,
+  "y": 1105,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_ba_r4",
+   "p3b_ba_r2"
+  ],
+  "flags": [
+   "volley_fire"
+  ],
+  "desc": "Attacks that fire more than one projectile fire 2 more. Attacks that fire a single projectile pierce 1 more enemy. 8% increased projectile damage.",
+  "cluster": "Barrage",
+  "tags": [
+   "projectile",
+   "attack"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_r4",
+  "name": "Steady Arm",
+  "type": "minor",
+  "x": 807,
+  "y": 1120,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "bow_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_ba_r5",
+   "p3b_ba_r3"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "bow"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_r5",
+  "name": "Quiver Master",
+  "type": "greater",
+  "x": 864,
+  "y": 1097,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 5
+   },
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_ba_r6",
+   "p3b_ba_r4",
+   "p3b_ba_tip",
+   "p3b_ba_cap"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "speed",
+   "projectile"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_r6",
+  "name": "Light Quiver",
+  "type": "minor",
+  "x": 897,
+  "y": 1044,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "move_speed",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3b_ba_r7",
+   "p3b_ba_r5"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "mobility"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_r7",
+  "name": "Arrowstorm",
+  "type": "notable",
+  "x": 893,
+  "y": 983,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_ba_r8",
+   "p3b_ba_r6"
+  ],
+  "flags": [
+   "arrowstorm"
+  ],
+  "desc": "Every 10th projectile attack hit calls down 3 volleys of arrows on the target (radius 40), each dealing 40% of that hit's damage. 6% increased attack speed.",
+  "cluster": "Barrage",
+  "tags": [
+   "projectile",
+   "area",
+   "attack"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_r8",
+  "name": "Hawk Eye",
+  "type": "minor",
+  "x": 853,
+  "y": 935,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_ba_r9",
+   "p3b_ba_r7"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "crit"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_r9",
+  "name": "Bowyer",
+  "type": "minor",
+  "x": 793,
+  "y": 920,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "bow_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_ba_r0",
+   "p3b_ba_r8"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "bow"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_tip",
+  "name": "Hail of Arrows",
+  "type": "greater",
+  "x": 909,
+  "y": 1150,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "projectile_damage",
+    "type": "inc",
+    "value": 8
+   },
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_ba_r5",
+   "p4_m_proj_b"
+  ],
+  "cluster": "Barrage",
+  "tags": [
+   "projectile",
+   "area"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ba_cap",
+  "name": "Endless Quiver",
+  "type": "notable",
+  "x": 800,
+  "y": 1020,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "attack_speed",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_ba_r5"
+  ],
+  "flags": [
+   "endless_quiver"
+  ],
+  "desc": "Projectile attacks have a 15% chance to fire a second time. 5% increased attack speed.",
+  "cluster": "Barrage",
+  "tags": [
+   "projectile",
+   "attack",
+   "speed"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_t1",
+  "name": "Snare Craft",
+  "type": "minor",
+  "x": 820,
+  "y": 120,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "r_engineer",
+   "p3b_tr_t2"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "trap"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_t2",
+  "name": "Tripwire",
+  "type": "minor",
+  "x": 905,
+  "y": 90,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_tr_t1",
+   "p3b_tr_r0"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "trap",
+   "ailment"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_r0",
+  "name": "Quick Set",
+  "type": "minor",
+  "x": 930,
+  "y": 20,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3b_tr_t2",
+   "p3b_tr_r1",
+   "p3b_tr_r9"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "trap",
+   "speed"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_r1",
+  "name": "Sharpened Teeth",
+  "type": "minor",
+  "x": 986,
+  "y": 2,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_tr_r2",
+   "p3b_tr_r0"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "trap"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_r2",
+  "name": "Toxic Coating",
+  "type": "minor",
+  "x": 1020,
+  "y": -46,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dot_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_tr_r3",
+   "p3b_tr_r1"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "dot",
+   "poison"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_r3",
+  "name": "Barbed Snares",
+  "type": "notable",
+  "x": 1020,
+  "y": -104,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_tr_r4",
+   "p3b_tr_r2"
+  ],
+  "flags": [
+   "barbed_snares"
+  ],
+  "desc": "Trap hits Snare enemies for 2 seconds and have a 30% chance to inflict Bleed. 10% increased trap damage.",
+  "cluster": "Trapper",
+  "tags": [
+   "trap",
+   "snare",
+   "bleed"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_r4",
+  "name": "Lingering Venom",
+  "type": "minor",
+  "x": 986,
+  "y": -152,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_tr_r5",
+   "p3b_tr_r3"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "ailment"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_r5",
+  "name": "Trapper's Instinct",
+  "type": "greater",
+  "x": 930,
+  "y": -170,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 10
+   },
+   {
+    "stat": "area",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_tr_r6",
+   "p3b_tr_r4",
+   "p3b_tr_tip",
+   "p3b_tr_cap"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "trap",
+   "area"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_r6",
+  "name": "Concealment",
+  "type": "minor",
+  "x": 874,
+  "y": -152,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "evasion",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_tr_r7",
+   "p3b_tr_r5"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "evasion"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_r7",
+  "name": "Noxious Payload",
+  "type": "notable",
+  "x": 840,
+  "y": -104,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "dot_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_tr_r8",
+   "p3b_tr_r6",
+   "p4_s_r_out"
+  ],
+  "flags": [
+   "noxious_payload"
+  ],
+  "desc": "Trap hits poison Snared enemies. Your poisons on Snared enemies stack up to 5 times; an enemy with 5 stacks suffers Agony. 8% increased damage over time.",
+  "cluster": "Trapper",
+  "tags": [
+   "trap",
+   "poison",
+   "agony",
+   "snare",
+   "dot"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_r8",
+  "name": "Caltrops",
+  "type": "minor",
+  "x": 840,
+  "y": -46,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "status_chance",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3b_tr_r9",
+   "p3b_tr_r7"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "ailment"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_r9",
+  "name": "Hunter's Patience",
+  "type": "minor",
+  "x": 874,
+  "y": 2,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_tr_r0",
+   "p3b_tr_r8"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "trap"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_tip",
+  "name": "Deadfall",
+  "type": "greater",
+  "x": 930,
+  "y": -240,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "trap_damage",
+    "type": "inc",
+    "value": 8
+   },
+   {
+    "stat": "damage_vs_elite",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_tr_r5"
+  ],
+  "cluster": "Trapper",
+  "tags": [
+   "trap",
+   "elite"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_tr_cap",
+  "name": "Master Trapper",
+  "type": "keystone",
+  "x": 930,
+  "y": -75,
+  "cost": 2,
+  "mods": [],
+  "links": [
+   "p3b_tr_r5"
+  ],
+  "flags": [
+   "master_trapper"
+  ],
+  "desc": "+1 to the maximum number of each trap. Your traps arm instantly and deal 30% more damage. You cannot deploy turrets.",
+  "cluster": "Trapper",
+  "tags": [
+   "trap",
+   "deployable"
+  ],
+  "rev": 4,
+  "drawback": "You cannot deploy turrets.",
+  "exclusive_with": [
+   "p2_ks_clockwork"
+  ]
+ },
+ {
+  "id": "p3b_ts_t1",
+  "name": "Static Charge",
+  "type": "minor",
+  "x": -95,
+  "y": -720,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "m_storm",
+   "p3b_ts_t2"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "lightning"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_t2",
+  "name": "Ionised Air",
+  "type": "minor",
+  "x": -130,
+  "y": -790,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 3
+   }
+  ],
+  "links": [
+   "p3b_ts_t1",
+   "p3b_ts_r0"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "spell",
+   "speed"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_r0",
+  "name": "Conductor",
+  "type": "minor",
+  "x": -181,
+  "y": -838,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_ts_t2",
+   "p3b_ts_r1",
+   "p3b_ts_r9"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "lightning"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_r1",
+  "name": "Thunder Lore",
+  "type": "minor",
+  "x": -217,
+  "y": -791,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_ts_r2",
+   "p3b_ts_r0"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "spell"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_r2",
+  "name": "Crackle",
+  "type": "minor",
+  "x": -273,
+  "y": -775,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "status_chance",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3b_ts_r3",
+   "p3b_ts_r1"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "ailment",
+   "shock"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_r3",
+  "name": "Conductive Web",
+  "type": "notable",
+  "x": -328,
+  "y": -795,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_ts_r4",
+   "p3b_ts_r2"
+  ],
+  "flags": [
+   "conductive_web"
+  ],
+  "desc": "When you Shock an enemy, the nearest unshocked enemy within 90 units is also Shocked. 10% increased lightning damage.",
+  "cluster": "Tempest",
+  "tags": [
+   "lightning",
+   "shock"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_r4",
+  "name": "Storm Mana",
+  "type": "minor",
+  "x": -361,
+  "y": -844,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_ts_r5",
+   "p3b_ts_r3"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "mana"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_r5",
+  "name": "Stormheart",
+  "type": "greater",
+  "x": -359,
+  "y": -902,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 10
+   },
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3b_ts_r6",
+   "p3b_ts_r4",
+   "p3b_ts_tip",
+   "p3b_ts_cap"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "lightning",
+   "speed"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_r6",
+  "name": "Arc Flash",
+  "type": "minor",
+  "x": -323,
+  "y": -949,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_ts_r7",
+   "p3b_ts_r5"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "crit"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_r7",
+  "name": "Thunderhead",
+  "type": "notable",
+  "x": -267,
+  "y": -965,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "p3b_ts_r8",
+   "p3b_ts_r6"
+  ],
+  "flags": [
+   "thunderhead"
+  ],
+  "desc": "Every 4th lightning spell you cast also strikes the enemy nearest your target with a bolt for 150% of the spell's damage, Shocking it. 6% increased cast speed.",
+  "cluster": "Tempest",
+  "tags": [
+   "lightning",
+   "spell",
+   "shock"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_r8",
+  "name": "Surge",
+  "type": "minor",
+  "x": -212,
+  "y": -945,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "mana_regen",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_ts_r9",
+   "p3b_ts_r7"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "mana"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_r9",
+  "name": "Galvanic",
+  "type": "minor",
+  "x": -179,
+  "y": -896,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_ts_r0",
+   "p3b_ts_r8"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "lightning"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_tip",
+  "name": "Eye of the Storm",
+  "type": "greater",
+  "x": -425,
+  "y": -926,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "res_lightning",
+    "type": "flat",
+    "value": 10
+   },
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_ts_r5",
+   "p4_m_elem_t"
+  ],
+  "cluster": "Tempest",
+  "tags": [
+   "resist",
+   "lightning"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_ts_cap",
+  "name": "Static Cascade",
+  "type": "notable",
+  "x": -270,
+  "y": -870,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "lightning_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_ts_r5"
+  ],
+  "flags": [
+   "static_cascade"
+  ],
+  "desc": "Lightning hits against Shocked enemies arc to another enemy within 100 units for 50% of the hit's damage. 10% increased lightning damage.",
+  "cluster": "Tempest",
+  "tags": [
+   "lightning",
+   "shock"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_t1",
+  "name": "Rime",
+  "type": "minor",
+  "x": 280,
+  "y": -775,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cold_damage",
+    "type": "inc",
+    "value": 6
+   }
+  ],
+  "links": [
+   "m_command",
+   "p3b_fw_t2"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "cold"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_t2",
+  "name": "Winter's Breath",
+  "type": "minor",
+  "x": 320,
+  "y": -850,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3b_fw_t1",
+   "p3b_fw_r0"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "spell"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_r0",
+  "name": "Frost Lore",
+  "type": "minor",
+  "x": 385,
+  "y": -911,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cold_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_fw_t2",
+   "p3b_fw_r1",
+   "p3b_fw_r9"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "cold"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_r1",
+  "name": "Glacial Ward",
+  "type": "minor",
+  "x": 383,
+  "y": -855,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "res_cold",
+    "type": "flat",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_fw_r2",
+   "p3b_fw_r0"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "resist"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_r2",
+  "name": "Numbing Touch",
+  "type": "minor",
+  "x": 415,
+  "y": -809,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "status_duration",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_fw_r3",
+   "p3b_fw_r1"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "ailment",
+   "chill"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_r3",
+  "name": "Cold Snap",
+  "type": "notable",
+  "x": 467,
+  "y": -790,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cold_damage",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_fw_r4",
+   "p3b_fw_r2",
+   "p4_s_m_out"
+  ],
+  "flags": [
+   "cold_snap"
+  ],
+  "desc": "When you Freeze an enemy, enemies within 70 units are Chilled. 10% increased cold damage.",
+  "cluster": "Frostweaver",
+  "tags": [
+   "cold",
+   "freeze",
+   "chill",
+   "area"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_r4",
+  "name": "Ice Mana",
+  "type": "minor",
+  "x": 520,
+  "y": -805,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "max_mana",
+    "type": "inc",
+    "value": 8
+   }
+  ],
+  "links": [
+   "p3b_fw_r5",
+   "p3b_fw_r3"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "mana"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_r5",
+  "name": "Heart of Winter",
+  "type": "greater",
+  "x": 555,
+  "y": -849,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cold_damage",
+    "type": "inc",
+    "value": 10
+   },
+   {
+    "stat": "spell_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_fw_r6",
+   "p3b_fw_r4",
+   "p3b_fw_tip",
+   "p3b_fw_cap"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "cold",
+   "spell"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_r6",
+  "name": "Shiver",
+  "type": "minor",
+  "x": 557,
+  "y": -905,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3b_fw_r7",
+   "p3b_fw_r5"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "spell",
+   "speed"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_r7",
+  "name": "Brittle",
+  "type": "notable",
+  "x": 525,
+  "y": -951,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "links": [
+   "p3b_fw_r8",
+   "p3b_fw_r6"
+  ],
+  "flags": [
+   "brittle"
+  ],
+  "desc": "Hits against Frozen enemies have +30% critical strike chance. Freezes you inflict last 30% longer. 10% increased critical strike chance.",
+  "cluster": "Frostweaver",
+  "tags": [
+   "freeze",
+   "crit",
+   "cold"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_r8",
+  "name": "Permafrost",
+  "type": "minor",
+  "x": 473,
+  "y": -970,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "cold_damage",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_fw_r9",
+   "p3b_fw_r7"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "cold"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_r9",
+  "name": "Hoarfrost",
+  "type": "minor",
+  "x": 420,
+  "y": -955,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "status_chance",
+    "type": "flat",
+    "value": 4
+   }
+  ],
+  "links": [
+   "p3b_fw_r0",
+   "p3b_fw_r8"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "ailment",
+   "chill"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_tip",
+  "name": "Ice Carapace",
+  "type": "greater",
+  "x": 611,
+  "y": -829,
+  "cost": 1,
+  "mods": [
+   {
+    "stat": "armour",
+    "type": "inc",
+    "value": 10
+   },
+   {
+    "stat": "max_life",
+    "type": "inc",
+    "value": 5
+   }
+  ],
+  "links": [
+   "p3b_fw_r5"
+  ],
+  "cluster": "Frostweaver",
+  "tags": [
+   "armour",
+   "life"
+  ],
+  "rev": 4
+ },
+ {
+  "id": "p3b_fw_cap",
+  "name": "Glacial Heart",
+  "type": "keystone",
+  "x": 470,
+  "y": -880,
+  "cost": 2,
+  "mods": [],
+  "links": [
+   "p3b_fw_r5"
+  ],
+  "flags": [
+   "glacial_heart"
+  ],
+  "desc": "Cold hits always Chill. Hits against Frozen enemies deal 40% more damage. Hits against enemies that are neither Chilled nor Frozen deal 20% less damage.",
+  "cluster": "Frostweaver",
+  "tags": [
+   "cold",
+   "chill",
+   "freeze"
+  ],
+  "rev": 4,
+  "drawback": "Hits against enemies that are neither Chilled nor Frozen deal 20% less damage.",
+  "exclusive_with": [
+   "p2_ks_embers",
+   "xp_ks"
+  ]
+ },
+ {
+  "id": "p4_m_melee",
+  "name": "Melee Mastery",
+  "type": "mastery",
+  "x": -478,
+  "y": 445,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "w_2h"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Weapon Master",
+  "tags": [
+   "melee"
+  ],
+  "rev": 5,
+  "mastery": "melee"
+ },
+ {
+  "id": "p4_m_bulwark",
+  "name": "Bulwark Mastery",
+  "type": "mastery",
+  "x": -613,
+  "y": 238,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "w_blk1"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Iron Bastion",
+  "tags": [
+   "armour",
+   "block"
+  ],
+  "rev": 5,
+  "mastery": "bulwark"
+ },
+ {
+  "id": "p4_m_bleed_w",
+  "name": "Bloodletting Mastery",
+  "type": "mastery",
+  "x": -280,
+  "y": 500,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "p2_bf_a"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Bloodrage",
+  "tags": [
+   "bleed",
+   "physical"
+  ],
+  "rev": 5,
+  "mastery": "bleed"
+ },
+ {
+  "id": "p4_m_bleed_x",
+  "name": "Bloodletting Mastery",
+  "type": "mastery",
+  "x": -181,
+  "y": 1173,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "xs_r6"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Sanguine Rites",
+  "tags": [
+   "bleed",
+   "physical"
+  ],
+  "rev": 5,
+  "mastery": "bleed"
+ },
+ {
+  "id": "p4_m_proj_r",
+  "name": "Projectile Mastery",
+  "type": "mastery",
+  "x": 478,
+  "y": 445,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "r_pspd"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Marksman",
+  "tags": [
+   "projectile"
+  ],
+  "rev": 5,
+  "mastery": "projectile"
+ },
+ {
+  "id": "p4_m_proj_b",
+  "name": "Projectile Mastery",
+  "type": "mastery",
+  "x": 964,
+  "y": 1150,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "p3b_ba_tip"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Barrage",
+  "tags": [
+   "projectile"
+  ],
+  "rev": 5,
+  "mastery": "projectile"
+ },
+ {
+  "id": "p4_m_deploy",
+  "name": "Deployable Mastery",
+  "type": "mastery",
+  "x": 613,
+  "y": 238,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "r_trap2"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Engineer",
+  "tags": [
+   "deployable",
+   "trap"
+  ],
+  "rev": 5,
+  "mastery": "deployable"
+ },
+ {
+  "id": "p4_m_afflict",
+  "name": "Affliction Mastery",
+  "type": "mastery",
+  "x": 280,
+  "y": 500,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "p2_vn_a"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Venom",
+  "tags": [
+   "dot",
+   "ailment"
+  ],
+  "rev": 5,
+  "mastery": "affliction"
+ },
+ {
+  "id": "p4_m_elem_m",
+  "name": "Elemental Mastery",
+  "type": "mastery",
+  "x": -251,
+  "y": -530,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "m_ele"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Elementalist",
+  "tags": [
+   "elemental"
+  ],
+  "rev": 5,
+  "mastery": "elemental"
+ },
+ {
+  "id": "p4_m_elem_t",
+  "name": "Elemental Mastery",
+  "type": "mastery",
+  "x": -468,
+  "y": -852,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "p3b_ts_tip"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Tempest",
+  "tags": [
+   "elemental"
+  ],
+  "rev": 5,
+  "mastery": "elemental"
+ },
+ {
+  "id": "p4_m_minion",
+  "name": "Minion Mastery",
+  "type": "mastery",
+  "x": 227,
+  "y": -552,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "m_minl"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Necromancy",
+  "tags": [
+   "minion"
+  ],
+  "rev": 5,
+  "mastery": "minion"
+ },
+ {
+  "id": "p4_m_mind",
+  "name": "Mind Mastery",
+  "type": "mastery",
+  "x": -1099,
+  "y": -401,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "xa_r2"
+  ],
+  "desc": "Choose one of its effects when you allocate it. Each effect can be taken only once.",
+  "cluster": "Mind Fortress",
+  "tags": [
+   "mana"
+  ],
+  "rev": 5,
+  "mastery": "mind"
+ },
+ {
+  "id": "p4_s_w_in",
+  "name": "Warrior Gem Socket",
+  "type": "socket",
+  "x": -448,
+  "y": 358,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "w_1h"
+  ],
+  "desc": "Holds one gem from your pouch. Socketing and removing are free.",
+  "cluster": "Weapon Master",
+  "tags": [
+   "generic"
+  ],
+  "rev": 6
+ },
+ {
+  "id": "p4_s_w_out",
+  "name": "Duelist Gem Socket",
+  "type": "socket",
+  "x": -786,
+  "y": -59,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "p3b_du_r7"
+  ],
+  "desc": "Holds one gem from your pouch. Socketing and removing are free.",
+  "cluster": "Duelist",
+  "tags": [
+   "generic"
+  ],
+  "rev": 6
+ },
+ {
+  "id": "p4_s_r_in",
+  "name": "Ranger Gem Socket",
+  "type": "socket",
+  "x": 448,
+  "y": 358,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "r_gun"
+  ],
+  "desc": "Holds one gem from your pouch. Socketing and removing are free.",
+  "cluster": "Marksman",
+  "tags": [
+   "generic"
+  ],
+  "rev": 6
+ },
+ {
+  "id": "p4_s_r_out",
+  "name": "Trapper Gem Socket",
+  "type": "socket",
+  "x": 786,
+  "y": -59,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "p3b_tr_r7"
+  ],
+  "desc": "Holds one gem from your pouch. Socketing and removing are free.",
+  "cluster": "Trapper",
+  "tags": [
+   "generic"
+  ],
+  "rev": 6
+ },
+ {
+  "id": "p4_s_m_in",
+  "name": "Mage Gem Socket",
+  "type": "socket",
+  "x": -184,
+  "y": -664,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "m_ele"
+  ],
+  "desc": "Holds one gem from your pouch. Socketing and removing are free.",
+  "cluster": "Elementalist",
+  "tags": [
+   "generic"
+  ],
+  "rev": 6
+ },
+ {
+  "id": "p4_s_m_out",
+  "name": "Frostweaver Gem Socket",
+  "type": "socket",
+  "x": 512,
+  "y": -736,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "p3b_fw_r3"
+  ],
+  "desc": "Holds one gem from your pouch. Socketing and removing are free.",
+  "cluster": "Frostweaver",
+  "tags": [
+   "generic"
+  ],
+  "rev": 6
+ },
+ {
+  "id": "p4_s_wr",
+  "name": "Hunter-Knight Gem Socket",
+  "type": "socket",
+  "x": 0,
+  "y": 690,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "p3_hk_a",
+   "p3_hk_b"
+  ],
+  "desc": "Holds one gem from your pouch. Socketing and removing are free.",
+  "cluster": "Warrior-Ranger Road",
+  "tags": [
+   "generic"
+  ],
+  "rev": 6
+ },
+ {
+  "id": "p4_s_rm",
+  "name": "Hexshot Gem Socket",
+  "type": "socket",
+  "x": 665,
+  "y": -232,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "p3_hs_a",
+   "p3_hs_b"
+  ],
+  "desc": "Holds one gem from your pouch. Socketing and removing are free.",
+  "cluster": "Ranger-Mage Road",
+  "tags": [
+   "generic"
+  ],
+  "rev": 6
+ },
+ {
+  "id": "p4_s_mw",
+  "name": "Spellblade Gem Socket",
+  "type": "socket",
+  "x": -665,
+  "y": -232,
+  "cost": 1,
+  "mods": [],
+  "links": [
+   "p3_sb_a",
+   "p3_sb_b"
+  ],
+  "desc": "Holds one gem from your pouch. Socketing and removing are free.",
+  "cluster": "Mage-Warrior Road",
+  "tags": [
+   "generic"
+  ],
+  "rev": 6
+ }
+]

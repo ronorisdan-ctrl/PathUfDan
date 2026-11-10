@@ -4,7 +4,7 @@ extends RefCounted
 ## absent at 0, so old items and saves need no migration (same idea as "locked").
 ## Rolling crafts (see data/corruption.json) always apply in full first; then one
 ## roll decides whether the item gains `step` corruption. At `max` the item can no
-## longer be crafted with a rolling craft. Exempt crafts always work.
+## longer be crafted. Non-rolling crafts are exempt from corruption gain, not the seal.
 ## `cfg` is optional everywhere: tests pass their own, the game uses Data.corruption_cfg.
 
 static func _c(cfg) -> Dictionary:
@@ -26,6 +26,9 @@ static func drop_start(cfg = null) -> int:
 static func get_level(it, cfg = null) -> int:
 	if it == null or typeof(it) != TYPE_DICTIONARY:
 		return 0
+	var raw = it.get("corruption", 0)
+	if not (raw is int or raw is float) or not is_finite(float(raw)):
+		return max_level(cfg)  # corrupt numeric data fails closed; preserve the raw value on load
 	return clampi(int(it.get("corruption", 0)), 0, max_level(cfg))
 
 static func is_maxed(it, cfg = null) -> bool:
@@ -37,9 +40,9 @@ static func rolls_for(craft_id: String, cfg = null) -> bool:
 static func is_exempt(craft_id: String, cfg = null) -> bool:
 	return craft_id in _c(cfg).get("exempt_crafts", [])
 
-## "" = allowed, otherwise the reason. Exempt crafts are always allowed.
+## "" = allowed, otherwise the reason. At 100% every craft is sealed.
 static func craft_refusal(it, craft_id: String, cfg = null) -> String:
-	if rolls_for(craft_id, cfg) and is_maxed(it, cfg):
+	if is_maxed(it, cfg) and (_c(cfg).get("seal_blocks_all_crafts", true) or rolls_for(craft_id, cfg)):
 		return str(_c(cfg).get("refusal_text", "Corrupted: this item can no longer be crafted"))
 	return ""
 
@@ -121,6 +124,7 @@ static func tooltip_bbcode(it, cfg = null) -> String:
 	var out := "[color=#%s]Corruption: %d%%[/color]  %s" % [col, lv, bar_bbcode(lv, 10, cfg)]
 	if is_maxed(it, cfg):
 		out += "\n[color=#%s]Corrupted: cannot be crafted[/color]" % level_color(max_level(cfg), cfg).to_html(false)
+		out += "\n[color=#db79e8]FINAL — cannot craft, socket or corrupt again[/color]"
 	return out
 
 ## Extra lines for the Blacksmith confirm dialog ("" for crafts that do not roll).

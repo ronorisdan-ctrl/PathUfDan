@@ -11,6 +11,7 @@ signal inventory_changed
 signal currency_changed
 signal skill_unlocked(skill_id)
 signal loadout_changed
+signal player_skill_used(skill_id)
 signal passive_changed
 signal boss_spawned(boss)
 signal boss_died(boss)

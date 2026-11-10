@@ -2,8 +2,12 @@ extends "res://scripts/ui/base_panel.gd"
 ## Class specialisation: pick one of your class's archetypes (from level 12),
 ## then spend specialisation points (levels 12/20/28/36/44) on its node path.
 
+const Chrome = preload("res://scripts/ui/components/panel_chrome.gd")
+
 var info: RichTextLabel
-var area: HBoxContainer
+var area: GridContainer
+var chooser_scroll: ScrollContainer
+var graph_frame: PanelContainer
 var reset_btn: Button
 
 class SpecGraph extends Control:
@@ -63,59 +67,77 @@ var graph: SpecGraph
 
 func _init() -> void:
 	place = "center"
-	build("Specialisation", Vector2(760, 560))
-	info = UIKit.rich("", 720)
+	build("Specialisation", Vector2(940, 620))
+	Chrome.apply(self)
+	info = UIKit.rich()
 	body.add_child(info)
-	area = HBoxContainer.new()
-	area.add_theme_constant_override("separation", 8)
-	body.add_child(area)
+	chooser_scroll = ScrollContainer.new()
+	Chrome.scroll_inset(chooser_scroll)
+	chooser_scroll.custom_minimum_size.y = 200
+	body.add_child(chooser_scroll)
+	area = GridContainer.new()
+	area.columns = 3
+	area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	area.add_theme_constant_override("h_separation", 8)
+	area.add_theme_constant_override("v_separation", 8)
+	chooser_scroll.add_child(area)
+	graph_frame = Chrome.Cabinet.inset()
+	graph_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_child(graph_frame)
 	graph = SpecGraph.new()
 	graph.panel = self
-	graph.custom_minimum_size = Vector2(720, 380)
-	body.add_child(graph)
+	graph.custom_minimum_size = Vector2(600, 380)
+	graph_frame.add_child(graph)
 	reset_btn = UIKit.button("Reset specialisation", _reset)
 	body.add_child(reset_btn)
 	Events.passive_changed.connect(refresh)
 	Events.player_leveled.connect(func(_l): refresh())
+
+func reposition() -> void:
+	Chrome.place_panel(self, Vector2(940, 620))
 
 func refresh() -> void:
 	var ch = Game.ch
 	if ch == null or not visible:
 		return
 	for c in area.get_children():
+		area.remove_child(c)
 		c.queue_free()
 	var specs: Array = Data.specs_for_class(ch.class_id)
 	if ch.spec_id == "":
-		graph.visible = false
+		graph_frame.visible = false
 		reset_btn.visible = false
-		area.visible = true
+		chooser_scroll.visible = true
 		var lock := "" if ch.level >= ch.SPEC_LEVELS[0] else "[color=#ff8080]Unlocks at level %d (you are level %d).[/color] " % [ch.SPEC_LEVELS[0], ch.level]
 		info.text = "[font_size=15]Choose a specialisation for your %s.[/font_size]\n%sYou gain a specialisation point at levels 12, 20, 28, 36 and 44. Only one capstone can be taken." % [ch.class_def()["name"], lock]
 		for sp in specs:
-			var card := PanelContainer.new()
-			card.custom_minimum_size = Vector2(140 if specs.size() > 5 else 140, 300)
+			var card := Chrome.Cabinet.inset()
+			card.custom_minimum_size = Vector2(0, 190)
+			card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			var v := VBoxContainer.new()
 			card.add_child(v)
-			v.add_child(UIKit.label(sp["name"], 15, Color(sp["color"])))
-			var d := UIKit.label(sp["desc"], 11, UIKit.MUTED)
+			var title := UIKit.label(sp["name"], 17, Color(sp["color"]))
+			title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			v.add_child(title)
+			var d := UIKit.label(sp["desc"], 12, Chrome.Cabinet.MUTED)
 			d.autowrap_mode = TextServer.AUTOWRAP_WORD
-			d.custom_minimum_size = Vector2(120, 150)
+			d.size_flags_vertical = Control.SIZE_EXPAND_FILL
 			v.add_child(d)
 			var caps := []
 			for n in sp["nodes"]:
 				if n.get("capstone", false):
 					caps.append(n["name"])
-			var cl := UIKit.label("Capstones: " + ", ".join(caps), 10, UIKit.GOLD)
+			var cl := UIKit.label("Capstones: " + ", ".join(caps), 12, UIKit.GOLD)
 			cl.autowrap_mode = TextServer.AUTOWRAP_WORD
-			cl.custom_minimum_size.x = 120
 			v.add_child(cl)
 			var b := UIKit.button("Choose", _choose.bind(sp["id"]))
+			b.tooltip_text = "Choose " + sp["name"]
 			b.disabled = ch.level < ch.SPEC_LEVELS[0]
 			v.add_child(b)
 			area.add_child(card)
 	else:
-		area.visible = false
-		graph.visible = true
+		chooser_scroll.visible = false
+		graph_frame.visible = true
 		reset_btn.visible = true
 		var sp: Dictionary = Data.specs[ch.spec_id]
 		graph.spec = sp

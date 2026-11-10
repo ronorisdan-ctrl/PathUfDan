@@ -26,6 +26,8 @@ var COND_FIELDS := [
 	{"k": "is_upgrade", "l": "Is an upgrade for me", "t": "tri"},
 	{"k": "tier_min", "l": "Dungeon tier at least", "t": "int"},
 	{"k": "tier_max", "l": "Dungeon tier at most", "t": "int"},
+	{"k": "rot_touched", "l": "Is Rot-touched (Atlas Rot 4+)", "t": "tri"},
+	{"k": "rot_implicit_any", "l": "Rot-touched kind ids (comma list)", "t": "list"},
 ]
 
 var engine: Node

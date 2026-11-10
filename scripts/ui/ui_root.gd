@@ -4,6 +4,8 @@ extends CanvasLayer
 
 const UIKit = preload("res://scripts/ui/ui_kit.gd")
 const HUD = preload("res://scripts/ui/hud.gd")
+const TooltipCard = preload("res://scripts/ui/components/tooltip_card.gd")
+const Chrome = preload("res://scripts/ui/components/inventory_chrome.gd")
 const PANELS := {
 	"inventory": "res://scripts/ui/inventory_panel.gd",
 	"character": "res://scripts/ui/character_panel.gd",
@@ -17,6 +19,10 @@ const PANELS := {
 	"training": "res://scripts/ui/training_panel.gd",
 	"stash": "res://scripts/ui/stash_panel.gd",
 	"dungeon": "res://scripts/ui/dungeon_panel.gd",
+	"atlas": "res://scripts/ui/atlas_panel.gd",
+	"easel": "res://scripts/ui/easel_panel.gd",
+	"guild": "res://scripts/ui/guild_panel.gd",
+	"wager": "res://scripts/ui/wager_panel.gd",
 	"pause": "res://scripts/ui/pause_panel.gd",
 	"options": "res://scripts/ui/options_panel.gd",
 	"death": "res://scripts/ui/death_panel.gd",
@@ -36,6 +42,11 @@ var context: PanelContainer
 var confirm: PanelContainer
 var confirm_text: RichTextLabel
 var confirm_cb: Callable
+var tooltip_reading := false
+var _reading_card := 0
+var _reading_character = null
+var _tooltip_anchor := Vector2.ZERO
+var _context_anchor := Vector2.ZERO
 
 func _ready() -> void:
 	layer = 10
@@ -63,9 +74,9 @@ func _ready() -> void:
 	toasts.alignment = BoxContainer.ALIGNMENT_BEGIN
 	root.add_child(toasts)
 	tooltip = _make_tooltip()
-	tooltip_text = tooltip.get_child(0)
+	tooltip_text = tooltip.text
 	tooltip2 = _make_tooltip()
-	tooltip2_text = tooltip2.get_child(0)
+	tooltip2_text = tooltip2.text
 	_build_context()
 	_build_confirm()
 	Events.message.connect(toast)
@@ -75,16 +86,14 @@ func _ready() -> void:
 	Events.item_picked.connect(func(it): toast("Picked up %s" % it["name"], Data.rarity_color(it.get("rarity", "common"))))
 	Events.player_died.connect(func(): open("death"))
 	get_viewport().size_changed.connect(_on_resize)
+	Events.inventory_changed.connect(func(): hide_tooltip(true))
+	Events.stats_changed.connect(func():
+		if tooltip_reading:
+			hide_tooltip(true))
+	Events.level_ready.connect(func(_level): hide_tooltip(true))
 
 func _make_tooltip() -> PanelContainer:
-	var t := PanelContainer.new()
-	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	t.add_theme_stylebox_override("panel", root.theme.get_stylebox("panel", "TooltipPanel"))
-	var r := UIKit.rich("", 300)
-	r.custom_minimum_size = Vector2(300, 0)
-	t.add_child(r)
-	t.visible = false
-	t.z_index = 100
+	var t := TooltipCard.new()
 	root.add_child(t)
 	return t
 
@@ -102,6 +111,7 @@ func any_blocking_open() -> bool:
 func open(n: String) -> void:
 	if not panels.has(n):
 		return
+	hide_tooltip(true)
 	if n == "death":
 		close_all()
 	var p = panels[n]
@@ -119,7 +129,7 @@ func close(n: String) -> void:
 	open_set.erase(n)
 	panels[n].visible = false
 	panels[n].on_close()
-	hide_tooltip()
+	hide_tooltip(true)
 	if n in ["vendor", "blacksmith", "stash", "jeweller"]:
 		close("inventory")
 	Events.ui_panel_toggled.emit(n, false)
@@ -136,13 +146,14 @@ func toggle(n: String) -> void:
 					open_set.erase(o)
 					panels[o].visible = false
 					panels[o].on_close()
-		if n in ["passives", "skills", "dungeon", "spec"]:
-			for o in ["passives", "skills", "dungeon", "spec"]:
+		if n in ["passives", "skills", "dungeon", "spec", "atlas", "easel", "guild"]:
+			for o in ["passives", "skills", "dungeon", "spec", "atlas", "easel", "guild"]:
 				if o != n:
 					close(o)
 		open(n)
 
 func close_all() -> void:
+	hide_tooltip(true)
 	for k in open_set.keys():
 		close(k)
 	hide_context()
@@ -178,6 +189,8 @@ func open_station(kind: String) -> void:
 			toggle("pets")
 		"training":
 			toggle("training")
+		"guild":
+			toggle("guild")
 		"dungeon":
 			toggle("dungeon")
 		"altar":
@@ -266,38 +279,74 @@ func filter_is_upgrade(it: Dictionary) -> bool:
 
 # ------------------------------------------------------------------ tooltip
 func show_tooltip(text: String, text2: String = "") -> void:
-	tooltip_text.text = text
+	if tooltip_reading:
+		return
+	tooltip.present(text)
+	tooltip2.present(text2)
+	# Keep the public text API current even when a menu/modal owns visibility.
+	if context.visible or confirm.visible:
+		return
 	tooltip.visible = true
-	tooltip.reset_size()
 	tooltip2.visible = text2 != ""
-	if text2 != "":
-		tooltip2_text.text = text2
-		tooltip2.reset_size()
 	_place_tooltips()
 
-func hide_tooltip() -> void:
+func hide_tooltip(force: bool = false) -> void:
+	if tooltip_reading and not force:
+		return
+	tooltip_reading = false
+	_reading_character = null
+	for card in [tooltip, tooltip2]:
+		card.set_reading(false)
+		card.mark_active(false)
+		if card.text.has_focus():
+			card.text.release_focus()
 	tooltip.visible = false
 	tooltip2.visible = false
 
 func _process(_delta: float) -> void:
+	if tooltip_reading and (Game.ch != _reading_character or not any_blocking_open()):
+		hide_tooltip(true)
 	if tooltip.visible:
 		_place_tooltips()
+	if confirm.visible:
+		_place_confirmation()
+	if context.visible:
+		_place_context()
 
 func _place_tooltips() -> void:
-	var m := root.get_local_mouse_position()
+	var m := _tooltip_anchor if tooltip_reading else root.get_local_mouse_position()
 	var vs := root.size
-	var sz := tooltip.size
+	var paired := tooltip2.visible
+	var width := minf(336, (vs.x - 16 - (6 if paired else 0)) / (2 if paired else 1))
+	tooltip.fit_card(width, vs.y - 16, any_blocking_open())
+	if paired:
+		tooltip2.fit_card(width, vs.y - 16, any_blocking_open())
+	var sz := Vector2(width * (2 if paired else 1) + (6 if paired else 0), maxf(tooltip.size.y, tooltip2.size.y if paired else 0))
 	var pos := m + Vector2(18, 12)
 	if pos.x + sz.x > vs.x:
 		pos.x = m.x - sz.x - 18
-	pos.y = clampf(pos.y, 0, maxf(0, vs.y - sz.y))
-	pos.x = maxf(0, pos.x)
-	tooltip.position = pos
-	if tooltip2.visible:
-		var p2 := Vector2(pos.x - tooltip2.size.x - 6, pos.y)
-		if p2.x < 0:
-			p2.x = pos.x + sz.x + 6
-		tooltip2.position = p2
+	pos.y = clampf(pos.y, 8, maxf(8, vs.y - sz.y - 8))
+	pos.x = clampf(pos.x, 8, maxf(8, vs.x - sz.x - 8))
+	# Equipped comparison to the left, hovered candidate to the right.
+	tooltip.position = pos + Vector2(width + 6 if paired else 0, 0)
+	if paired:
+		tooltip2.position = pos
+
+func _read_tooltips() -> void:
+	tooltip_reading = true
+	_reading_character = Game.ch
+	_tooltip_anchor = root.get_local_mouse_position()
+	tooltip.set_reading(true)
+	tooltip2.set_reading(true)
+	_focus_tooltip(0)
+	_place_tooltips()
+
+func _focus_tooltip(index: int) -> void:
+	_reading_card = index
+	tooltip.mark_active(index == 0)
+	tooltip2.mark_active(index == 1)
+	var card = tooltip if index == 0 else tooltip2
+	card.text.grab_focus()
 
 func item_tooltip(it: Dictionary, compare: bool) -> void:
 	var ch = Game.ch
@@ -362,6 +411,7 @@ func toast(text: String, color: Color = Color.WHITE) -> void:
 # ------------------------------------------------------------------ context menu
 func _build_context() -> void:
 	context = PanelContainer.new()
+	context.theme = Chrome.make_theme()
 	context.visible = false
 	context.z_index = 90
 	var v := VBoxContainer.new()
@@ -372,6 +422,7 @@ func show_context(options: Array) -> void:
 	## options: [[label, callable, enabled], ...]
 	var v: VBoxContainer = context.get_child(0)
 	for c in v.get_children():
+		v.remove_child(c)
 		c.queue_free()
 	for o in options:
 		var cb: Callable = o[1]
@@ -382,17 +433,52 @@ func show_context(options: Array) -> void:
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		v.add_child(b)
 	context.visible = true
-	context.reset_size()
-	context.position = root.get_local_mouse_position() + Vector2(4, 4)
-	var vs := root.size
-	context.position.x = minf(context.position.x, vs.x - 180)
-	context.position.y = minf(context.position.y, vs.y - 40 * options.size())
-	hide_tooltip()
+	_context_anchor = root.get_local_mouse_position() + Vector2(4, 4)
+	_place_context()
+	hide_tooltip(true)
+
+func _place_context() -> void:
+	context.size = context.get_combined_minimum_size()
+	context.position.x = clampf(_context_anchor.x, 8, maxf(8, root.size.x - context.size.x - 8))
+	context.position.y = clampf(_context_anchor.y, 8, maxf(8, root.size.y - context.size.y - 8))
 
 func hide_context() -> void:
 	context.visible = false
 
 func _input(event: InputEvent) -> void:
+	if tooltip_reading:
+		if event is InputEventKey and event.pressed:
+			if event.keycode in [KEY_ESCAPE, KEY_F4] and not event.alt_pressed:
+				hide_tooltip(true)
+				get_viewport().set_input_as_handled()
+				return
+			if event.keycode in [KEY_TAB, KEY_PAGEUP, KEY_PAGEDOWN, KEY_HOME, KEY_END]:
+				get_viewport().set_input_as_handled()
+				if event.keycode == KEY_TAB:
+					_focus_tooltip(1 - _reading_card if tooltip2.visible else 0)
+				else:
+					var card = tooltip if _reading_card == 0 else tooltip2
+					if event.keycode in [KEY_HOME, KEY_END]:
+						card.text.get_v_scroll_bar().value = 0 if event.keycode == KEY_HOME else card.text.get_v_scroll_bar().max_value
+					else:
+						card.scroll_page(-1 if event.keycode == KEY_PAGEUP else 1)
+				return
+		if event is InputEventMouseButton and event.pressed:
+			if tooltip.get_global_rect().has_point(event.position):
+				_focus_tooltip(0)
+			elif tooltip2.visible and tooltip2.get_global_rect().has_point(event.position):
+				_focus_tooltip(1)
+			elif event.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE]:
+				# Dismiss only; never send the dismissing click to an item or combat.
+				hide_tooltip(true)
+				get_viewport().set_input_as_handled()
+				return
+	elif tooltip.visible and any_blocking_open() and not context.visible and not confirm.visible:
+		if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F4 and not event.alt_pressed and not event.ctrl_pressed and not event.meta_pressed:
+			if tooltip.overflowing or (tooltip2.visible and tooltip2.overflowing):
+				_read_tooltips()
+				get_viewport().set_input_as_handled()
+				return
 	# While a confirmation is showing: Space = Confirm, Escape = Cancel.
 	# Handled here so the game (dodge, pause menu) never sees these keys.
 	if confirm.visible and event is InputEventKey and event.pressed and not event.echo:
@@ -411,6 +497,7 @@ func _input(event: InputEvent) -> void:
 # ------------------------------------------------------------------ confirmation
 func _build_confirm() -> void:
 	confirm = PanelContainer.new()
+	confirm.theme = Chrome.make_theme()
 	confirm.visible = false
 	confirm.z_index = 95
 	confirm.custom_minimum_size = Vector2(420, 0)
@@ -418,6 +505,9 @@ func _build_confirm() -> void:
 	v.add_theme_constant_override("separation", 10)
 	confirm.add_child(v)
 	confirm_text = UIKit.rich("", 400)
+	confirm_text.fit_content = false
+	confirm_text.scroll_active = true
+	confirm_text.mouse_filter = Control.MOUSE_FILTER_STOP
 	v.add_child(confirm_text)
 	var h := HBoxContainer.new()
 	h.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -438,6 +528,11 @@ func ask(text: String, cb: Callable) -> void:
 	confirm_text.text = text
 	confirm_cb = cb
 	confirm.visible = true
-	confirm.reset_size()
+	confirm_text.get_v_scroll_bar().value = 0
+	_place_confirmation()
+	hide_tooltip(true)
+
+func _place_confirmation() -> void:
+	confirm_text.custom_minimum_size.y = minf(maxf(20, confirm_text.get_content_height()), maxf(20, root.size.y - 120))
+	confirm.size = confirm.get_combined_minimum_size()
 	confirm.position = (root.size - confirm.size) / 2
-	hide_tooltip()

@@ -28,6 +28,7 @@ var added_fire := 0.0
 var front_guard := 0.0
 var is_miniboss := false
 var summons := []
+var summoned_total := 0      # adds created so far (zone lifetime cap)
 var dash_t := 0.0
 var dash_hit := {}
 var shield_max := 0.0
@@ -37,6 +38,30 @@ var elite_summon := ""
 var elite_summon_t := 6.0
 var blink := false
 var blink_t := 5.0
+var base_regen := 0.0        # regen / explode from the run, kept when a glaze layer is peeled
+var base_explode := false
+# Glazed Elites (Endgame Phase 1D): each layer is one elite modifier (outermost = last); a full
+# glaze-poise bar peels it (atlas.json mechanics.glazed).
+var glaze_total := 0
+var glaze_layers := 0
+var glaze_poise := {}
+var glaze_cfg := {}          # {"enabled", "poise"} in the shape Stun.poise_hit expects
+var glaze_data := {}
+var glaze_fight_t := -1.0    # seconds since the first hit on a glazed elite (-1 = not hit yet)
+var glaze_peeled := 0
+var glaze_shattered := 0
+# The Unfinished (Phase 1D): a sketch takes no life damage until painted with its status colours
+# or the neutral raw fill (atlas.json mechanics.unfinished).
+var sketched := false
+var sketch_need := []        # palette entries {id, name, color, statuses}
+var sketch_have := {}        # colour id -> true
+var sketch_raw := 0.0        # neutral fill, fraction of max life
+var sketch_data := {}
+var sketch_hit := false      # the last hit landed on the sketch (Combat.deal still applies statuses)
+var painted_by := ""         # "", "colour" or "raw"
+var loot_rank_up := false    # drops roll one rank higher (painted sketch)
+var loot_rarity_extra := 0.0 # extra rarity on this enemy's drops
+var _sketch_msg_t := 0.0
 
 var state := "idle"
 var state_t := 0.0
@@ -72,6 +97,8 @@ func setup(d: Dictionary, lvl: int, mods: Array, run: Dictionary = {}) -> void:
 	armour *= float(run.get("armour", 1.0))
 	regen = float(run.get("regen", 0.0))
 	death_explode = run.get("explode", false) and not is_boss
+	base_regen = regen
+	base_explode = death_explode
 	added_fire = float(run.get("added_fire", 0.0))
 	var rb := float(run.get("resist", 0.0))
 	if rb != 0.0:
@@ -121,7 +148,9 @@ func setup(d: Dictionary, lvl: int, mods: Array, run: Dictionary = {}) -> void:
 		tex = Art.tinted(d.get("sprite", "ghoul"), Color(d["tint"]))
 	if is_elite and not is_miniboss:
 		tex = Art.tinted(d.get("sprite", "ghoul"), elite_color)
-	setup_sprite(tex, 0.0, float(d.get("sprite_scale", 1.0)))
+	setup_sprite(tex, 0.0, float(d.get("sprite_scale", 1.0)), [str(d.get("id", "")), str(d.get("sprite", "ghoul"))])
+	if anim != null and (d.has("tint") or (is_elite and not is_miniboss)):
+		anim.self_modulate = Color.WHITE.lerp(Color(d["tint"]) if d.has("tint") else elite_color, 0.35)
 	if is_elite or is_boss:
 		var l := PointLight2D.new()
 		l.texture = Art.light_tex
@@ -136,7 +165,185 @@ func elite_title() -> String:
 	var names := []
 	for m in elite_mods:
 		names.append(m["name"])
+	if glaze_total > 0:
+		return "Glazed " + " ".join(names) if not names.is_empty() else "Peeled"
 	return " ".join(names)
+
+# ------------------------------------------------------------- Glazed Elites (Phase 1D)
+## Turns an elite into a Glazed Elite: one layer per modifier (the modifiers were picked by the level).
+func make_glazed(g: Dictionary) -> void:
+	if not is_elite or is_miniboss or is_boss:
+		return
+	glaze_data = g
+	glaze_total = mini(elite_mods.size(), int(g.get("max_layers", 4)))
+	glaze_layers = glaze_total
+	glaze_poise = Stun.new_poise()
+	glaze_cfg = {"enabled": true, "poise": {
+		"fill_fraction": float(g.get("fill_fraction", 0.2)), "big_hit_start": float(g.get("big_hit_start", 0.05)),
+		"big_hit_full": float(g.get("big_hit_full", 0.15)), "big_hit_multiplier": float(g.get("big_hit_multiplier", 1.75)),
+		"regen_delay": 0.0, "regen_per_sec": 0.0,
+		"stagger_duration": float(g.get("stagger", 0.6)), "immunity_after_stagger": float(g.get("peel_immunity", 2.5))}}
+
+func glaze_hit(dmg: float) -> bool:
+	if glaze_total > 0 and glaze_fight_t < 0.0:
+		glaze_fight_t = 0.0
+	if glaze_layers <= 0 or glaze_cfg.is_empty():
+		return false
+	if Stun.poise_hit(glaze_cfg, glaze_poise, dmg, max_life):
+		peel()
+		return true
+	return false
+
+## Burst poise: the glaze bar drains at decay_per_sec all the time, so only fast damage fills it.
+func glaze_tick(delta: float) -> void:
+	if glaze_fight_t >= 0.0:
+		glaze_fight_t += delta
+	if glaze_poise.is_empty():
+		return
+	glaze_poise["stagger"] = maxf(0.0, float(glaze_poise["stagger"]) - delta)
+	glaze_poise["immune"] = maxf(0.0, float(glaze_poise["immune"]) - delta)
+	glaze_poise["poise"] = maxf(0.0, float(glaze_poise["poise"]) - float(glaze_data.get("decay_per_sec", 25.0)) * delta)
+
+## Layers still on when it dies shatter into Flakes: all of them if it died within shatter_fast s of the
+## first hit, none after shatter_slow s, linear between (the fast-kill reward).
+func glaze_shatter_count() -> int:
+	if glaze_layers <= 0:
+		return 0
+	var t := maxf(0.0, glaze_fight_t)
+	var fast := float(glaze_data.get("shatter_fast", 3.0))
+	var slow := float(glaze_data.get("shatter_slow", 10.0))
+	var k := 1.0 if t <= fast else clampf((slow - t) / maxf(0.01, slow - fast), 0.0, 1.0)
+	return int(round(glaze_layers * k))
+
+## A stun or freeze on a glazed elite (hit-stun or a skill's stun) adds stun_poise to its glaze bar.
+func glaze_stun() -> bool:
+	if glaze_total > 0 and glaze_fight_t < 0.0:
+		glaze_fight_t = 0.0
+	if glaze_layers <= 0 or glaze_poise.is_empty() or float(glaze_poise["immune"]) > 0.0 or float(glaze_poise["stagger"]) > 0.0:
+		return false
+	glaze_poise["poise"] = float(glaze_poise["poise"]) + float(glaze_data.get("stun_poise", 60.0))
+	glaze_poise["since_hit"] = 0.0
+	if float(glaze_poise["poise"]) >= 100.0:
+		glaze_poise["poise"] = 0.0
+		glaze_poise["stagger"] = float(glaze_cfg["poise"]["stagger_duration"])
+		glaze_poise["immune"] = float(glaze_cfg["poise"]["immunity_after_stagger"]) + float(glaze_cfg["poise"]["stagger_duration"])
+		peel()
+		return true
+	return false
+
+## Peels the outermost layer: its modifier stops working and the level drops a Glaze Flake.
+func peel() -> void:
+	if glaze_layers <= 0 or elite_mods.is_empty():
+		return
+	var m: Dictionary = elite_mods.pop_back()
+	glaze_layers -= 1
+	glaze_peeled += 1
+	_unapply_mod(m)
+	interrupt_windup()
+	add_status("stun", float(glaze_cfg["poise"]["stagger_duration"]), {})
+	if not elite_mods.is_empty():
+		elite_color = Color(elite_mods[0].get("color", "#ffffff"))
+	else:
+		elite_color = Color(str(glaze_data.get("color", "#e0c890")))
+	if level != null:
+		level.add_fx(VFX.make("ring", global_position, Color(str(m.get("color", "#e0c890"))), 0.4, radius * 4.0))
+		Combat.number(level, global_position + Vector2(0, -14), "Peeled: %s" % str(m.get("name", "")), Color("#e0c890"))
+		if level.has_method("on_glaze_peel"):
+			level.on_glaze_peel(self, m)
+
+## Undoes one modifier's effects (setup() applied them multiplicatively).
+func _unapply_mod(m: Dictionary) -> void:
+	speed /= float(m.get("speed_mult", 1.0))
+	attack_speed_mult /= float(m.get("attack_speed_mult", 1.0))
+	elite_taken /= float(m.get("damage_taken_mult", 1.0))
+	damage_mult /= float(m.get("damage_mult", 1.0))
+	leech = 0.0
+	regen = base_regen
+	death_explode = base_explode
+	convert_type = ""
+	on_hit_status = ""
+	elite_summon = ""
+	blink = false
+	for o in elite_mods:
+		leech = maxf(leech, float(o.get("leech", 0.0)))
+		regen = maxf(regen, float(o.get("regen", 0.0)))
+		if o.get("death_explode", false):
+			death_explode = true
+		if o.has("convert"):
+			convert_type = o["convert"]
+		if o.has("on_hit_status"):
+			on_hit_status = o["on_hit_status"]
+		if o.has("summons"):
+			elite_summon = o["summons"]
+		if o.get("blink", false):
+			blink = true
+	if m.has("shield"):
+		shield_max = 0.0
+		shield = 0.0
+
+# ------------------------------------------------------------- The Unfinished (Phase 1D)
+## Makes this enemy a sketch that needs `colours` (palette entries) to be painted.
+func make_sketch(colours: Array, u: Dictionary) -> void:
+	if is_boss:
+		return
+	sketched = true
+	sketch_need = colours
+	sketch_data = u
+	modulate = Color(0.92, 0.88, 0.8, 0.62)
+
+func sketch_progress() -> float:
+	return clampf(sketch_raw / maxf(0.01, float(sketch_data.get("raw_fill", 0.6))), 0.0, 1.0)
+
+func _sketch_raw(v: float) -> void:
+	if not sketched or v <= 0.0:
+		return
+	sketch_raw += v / maxf(1.0, max_life)
+	if sketch_raw >= float(sketch_data.get("raw_fill", 0.6)):
+		paint("raw")
+
+func _sketch_status(type: String) -> void:
+	for c in sketch_need:
+		if c.get("statuses", []).has(type) and not sketch_have.has(c["id"]):
+			sketch_have[c["id"]] = true
+			if float(sketch_data.get("status_raw", 0.0)) > 0.0:   # Vivid Pigment (Phase 1E)
+				sketch_raw += float(sketch_data.get("status_raw", 0.0))
+			if level != null:
+				level.add_fx(VFX.make("ring", global_position, Color(str(c.get("color", "#ffffff"))), 0.3, radius * 3.0))
+	if sketch_have.size() >= sketch_need.size():
+		paint("colour")
+	elif sketch_raw >= float(sketch_data.get("raw_fill", 0.6)):
+		paint("raw")
+
+## The sketch becomes a full enemy: it takes damage again and its drops roll one rank higher.
+func paint(by: String) -> void:
+	if not sketched:
+		return
+	sketched = false
+	painted_by = by
+	loot_rank_up = true
+	if is_elite:
+		loot_rarity_extra += float(sketch_data.get("elite_rarity_bonus", 150))
+	loot_rarity_extra += float(sketch_data.get("painted_rarity", 0.0))   # Crowded Pigment (Phase 1E)
+	modulate = Color.WHITE
+	if level != null:
+		var col := Color(str(sketch_need[0].get("color", "#ffffff"))) if by == "colour" and not sketch_need.is_empty() else Color("#c8c0b0")
+		level.add_fx(VFX.make("nova", global_position, col, 0.35, radius * 4.0))
+		Combat.number(level, global_position + Vector2(0, -14), "Painted!" if by == "colour" else "Filled in", col)
+		if level.has_method("on_sketch_painted"):
+			level.on_sketch_painted(self, by)
+
+func add_status(type: String, duration: float, data: Dictionary) -> void:
+	super(type, duration, data)
+	if sketched and alive:
+		_sketch_status(type)
+	if glaze_layers > 0 and alive and type in ["stun", "freeze"]:
+		glaze_stun()
+
+func take_dot(amount: float, dtype: String) -> void:
+	if sketched:
+		_sketch_raw(amount * dot_resist(dtype) * float(sketch_data.get("dot_raw_mult", 0.5)))
+		return
+	super(amount, dtype)
 
 func _ready() -> void:
 	home = global_position
@@ -147,6 +354,14 @@ func _physics_process(delta: float) -> void:
 		return
 	if Dev.freeze_ai():
 		# developer tools: stand still, never think or attack (statuses and visuals still tick)
+		tick_statuses(delta)
+		update_visual(delta, false)
+		queue_redraw()
+		return
+	if def.get("object", false):
+		# Endgame 2D: a Pentimento Vault wall - takes hits and statuses, never thinks, moves or attacks
+		knock = Vector2.ZERO
+		recently_hit -= delta
 		tick_statuses(delta)
 		update_visual(delta, false)
 		queue_redraw()
@@ -162,6 +377,9 @@ func _physics_process(delta: float) -> void:
 	tick_statuses(delta)
 	if not alive:
 		return
+	if glaze_total > 0:
+		glaze_tick(delta)
+	_sketch_msg_t -= delta
 	if dash_t > 0:
 		_do_dash(delta)
 		return
@@ -277,8 +495,8 @@ func _chase() -> Vector2:
 		var fd: Vector2 = level.flow_dir(global_position) if target == level.player else Vector2.ZERO
 		if fd != Vector2.ZERO:
 			dir = fd
-	# light separation so packs spread around the target
-	for e in level.enemies:
+	# light separation so packs spread around the target (zones: awake enemies only)
+	for e in level.separation_pool():
 		if e != self and is_instance_valid(e):
 			var off: Vector2 = global_position - e.global_position
 			var l := off.length()
@@ -335,7 +553,7 @@ func _perform_attack() -> void:
 			dash_hit.clear()
 		"summoner":
 			summons = summons.filter(func(s): return is_instance_valid(s) and s.alive)
-			if summons.size() < int(def.get("summon_max", 4)):
+			if summons.size() < int(def.get("summon_max", 4)) and _summon_room() > 0:
 				_summon_adds(def.get("summon", "plague_rat"), int(def.get("summon_count", 2)))
 			else:
 				_fire_projectile(attack_dir)
@@ -367,10 +585,22 @@ func _tick_elite(delta: float) -> void:
 				state = "recover"
 				state_t = 0.35
 
+## Zones cap how many adds one non-boss summoner may create in total (level.summon_lifetime;
+## Endgame Phase 1). Dungeons have no cap (0), so their behaviour is unchanged.
+func _summon_room() -> int:
+	var cap: int = level.summon_lifetime if level != null else 0
+	if cap <= 0 or is_boss:
+		return 1 << 30
+	return cap - summoned_total
+
 func _summon_adds(id: String, n: int) -> void:
 	var sd: Dictionary = Data.enemies.get(id, {})
 	if sd.is_empty():
 		return
+	n = mini(n, _summon_room())
+	if n <= 0:
+		return
+	summoned_total += n
 	for i in n:
 		var p: Vector2 = global_position + Vector2.RIGHT.rotated(randf() * TAU) * randf_range(16, 30)
 		if level.is_solid(p):
@@ -428,12 +658,16 @@ func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float
 	var total := 0.0
 	var arm := armour * (0.5 if p.get("flags", {}).has("armour_pen") else 1.0)
 	var res_shift := -20.0 if statuses.has("frailty") else 0.0
+	var pen: float = float(p.get("ele_pen", 0.0))
 	for t in rolled:
 		var v: float = rolled[t]
 		if t == "physical":
 			v *= 1.0 - Combat.armour_reduction(arm, v)
 		else:
-			v *= 1.0 - clampf(float(resist.get(t, 0)) + res_shift, -100, 90) / 100.0
+			var r: float = float(resist.get(t, 0)) + res_shift
+			if pen > 0.0 and t in ["fire", "cold", "lightning"]:
+				r -= pen
+			v *= 1.0 - clampf(r, -100, 90) / 100.0
 		total += v
 	total *= taken_mult() * elite_taken
 	if front_guard > 0 and source != null and is_instance_valid(source):
@@ -449,6 +683,17 @@ func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float
 			target = source
 	if state == "idle":
 		state = "chase"
+	if sketched:   # The Unfinished: no life damage; the hit fills the neutral raw paint and can stun
+		sketch_hit = total > 0
+		if total > 0:
+			_sketch_raw(total)
+			if sketched:
+				_try_hit_stun(total)
+			if sketched and _sketch_msg_t <= 0.0 and level != null:
+				_sketch_msg_t = 1.2
+				Combat.number(level, global_position, "Sketch", Color("#c8c0b0"))
+		return 0.0
+	sketch_hit = false
 	if shield > 0 and total > 0:
 		var absorbed := minf(shield, total)
 		shield -= absorbed
@@ -467,6 +712,8 @@ func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float
 	apply_damage(total, source, crit, Combat.dominant_type(rolled))
 	if alive and total > 0 and not is_boss:
 		_try_hit_stun(total)
+		if glaze_layers > 0:
+			glaze_hit(total)
 	return total
 
 ## Armour/health stun for normal and elite enemies (bosses use poise in boss.gd).
@@ -474,8 +721,10 @@ func _try_hit_stun(dmg: float) -> void:
 	if Data.stun_cfg.is_empty():
 		return
 	var kind := "elite" if (is_elite or is_miniboss) else "normal"
-	if try_hit_stun(dmg, kind) > 0.0 and Data.stun_cfg["kinds"][kind].get("interrupts_windup", true):
+	var stunned := try_hit_stun(dmg, kind) > 0.0
+	if stunned and Data.stun_cfg["kinds"][kind].get("interrupts_windup", true):
 		interrupt_windup()
+
 
 ## Cancels a telegraphed attack: its warning circles are removed and the attack never lands.
 func interrupt_windup() -> bool:
@@ -500,6 +749,9 @@ func die(killer) -> void:
 	if level != null:
 		level.enemies.erase(self)
 		level.add_fx(VFX.make("dust", global_position, Color("#8a7a6a"), 0.4, radius * 2.5))
+		if glaze_total > 0 and level.has_method("on_glaze_death"):
+			glaze_shattered = glaze_shatter_count()
+			level.on_glaze_death(self, glaze_shattered)   # before the drops roll, so a full glaze adds rarity
 		Events.enemy_killed.emit(self, killer)
 		if death_explode:
 			_spawn_aoe(global_position, 42.0, 0.7, "explosion", Color("#ffa030"), 1.2)
@@ -507,6 +759,17 @@ func die(killer) -> void:
 
 func _draw() -> void:
 	if not alive:
+		return
+	if def.get("object", false):
+		var f := ThemeDB.fallback_font
+		var lbl := str(def.get("plaque", display_name))
+		var w := f.get_string_size(lbl, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
+		var col := Color(str(def.get("plaque_color", "#8fc4d8")))
+		draw_string_outline(f, Vector2(-w / 2, -26), lbl, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, 3, Color.BLACK)
+		draw_string(f, Vector2(-w / 2, -26), lbl, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, col)
+		var bw := 26.0
+		draw_rect(Rect2(-bw / 2, -20, bw, 3), Color(0, 0, 0, 0.7))
+		draw_rect(Rect2(-bw / 2, -20, bw * clampf(life / maxf(1.0, max_life), 0, 1), 3), col)
 		return
 	if state == "windup" and attack_kind == "melee":
 		var k := 1.0 - clampf(state_t / float(def.get("windup", 0.5)), 0, 1)
@@ -525,11 +788,13 @@ func _draw() -> void:
 		return
 	if life < max_life or is_elite:
 		var w := 18.0 if not is_elite else (24.0 if not is_miniboss else 34.0)
-		var y := -float(sprite.texture.get_height()) * sprite.scale.y - 2 if sprite else -20.0
+		var y := -visual_height() - 2
 		draw_rect(Rect2(-w / 2 - 1, y - 1, w + 2, 4), Color(0, 0, 0, 0.8))
 		draw_rect(Rect2(-w / 2, y, w * clampf(life / max_life, 0, 1), 2), Color("#d03030") if not is_elite else elite_color)
 		if shield_max > 0 and shield > 0:
 			draw_rect(Rect2(-w / 2, y + 2, w * clampf(shield / shield_max, 0, 1), 1), Color("#80a0ff"))
+		if glaze_total > 0:
+			_draw_glaze(w, y)
 		if is_elite:
 			var f := ThemeDB.fallback_font
 			var nm := elite_title()
@@ -538,3 +803,40 @@ func _draw() -> void:
 			draw_string(f, Vector2(-tw / 2, y - 3), nm, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, elite_color)
 	if shield > 0:
 		draw_arc(Vector2(0, -6), radius + 3, 0, TAU, 16, Color(0.5, 0.65, 1.0, 0.45), 1.0)
+	if sketched:
+		_draw_sketch()
+
+## Glaze: one pip per layer (filled = still on) and the glaze-poise bar under the life bar.
+func _draw_glaze(w: float, y: float) -> void:
+	var gc := Color(str(glaze_data.get("color", "#e0c890")))
+	var pw := 4.0
+	var x0 := -float(glaze_total) * (pw + 1.0) / 2.0
+	for i in glaze_total:
+		var r := Rect2(x0 + i * (pw + 1.0), y + 4, pw, 2)
+		if i < glaze_layers:
+			draw_rect(r, gc)
+		else:
+			draw_rect(r, Color(gc.r, gc.g, gc.b, 0.25), false, 1.0)
+	if glaze_layers > 0 and not glaze_poise.is_empty():
+		var pf := clampf(float(glaze_poise["poise"]) / 100.0, 0.0, 1.0)
+		var col := gc if float(glaze_poise["immune"]) <= 0.0 else Color(0.5, 0.5, 0.5, 0.8)
+		draw_rect(Rect2(-w / 2, y + 7, w * pf, 1), col)
+
+## Sketch: dashed outline split into its colours (bright once painted) and the raw-fill arc.
+func _draw_sketch() -> void:
+	var r := radius + 5.0
+	var n := maxi(1, sketch_need.size())
+	var seg := TAU / n
+	for i in n:
+		var c: Dictionary = sketch_need[i] if i < sketch_need.size() else {}
+		var col := Color(str(c.get("color", "#c8c0b0")))
+		var done := sketch_have.has(c.get("id", ""))
+		col.a = 1.0 if done else 0.75
+		var a0 := -PI / 2 + i * seg
+		var dashes := 6
+		for d in dashes:
+			var s0 := a0 + seg * float(d) / dashes
+			draw_arc(Vector2(0, -6), r, s0, s0 + seg / dashes * (1.0 if done else 0.55), 4, col, 2.0 if done else 1.5)
+	var pr := sketch_progress()
+	if pr > 0.0:
+		draw_arc(Vector2(0, -6), r + 3.0, -PI / 2, -PI / 2 + TAU * pr, 16, Color(0.8, 0.76, 0.68, 0.7), 1.0)

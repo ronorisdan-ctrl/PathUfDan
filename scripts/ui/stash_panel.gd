@@ -7,6 +7,7 @@ extends "res://scripts/ui/base_panel.gd"
 
 const ItemSlot = preload("res://scripts/ui/item_slot.gd")
 const Rules = preload("res://scripts/core/stash_rules.gd")
+const Chrome = preload("res://scripts/ui/components/station_chrome.gd")
 
 var slots := []
 var mode := "stash"                       # "stash" | "shared"
@@ -20,6 +21,7 @@ var grid: GridContainer
 func _init() -> void:
 	place = "left"
 	build("Stash", Vector2(420, 560))
+	Chrome.apply(self)
 	var mrow := HBoxContainer.new()
 	mrow.add_theme_constant_override("separation", 6)
 	body.add_child(mrow)
@@ -34,14 +36,17 @@ func _init() -> void:
 	tab_row = HFlowContainer.new()
 	tab_row.add_theme_constant_override("h_separation", 4)
 	tab_row.add_theme_constant_override("v_separation", 4)
-	body.add_child(tab_row)
+	var tab_scroll := Chrome.reading_scroll(body, 72)
+	tab_scroll.size_flags_vertical = Control.SIZE_FILL
+	tab_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tab_scroll.add_child(tab_row)
 	info_label = UIKit.label("", 11, UIKit.MUTED)
 	body.add_child(info_label)
 	grid = GridContainer.new()
 	grid.columns = Rules.columns(Data.stash_cfg)
 	grid.add_theme_constant_override("h_separation", 4)
 	grid.add_theme_constant_override("v_separation", 4)
-	body.add_child(grid)
+	Chrome.inset(body, grid)
 	for i in Rules.slots_per_tab(Data.stash_cfg):
 		var s = ItemSlot.new()
 		s.key = i
@@ -52,11 +57,14 @@ func _init() -> void:
 		s.unhovered.connect(func(_s): ui.hide_tooltip())
 		grid.add_child(s)
 		slots.append(s)
-	body.add_child(UIKit.label("LMB: take an item. LMB in your bag: store it.", 11, UIKit.MUTED))
-	body.add_child(UIKit.label("Shared Stash is visible to all your characters (items only).", 11, UIKit.MUTED))
+	body.add_child(Chrome.caption("LMB: take an item. LMB in your bag: store it."))
+	body.add_child(Chrome.caption("Shared Stash is visible to all your characters (items only)."))
 	Events.inventory_changed.connect(refresh)
 	Events.currency_changed.connect(refresh)
 	SharedStash.changed.connect(refresh)
+
+func reposition() -> void:
+	Chrome.place_panel(self, Vector2(480, 620))
 
 # ------------------------------------------------------------------ state helpers
 func is_shared() -> bool:

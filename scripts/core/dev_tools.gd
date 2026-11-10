@@ -15,6 +15,8 @@ const DevRules = preload("res://scripts/core/dev_rules.gd")
 const CharacterData = preload("res://scripts/core/character_data.gd")
 const PetRules = preload("res://scripts/core/pet_rules.gd")
 const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
+const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
+const GuildRules = preload("res://scripts/core/guild_rules.gd")
 
 signal changed   # enabled state or a flag changed (panel, HUD)
 
@@ -308,7 +310,9 @@ func respec_passives() -> Dictionary:
 		return _fail(why)
 	var ch = Game.ch
 	_taint()
+	ch.clear_tree_gems()
 	ch.allocated = [ch.class_def().get("start_passive", "")]
+	ch.mastery_choices = {}
 	ch.recalc()
 	Events.passive_changed.emit()
 	return _ok("Passives reset for free (%d points available)" % ch.available_passive_points())
@@ -581,6 +585,28 @@ func clear_bag_corruption() -> Dictionary:
 	Events.inventory_changed.emit()
 	return _ok("Corruption cleared on %d bag item%s" % [n, "" if n == 1 else "s"])
 
+## Endgame 2B: gives every bag item without one a Rot-touched implicit (Rot 5 tier),
+## cycling through the pool so each entry can be seen. Taints the save.
+func rot_touch_bag() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	var AC = preload("res://scripts/core/atlas_craft_rules.gd")
+	var pool: Array = AC.pool()
+	if pool.is_empty():
+		return _fail("No Rot-touched pool in data/atlas.json")
+	var r := RandomNumberGenerator.new()
+	r.randomize()
+	var n := 0
+	for it in Game.ch.inventory:
+		if it != null and not it.has("rot_implicit"):
+			it["rot_implicit"] = AC.make_record(pool[n % pool.size()], 2, r)
+			n += 1
+	_taint()
+	Game.ch.recalc()
+	Events.inventory_changed.emit()
+	return _ok("Rot-touched %d bag item%s" % [n, "" if n == 1 else "s"])
+
 func unique_for_base(base_id: String) -> String:
 	for u in Data.unique_list:
 		if u.get("base", "") == base_id:
@@ -738,7 +764,7 @@ func start_run(dungeon_id: String, mods: Array = [], depth: int = 1) -> Dictiona
 	var why := _gate()
 	if why != "":
 		return _fail(why)
-	var def: Dictionary = Data.dungeons.get(dungeon_id, {})
+	var def: Dictionary = Data.dungeons.get(dungeon_id, Data.zones.get(dungeon_id, {}))
 	if def.is_empty():
 		return _fail("Unknown dungeon")
 	if Game.main == null or not is_instance_valid(Game.main):
@@ -753,6 +779,153 @@ func start_run(dungeon_id: String, mods: Array = [], depth: int = 1) -> Dictiona
 	if not Game.main.enter_dungeon(dungeon_id, s, {"mods": clean, "depth": maxi(1, depth)}):
 		return _fail("Could not build the dungeon")
 	return _ok("Entered %s%s%s" % [def["name"], (" depth %d" % depth) if depth > 1 else "", (" with %d modifiers" % clean.size()) if clean.size() > 0 else ""])
+
+# ---- Atlas of Ruin (Endgame Phase 1E dev shortcuts)
+func atlas_unlock() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	_taint()
+	AtlasRules.ensure(Game.ch)
+	return _ok("Atlas of Ruin unlocked")
+
+func atlas_reveal_all() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	var n := 0
+	for h in AtlasRules.within(Vector2i.ZERO, AtlasRules.radius()):
+		if AtlasRules.ring_of(h) >= 1 and not AtlasRules.is_revealed(st, h):
+			st["revealed"].append(AtlasRules.key(h))
+			n += 1
+	return _ok("Revealed %d regions" % n)
+
+## Sets hex "q,r" to Rot n (0 clears it; a Restored hex is un-restored first). Rings below min_ring refuse.
+func atlas_set_rot(hex_key: String, n: int) -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	var h := AtlasRules.parse(hex_key.strip_edges())
+	if not AtlasRules.in_atlas(h) or AtlasRules.ring_of(h) < int(AtlasRules.rot_cfg().get("min_ring", 2)):
+		return _fail("Rot needs a region in ring %d or further (q,r)" % int(AtlasRules.rot_cfg().get("min_ring", 2)))
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	st["restored"].erase(AtlasRules.key(h))
+	if n <= 0:
+		st["rot"].erase(AtlasRules.key(h))
+	else:
+		st["rot"][AtlasRules.key(h)] = clampi(n, 1, int(AtlasRules.rot_cfg().get("max", 5)))
+	if not AtlasRules.is_revealed(st, h):
+		st["revealed"].append(AtlasRules.key(h))
+	return _ok("Region %s is now Rot %d" % [AtlasRules.key(h), maxi(0, n)])
+
+## "" = natural roll, "none" = no natural mechanic, or a mechanic id (Pigments still apply). Not saved.
+func atlas_force_mechanic(id: String) -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	Game.atlas_force_mechanic = id
+	return _ok("Atlas mechanic: %s" % ("natural roll" if id == "" else id))
+
+## Endgame 2D: opens every Pentimento Vault of the current Atlas zone (tests / balancing).
+func atlas_open_vaults() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	var lv = Game.level
+	if lv == null or not ("vaults" in lv) or lv.vaults.is_empty():
+		return _fail("No Pentimento Vaults in this zone")
+	var n := 0
+	for v in lv.vaults:
+		if not v["open"]:
+			lv.open_vault(v)
+			n += 1
+	return _ok("Opened %d vault%s" % [n, "" if n == 1 else "s"])
+
+## +Flakes/+Dust, one Pigment of every modifier and one of each Varnish.
+func atlas_grant() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	Game.ch.add_material("glaze_flake", 300)
+	Game.ch.add_material("pigment_dust", 100)
+	var n := 0
+	for mech in AtlasRules.pig_cfg().get("mods", {}):
+		for m in AtlasRules.pig_cfg()["mods"][mech]:
+			if AtlasRules.pigment_count(st) < int(AtlasRules.pig_cfg().get("stock_cap", 12)):
+				AtlasRules.add_pigment(st, str(mech), str(m.get("id", "")))
+				n += 1
+	for v in AtlasRules.varn_cfg().get("list", []):
+		AtlasRules.add_varnish(st, str(v.get("id", "")))
+	return _ok("Granted 300 Flakes, 100 Dust, %d Pigments and every Varnish" % n)
+
+## Layer Wardens (Phase 2A): +3 Ground Shards of every warded ring.
+func atlas_grant_shards() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	for r in AtlasRules.warden_rings():
+		AtlasRules.add_shards(st, r, AtlasRules.summon_cost())
+	return _ok("+%d Ground Shards of each layer" % AtlasRules.summon_cost())
+
+## Restorers' Guild (Phase 2C): +rep reputation and +seals Seals.
+func atlas_guild_grant(rep: int, seals: int) -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	var g := GuildRules.ensure(st)
+	GuildRules.adds_rep(st, rep)
+	g["seals"] = mini(int(GuildRules.cfg().get("seal_cap", 99)), int(g["seals"]) + seals)
+	return _ok("Guild: +%d reputation (rank %d), +%d Seals" % [rep, GuildRules.rank(st), seals])
+
+## Restorers' Guild: complete every unfinished contract on the board (pays them) and refresh it.
+func atlas_guild_complete() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	var g := GuildRules.ensure(st)
+	var n := 0
+	for c in g["board"]:
+		if not c.get("done", false):
+			c["have"] = int(c["need"]) - 1
+			var t := GuildRules.template(str(c["tpl"]))
+			var rep := {"zones": 0, "ring": 9, "rot": 9}
+			rep[str(t.get("stat", "zones"))] = 1
+			n += GuildRules.credit(st, rep)["completed"].size()
+	GuildRules.refresh(st)
+	return _ok("Guild: %d contracts completed, board refreshed" % n)
+
+## Summons the ring's Warden at hex "q,r" (reveals it, marks it cleared once and tops up shards).
+func atlas_summon_warden(hex_key: String) -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	var h := AtlasRules.parse(hex_key.strip_edges())
+	if AtlasRules.warden_cfg(AtlasRules.ring_of(h)).is_empty() or not AtlasRules.in_atlas(h):
+		return _fail("No Warden for that region (q,r in rings %s)" % str(AtlasRules.warden_rings()))
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	if not AtlasRules.is_revealed(st, h):
+		st["revealed"].append(AtlasRules.key(h))
+	if AtlasRules.clears(st, h) <= 0:
+		st["clears"][AtlasRules.key(h)] = 1
+	var ring := AtlasRules.ring_of(h)
+	if AtlasRules.shards(st, ring) < AtlasRules.summon_cost():
+		AtlasRules.add_shards(st, ring, AtlasRules.summon_cost() - AtlasRules.shards(st, ring))
+	AtlasRules.unsummon(st, ring)
+	if not AtlasRules.summon(st, h):
+		return _fail(AtlasRules.summon_refusal(st, h))
+	return _ok("Warden of ring %d summoned at %s" % [ring, AtlasRules.key(h)])
 
 func set_abyss_depth(depth: int) -> Dictionary:
 	var abyss := ""

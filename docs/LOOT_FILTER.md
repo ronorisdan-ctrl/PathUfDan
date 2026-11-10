@@ -47,7 +47,7 @@ User filters live in `user://loot_filters/<character>/NAME.json` (the panel show
       "minimap": { "shape": "diamond", "color": "#ffd84a" }, "continue": false } } ] }
 ```
 
-Conditions (all must match): `rarity_min`, `rarity_max`, `kind`, `slot`, `name_contains`, `ilvl_min/max`, `ilvl_vs_player_min/max`, `sockets_min`, `affix_any` + `affix_min_matches`, `affix_count_min`, `is_upgrade`, `tier_min/max`. Actions: `visibility` (show, minimal, hide), `color`, `size` (small, normal, large, huge), `beam` (colour or "none"), `sound` (id or "none"), `minimap` (object or "none"), `continue`. Rules run top to bottom; with `continue`, later rules override the fields they set.
+Conditions (all must match): `rarity_min`, `rarity_max`, `kind`, `slot`, `name_contains`, `ilvl_min/max`, `ilvl_vs_player_min/max`, `sockets_min`, `affix_any` + `affix_min_matches`, `affix_count_min`, `is_upgrade`, `tier_min/max`, `rot_touched` (true/false) and `rot_implicit_any` (list of Rot-touched ids from `data/atlas.json` `rot_touched.pool`; Endgame 2B). Actions: `visibility` (show, minimal, hide), `color`, `size` (small, normal, large, huge), `beam` (colour or "none"), `sound` (id or "none"), `minimap` (object or "none"), `continue`. Rules run top to bottom; with `continue`, later rules override the fields they set.
 
 `evaluate(item, ctx)` returns `{visibility, visible, color, font_px, beam, sound, minimap, rule, safety_override}`. `color` and `beam` are `null` when unset and `font_px` is -1 when unset, so the caller keeps its default.
 
@@ -80,3 +80,9 @@ Conditions (all must match): `rarity_min`, `rarity_max`, `kind`, `slot`, `name_c
 ## 8. Open questions
 
 None outstanding.
+
+## 9. Rot-touched items (Endgame 2B, 2026-11-05)
+
+- `describe()` adds `rot` = the item's `rot_implicit.id` ("" when none). Conditions `rot_touched` and `rot_implicit_any` read it; the editor has both fields ("Is Rot-touched", "Rot-touched kind ids").
+- Every preset now starts with a **"Rot-touched" rule (green #b0e050 beam + diamond minimap icon, `continue`)**, so rarer rules keep their own label colour and a legendary/epic keeps its own beam. A second rule shows Rot-touched gear below rare in a large green label (strict: below epic), before the hide/dim rules, so no preset hides or dims a Rot-touched item.
+- `tools/validate_loot_filters.py` knows both conditions and warns on an unknown Rot-touched id. `SAMPLE_ITEMS` has a Rot-touched sample ("Blighted Boots") for the dry run. Tests: `_t_rot_touched` in `tests/test_loot_filter.gd`.

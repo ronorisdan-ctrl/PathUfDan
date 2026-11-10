@@ -1,5 +1,5 @@
 {
-  "npc": {"name": "Drillmaster Rook", "cell": [14, 18], "sprite": "drillmaster", "color": "#e0a050"},
+  "npc": {"name": "Drillmaster Rook", "cell": [14, 18], "sprite": "npc_drillmaster", "color": "#e0a050"},
   "spawn_cell": [18, 18],
   "durations": [10, 30],
   "default_duration": 10,

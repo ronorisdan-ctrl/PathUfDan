@@ -16,6 +16,7 @@ extends RefCounted
 ##   potion_discipline  0..1; drink threshold = 0.30 + 0.20 * discipline of max life, cleanses DoTs if >= 0.9
 ##   decision_ms        how often targets / skills / movement goals are re-evaluated (APM)
 ##   lead_targets       aim projectiles ahead of moving targets
+##   group_perception   (Phase 2E, off by default) telegraphs spawned together by one source share one awareness roll
 
 const BASE := {
 	"reaction_ms": 350.0,
@@ -30,6 +31,7 @@ const BASE := {
 	"potion_discipline": 0.7,
 	"decision_ms": 120.0,
 	"lead_targets": false,
+	"group_perception": false,
 }
 
 const PRESETS := {

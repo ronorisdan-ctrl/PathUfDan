@@ -4,14 +4,20 @@ extends Node
 
 const DevRules = preload("res://scripts/core/dev_rules.gd")
 const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
+const CorruptionSystem = preload("res://scripts/core/corruption_system.gd")
+const AtlasCraft = preload("res://scripts/core/atlas_craft_rules.gd")
+const GuildRules = preload("res://scripts/core/guild_rules.gd")
 
 var rng := RandomNumberGenerator.new()
+var brand_rng := RandomNumberGenerator.new()  # rare-material stream never perturbs existing drops
 
 func _ready() -> void:
 	rng.randomize()
+	brand_rng.randomize()
 
 func set_seed(s: int) -> void:
 	rng.seed = s
+	brand_rng.seed = s + 17041
 
 # ------------------------------------------------------------------ creation
 func make_item(base_id: String, rarity: String, ilvl: int) -> Dictionary:
@@ -26,6 +32,7 @@ func make_item(base_id: String, rarity: String, ilvl: int) -> Dictionary:
 		"two_handed": b.get("two_handed", false), "tags": b.get("tags", []).duplicate(),
 		"armour_type": b.get("armour_type", ""), "implicit": b.get("implicit", []).duplicate(true),
 		"affixes": [], "upgrade": 0, "uid": 0,
+		"corrupted_prefix": null, "corrupted_suffix": null, "corruption_roll_version": 0,
 	}
 	for k in ["damage", "aps", "crit", "armour", "evasion", "block"]:
 		if b.has(k):
@@ -87,6 +94,8 @@ func max_sockets(it: Dictionary) -> int:
 	return 0
 
 func roll_sockets(it: Dictionary) -> void:
+	if CorruptionRules.is_maxed(it):
+		return
 	var mx := max_sockets(it)
 	var n := 0
 	var p := clampf(0.12 + 0.01 * int(it.get("ilvl", 1)), 0.12, 0.5)
@@ -104,6 +113,8 @@ func item_sockets(it: Dictionary) -> int:
 	return int(it.get("sockets", 0))
 
 func add_socket(it: Dictionary) -> void:
+	if CorruptionRules.is_maxed(it):
+		return
 	it["sockets"] = item_sockets(it) + 1
 	var g: Array = it.get("gems", [])
 	while g.size() < it["sockets"]:
@@ -151,6 +162,11 @@ func gem_summary(gid: String) -> String:
 		for m in gem_mods(gid, cat[0]):
 			ms.append(mod_text(m))
 		parts.append("%s: %s" % [cat[1], ", ".join(ms)])
+	var tm := []
+	for m in gem_mods(gid, "tree"):   # Phase 4b: passive tree sockets
+		tm.append(mod_text(m))
+	if not tm.is_empty():
+		parts.append("Passive tree: %s" % ", ".join(tm))
 	return "\n".join(parts)
 
 func random_gem(monster_level: int) -> String:
@@ -296,6 +312,8 @@ func open_kinds(it: Dictionary) -> Array:
 	return kinds
 
 func add_random_affix(it: Dictionary, tier_bonus: int = 0, kind: String = "") -> bool:
+	if CorruptionRules.is_maxed(it):
+		return false
 	var kinds := open_kinds(it)
 	if kind != "":
 		if not kinds.has(kind):
@@ -389,6 +407,8 @@ func item_mods(it: Dictionary) -> Array:
 	for g in it.get("gems", []):
 		if g != "":
 			out.append_array(gem_mods(g, cat))
+	out.append_array(CorruptionSystem.item_mods(it, Data.corruption_cfg, Data.corruption_affixes))
+	out.append_array(AtlasCraft.mods(it))   # Rot-touched implicit (Endgame 2B)
 	return out
 
 func weapon_damage(it: Dictionary) -> Array:
@@ -493,6 +513,10 @@ func tooltip(it: Dictionary, ch = null, show_corruption: bool = true) -> String:
 		lines.append("[color=#3a3440]────────────────────[/color]")
 		for m in impl:
 			lines.append("[color=#c8c0d8]%s[/color]" % mod_text(m))
+	var rot_lines := rot_implicit_text(it)
+	if rot_lines != "":
+		lines.append("[color=#3a3440]────────────────────[/color]")
+		lines.append(rot_lines)
 	var fixed: Array = it.get("fixed", [])
 	var affs: Array = it.get("affixes", [])
 	if fixed.size() + affs.size() > 0:
@@ -521,14 +545,49 @@ func tooltip(it: Dictionary, ch = null, show_corruption: bool = true) -> String:
 		if u.get("flavor", "") != "":
 			lines.append("[i][color=#a07850]\"%s\"[/color][/i]" % u["flavor"])
 	lines.append("[color=#3a3440]────────────────────[/color]")
+	var corrupted_text := corrupted_implicit_text(it)
+	if corrupted_text != "":
+		lines.append("[color=#db79e8]CORRUPTED IMPLICITS[/color]\n" + corrupted_text)
+		if ch != null and ch.stats != null and CorruptionSystem.Effects.projectile_total(ch.stats) > 0:
+			lines.append("[color=#db79e8]%s[/color]" % CorruptionSystem.Effects.projectile_summary(ch.stats))
+	if it.has("corruption_invalid_prefix") or it.has("corruption_invalid_suffix"):
+		lines.append("[color=#ff8080]Unrecognized corrupted implicit preserved but inactive.[/color]")
 	if show_corruption:
 		lines.append(CorruptionRules.tooltip_bbcode(it))
+	var fix_line := AtlasCraft.fix_tooltip(it)
+	if fix_line != "":
+		lines.append(fix_line)
 	lines.append("[color=#8a8494]Sell: %d gold   Salvage: %s[/color]" % [sell_value(it), cost_text(salvage_yield(it))])
+	return "\n".join(lines)
+
+## Rot-touched implicit block (Endgame 2B): name, bonus line, drawback line in red.
+func rot_implicit_text(it: Dictionary) -> String:
+	var ms := AtlasCraft.mods(it)
+	if ms.is_empty():
+		return ""
+	var col := str(AtlasCraft.rot_cfg().get("color", "#b0e050"))
+	var out := ["[color=%s]Rot-touched: %s (T%d)[/color]" % [col, AtlasCraft.name_of(it), int(it["rot_implicit"].get("tier", 1))]]
+	for i in ms.size():
+		out.append("[color=%s]%s[/color]" % [col if i == 0 else "#e07060", mod_text(ms[i])])
+	return "\n".join(out)
+
+func corrupted_implicit_text(it: Dictionary) -> String:
+	var index := CorruptionSystem.registry_index(Data.corruption_affixes)
+	var lines := []
+	for side in ["prefix", "suffix"]:
+		var record = it.get("corrupted_" + side)
+		if not CorruptionSystem.valid_record(record, side, it, Data.corruption_cfg, index):
+			continue
+		var family: Dictionary = index[record["id"]]
+		var tier := "%s — fixed" % str(family["rarity_class"]).capitalize() if record.get("tier") == null else "T%d" % int(record["tier"])
+		lines.append("[color=#db79e8][%s] %s (%s)[/color]" % [side.to_upper(), family["name"], tier])
+		for m in record["effects"]:
+			lines.append("  " + (mod_text(m) if m.has("stat") else CorruptionSystem.Effects.describe(m)))
 	return "\n".join(lines)
 
 # ------------------------------------------------------------------ drops
 ## Returns a list of drops: {"kind": "item"|"gold"|"material", ...}
-func roll_drops(monster_level: int, loot_mult: float, is_elite: bool, is_boss: bool, class_id: String, rarity_stat: float) -> Array:
+func roll_drops(monster_level: int, loot_mult: float, is_elite: bool, is_boss: bool, class_id: String, rarity_stat: float, corruption_context: Dictionary = {}) -> Array:
 	var out := []
 	var L: Dictionary = Data.loot
 	var rolls := 1
@@ -574,6 +633,9 @@ func roll_drops(monster_level: int, loot_mult: float, is_elite: bool, is_boss: b
 	for i in mat_rolls:
 		if is_boss or rng.randf() < float(L.get("material_drop_chance", 0.12)) * loot_mult:
 			out.append({"kind": "material", "id": _roll_material(), "amount": 1})
+	var brand: float = CorruptionSystem.brand_chance(int(corruption_context.get("tier", 0)), int(corruption_context.get("depth", 1)), bool(corruption_context.get("endless", false)), is_boss, is_elite, Data.corruption_cfg)
+	if brand > 0 and brand_rng.randf() < brand:
+		out.append({"kind": "material", "id": "abyssal_brand", "amount": 1})
 	return out
 
 func random_rune() -> String:
@@ -589,6 +651,8 @@ func _roll_material() -> String:
 		total += float(mats[k].get("weight", 10))
 	var r := rng.randf() * total
 	for k in mats:
+		if float(mats[k].get("weight", 10)) <= 0:
+			continue
 		r -= float(mats[k].get("weight", 10))
 		if r <= 0:
 			return k
@@ -601,12 +665,16 @@ func _roll_material() -> String:
 const MAX_UPGRADE := 5
 
 func craft_ops() -> Array:
-	return ["upgrade", "reroll", "add", "remove", "rarity", "socket"]
+	return ["upgrade", "reroll", "add", "remove", "rarity", "socket", "fixative"]
 
 func craft_name(op: String) -> String:
-	return {"upgrade": "Upgrade Base", "reroll": "Reroll Affix", "add": "Add Affix", "remove": "Remove Affix", "rarity": "Raise Rarity", "socket": "Add Socket"}.get(op, op)
+	if op == "corrupt":
+		return "Corrupt Item"
+	return {"upgrade": "Upgrade Base", "reroll": "Reroll Affix", "add": "Add Affix", "remove": "Remove Affix", "rarity": "Raise Rarity", "socket": "Add Socket", "fixative": "Apply Fixative"}.get(op, op)
 
 func craft_cost(op: String, it: Dictionary) -> Dictionary:
+	if op == "corrupt" and Game.ch != null:
+		return Game.ch.corruption_cost()
 	var lv := int(it.get("ilvl", 1))
 	match op:
 		"upgrade":
@@ -624,13 +692,18 @@ func craft_cost(op: String, it: Dictionary) -> Dictionary:
 		"socket":
 			var ns := item_sockets(it)
 			return {"gold": 40 + lv * 4 * (ns + 1), "iron_fragment": 2 + ns, "monster_core": 1}
+		"fixative":
+			return AtlasCraft.fix_cost(it)
 	return {}
 
 func craft_check(op: String, it: Dictionary, affix_index: int = -1) -> String:
 	if it.is_empty():
 		return "Select an item"
-	# Corruption first: a fully corrupted item refuses add / reroll / raise rarity
-	# before any cost is looked at (exempt crafts are never refused here).
+	if it.get("destroyed", false):
+		return "This item was destroyed"
+	if op == "corrupt":
+		return Game.ch.corruption_refusal(int(it.get("uid", 0))) if Game.ch != null else "No active character"
+	# Corruption first: the permanent seal refuses every craft before costs.
 	var corrupt_why: String = CorruptionRules.craft_refusal(it, op)
 	if corrupt_why != "":
 		return corrupt_why
@@ -671,10 +744,19 @@ func craft_check(op: String, it: Dictionary, affix_index: int = -1) -> String:
 				return "This item cannot hold sockets"
 			if item_sockets(it) >= max_sockets(it):
 				return "Already has the maximum of %d sockets" % max_sockets(it)
+		"fixative":
+			var gate := GuildRules.fixative_refusal(Game.ch)   # Endgame 2C: Restorers' Guild rank 3
+			if gate != "":
+				return gate
+			return AtlasCraft.fix_refusal(it)
 	return ""
 
 func craft_apply(op: String, it: Dictionary, affix_index: int = -1) -> Dictionary:
 	## mutates and returns the item
+	if op == "corrupt":
+		return it  # corruption requires the character ownership/resource transaction
+	if craft_check(op, it, affix_index) != "":
+		return it
 	match op:
 		"upgrade":
 			it["upgrade"] = int(it.get("upgrade", 0)) + 1
@@ -693,6 +775,8 @@ func craft_apply(op: String, it: Dictionary, affix_index: int = -1) -> Dictionar
 			it["affixes"].remove_at(affix_index)
 		"socket":
 			add_socket(it)
+		"fixative":
+			AtlasCraft.apply_fix(it)
 		"rarity":
 			var r := Data.rarity_index(it.get("rarity", "common"))
 			var nr: Dictionary = Data.rarity_list[r + 1]
@@ -705,6 +789,8 @@ func craft_apply(op: String, it: Dictionary, affix_index: int = -1) -> Dictionar
 	return it
 
 func craft_preview(op: String, it: Dictionary, affix_index: int = -1) -> String:
+	if op == "corrupt":
+		return corruption_warning()
 	match op:
 		"upgrade":
 			var u := int(it.get("upgrade", 0))
@@ -723,6 +809,8 @@ func craft_preview(op: String, it: Dictionary, affix_index: int = -1) -> String:
 				return "Permanently remove \"%s\"" % affix_text(it["affixes"][affix_index])
 		"add":
 			return "Add one random affix to a free prefix/suffix slot"
+		"fixative":
+			return AtlasCraft.fix_preview(it)
 		"socket":
 			return "Sockets: %d -> %d (max %d). Socket gems at the Jeweller." % [item_sockets(it), item_sockets(it) + 1, max_sockets(it)]
 		"rarity":
@@ -731,3 +819,7 @@ func craft_preview(op: String, it: Dictionary, affix_index: int = -1) -> String:
 				var nr: Dictionary = Data.rarity_list[r + 1]
 				return "%s -> %s. Existing affixes are kept; new ones fill up to %d affixes." % [Data.rarity_list[r]["name"], nr["name"], int(nr["affixes"][0])]
 	return ""
+
+func corruption_warning() -> String:
+	var weights: Dictionary = Data.corruption_cfg.get("outcome_weights_basis_points", {})
+	return "[color=#db79e8]Corrupt Item — Irreversible[/color]\nCosts %s. %.0f%%: destroy item; %.0f%%: no new modifier; %.0f%%: one corrupted prefix or suffix; %.0f%%: both.\nEvery survivor becomes 100%% Corrupted: FINAL — cannot craft, socket, edit gems or corrupt again. Existing affixes, Legendary effects and attached gems remain on survivors. Destruction returns gems to your pouch." % [cost_text(Game.ch.corruption_cost()) if Game.ch != null else "1 Abyssal Brand", float(weights.get("destroyed", 1500)) / 100.0, float(weights.get("no_modifier", 2500)) / 100.0, float(weights.get("single", 5600)) / 100.0, float(weights.get("double", 400)) / 100.0]

@@ -521,7 +521,8 @@ static func profile_defence(profile: Dictionary, dungeons: Array, enemies: Dicti
 ## Damage a defender with `armour` and `resist` takes from rolled damage {type: amount}.
 ## Same maths as enemy.gd receive_hit (armour reduction for physical, clamped resistances,
 ## frailty -20 resist, taken multiplier). `reduction` is Combat.armour_reduction as a Callable.
-static func mitigate(rolled: Dictionary, armour: float, resist: Dictionary, frailty: bool, taken_mult: float, reduction: Callable) -> float:
+## pen: points of fire/cold/lightning resistance the hit ignores (spell penetration).
+static func mitigate(rolled: Dictionary, armour: float, resist: Dictionary, frailty: bool, taken_mult: float, reduction: Callable, pen: float = 0.0) -> float:
 	var total := 0.0
 	var shift := -20.0 if frailty else 0.0
 	for t in rolled:
@@ -529,7 +530,10 @@ static func mitigate(rolled: Dictionary, armour: float, resist: Dictionary, frai
 		if t == "physical":
 			v *= 1.0 - float(reduction.call(armour, v))
 		else:
-			v *= 1.0 - clampf(float(resist.get(t, 0)) + shift, -100.0, 90.0) / 100.0
+			var r: float = float(resist.get(t, 0)) + shift
+			if pen > 0.0 and t in ["fire", "cold", "lightning"]:
+				r -= pen
+			v *= 1.0 - clampf(r, -100.0, 90.0) / 100.0
 		total += v
 	return total * taken_mult
 

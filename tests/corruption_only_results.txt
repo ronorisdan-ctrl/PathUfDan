@@ -1,7 +1,7 @@
-==== 78 passed, 0 failed ====
+==== 127 passed, 0 failed ====
 --- item corruption rules
 PASS  corruption: data/corruption.json loads
-PASS  corruption: defaults are 50% chance, +20 step, max 100, drop_start 0
+PASS  corruption: rules read chance and step from the data file; max 100, drop_start 0
 PASS  corruption: confirm_above is 60
 PASS  corruption: every Blacksmith craft is either rolling or exempt, never both or neither
 PASS  corruption: data lists only real craft ids
@@ -14,22 +14,22 @@ PASS  corruption: set_level stores the value
 PASS  corruption: set_level(0) erases the key
 PASS  corruption: set_level clamps to 100
 PASS  corruption: set_level clamps negatives to 0 and erases
-PASS  corruption: events remaining (5, 3, 0)
+PASS  corruption: events remaining are derived from the step (full, 40%, 100%)
 PASS  corruption: add is refused at 100%
 PASS  corruption: add is allowed at 80%
 PASS  corruption: reroll is refused at 100%
 PASS  corruption: reroll is allowed at 80%
 PASS  corruption: rarity is refused at 100%
 PASS  corruption: rarity is allowed at 80%
-PASS  corruption: upgrade is allowed at 100%
-PASS  corruption: remove is allowed at 100%
-PASS  corruption: socket is allowed at 100%
+PASS  corruption: upgrade is sealed at 100% (spec v1)
+PASS  corruption: remove is sealed at 100% (spec v1)
+PASS  corruption: socket is sealed at 100% (spec v1)
 PASS  corruption: refusal text
 PASS  corruption: exempt craft takes no random number and changes nothing
 PASS  corruption: a rolling craft takes exactly one random number
 PASS  corruption: roll reports before/after and adds the step on a hit
-PASS  corruption: a hit at 60% gives 80%
-PASS  corruption: a hit at 80% gives exactly 100
+PASS  corruption: a hit at 40% adds exactly one step
+PASS  corruption: a hit one step below the top gives exactly 100
 PASS  corruption: a further hit never exceeds 100
 PASS  corruption: a miss leaves the value unchanged
 PASS  corruption: an odd step still caps at 100
@@ -39,9 +39,9 @@ PASS  corruption: result text on a miss
 PASS  corruption: no result text for exempt crafts
 PASS  corruption: default drop_start leaves items clean
 PASS  corruption: drop_start from data is applied
-PASS  corruption: no item locks before its 5th rolling craft (min over 10,000 items)
-PASS  corruption: mean rolling crafts to lockout is within 0.2 of 10
-PASS  corruption: hit rate over 10,000 rolls is within 1.5 points of 50%
+PASS  corruption: no item locks before its 4th rolling craft (min over 10,000 items)
+PASS  corruption: mean rolling crafts to lockout is within 0.2 of 6.67
+PASS  corruption: hit rate over 10,000 rolls is within 1.5 points of the configured chance
 PASS  corruption: rolls leave the global RNG alone
 PASS  corruption: rolls leave the Loot RNG alone
 --- item corruption crafting and persistence
@@ -54,21 +54,21 @@ PASS  corruption craft: upgrade does not roll for corruption
 PASS  corruption craft: upgrade leaves corruption untouched
 PASS  corruption craft: socket does not roll for corruption
 PASS  corruption craft: socket leaves corruption untouched
-PASS  corruption craft: a hit at 80% reaches exactly 100
+PASS  corruption craft: a hit one step below the top reaches exactly 100
 PASS  corruption craft: the locking craft was applied
 PASS  corruption craft: add is refused at 100% with the clear message
 PASS  corruption craft: reroll is refused at 100% with the clear message
 PASS  corruption craft: rarity is refused at 100% with the clear message
-PASS  corruption craft: upgrade is not refused for corruption at 100%
-PASS  corruption craft: socket is not refused for corruption at 100%
-PASS  corruption craft: remove affix still works at 100%
+PASS  corruption craft: upgrade is sealed at 100%
+PASS  corruption craft: socket is sealed at 100%
+PASS  corruption craft: remove affix is sealed at 100%
 PASS  corruption craft: refused craft at 100% spends no gold or materials
 PASS  corruption craft: rolling takes nothing from the Loot RNG and the craft result is identical
 PASS  corruption craft: rolling takes nothing from the global RNG
 PASS  corruption persist: the value survives save and load as an integer
 PASS  corruption persist: a clean item gains no corruption key
 PASS  corruption persist: items without the field read as 0%
-PASS  corruption persist: SAVE_VERSION is unchanged (3)
+PASS  corruption persist: SAVE_VERSION is unchanged by corruption (4 since the passive tree Phase 1, 5 since the Atlas)
 PASS  corruption persist: an equipped 100% item keeps its value after save and load
 PASS  corruption persist: personal stash keeps the value through save and load
 PASS  corruption persist: deposit into the shared stash keeps the value
@@ -79,3 +79,53 @@ PASS  corruption actions: a 100% item can be salvaged
 PASS  corruption actions: the Destroy sweep removes an unlocked 100% item and keeps the locked one
 PASS  corruption actions: equipping a 100% item is not blocked by corruption
 PASS  corruption actions: equip refusal (if any) is not about corruption
+--- item corruption visuals and dev tools
+PASS  corruption ui: colour is grey at 0, amber at 50, red at 100
+PASS  corruption ui: colours between the stops are interpolated
+PASS  corruption ui: 80% sits between amber and red
+PASS  corruption ui: a clean item shows 'Corruption: 0%' and no lock line
+PASS  corruption ui: 40% shows the number in its own colour
+PASS  corruption ui: 100% shows the red 'Corrupted: cannot be crafted' line
+PASS  corruption ui: the tooltip line can be left out (Blacksmith has its own readout)
+PASS  corruption ui: legendaries show the line too
+PASS  corruption ui: tooltip bar is 10 blocks, part filled at 40%, all empty at 0 and all filled at 100
+PASS  corruption ui: the hover tooltip shows the line
+PASS  corruption ui: the equipped-item comparison tooltip shows its line
+PASS  corruption ui: the slot marker sits in the opposite corner and does not overlap the padlock
+PASS  corruption ui: the marker shows at 100% only
+PASS  corruption ui: Blacksmith bar shows the number
+PASS  corruption ui: remaining events are derived from the level
+PASS  corruption ui: the Blacksmith item text has no second corruption line
+PASS  corruption ui: Add Affix button carries the risk line
+PASS  corruption ui: Reroll Affix button carries the risk line
+PASS  corruption ui: Raise Rarity button carries the risk line
+PASS  corruption ui: Upgrade Base button has no risk line
+PASS  corruption ui: Remove Affix button has no risk line
+PASS  corruption ui: Add Socket button has no risk line
+PASS  corruption ui: the preview repeats the risk for a rolling craft
+PASS  corruption ui: an exempt craft's confirm dialog has no corruption text
+PASS  corruption ui: at 60% the confirm shows the risk but no warning (threshold is above 60)
+PASS  corruption ui: above 60% the confirm dialog adds a warning
+PASS  corruption ui: the bar refreshes right after a craft
+PASS  corruption ui: a result toast says whether corruption rose
+PASS  corruption ui: Add Affix is disabled at 100% with the refusal as tooltip
+PASS  corruption ui: Reroll Affix is disabled at 100% with the refusal as tooltip
+PASS  corruption ui: Raise Rarity is disabled at 100% with the refusal as tooltip
+PASS  corruption ui: Upgrade Base is sealed at 100%
+PASS  corruption ui: the readout says the item is corrupted
+PASS  corruption ui: the Craft button is disabled for a refused craft
+PASS  corruption ui: readout text fits the 390 px bar
+PASS  corruption ui: risk line fits the Blacksmith width
+PASS  corruption dev: off unless Developer tools are on
+PASS  corruption dev: set to 60% marks the save as dev-used
+PASS  corruption dev: value 0 applied through set_level
+PASS  corruption dev: value 20 applied through set_level
+PASS  corruption dev: value 40 applied through set_level
+PASS  corruption dev: value 60 applied through set_level
+PASS  corruption dev: value 80 applied through set_level
+PASS  corruption dev: value 100 applied through set_level
+PASS  corruption dev: clear selected resets only that item
+PASS  corruption dev: clear all bag items resets every item and erases the key
+PASS  corruption dev: an empty slot or no selection is refused
+PASS  corruption dev: the panel lists the bag items
+PASS  corruption dev: the dev_used flag is written to the save

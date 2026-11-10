@@ -42,7 +42,7 @@ func setup(id: String, player, lvl: int, sk: Dictionary = {}) -> void:
 	var tex: Texture2D = Art.sprite(def.get("sprite", "skeleton"))
 	if def.has("tint"):
 		tex = Art.tinted(def.get("sprite", "skeleton"), Color(def["tint"]))
-	setup_sprite(tex, 0.0, float(def.get("sprite_scale", 1.0)))
+	setup_sprite(tex, 0.0, float(def.get("sprite_scale", 1.0)), [def_id, str(def.get("sprite", "skeleton"))])
 
 func _physics_process(delta: float) -> void:
 	if not alive or level == null:
@@ -113,7 +113,7 @@ func _attack() -> void:
 	if target == null or owner_player == null or not is_instance_valid(owner_player):
 		return
 	facing = signf(target.global_position.x - global_position.x)
-	var pk: Dictionary = Combat.minion_packet(owner_player.ch, def, mlevel)
+	var pk: Dictionary = Combat.minion_packet(owner_player.ch, def, mlevel, owner_player.life / maxf(1.0,owner_player.max_life))
 	pk["src_skill"] = skill_id
 	if dmg_mult != 1.0:
 		for k in pk["dmg"]:
@@ -153,6 +153,9 @@ func die(_killer) -> void:
 	if not alive:
 		return
 	alive = false
+	if level != null and owner_player != null and is_instance_valid(owner_player) and owner_player.ch.stats.has_flag("legion_of_bone"):
+		var d := max_life * 0.4   # Legion of Bone: minions explode on death (40% of their life as physical damage)
+		level._effect_burst(global_position, {"physical": [d * 0.9, d * 1.1]}, Color("#e0d8c0"), 50.0)
 	if level != null:
 		level.allies.erase(self)
 		level.add_fx(VFX.make("dust", global_position, Color("#d0d8c0"), 0.4, 12))

@@ -3,6 +3,9 @@ extends "res://scripts/ui/base_panel.gd"
 ## boss info, objectives, rewards and the pre-rolled run modifiers.
 
 var list: VBoxContainer
+const Chrome = preload("res://scripts/ui/components/station_chrome.gd")
+const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
+var atlas_btn: Button
 var detail: RichTextLabel
 var enter_btn: Button
 var reroll_btn: Button
@@ -11,20 +14,25 @@ var chosen := ""
 func _init() -> void:
 	place = "center"
 	build("The Dungeon Gate", Vector2(760, 540))
+	Chrome.apply(self)
 	var h := HBoxContainer.new()
+	h.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	h.add_theme_constant_override("separation", 12)
 	body.add_child(h)
 	list = VBoxContainer.new()
-	list.custom_minimum_size = Vector2(250, 460)
-	h.add_child(list)
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var tiers := Chrome.reading_scroll(h, 300)
+	tiers.custom_minimum_size.x = 260
+	tiers.add_child(list)
+	atlas_btn = UIKit.button("Atlas of Ruin", _open_atlas)
+	atlas_btn.tooltip_text = "The endgame map. Opens after Malgrath (Tier 5) is defeated."
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(v)
-	var sc := ScrollContainer.new()
-	sc.custom_minimum_size = Vector2(470, 420)
-	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	v.add_child(sc)
-	detail = UIKit.rich("", 450)
+	v.add_child(atlas_btn)
+	var sc := Chrome.reading_scroll(v, 300)
+	detail = UIKit.rich()
+	detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(detail)
 	var hb := HBoxContainer.new()
 	enter_btn = UIKit.button("Enter Dungeon", _enter)
@@ -34,6 +42,9 @@ func _init() -> void:
 	hb.add_child(reroll_btn)
 	v.add_child(hb)
 
+func reposition() -> void:
+	Chrome.place_panel(self, Vector2(900, 620))
+
 func _unlocked(d: Dictionary) -> bool:
 	return int(d.get("tier", 1)) <= int(Game.ch.progress.get("highest_tier", 1))
 
@@ -42,6 +53,8 @@ func reroll_cost(d: Dictionary) -> int:
 
 func refresh() -> void:
 	var ch = Game.ch
+	atlas_btn.disabled = not AtlasRules.unlocked(ch)
+	atlas_btn.text = "Atlas of Ruin" if not atlas_btn.disabled else "Atlas of Ruin (locked)"
 	for c in list.get_children():
 		c.queue_free()
 	for d in Data.dungeon_list:
@@ -51,6 +64,7 @@ func refresh() -> void:
 		if d["id"] == chosen:
 			b.add_theme_color_override("font_color", UIKit.GOLD)
 		list.add_child(b)
+		Chrome.wrap_button(b, 224)
 	if chosen == "" or not Data.dungeons.has(chosen):
 		for d in Data.dungeon_list:
 			if _unlocked(d):
@@ -120,3 +134,7 @@ func _enter() -> void:
 		return
 	ui.close_all()
 	Game.main.enter_dungeon(chosen)
+
+func _open_atlas() -> void:
+	if AtlasRules.unlocked(Game.ch):
+		ui.toggle("atlas")

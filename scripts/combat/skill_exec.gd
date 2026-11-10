@@ -9,6 +9,7 @@ const Minion = preload("res://scripts/entities/minion.gd")
 const Turret = preload("res://scripts/entities/turret.gd")
 const Mine = preload("res://scripts/entities/mine.gd")
 const Zone = preload("res://scripts/entities/zone.gd")
+const CorruptionEffects = preload("res://scripts/core/corruption_effects.gd")
 
 const BEHAVIORS := ["melee_arc", "projectile", "ground_aoe", "nova", "chain", "dash", "blink", "summon", "deploy", "buff", "beam", "leap", "zone", "curse"]
 
@@ -25,11 +26,15 @@ func execute(p, sk: Dictionary, aim: Vector2) -> void:
 	match sk.get("behavior", ""):
 		"melee_arc":
 			var delay: float = p.current_use_time * 0.3
+			if "swing_impact" in p:
+				p.swing_impact = delay   # visual only: lets the attack animation land on the hit
 			p.schedule(delay, func(): _melee(p, sk, dir, col))
 		"projectile":
 			_projectiles(p, sk, origin, dir, col)
 		"ground_aoe":
 			var delay2: float = p.current_use_time * 0.3 if sk.get("at_self", false) else 0.0
+			if "swing_impact" in p:
+				p.swing_impact = delay2   # visual only
 			p.schedule(delay2, func(): _ground(p, sk, origin, aim, dir, col))
 		"nova":
 			_nova(p, sk, col)
@@ -41,14 +46,21 @@ func execute(p, sk: Dictionary, aim: Vector2) -> void:
 		"blink":
 			var to: Vector2 = lv.clamp_to_floor(p.global_position, p.global_position + (aim - p.global_position).limit_length(float(sk.get("max_range", 150))))
 			lv.add_fx(VFX.make("nova", p.global_position, col, 0.3, 18))
+			var from: Vector2 = p.global_position
 			p.global_position = to
 			lv.add_fx(VFX.make("nova", to, col, 0.3, 22))
+			if p.ch.stats.has_flag("rift_step"):   # Phase 3: Rift Step snares around both ends of the blink
+				rift_snare(lv, [from, to])
 		"summon":
 			_summon(p, sk)
 		"deploy":
 			_deploy(p, sk, aim)
 		"buff":
-			p.add_buff(sk["id"], sk.get("mods", []), float(sk.get("duration", 5)))
+			var herald: bool = p.ch.stats.has_flag("war_herald")
+			p.add_buff(sk["id"], sk.get("mods", []), float(sk.get("duration", 5)) * (1.5 if herald else 1.0))
+			if herald:   # War Herald's Voice: buff skills last 50% longer and stun nearby enemies
+				for e in lv.hostiles_in_radius(p.global_position, 70.0, "player"):
+					Combat.apply_status(e, {"type": "stun"}, {}, {"status_dur": 1.0})
 			lv.add_fx(VFX.make("nova", p.global_position, col, 0.4, 26))
 			if sk.has("heal_pct"):
 				p.heal(p.max_life * float(sk["heal_pct"]) / 100.0)
@@ -111,11 +123,12 @@ func _aftershock(p, at: Vector2, pk: Dictionary, col: Color, rad: float = 42.0, 
 func _projectiles(p, sk: Dictionary, origin: Vector2, dir: Vector2, col: Color) -> void:
 	var f: Dictionary = p.ch.final
 	var sb = p.ch.stats
-	var count: int = int(sk.get("count", 1)) + int(f.get("projectile_count", 0))
+	var count: int = proj_count(p, sk)
 	var spread := deg_to_rad(float(sk.get("spread", 0)) + (10.0 * (count - 1) if int(sk.get("count", 1)) == 1 and count > 1 else 0.0))
 	var spd: float = float(sk.get("speed", 300)) * maxf(0.2, 1.0 + sb.inc("projectile_speed") / 100.0)
 	var pk: Dictionary = Combat.player_packet(p.ch, sk, p.damage_more(sk))
 	var chain := int(sk.get("chain", 0)) + int(f.get("chain", 0))
+	chain += CorruptionEffects.chains(sb,sk)
 	if sk.get("tags", []).has("lightning") and sb.has_flag("stormglass"):
 		chain += 2
 	if sb.has_flag("ricochet") and p.ch.weapon_groups().has("firearm") and sk.get("kind") == "attack":
@@ -134,7 +147,7 @@ func _projectiles(p, sk: Dictionary, origin: Vector2, dir: Vector2, col: Color) 
 		pr.radius = float(sk.get("size", 4))
 		pr.vel = dir.rotated(a) * spd
 		pr.max_dist = float(sk.get("max_range", 300))
-		pr.pierce = int(sk.get("pierce", 0)) + int(f.get("pierce", 0))
+		pr.pierce = proj_pierce(p, sk)
 		pr.chain = chain
 		pr.explode_radius = float(sk.get("explode_radius", 0)) * sqrt(f.get("area_mult", 1.0))
 		pr.homing = float(sk.get("homing", 0.0))
@@ -145,6 +158,23 @@ func _projectiles(p, sk: Dictionary, origin: Vector2, dir: Vector2, col: Color) 
 		pr.position = origin + dir * 6
 		p.level.projectile_layer.add_child(pr)
 	p.register_hit()
+
+## Projectiles per use. Phase 3b Volley Fire: multi-projectile attacks fire 2 more.
+func proj_count(p, sk: Dictionary) -> int:
+	var c: int = int(sk.get("count", 1)) + int(p.ch.final.get("projectile_count", 0))
+	c += CorruptionEffects.projectiles(p.ch,sk)
+	if c > 1 and sk.get("kind") == "attack" and p.ch.stats.has_flag("volley_fire"):
+		c += 2
+	return c
+
+## Pierce per projectile. Phase 3b Volley Fire: single-projectile attacks pierce 1 more.
+func proj_pierce(p, sk: Dictionary) -> int:
+	var n: int = int(sk.get("pierce", 0)) + int(p.ch.final.get("pierce", 0))
+	if sk.get("kind") == "attack" and p.ch.stats.has_flag("volley_fire") \
+			and int(sk.get("count", 1)) + int(p.ch.final.get("projectile_count", 0)) + CorruptionEffects.projectiles(p.ch,sk) <= 1:
+		n += 1
+	n += CorruptionEffects.pierce(p.ch,sk)
+	return n
 
 func _ground(p, sk: Dictionary, origin: Vector2, aim: Vector2, dir: Vector2, col: Color) -> void:
 	if not is_instance_valid(p) or not p.alive:
@@ -230,6 +260,7 @@ func _chain(p, sk: Dictionary, origin: Vector2, aim: Vector2, dir: Vector2, col:
 		lv.add_fx(v0)
 		return
 	var chains: int = int(sk.get("chains", 3)) + int(p.ch.final.get("chain", 0))
+	chains += CorruptionEffects.chains(p.ch.stats,sk)
 	if p.ch.stats.has_flag("stormglass"):
 		chains += 2
 	var pk: Dictionary = Combat.player_packet(p.ch, sk, p.damage_more(sk))
@@ -273,11 +304,15 @@ func _deploy(p, sk: Dictionary, aim: Vector2) -> void:
 		if p.ch.stats.has_flag("clockwork_choir"):
 			limit += 1
 		limit = maxi(1, limit)
+	else:
+		limit += int(CorruptionEffects.total(p.ch.stats,"trap_limit"))
+		if p.ch.stats.has_flag("master_trapper"):   # Phase 3b: +1 of each trap
+			limit += 1
 	var group: String = kind if kind == "turret" else sk["id"]
 	var mine: Array = p.deployables.filter(func(d): return is_instance_valid(d) and d.get_meta("group", "") == group)
 	while mine.size() >= limit:
 		var old = mine.pop_front()
-		old.expire()
+		old.retire()
 	var pos: Vector2 = lv.clamp_to_floor(p.global_position, p.global_position + (aim - p.global_position).limit_length(float(sk.get("max_range", 120))))
 	var d
 	if kind == "turret":
@@ -381,8 +416,18 @@ func _zone(p, sk: Dictionary, aim: Vector2, col: Color) -> void:
 			p.deployables.erase(z))
 	lv.floor_layer.add_child(z)
 
+static func rift_snare(lv, points: Array) -> void:
+	var done := {}
+	for at in points:
+		for e in lv.hostiles_in_radius(at, 60.0, "player"):
+			if not done.has(e.get_instance_id()):
+				done[e.get_instance_id()] = true
+				Combat.apply_status(e, {"type": "snare", "duration": 2.0}, {}, {"status_dur": 1.0, "flags": {}, "faction": "player"})
+
 func _curse(p, sk: Dictionary, aim: Vector2, col: Color) -> void:
 	var lv = p.level
+	if "last_curse" in p:   # Phase 3 Hexshot: projectiles re-apply the last curse
+		p.last_curse = sk.get("curse", []).duplicate(true)
 	var center: Vector2 = lv.clamp_to_floor(p.global_position, p.global_position + (aim - p.global_position).limit_length(float(sk.get("max_range", 260))))
 	var radius: float = float(sk.get("radius", 50)) * sqrt(p.ch.final.get("area_mult", 1.0))
 	lv.add_fx(VFX.make("ring", center, col, 0.5, radius))

@@ -4,6 +4,8 @@ extends Control
 
 const UIKit = preload("res://scripts/ui/ui_kit.gd")
 const DevRules = preload("res://scripts/core/dev_rules.gd")
+const CombatDock = preload("res://scripts/ui/components/combat_dock.gd")
+const HUDStyle = preload("res://scripts/ui/components/hud_style.gd")
 
 var ui = null
 var boss = null
@@ -12,14 +14,34 @@ var big_map := false
 var slot_rects := []
 var flask_rects := []
 var hover_slot := -1
+var dock
+var _hover_text := ""
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dock = CombatDock.new()
+	add_child(dock)
+	Events.player_skill_used.connect(dock.trigger_skill)
 	Events.boss_spawned.connect(func(b): boss = b)
 	Events.objective_changed.connect(func(t): objective = t)
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	var p = _player()
+	dock.visible = p != null and Game.ch != null
+	if dock.visible:
+		dock.fit_to(size)
+		dock.present(p, Game.ch, 0.0 if get_tree().paused else delta)
+		slot_rects.clear()
+		flask_rects.clear()
+		for slot in dock.slots:
+			slot_rects.append(Rect2(dock.position + slot.position * dock.scale, slot.size * dock.scale))
+		for flask in dock.flasks:
+			flask_rects.append(Rect2(dock.position + flask.position * dock.scale, flask.size * dock.scale))
+	else:
+		dock.source = null
+		slot_rects.clear()
+		flask_rects.clear()
 	queue_redraw()
 	_update_hover()
 
@@ -30,22 +52,50 @@ func _player():
 	return lv.player
 
 func _update_hover() -> void:
+	if ui == null:
+		return
 	var m := get_local_mouse_position()
 	var h := -1
-	for i in slot_rects.size():
-		if (slot_rects[i] as Rect2).has_point(m):
-			h = i
-	if h != hover_slot:
-		hover_slot = h
-		var p = _player()
-		if h >= 0 and p != null:
-			var sk: Dictionary = p.skill_in_slot(h)
-			if not sk.is_empty():
-				ui.show_tooltip(UIKit.skill_tooltip(sk, Game.ch))
-			else:
-				ui.show_tooltip("Empty skill slot\n[color=#8a8494]Press K to assign skills[/color]")
+	var description := ""
+	var p = _player()
+	var blocked: bool = ui.any_blocking_open() or ui.context.visible or ui.confirm.visible
+	if not blocked and p != null and dock.visible:
+		for i in slot_rects.size():
+			if (slot_rects[i] as Rect2).has_point(m):
+				h = i
+		if h >= 0:
+			var slot = dock.slots[h]
+			description = UIKit.skill_tooltip(slot.skill, Game.ch) if not slot.skill.is_empty() else "Empty skill slot"
+			if slot.reason != "" and slot.reason != "empty":
+				description += "\n[color=#c69e8c]%s[/color]" % slot.reason
+			description += "\n[color=#aaa38b]Assign skills: %s[/color]" % HUDStyle.key_label("toggle_skills")
 		else:
+			for i in flask_rects.size():
+				if (flask_rects[i] as Rect2).has_point(m):
+					description = "%s flask\n%d / 3 charges\n[%s] Restore %s" % ["Life" if i == 0 else "Mana", int(Game.ch.flask_charges[i]), HUDStyle.key_label("flask_%d" % (i + 1)), "life" if i == 0 else "mana"]
+			var dodge_rect := Rect2(dock.position + dock.evade.position * dock.scale, dock.evade.size * dock.scale)
+			if dodge_rect.has_point(m):
+				description = "Dodge  [%s]\n%.1fs cooldown remaining" % [HUDStyle.key_label("dodge"), maxf(0, p.dodge_cd)]
+			if description == "":
+				description = dock.statuses.description_at(dock.statuses.get_local_mouse_position())
+			if description == "" and dock.life.get_global_rect().has_point(get_global_mouse_position()):
+				description = "Life: " + dock.life.readout()
+			if description == "" and dock.mana.get_global_rect().has_point(get_global_mouse_position()):
+				description = "Mana: " + dock.mana.readout()
+			if description == "" and dock.progression.get_global_rect().has_point(get_global_mouse_position()):
+				description = dock.progression.character_text + "\n" + dock.progression.experience_text
+	hover_slot = h
+	for i in dock.slots.size():
+		dock.slots[i].hovered = i == h
+	for flask in dock.flasks:
+		flask.hovered = not blocked and flask.get_global_rect().has_point(get_global_mouse_position())
+	dock.evade.hovered = not blocked and dock.evade.get_global_rect().has_point(get_global_mouse_position())
+	if description != _hover_text:
+		if description != "":
+			ui.show_tooltip(description)
+		elif _hover_text != "" and ui.tooltip_text.text == _hover_text:
 			ui.hide_tooltip()
+		_hover_text = description
 
 func _draw() -> void:
 	var p = _player()
@@ -54,134 +104,25 @@ func _draw() -> void:
 	var ch = Game.ch
 	var vs := size
 	var f := ThemeDB.fallback_font
-	# ---------------- orbs
-	_orb(Vector2(78, vs.y - 78), 58, p.life / maxf(1.0, p.max_life), Color("#b02020"), Color("#3a0808"), "%d / %d" % [int(ceil(p.life)), int(p.max_life)])
-	var mm: float = ch.final.get("max_mana", 1)
-	_orb(Vector2(vs.x - 78, vs.y - 78), 58, p.mana / maxf(1.0, mm), Color("#2848c0"), Color("#080c30"), "%d / %d" % [int(p.mana), int(mm)])
-	# ---------------- xp bar
-	var xr := Rect2(150, vs.y - 12, vs.x - 300, 8)
-	draw_rect(xr.grow(1), Color(0, 0, 0, 0.8))
-	draw_rect(Rect2(xr.position, Vector2(xr.size.x * clampf(float(ch.xp) / ch.xp_to_next(), 0, 1), xr.size.y)), Color("#c8a040"))
-	for i in range(1, 10):
-		draw_line(xr.position + Vector2(xr.size.x * i / 10.0, 0), xr.position + Vector2(xr.size.x * i / 10.0, xr.size.y), Color(0, 0, 0, 0.5))
-	draw_string_outline(f, Vector2(xr.position.x, xr.position.y - 4), "Level %d" % ch.level, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 3, Color.BLACK)
-	draw_string(f, Vector2(xr.position.x, xr.position.y - 4), "Level %d" % ch.level, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#e8d8a0"))
-	var xpt: String = "%d / %d XP" % [ch.xp, ch.xp_to_next()]
-	var xw := f.get_string_size(xpt, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
-	draw_string_outline(f, Vector2(xr.end.x - xw, xr.position.y - 4), xpt, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, 3, Color.BLACK)
-	draw_string(f, Vector2(xr.end.x - xw, xr.position.y - 4), xpt, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, UIKit.MUTED)
-	# ---------------- hotbar
-	var keys := ["LMB", "RMB", "Q", "E", "R", "T", "G"]
-	var sz := 50.0
-	var gap := 6.0
-	var total := 7 * sz + 6 * gap
-	var x0 := vs.x / 2 - total / 2 + 40
-	var y0 := vs.y - sz - 26
-	slot_rects.clear()
-	for i in keys.size():
-		var r := Rect2(x0 + i * (sz + gap), y0, sz, sz)
-		slot_rects.append(r)
-		draw_rect(r.grow(2), Color(0, 0, 0, 0.85))
-		var sk: Dictionary = p.skill_in_slot(i)
-		if sk.is_empty():
-			draw_rect(r, Color(0.1, 0.09, 0.1))
-		else:
-			var blocked: String = p.use_block_reason(sk)
-			UIKit.draw_skill_icon(self, r, sk, blocked != "" and blocked != "On cooldown")
-			var cd: float = p.cooldowns.get(sk["id"], 0.0)
-			if cd > 0:
-				var full: float = maxf(0.01, float(sk.get("cooldown", 1)) * ch.final.get("cdr_mult", 1.0))
-				var k := clampf(cd / full, 0, 1)
-				draw_rect(Rect2(r.position, Vector2(r.size.x, r.size.y * k)), Color(0, 0, 0, 0.65))
-				var ct := "%.1f" % cd
-				var cw := f.get_string_size(ct, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x
-				draw_string_outline(f, r.get_center() + Vector2(-cw / 2, 6), ct, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, 3, Color.BLACK)
-				draw_string(f, r.get_center() + Vector2(-cw / 2, 6), ct, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color.WHITE)
-			elif p.mana < p.mana_cost(sk) and not ch.stats.has_flag("blood_magic"):
-				draw_rect(r, Color(0.1, 0.15, 0.6, 0.45))
-		draw_rect(r, UIKit.GOLD_DIM if hover_slot != i else UIKit.GOLD, false, 1.5)
-		draw_string_outline(f, r.position + Vector2(3, 12), keys[i], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, 3, Color.BLACK)
-		draw_string(f, r.position + Vector2(3, 12), keys[i], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("#f0e0b0"))
-	# flasks
-	flask_rects.clear()
-	for i in 2:
-		var fr := Rect2(x0 - 2 * 40 - 16 + i * 40, y0 + 6, 34, 44)
-		flask_rects.append(fr)
-		draw_rect(fr.grow(2), Color(0, 0, 0, 0.85))
-		draw_rect(fr, Color(0.1, 0.09, 0.1))
-		var charges: float = ch.flask_charges[i]
-		var fc := Color("#b02020") if i == 0 else Color("#2848c0")
-		draw_rect(Rect2(fr.position.x + 3, fr.end.y - 3 - (fr.size.y - 6) * clampf(charges / 3.0, 0, 1), fr.size.x - 6, (fr.size.y - 6) * clampf(charges / 3.0, 0, 1)), Color(fc.r, fc.g, fc.b, 0.5))
-		draw_texture_rect(Art.icon("flask_life" if i == 0 else "flask_mana"), Rect2(fr.position + Vector2(3, 6), Vector2(28, 28)), false)
-		draw_rect(fr, UIKit.GOLD_DIM, false, 1.0)
-		draw_string(f, fr.position + Vector2(3, 12), str(i + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("#f0e0b0"))
-		draw_string(f, Vector2(fr.position.x + 3, fr.end.y - 3), "%d" % int(charges), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.WHITE)
-	# dodge
-	var dr := Rect2(x0 + 7 * (sz + gap) + 4, y0 + 14, 36, 36)
-	draw_rect(dr.grow(2), Color(0, 0, 0, 0.85))
-	draw_rect(dr, Color(0.12, 0.11, 0.1))
-	draw_polyline(PackedVector2Array([dr.get_center() + Vector2(-10, 6), dr.get_center() + Vector2(0, -8), dr.get_center() + Vector2(10, 6)]), Color("#d0c0a0"), 2.5)
-	if p.dodge_cd > 0:
-		draw_rect(Rect2(dr.position, Vector2(dr.size.x, dr.size.y * clampf(p.dodge_cd / p.DODGE_CD, 0, 1))), Color(0, 0, 0, 0.6))
-	draw_string(f, dr.position + Vector2(2, 11), "Spc", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("#f0e0b0"))
-	# buffs
-	var bx := x0
-	for b in p.buffs:
-		if b["t"] > 10000:
-			continue
-		var br := Rect2(bx, y0 - 28, 22, 22)
-		var bsk: Dictionary = Data.skills.get(b["id"], {"fx": "#c0c0ff", "behavior": "buff"})
-		UIKit.draw_skill_icon(self, br, bsk)
-		draw_string(f, br.position + Vector2(0, -2), "%d" % int(ceil(b["t"])), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.WHITE)
-		bx += 26
-	# ---------------- top-left info
 	var lv = Game.level
-	var tl := Vector2(16, 26)
-	draw_string_outline(f, tl, lv.level_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, 4, Color.BLACK)
-	draw_string(f, tl, lv.level_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color("#e8c890"))
-	var oy := tl.y + 20
-	var obj := objective
-	if lv.has_method("objective_text"):
-		obj = lv.objective_text()
-	for line in obj.split("\n"):
-		if line == "":
-			continue
-		draw_string_outline(f, Vector2(tl.x, oy), line, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 3, Color.BLACK)
-		draw_string(f, Vector2(tl.x, oy), line, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#c8c0b0"))
-		oy += 16
-	var gold_t: String = "Gold: %d" % ch.gold
-	draw_string_outline(f, Vector2(tl.x, oy + 4), gold_t, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 3, Color.BLACK)
-	draw_string(f, Vector2(tl.x, oy + 4), gold_t, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#e8c050"))
-	var spts: int = ch.spec_points_available() if ch.level >= ch.SPEC_LEVELS[0] else 0
-	if ch.spec_id == "" and ch.level >= ch.SPEC_LEVELS[0]:
-		spts = 1
-	if spts > 0:
-		var st: String = "Choose a specialisation - press J" if ch.spec_id == "" else "%d specialisation point%s - press J" % [spts, "s" if spts > 1 else ""]
-		draw_string_outline(f, Vector2(tl.x, oy + 40), st, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 3, Color.BLACK)
-		draw_string(f, Vector2(tl.x, oy + 40), st, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#ffb060"))
-	var pts: int = ch.available_passive_points()
-	if pts > 0:
-		var pt: String = "%d unspent passive point%s - press P" % [pts, "s" if pts > 1 else ""]
-		draw_string_outline(f, Vector2(tl.x, oy + 22), pt, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 3, Color.BLACK)
-		draw_string(f, Vector2(tl.x, oy + 22), pt, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#80ff80"))
+	_draw_zone(lv, ch, vs)
 	# ---------------- interaction prompt
 	var it = lv.nearest_interactable(p.global_position)
 	if it != null:
-		var tx: String = "[F] %s" % it["name"]
+		var tx: String = "[%s] %s" % [HUDStyle.key_label("interact"), it["name"]]
 		var tw := f.get_string_size(tx, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-		draw_string_outline(f, Vector2(vs.x / 2 - tw / 2, vs.y - 150), tx, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, 4, Color.BLACK)
-		draw_string(f, Vector2(vs.x / 2 - tw / 2, vs.y - 150), tx, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color("#ffe0a0"))
+		var prompt_y := minf(dock.position.y, dock.position.y + dock.statuses.position.y * dock.scale.y) - 14
+		HUDStyle.text(self, Vector2(vs.x / 2 - tw / 2, prompt_y), tx, 16, HUDStyle.color("ivory"))
 	# ---------------- minimap
 	if "minimap_tex" in lv and lv.minimap_tex != null:
 		_minimap(lv, p, vs)
 	# ---------------- boss bar
 	if boss != null and is_instance_valid(boss) and boss.alive:
-		var bw := 520.0
-		var br2 := Rect2(vs.x / 2 - bw / 2, 22, bw, 16)
-		draw_rect(br2.grow(2), Color(0, 0, 0, 0.9))
-		draw_rect(br2, Color("#2a0808"))
-		draw_rect(Rect2(br2.position, Vector2(bw * clampf(boss.life / boss.max_life, 0, 1), br2.size.y)), Color("#a01818") if boss.get("phase") != 2 else Color("#d03030"))
-		draw_rect(br2, UIKit.GOLD_DIM, false, 1.0)
+		var bw := minf(520, maxf(280, vs.x - 2 * (minf(400, vs.x * 0.29) + 32)))
+		var br2 := Rect2(vs.x / 2 - bw / 2, 32, bw, 14)
+		HUDStyle.frame(self, br2.grow(5))
+		draw_rect(br2, HUDStyle.color("life").darkened(0.75))
+		draw_rect(Rect2(br2.position, Vector2(bw * clampf(boss.life / maxf(1, boss.max_life), 0, 1), br2.size.y)), HUDStyle.color("life") if boss.get("phase") != 2 else HUDStyle.color("life").lightened(0.15))
 		var ps = boss.get("poise_state")
 		if ps is Dictionary and not ps.is_empty():
 			# poise bar: gold fills toward a stagger; grey shows the immunity that follows
@@ -205,6 +146,58 @@ func _draw() -> void:
 		if Dev.flags.get("overlay", false):
 			_dev_overlay(f, vs)
 
+func _wrapped(value: String, width: float, font_size: int = 13) -> Array:
+	var result := []
+	var font := ThemeDB.fallback_font
+	for paragraph in value.split("\n"):
+		var line := ""
+		for word in paragraph.split(" "):
+			var next := word if line == "" else line + " " + word
+			if line != "" and font.get_string_size(next, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > width:
+				result.append(line)
+				line = word
+			else:
+				line = next
+		if line != "": result.append(line)
+	return result
+
+func _draw_zone(lv, ch, vs: Vector2) -> void:
+	var width := minf(400, vs.x * 0.29)
+	var obj: String = lv.objective_text() if lv.has_method("objective_text") else objective
+	var lines := _wrapped(obj, width - 28)
+	var prompts := []
+	var points: int = ch.available_passive_points()
+	if points > 0:
+		prompts.append("%d passive point%s  [%s]" % [points, "s" if points > 1 else "", HUDStyle.key_label("toggle_passives")])
+	var spec_points: int = ch.spec_points_available() if ch.level >= ch.SPEC_LEVELS[0] else 0
+	if ch.spec_id == "" and ch.level >= ch.SPEC_LEVELS[0]: spec_points = 1
+	if spec_points > 0:
+		prompts.append(("Choose a specialisation" if ch.spec_id == "" else "%d specialisation point%s" % [spec_points, "s" if spec_points > 1 else ""]) + "  [%s]" % HUDStyle.key_label("toggle_spec"))
+	var height := 62.0 + (lines.size() + prompts.size()) * 17
+	HUDStyle.frame(self, Rect2(12, 12, width, height))
+	var title_size := 20
+	var title_font: Font = HUDStyle.THEME.get_font("font", "Title")
+	while title_size > 13 and title_font.get_string_size(lv.level_name, HORIZONTAL_ALIGNMENT_LEFT, -1, title_size).x > width - 28:
+		title_size -= 1
+	HUDStyle.text(self, Vector2(26, 38), lv.level_name, title_size, HUDStyle.color("gold"), true)
+	draw_line(Vector2(26, 47), Vector2(width - 2, 47), HUDStyle.color("bronze").darkened(0.35))
+	var y := 65.0
+	for line in lines:
+		HUDStyle.text(self, Vector2(26, y), line, 13, HUDStyle.color("ivory"))
+		y += 17
+	HUDStyle.text(self, Vector2(26, y + 3), "Gold  %d" % ch.gold, 13, HUDStyle.color("gold"))
+	y += 21
+	for prompt in prompts:
+		HUDStyle.text(self, Vector2(26, y), prompt, 12, HUDStyle.color("ivory"))
+		y += 17
+
+func minimap_rect(vs: Vector2) -> Rect2:
+	if not big_map:
+		return Rect2(vs.x - 210, 14, 196, 150)
+	var available := Rect2(24, 80, vs.x - 48, maxf(80, dock.position.y - 126))
+	var dimensions := Vector2(minf(720, available.size.x), minf(480, available.size.y))
+	return Rect2(available.position + (available.size - dimensions) * 0.5, dimensions)
+
 ## Small "DEV" tag above the life orb so the tools are never on by accident.
 func _dev_tag(f: Font, vs: Vector2) -> void:
 	var r := Rect2(14, vs.y - 160, 44, 18)
@@ -226,30 +219,10 @@ func _dev_overlay(f: Font, vs: Vector2) -> void:
 		draw_string(f, Vector2(x, y), l, HORIZONTAL_ALIGNMENT_LEFT, 286, 12, Color("#c0ffc0"))
 		y += 16
 
-func _orb(c: Vector2, r: float, k: float, col: Color, dark: Color, text: String) -> void:
-	draw_circle(c, r + 4, Color(0, 0, 0, 0.9))
-	draw_circle(c, r, dark)
-	k = clampf(k, 0, 1)
-	# fill from the bottom using horizontal slices
-	var top := c.y + r - 2 * r * k
-	var y := c.y - r
-	while y < c.y + r:
-		if y >= top:
-			var dy := absf(y + 1 - c.y)
-			var hw := sqrt(maxf(0.0, r * r - dy * dy))
-			draw_line(Vector2(c.x - hw, y + 1), Vector2(c.x + hw, y + 1), col, 2.0)
-		y += 2
-	draw_arc(c, r, 0, TAU, 48, UIKit.GOLD_DIM, 3.0)
-	draw_arc(c + Vector2(-r * 0.3, -r * 0.35), r * 0.45, PI * 1.1, PI * 1.6, 8, Color(1, 1, 1, 0.25), 3.0)
-	var f := ThemeDB.fallback_font
-	var w := f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x
-	draw_string_outline(f, c + Vector2(-w / 2, 5), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 3, Color.BLACK)
-	draw_string(f, c + Vector2(-w / 2, 5), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color.WHITE)
-
 func _minimap(lv, p, vs: Vector2) -> void:
 	var mscale := 2.0 if not big_map else 4.0
-	var mr := Rect2(vs.x - 210, 14, 196, 150) if not big_map else Rect2(vs.x / 2 - 360, vs.y / 2 - 260, 720, 480)
-	draw_rect(mr.grow(2), Color(0, 0, 0, 0.6 if not big_map else 0.4))
+	var mr := minimap_rect(vs)
+	HUDStyle.frame(self, mr.grow(5))
 	var pc: Vector2 = p.global_position / float(lv.T)
 	var origin := mr.get_center() - pc * mscale
 	# clip by drawing only the texture region that fits
@@ -293,4 +266,4 @@ func _minimap(lv, p, vs: Vector2) -> void:
 				if mr.has_point(bp):
 					draw_string(ThemeDB.fallback_font, bp + Vector2(-4, 4), "X", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("#ff6060"))
 	draw_circle(mr.get_center(), 2.5, Color("#60ff60"))
-	draw_rect(mr, UIKit.GOLD_DIM, false, 1.0)
+	draw_rect(mr, HUDStyle.color("bronze"), false, 1.0)

@@ -1,0 +1,52 @@
+{
+  "seed": 20261104,
+  "simulated_hours_per_scenario": 100000,
+  "assumptions": {
+    "bosses_per_hour": 6,
+    "endgame_elites_per_hour": 60,
+    "note": "Scenario inputs, not measured clear times; no drop-rate tuning."
+  },
+  "income": [
+    {
+      "tier": "T4",
+      "expected_brands_per_hour": 0.0,
+      "simulated_brands_per_hour": 0.0
+    },
+    {
+      "tier": "T5",
+      "expected_brands_per_hour": 0.6600000000000001,
+      "simulated_brands_per_hour": 0.65891
+    },
+    {
+      "tier": "T6",
+      "expected_brands_per_hour": 0.96,
+      "simulated_brands_per_hour": 0.96365
+    },
+    {
+      "tier": "Endless capped",
+      "expected_brands_per_hour": 1.2600000000000002,
+      "simulated_brands_per_hour": 1.26071
+    }
+  ],
+  "attempts": [
+    {
+      "event": "Any double",
+      "probability": 0.04,
+      "expected_attempts": 25.0,
+      "simulated_mean_attempts": 25.12861
+    },
+    {
+      "event": "Forbidden Knowledge on eligible enabled level-40+ amulet",
+      "probability": 0.0016,
+      "expected_attempts": 625.0,
+      "simulated_mean_attempts": 626.79024
+    },
+    {
+      "event": "Double T1, conditional on both families ordinary",
+      "probability": 0.0004,
+      "expected_attempts": 2500.0,
+      "simulated_mean_attempts": 2502.73886
+    }
+  ],
+  "note": "Geometric expectations include the successful attempt; no guarantee/pity. Both-T1 assumes two ordinary selections; actual unconditional rates depend on eligible categories."
+}

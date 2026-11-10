@@ -3,6 +3,7 @@ extends "res://scripts/ui/base_panel.gd"
 ## (equip, compare, sell, salvage, stash, craft-select, destroy).
 
 const ItemSlot = preload("res://scripts/ui/item_slot.gd")
+const Chrome = preload("res://scripts/ui/components/inventory_chrome.gd")
 
 const EQUIP_LAYOUT := {
 	"charm": Vector2(0, 0), "helmet": Vector2(150, 0), "amulet": Vector2(210, 0),
@@ -19,18 +20,34 @@ var mats_label: RichTextLabel
 var filter_btn: Button
 var destroy_btn: Button
 var info_label: Label
+var bag_count: Label
 
 func _init() -> void:
 	place = "right"
 	build("Inventory", Vector2(430, 560))
+	theme = Chrome.make_theme()
+	var outer = get_child(0)
+	outer.add_theme_constant_override("separation", 4)
+	body.add_theme_constant_override("separation", 4)
+	title_label.add_theme_font_override("font", Chrome.HUDStyle.THEME.get_font("font", "Title"))
+	title_label.add_theme_font_size_override("font_size", 24)
+	title_label.add_theme_color_override("font_color", Chrome.IVORY)
+	var close_button = title_label.get_parent().get_child(1)
+	close_button.tooltip_text = "Close inventory"
+	var equipment_inset := Chrome.inset()
+	body.add_child(equipment_inset)
 	var eqbox := Control.new()
-	eqbox.custom_minimum_size = Vector2(400, 200)
-	body.add_child(eqbox)
+	eqbox.custom_minimum_size = Vector2(392, 206)
+	eqbox.mouse_filter = Control.MOUSE_FILTER_PASS
+	equipment_inset.add_child(eqbox)
+	var equipped_caption := Chrome.caption("EQUIPPED")
+	equipped_caption.position = Vector2(4, 64)
+	eqbox.add_child(equipped_caption)
 	for s in EQUIP_LAYOUT:
 		var sl = ItemSlot.new()
 		sl.key = s
 		sl.placeholder = PLACEHOLDERS[s]
-		sl.position = EQUIP_LAYOUT[s] * 0.88 + Vector2(50, 0)
+		sl.position = EQUIP_LAYOUT[s] * 0.88 + Vector2(44, 0)
 		sl.size = Vector2(46, 46)
 		sl.custom_minimum_size = Vector2(46, 46)
 		sl.clicked.connect(_on_equip_click)
@@ -38,12 +55,23 @@ func _init() -> void:
 		sl.unhovered.connect(_on_unhover)
 		eqbox.add_child(sl)
 		equip_slots[s] = sl
-	body.add_child(HSeparator.new())
+	var bag_inset := Chrome.inset()
+	body.add_child(bag_inset)
+	var bag_body := VBoxContainer.new()
+	bag_body.add_theme_constant_override("separation", 4)
+	bag_inset.add_child(bag_body)
+	var bag_header := HBoxContainer.new()
+	bag_body.add_child(bag_header)
+	var bag_caption := Chrome.caption("BAG")
+	bag_caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bag_header.add_child(bag_caption)
+	bag_count = Chrome.caption("0 / 40")
+	bag_header.add_child(bag_count)
 	var grid := GridContainer.new()
 	grid.columns = 8
 	grid.add_theme_constant_override("h_separation", 4)
 	grid.add_theme_constant_override("v_separation", 4)
-	body.add_child(grid)
+	bag_body.add_child(grid)
 	for i in 40:
 		var sl2 = ItemSlot.new()
 		sl2.key = i
@@ -53,22 +81,37 @@ func _init() -> void:
 		sl2.unhovered.connect(_on_unhover)
 		grid.add_child(sl2)
 		bag_slots.append(sl2)
-	mats_label = UIKit.rich("", 400)
-	body.add_child(mats_label)
+	var materials_inset := Chrome.inset()
+	body.add_child(materials_inset)
+	mats_label = UIKit.rich("", 392)
+	mats_label.add_theme_font_size_override("normal_font_size", 13)
+	materials_inset.add_child(mats_label)
 	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 4)
 	h.add_child(UIKit.button("Sort", func(): Game.ch.sort_bag()))
 	destroy_btn = UIKit.button("Destroy...", _open_destroy_menu)
 	destroy_btn.tooltip_text = "Destroy every bag item of a chosen rarity and lower"
 	h.add_child(destroy_btn)
 	filter_btn = UIKit.button("Filter", func(): ui.cycle_loot_filter())
+	filter_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(filter_btn)
 	body.add_child(h)
-	info_label = UIKit.label("", 11, UIKit.MUTED)
+	info_label = UIKit.label("", 12, Chrome.MUTED)
 	info_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	info_label.custom_minimum_size.x = 400
 	body.add_child(info_label)
 	Events.inventory_changed.connect(refresh)
 	Events.currency_changed.connect(refresh)
+	resized.connect(queue_redraw)
+	# Rich text wraps asynchronously. Refit on currency growth or first open too.
+	minimum_size_changed.connect(_refit)
+
+func _draw() -> void:
+	Chrome.draw_frame(self)
+
+func _refit() -> void:
+	if is_inside_tree() and visible:
+		reposition.call_deferred()
 
 func refresh() -> void:
 	var ch = Game.ch
@@ -81,6 +124,11 @@ func refresh() -> void:
 		bag_slots[i].set_item(ch.inventory[i])
 		bag_slots[i].selected = _is_selected(ch.inventory[i])
 		bag_slots[i].price = Loot.sell_value(ch.inventory[i]) if ui.is_open("vendor") and ch.inventory[i] != null and not ch.is_locked(ch.inventory[i]) else -1
+	var occupied := 0
+	for it in ch.inventory:
+		if it != null:
+			occupied += 1
+	bag_count.text = "%d / %d" % [occupied, bag_slots.size()]
 	var parts := ["[color=#e8c050]Gold: %d[/color]" % ch.gold]
 	for k in Data.materials:
 		var md: Dictionary = Data.materials[k]

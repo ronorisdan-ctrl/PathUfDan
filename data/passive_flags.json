@@ -1,0 +1,1091 @@
+{
+ "_about": "Registry of passive-tree flags and node tags. Every flag a tree node uses must be listed here and must have a behavioural test (tests/test_passive_tree.gd, func flag_<id>). kind 'behaviour' = code reacts to the flag; 'marker' = the node's mods do the work and the flag only names it. Checked by scripts/core/tree_rules.gd.",
+ "budget_l60": 72,
+ "abyss_point_depths": [
+  10,
+  20,
+  30,
+  40,
+  50,
+  60,
+  70
+ ],
+ "_abyss_about": "Bonus passive points: +1 the first time the Endless Abyss record (progress.abyss_best) reaches each depth. 59 (levels) + 6 (first boss kill per tier) + 7 = 72 = budget_l60. Derived from abyss_best, so retroactive.",
+ "flags": {
+  "momentum": {
+   "kind": "behaviour",
+   "hook": "player.damage_more / register_hit",
+   "desc": "Consecutive hits within 2s stack 3% more damage (max 20); 10% less with no stacks."
+  },
+  "bulwark": {
+   "kind": "behaviour",
+   "hook": "player._on_block",
+   "desc": "Blocking grants 15% damage reduction for 2s."
+  },
+  "fortress": {
+   "kind": "behaviour",
+   "hook": "player.receive_hit (still_t)",
+   "desc": "30% damage reduction after standing still for 1s."
+  },
+  "perfect_aim": {
+   "kind": "behaviour",
+   "hook": "Combat._conditional",
+   "desc": "Projectiles: 30% more beyond 180 units, 30% less within 100."
+  },
+  "automaton": {
+   "kind": "marker",
+   "hook": "mods: turret_damage more, turret_limit",
+   "desc": "Turrets 70% more damage, 1 fewer turret."
+  },
+  "convergence": {
+   "kind": "behaviour",
+   "hook": "Combat._conditional",
+   "desc": "Fire vs chilled/shocked or cold/lightning vs ignited: 35% more; 10% less vs unafflicted."
+  },
+  "one_mind": {
+   "kind": "marker",
+   "hook": "mods: minion_damage/minion_life more, damage more -30",
+   "desc": "Minions stronger, you weaker."
+  },
+  "blood_magic": {
+   "kind": "behaviour",
+   "hook": "player.try_use_slot / use_block_reason",
+   "desc": "Skills cost life instead of mana."
+  },
+  "glass_cannon": {
+   "kind": "marker",
+   "hook": "mods: damage more 40, max_life more -40",
+   "desc": "40% more damage, 40% less life."
+  },
+  "vampiric": {
+   "kind": "behaviour",
+   "hook": "Combat.deal (leech)",
+   "desc": "2% of hit damage leeched as life."
+  },
+  "crimson_dance": {
+   "kind": "behaviour",
+   "hook": "Combat.apply_status (bleed)",
+   "desc": "Bleeds deal 60% more and last 50% longer."
+  },
+  "wind_dancer": {
+   "kind": "behaviour",
+   "hook": "player.start_dodge / damage_more",
+   "desc": "Dodge grants Wind Dance (40% more damage); 10% less without it."
+  },
+  "executioner": {
+   "kind": "behaviour",
+   "hook": "Combat.deal (crit)",
+   "desc": "Hits vs enemies below 35% life always crit."
+  },
+  "mind_over_matter": {
+   "kind": "behaviour",
+   "hook": "player.receive_hit",
+   "desc": "30% of damage taken comes from mana first."
+  },
+  "void_pact": {
+   "kind": "behaviour",
+   "hook": "Combat._conditional",
+   "desc": "25% more damage vs enemies with any ailment."
+  },
+  "opened_veins": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_passives",
+   "desc": "Melee crits always inflict Bleed."
+  },
+  "blood_scent": {
+   "kind": "behaviour",
+   "hook": "player._kill_passives",
+   "desc": "Killing a bleeding enemy restores 4% life."
+  },
+  "blood_frenzy": {
+   "kind": "behaviour",
+   "hook": "player.use_time_for / frenzy_count / receive_hit / _regen",
+   "desc": "+4% attack speed per bleeding enemy within 150 (max 5); 10% more physical taken; no regen above 50% life."
+  },
+  "counterweight": {
+   "kind": "behaviour",
+   "hook": "player._on_block",
+   "desc": "Blocking grants 40% increased melee damage for 2s."
+  },
+  "staggering_guard": {
+   "kind": "behaviour",
+   "hook": "player._on_block(source)",
+   "desc": "Blocking stuns an attacker within 70."
+  },
+  "iron_riposte": {
+   "kind": "behaviour",
+   "hook": "player._on_block / start_dodge / mana_cost",
+   "desc": "Block triggers a 55-radius weapon counterattack (0.5s ICD); no dodge roll; movement skills cost 50% more."
+  },
+  "rallying_cry": {
+   "kind": "behaviour",
+   "hook": "player._kill_passives",
+   "desc": "Killing a stunned enemy resets the shortest remaining cooldown."
+  },
+  "war_herald": {
+   "kind": "behaviour",
+   "hook": "skill_exec buff",
+   "desc": "Buff skills last 50% longer and stun enemies within 70."
+  },
+  "volatile_mechanisms": {
+   "kind": "behaviour",
+   "hook": "turret.retire / mine.retire",
+   "desc": "Turrets explode on expiry/replacement; traps detonate instead of fizzling."
+  },
+  "overclock": {
+   "kind": "behaviour",
+   "hook": "turret.overclocked",
+   "desc": "Turrets fire 25% faster while the owner is within 120."
+  },
+  "clockwork_mind": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet (crit) / _conditional",
+   "desc": "Turret/trap hits use weapon crit if higher; other hits 30% less."
+  },
+  "agonising_toxins": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet / apply_status (poison stacks)",
+   "desc": "10% poison chance; poison stacks to 3; 3 stacks inflict Agony."
+  },
+  "virulence": {
+   "kind": "behaviour",
+   "hook": "player._kill_passives",
+   "desc": "A dying poisoned enemy passes its poison to the nearest enemy within 90."
+  },
+  "venom_pact": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet / apply_status / actor.add_status",
+   "desc": "20% poison chance; poison stacks to 20 and lasts 40% longer; hits cannot crit."
+  },
+  "marked_for_death": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_passives",
+   "desc": "Projectile crits Mark for 2s; crits vs Marked also hit one nearby enemy."
+  },
+  "shadowstep": {
+   "kind": "behaviour",
+   "hook": "player.start_dodge",
+   "desc": "Dodge roll chills enemies within 60."
+  },
+  "funeral_pyre": {
+   "kind": "behaviour",
+   "hook": "player._kill_passives",
+   "desc": "Killing an ignited enemy: 20% inc fire damage, 10% inc cast speed for 3s."
+  },
+  "searing_insight": {
+   "kind": "behaviour",
+   "hook": "Combat.deal (crit)",
+   "desc": "+25% crit chance vs ignited enemies."
+  },
+  "avatar_of_embers": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet / apply_status",
+   "desc": "Cold and lightning convert to fire; chill/freeze/shock become ignite."
+  },
+  "marrow_feast": {
+   "kind": "behaviour",
+   "hook": "player._kill_passives(killer)",
+   "desc": "A minion that kills recovers 20% life."
+  },
+  "necrotic_orders": {
+   "kind": "behaviour",
+   "hook": "Combat.minion_packet",
+   "desc": "Minion hits: 20% chance to inflict Frailty."
+  },
+  "legion_of_bone": {
+   "kind": "behaviour",
+   "hook": "minion.die",
+   "desc": "+2 minions (mods); minions explode for 40% of their life on death; drawbacks in mods."
+  },
+  "frailty_bloom": {
+   "kind": "behaviour",
+   "hook": "player._kill_passives",
+   "desc": "A dying enemy with Frailty spreads it within 80."
+  },
+  "hexblight": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_passives",
+   "desc": "Hits vs Frailty/Snare: 25% chance to inflict Agony."
+  },
+  "hunter_knight": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_passives / Combat.deal (crit)",
+   "desc": "Melee hits: 20% chance to Mark an unmarked enemy for 2s. Projectile hits vs Marked: +15% crit chance."
+  },
+  "pinning_shot": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_passives",
+   "desc": "Projectile hits vs Marked enemies Snare for 1.5s."
+  },
+  "run_them_down": {
+   "kind": "behaviour",
+   "hook": "Combat.deal (crit)",
+   "desc": "Melee hits vs Snared or Chilled enemies: +20% crit chance."
+  },
+  "twin_disciplines": {
+   "kind": "behaviour",
+   "hook": "player.try_use_slot / damage_more",
+   "desc": "Melee after projectile (or the reverse): 25% more damage; same kind twice in a row: 10% less."
+  },
+  "hexshot": {
+   "kind": "behaviour",
+   "hook": "skill_exec._curse (player.last_curse) / Combat._on_hit_passives",
+   "desc": "First projectile hit of each skill use applies the last curse you cast."
+  },
+  "charged_quiver": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet",
+   "desc": "Projectile hits: 15% chance to Shock."
+  },
+  "overload": {
+   "kind": "behaviour",
+   "hook": "player._kill_passives / _death_burst",
+   "desc": "Killing a Shocked enemy shocks enemies within 80 and deals 10% of its max life as lightning to them."
+  },
+  "spell_archer": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet (inc stats)",
+   "desc": "spell_damage increases also apply to projectile attacks; 15% less attack speed (mods)."
+  },
+  "spellblade": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_passives (player.last_spell_type, spellblade_t)",
+   "desc": "Melee hits release a 50-radius burst of the last spell's element for 30% of the hit (0.6s ICD); fire ignites, cold chills, lightning shocks."
+  },
+  "rime_edge": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_passives",
+   "desc": "Melee hits vs Chilled enemies: 25% chance to Freeze."
+  },
+  "shatter": {
+   "kind": "behaviour",
+   "hook": "player._kill_passives / _death_burst",
+   "desc": "Killing a Frozen enemy chills enemies within 60 and deals 10% of its max life as cold to them."
+  },
+  "battlemage": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet (inc stats)",
+   "desc": "spell_damage increases apply to melee attacks and melee_damage increases to spells; 15% less max life (mods)."
+  },
+  "brutal_force": {
+   "kind": "behaviour",
+   "hook": "Combat.deal (crit)",
+   "desc": "Melee hits vs Stunned or Frozen enemies always crit."
+  },
+  "second_wind": {
+   "kind": "behaviour",
+   "hook": "player.receive_hit / second_wind_cd",
+   "desc": "A hit that leaves you below 35% life: regenerate 20% max life over 4s (20s cooldown)."
+  },
+  "deadeye_mastery": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_passives (origin)",
+   "desc": "Projectile hits vs enemies more than 160 units away Snare for 1.5s."
+  },
+  "engineers_doctrine": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet",
+   "desc": "Turret and trap hits: 15% chance to Shock."
+  },
+  "killer_instinct": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_passives",
+   "desc": "Crits vs Chilled enemies Freeze."
+  },
+  "pyroclasm": {
+   "kind": "behaviour",
+   "hook": "player._kill_passives / _death_burst",
+   "desc": "Ignited enemies explode on death: 10% of max life as fire within 60."
+  },
+  "commanders_edge": {
+   "kind": "behaviour",
+   "hook": "Combat.minion_packet",
+   "desc": "Minions use your crit chance increases (flat + inc) and crit multiplier."
+  },
+  "rift_step": {
+   "kind": "behaviour",
+   "hook": "skill_exec blink",
+   "desc": "Blink Snares enemies within 60 of the departure and arrival points for 2s."
+  },
+  "festering_wounds": {
+   "kind": "behaviour",
+   "hook": "Combat.apply_status",
+   "desc": "Bleed, ignite and poison on Snared or Marked enemies last 50% longer."
+  },
+  "elemental_warding": {
+   "kind": "behaviour",
+   "hook": "player.add_status",
+   "desc": "Ignite, chill, freeze and shock on you last 50% shorter."
+  },
+  "prismatic_soul": {
+   "kind": "behaviour",
+   "hook": "player.add_status / Combat.player_packet / apply_status",
+   "desc": "Immune to ignite, chill, freeze and shock; cannot inflict them. Stats in mods."
+  },
+  "tailwind": {
+   "kind": "behaviour",
+   "hook": "player._on_skill_used",
+   "desc": "Dash, leap or blink resets the dodge roll cooldown."
+  },
+  "deathblow": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_passives",
+   "desc": "Crit kill: 20% inc crit chance, 10% inc attack and cast speed for 3s."
+  },
+  "arcane_shell": {
+   "kind": "behaviour",
+   "hook": "player.receive_hit / arcane_shell_cd",
+   "desc": "Hit of 15%+ max life: +20% damage reduction for 3s (8s cooldown)."
+  },
+  "abyssal_gaze": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet",
+   "desc": "Void and arcane hits: 15% chance to inflict Frailty for 4s."
+  },
+  "tremor_lines": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet (slam snare) / apply_status (stun on snared x1.5)",
+   "desc": "Slam hits snare 1.5s; stuns on snared enemies last 50% longer."
+  },
+  "shockwave": {
+   "kind": "behaviour",
+   "hook": "player._kill_passives / Combat.death_burst",
+   "desc": "Killing a stunned enemy: 70-unit burst, 10% of its max life as physical, stuns."
+  },
+  "earthbreaker": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet (slam x1.35, stun 100%)",
+   "desc": "Slam skills 35% more damage and always stun; 20% less attack speed (mods)."
+  },
+  "feint": {
+   "kind": "behaviour",
+   "hook": "player.start_dodge (feint_t) / Combat.deal",
+   "desc": "Next melee hit within 2s of a dodge roll is a critical strike."
+  },
+  "single_combat": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_phase3 / level.is_isolated",
+   "desc": "Melee hits vs an enemy with no other enemy within 110 Mark it for 3s."
+  },
+  "blade_dance": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_phase3 / player.blade_dance_stack",
+   "desc": "Melee crits: +5% attack and move speed per stack for 3s (max 4)."
+  },
+  "barbed_snares": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet (trap statuses)",
+   "desc": "Trap hits snare 2s and have 30% chance to bleed."
+  },
+  "noxious_payload": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_phase3 / apply_status (poison stacks)",
+   "desc": "Trap hits poison snared enemies; poison on snared enemies stacks to 5; 5 stacks = agony."
+  },
+  "master_trapper": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet / SkillExec._deploy / Mine.setup / player.use_block_reason",
+   "desc": "+1 max per trap, traps arm instantly, 30% more trap damage; cannot deploy turrets."
+  },
+  "volley_fire": {
+   "kind": "behaviour",
+   "hook": "SkillExec.proj_count / proj_pierce",
+   "desc": "Multi-projectile attacks +2 projectiles; single-projectile attacks +1 pierce."
+  },
+  "arrowstorm": {
+   "kind": "behaviour",
+   "hook": "Combat._on_hit_phase3 / Combat.arrow_rain",
+   "desc": "Every 10th projectile attack hit: 3 arrow volleys (r40) at 40% of the hit."
+  },
+  "endless_quiver": {
+   "kind": "behaviour",
+   "hook": "player._on_skill_used",
+   "desc": "Projectile attacks: 15% chance to fire again."
+  },
+  "conductive_web": {
+   "kind": "behaviour",
+   "hook": "Combat.apply_status (shock)",
+   "desc": "Shocking an enemy also shocks the nearest unshocked enemy within 90."
+  },
+  "thunderhead": {
+   "kind": "behaviour",
+   "hook": "player._on_skill_used (thunder_n)",
+   "desc": "Every 4th lightning spell: bolt on the enemy nearest the target, 150% damage, shocks."
+  },
+  "static_cascade": {
+   "kind": "behaviour",
+   "hook": "Combat.deal (pre-hit shock) / _on_hit_phase3",
+   "desc": "Lightning hits vs shocked enemies arc to another enemy within 100 for 50%."
+  },
+  "cold_snap": {
+   "kind": "behaviour",
+   "hook": "Combat.apply_status (freeze)",
+   "desc": "Freezing an enemy chills enemies within 70."
+  },
+  "brittle": {
+   "kind": "behaviour",
+   "hook": "Combat.deal (conditional crit) / apply_status (freeze duration)",
+   "desc": "+30% crit chance vs frozen; freezes last 30% longer."
+  },
+  "glacial_heart": {
+   "kind": "behaviour",
+   "hook": "Combat.player_packet (chill) / Combat._conditional",
+   "desc": "Cold hits always chill; 40% more vs frozen; 20% less vs neither chilled nor frozen."
+  }
+ },
+ "tags": [
+  "attribute",
+  "fire",
+  "cold",
+  "lightning",
+  "elemental",
+  "void",
+  "arcane",
+  "physical",
+  "resist",
+  "ignite",
+  "chill",
+  "freeze",
+  "shock",
+  "bleed",
+  "poison",
+  "stun",
+  "frailty",
+  "marked",
+  "snare",
+  "agony",
+  "ailment",
+  "dot",
+  "melee",
+  "one_hand",
+  "two_hand",
+  "attack",
+  "spell",
+  "projectile",
+  "bow",
+  "firearm",
+  "area",
+  "speed",
+  "crit",
+  "execute",
+  "minion",
+  "deployable",
+  "trap",
+  "life",
+  "mana",
+  "sustain",
+  "armour",
+  "evasion",
+  "block",
+  "defence",
+  "dodge",
+  "mobility",
+  "stationary",
+  "range",
+  "cooldown",
+  "generic",
+  "elite",
+  "xp",
+  "loot",
+  "utility"
+ ],
+ "statuses": [
+  "ignite",
+  "chill",
+  "freeze",
+  "shock",
+  "bleed",
+  "poison",
+  "stun",
+  "frailty",
+  "marked",
+  "snare",
+  "agony"
+ ],
+ "pending_rework": {},
+ "_masteries_about": "Phase 4a mastery groups. A tree node of type 'mastery' names its group in 'mastery'; allocating it means choosing one option. An option id can be chosen at most once across the tree, so a group placed twice lets one character take two different options. Options use 'inc'/'flat' mods only (no 'more'). Changing a chosen option costs the refund price of one node.",
+ "masteries": {
+  "melee": {
+   "name": "Melee Mastery",
+   "tags": [
+    "melee"
+   ],
+   "options": [
+    {
+     "id": "melee_fury",
+     "name": "Fury",
+     "mods": [
+      {
+       "stat": "melee_damage",
+       "type": "inc",
+       "value": 20
+      }
+     ]
+    },
+    {
+     "id": "melee_tempo",
+     "name": "Tempo",
+     "mods": [
+      {
+       "stat": "attack_speed",
+       "type": "inc",
+       "value": 8
+      },
+      {
+       "stat": "move_speed",
+       "type": "inc",
+       "value": 4
+      }
+     ]
+    },
+    {
+     "id": "melee_leech",
+     "name": "Bloodthirst",
+     "mods": [
+      {
+       "stat": "life_on_hit",
+       "type": "flat",
+       "value": 2
+      }
+     ]
+    },
+    {
+     "id": "melee_heavy",
+     "name": "Heavy Blows",
+     "mods": [
+      {
+       "stat": "crit_multi",
+       "type": "flat",
+       "value": 20
+      },
+      {
+       "stat": "attack_speed",
+       "type": "inc",
+       "value": -6
+      }
+     ]
+    }
+   ]
+  },
+  "bulwark": {
+   "name": "Bulwark Mastery",
+   "tags": [
+    "armour",
+    "block"
+   ],
+   "options": [
+    {
+     "id": "bw_block",
+     "name": "Shield Wall",
+     "mods": [
+      {
+       "stat": "block_chance",
+       "type": "flat",
+       "value": 5
+      }
+     ]
+    },
+    {
+     "id": "bw_plate",
+     "name": "Plated",
+     "mods": [
+      {
+       "stat": "armour",
+       "type": "inc",
+       "value": 30
+      },
+      {
+       "stat": "stun_threshold",
+       "type": "inc",
+       "value": 10
+      }
+     ]
+    },
+    {
+     "id": "bw_stand",
+     "name": "Stand Firm",
+     "mods": [
+      {
+       "stat": "damage_reduction",
+       "type": "flat",
+       "value": 4
+      },
+      {
+       "stat": "move_speed",
+       "type": "inc",
+       "value": -8
+      }
+     ]
+    },
+    {
+     "id": "bw_regen",
+     "name": "Second Wind",
+     "mods": [
+      {
+       "stat": "life_regen",
+       "type": "flat",
+       "value": 2
+      }
+     ]
+    }
+   ]
+  },
+  "bleed": {
+   "name": "Bloodletting Mastery",
+   "tags": [
+    "bleed",
+    "physical"
+   ],
+   "options": [
+    {
+     "id": "bl_chance",
+     "name": "Serrated",
+     "mods": [
+      {
+       "stat": "bleed_chance",
+       "type": "flat",
+       "value": 15
+      }
+     ]
+    },
+    {
+     "id": "bl_rend",
+     "name": "Rend",
+     "mods": [
+      {
+       "stat": "dot_damage",
+       "type": "inc",
+       "value": 20
+      },
+      {
+       "stat": "physical_damage",
+       "type": "inc",
+       "value": 8
+      }
+     ]
+    },
+    {
+     "id": "bl_long",
+     "name": "Lingering Wounds",
+     "mods": [
+      {
+       "stat": "status_duration",
+       "type": "inc",
+       "value": 25
+      }
+     ]
+    },
+    {
+     "id": "bl_feast",
+     "name": "Blood Feast",
+     "mods": [
+      {
+       "stat": "life_on_kill",
+       "type": "flat",
+       "value": 5
+      },
+      {
+       "stat": "physical_damage",
+       "type": "inc",
+       "value": 10
+      }
+     ]
+    }
+   ]
+  },
+  "projectile": {
+   "name": "Projectile Mastery",
+   "tags": [
+    "projectile"
+   ],
+   "options": [
+    {
+     "id": "pj_split",
+     "name": "Split Shot",
+     "mods": [
+      {
+       "stat": "projectile_count",
+       "type": "flat",
+       "value": 1
+      },
+      {
+       "stat": "projectile_damage",
+       "type": "inc",
+       "value": -15
+      }
+     ]
+    },
+    {
+     "id": "pj_pierce",
+     "name": "Piercing",
+     "mods": [
+      {
+       "stat": "pierce",
+       "type": "flat",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "id": "pj_chain",
+     "name": "Ricochet",
+     "mods": [
+      {
+       "stat": "chain",
+       "type": "flat",
+       "value": 1
+      },
+      {
+       "stat": "projectile_damage",
+       "type": "inc",
+       "value": -10
+      }
+     ]
+    },
+    {
+     "id": "pj_velocity",
+     "name": "Velocity",
+     "mods": [
+      {
+       "stat": "projectile_speed",
+       "type": "inc",
+       "value": 20
+      },
+      {
+       "stat": "projectile_damage",
+       "type": "inc",
+       "value": 12
+      }
+     ]
+    }
+   ]
+  },
+  "deployable": {
+   "name": "Deployable Mastery",
+   "tags": [
+    "deployable",
+    "trap"
+   ],
+   "options": [
+    {
+     "id": "dp_turret",
+     "name": "Battery",
+     "mods": [
+      {
+       "stat": "turret_limit",
+       "type": "flat",
+       "value": 1
+      },
+      {
+       "stat": "turret_damage",
+       "type": "inc",
+       "value": -10
+      }
+     ]
+    },
+    {
+     "id": "dp_trap",
+     "name": "Hair Trigger",
+     "mods": [
+      {
+       "stat": "trap_damage",
+       "type": "inc",
+       "value": 25
+      }
+     ]
+    },
+    {
+     "id": "dp_cd",
+     "name": "Quick Assembly",
+     "mods": [
+      {
+       "stat": "cooldown_recovery",
+       "type": "inc",
+       "value": 12
+      }
+     ]
+    },
+    {
+     "id": "dp_blast",
+     "name": "Wide Charges",
+     "mods": [
+      {
+       "stat": "area",
+       "type": "inc",
+       "value": 15
+      },
+      {
+       "stat": "trap_damage",
+       "type": "inc",
+       "value": 8
+      }
+     ]
+    }
+   ]
+  },
+  "affliction": {
+   "name": "Affliction Mastery",
+   "tags": [
+    "dot",
+    "ailment"
+   ],
+   "options": [
+    {
+     "id": "af_dot",
+     "name": "Corrosion",
+     "mods": [
+      {
+       "stat": "dot_damage",
+       "type": "inc",
+       "value": 25
+      }
+     ]
+    },
+    {
+     "id": "af_chance",
+     "name": "Contagion",
+     "mods": [
+      {
+       "stat": "status_chance",
+       "type": "flat",
+       "value": 8
+      }
+     ]
+    },
+    {
+     "id": "af_dur",
+     "name": "Slow Rot",
+     "mods": [
+      {
+       "stat": "status_duration",
+       "type": "inc",
+       "value": 25
+      }
+     ]
+    },
+    {
+     "id": "af_elite",
+     "name": "Bane",
+     "mods": [
+      {
+       "stat": "damage_vs_elite",
+       "type": "inc",
+       "value": 20
+      }
+     ]
+    }
+   ]
+  },
+  "elemental": {
+   "name": "Elemental Mastery",
+   "tags": [
+    "elemental"
+   ],
+   "options": [
+    {
+     "id": "el_dmg",
+     "name": "Attunement",
+     "mods": [
+      {
+       "stat": "elemental_damage",
+       "type": "inc",
+       "value": 20
+      }
+     ]
+    },
+    {
+     "id": "el_ward",
+     "name": "Elemental Ward",
+     "mods": [
+      {
+       "stat": "res_fire",
+       "type": "flat",
+       "value": 12
+      },
+      {
+       "stat": "res_cold",
+       "type": "flat",
+       "value": 12
+      },
+      {
+       "stat": "res_lightning",
+       "type": "flat",
+       "value": 12
+      }
+     ]
+    },
+    {
+     "id": "el_ail",
+     "name": "Overload",
+     "mods": [
+      {
+       "stat": "status_chance",
+       "type": "flat",
+       "value": 8
+      },
+      {
+       "stat": "status_duration",
+       "type": "inc",
+       "value": 10
+      }
+     ]
+    },
+    {
+     "id": "el_flow",
+     "name": "Flowing Casts",
+     "mods": [
+      {
+       "stat": "cast_speed",
+       "type": "inc",
+       "value": 10
+      },
+      {
+       "stat": "mana_cost",
+       "type": "inc",
+       "value": -10
+      }
+     ]
+    }
+   ]
+  },
+  "minion": {
+   "name": "Minion Mastery",
+   "tags": [
+    "minion"
+   ],
+   "options": [
+    {
+     "id": "mn_horde",
+     "name": "Horde",
+     "mods": [
+      {
+       "stat": "minion_limit",
+       "type": "flat",
+       "value": 1
+      },
+      {
+       "stat": "minion_damage",
+       "type": "inc",
+       "value": -15
+      }
+     ]
+    },
+    {
+     "id": "mn_power",
+     "name": "Dark Pact",
+     "mods": [
+      {
+       "stat": "minion_damage",
+       "type": "inc",
+       "value": 25
+      }
+     ]
+    },
+    {
+     "id": "mn_tough",
+     "name": "Bone Armour",
+     "mods": [
+      {
+       "stat": "minion_life",
+       "type": "inc",
+       "value": 30
+      }
+     ]
+    },
+    {
+     "id": "mn_swift",
+     "name": "Hasted Dead",
+     "mods": [
+      {
+       "stat": "minion_speed",
+       "type": "inc",
+       "value": 15
+      },
+      {
+       "stat": "minion_damage",
+       "type": "inc",
+       "value": 10
+      }
+     ]
+    }
+   ]
+  },
+  "mind": {
+   "name": "Mind Mastery",
+   "tags": [
+    "mana"
+   ],
+   "options": [
+    {
+     "id": "md_well",
+     "name": "Deep Well",
+     "mods": [
+      {
+       "stat": "max_mana",
+       "type": "inc",
+       "value": 15
+      },
+      {
+       "stat": "mana_regen",
+       "type": "inc",
+       "value": 20
+      }
+     ]
+    },
+    {
+     "id": "md_thrift",
+     "name": "Thrift",
+     "mods": [
+      {
+       "stat": "mana_cost",
+       "type": "inc",
+       "value": -15
+      }
+     ]
+    },
+    {
+     "id": "md_arcane",
+     "name": "Esoterica",
+     "mods": [
+      {
+       "stat": "arcane_damage",
+       "type": "inc",
+       "value": 15
+      },
+      {
+       "stat": "void_damage",
+       "type": "inc",
+       "value": 15
+      }
+     ]
+    },
+    {
+     "id": "md_haste",
+     "name": "Quickened Mind",
+     "mods": [
+      {
+       "stat": "cooldown_recovery",
+       "type": "inc",
+       "value": 12
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_tree_sockets_about": "Phase 4b tree sockets. A node of type 'socket' costs 1 and holds one gem from the pouch (free to socket, swap or remove; refunding the node returns the gem). The gem gives its 'tree' table from data/gems.json (scaled by tier mult) and, D4 glyph style, boosts the mods of allocated minor/greater/notable nodes within 'radius' (tree units) that share a tag with the gem's 'tree_tags' by boost_pct[tier] percent. A node in range of several matching sockets takes the largest boost (no stacking).",
+ "tree_sockets": {
+  "radius": 240,
+  "boost_pct": [
+   15,
+   25,
+   35,
+   50
+  ],
+  "boost_types": [
+   "minor",
+   "greater",
+   "notable"
+  ]
+ }
+}

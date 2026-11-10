@@ -64,7 +64,7 @@ func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float
 	if not alive:
 		return 0.0
 	var arm := armour * (0.5 if p.get("flags", {}).has("armour_pen") else 1.0)
-	var total: float = TrainingRules.mitigate(rolled, arm, resist, statuses.has("frailty"), taken_mult(), Callable(Combat, "armour_reduction"))
+	var total: float = TrainingRules.mitigate(rolled, arm, resist, statuses.has("frailty"), taken_mult(), Callable(Combat, "armour_reduction"), float(p.get("ele_pen", 0.0)))
 	apply_damage(total, source, crit, Combat.dominant_type(rolled))   # number + flash; life is refilled below
 	life = max_life
 	if p.get("faction", "") == "player" and total > 0.0:
