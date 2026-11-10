@@ -6,7 +6,7 @@ re-baselined once); add a row here with the commit and the reason.
 
 Check: `powershell -File tests\smartbot\run_baseline.ps1 -Out res://tests/smartbot/out/check.csv`
 (about 12 minutes on Dan's PC), then
-`python tests\smartbot\compare_baseline.py tests\smartbot\baseline\caster_v1.csv tests\smartbot\out\check.csv`
+`python tests\smartbot\compare_baseline.py tests\smartbot\baseline\d2_v1.csv tests\smartbot\out\check.csv`
 (exit 0 = identical).
 
 | File | Date | Commit | Tree version | Set | Reason |
@@ -17,6 +17,7 @@ Check: `powershell -File tests\smartbot\run_baseline.ps1 -Out res://tests/smartb
 | `tree_v4.csv` | 2026-11-04 | uncommitted (on top of 18c3f71) | 4 | same set as tree_v1 | Re-baseline at the end of passive tree Phase 3b (six archetype spurs, tree 232 -> 316). Phase 3 was split by Dan, so 3b gets its own re-baseline. |
 | `tree_v4_bot2e.csv` | 2026-11-06 | uncommitted (on top of 18c3f71) | 4 | same set as tree_v1 | **Bot change, not a game change** (Endgame 2E): the mage now uses Blink as a dodge. Game data/code for these runs unchanged. |
 | `caster_v1.csv` | 2026-11-06 | uncommitted (on top of 18c3f71) | 4 | same set as tree_v1 | **Game change** (caster itemisation, `docs/CASTER_ITEMISATION.md`): flat added spell damage, caster base implicits, +spell levels past the cap, glove spell damage / cast speed, spell penetration. The larger affix pool changes item rolls for every class. Approved by Dan. |
+| `d2_v1.csv` | 2026-11-10 | Phase D2 commit | 6 | same set as tree_v1 | **Game change** (Phase D2, `docs/PHASE_D2_MEASUREMENTS.md`): Archon Velis fire resist 40 -> 30 (she is also the T3 boss), passive load fix, Perfect Aim 25% within 70. Approved by Dan 2026-11-10. |
 
 tree_v1 summary: T3 100% wins for all classes; T6 warrior 100%, ranger 100%, mage 70%
 (3 deaths to the Stormheart Colossus).
@@ -42,3 +43,4 @@ caster_v1 summary (bot2e -> caster_v1, means over 10 runs): mage T6 6/10 -> 8/10
 dps_est 1353 -> 3358); mage T3 10/10 (clear 115 -> 104 s). Warrior and ranger 10/10 at T3 and T6 both, clear times within
 +-6 s, dps_est within noise; their rows differ only because the new affixes change item rolls (10 of 60 rows identical).
 Full suite on the PC 47965/0. From now on compare against `caster_v1.csv`.
+d2_v1 summary (caster_v1 -> d2_v1): 52/60 rows identical. The 8 changed rows are T3 mage and ranger runs against Archon Velis (fire resist 40 -> 30); wins identical in all six class/tier cells, T3 mean clear mage 104.4 -> 103.8 s, ranger 132.7 -> 133.6 s; T6 and every warrior row byte-identical. Re-run after the Perfect Aim change: 60/60 identical (baseline bots take no keystones). From now on compare against `d2_v1.csv`.

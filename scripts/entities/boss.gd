@@ -272,7 +272,7 @@ func _shoot(dir: Vector2, mult: float) -> void:
 	p.kind = current.get("proj", "orb")
 	p.color = Combat.TYPE_COLORS.get(dt, Color.WHITE)
 	p.radius = 4.0
-	p.vel = dir * float(current.get("proj_speed", 180))
+	p.vel = dir * float(current.get("proj_speed", 180)) * proj_speed_mult
 	p.max_dist = 420.0
 	p.position = global_position + Vector2(0, -10) + dir * (radius + 2)
 	level.projectile_layer.add_child(p)

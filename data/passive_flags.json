@@ -30,7 +30,7 @@
   "perfect_aim": {
    "kind": "behaviour",
    "hook": "Combat._conditional",
-   "desc": "Projectiles: 30% more beyond 180 units, 30% less within 100."
+   "desc": "Projectiles: 30% more beyond 180 units, 25% less within 70."
   },
   "automaton": {
    "kind": "marker",

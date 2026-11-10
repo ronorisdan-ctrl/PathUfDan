@@ -442,7 +442,7 @@ func flag_perfect_aim(nid: String) -> void:
 	var far: float = Combat._conditional(pk, e, at + Vector2(250, 0))
 	var mid: float = Combat._conditional(pk, e, at + Vector2(140, 0))
 	var near: float = Combat._conditional(pk, e, at + Vector2(50, 0))
-	T.check(absf(far / mid - 1.3) < 0.01 and absf(near / mid - 0.7) < 0.01, "behaviour perfect_aim: far +30%, near -30%", "%.2f %.2f %.2f" % [far, mid, near])
+	T.check(absf(far / mid - 1.3) < 0.01 and absf(near / mid - 0.75) < 0.01, "behaviour perfect_aim: far +30%, near (< 70 units) -25%", "%.2f %.2f %.2f" % [far, mid, near])
 
 func flag_convergence(nid: String) -> void:
 	var pk := _pk({"fire": [100.0, 100.0]})
@@ -913,6 +913,27 @@ func test_phase3_data() -> void:
 	ch2.from_dict(d)
 	T.check(ch2.total_passive_points() == ch.total_passive_points(), "abyss points survive save/load (derived from abyss_best)")
 	ch.progress["abyss_best"] = best0
+	# Phase D2 fix: a tree that spends the Abyss points is kept on load (progress loads after
+	# the passives, so the check used to see 0 Abyss points and refunded the whole tree)
+	var ca = ch.get_script().new()
+	ca.class_id = ch.class_id
+	ca.level = 10
+	ca.progress["abyss_best"] = 99
+	ca.allocated = [ca.class_def()["start_passive"]]
+	var grew := true
+	while grew and ca.available_passive_points() > 0:
+		grew = false
+		for n in Data.passive_list:
+			if ca.available_passive_points() <= 0:
+				break
+			var nid: String = n["id"]
+			if n.get("type", "") in ["minor", "greater"] and int(n.get("cost", 1)) == 1 and not ca.allocated.has(nid) and ca.can_allocate(nid) == "" and ca.allocate(nid):
+				grew = true
+	var spent_a: int = ca.allocated.size() - 1
+	var ca2 = ch.get_script().new()
+	ca2.from_dict(JSON.parse_string(JSON.stringify(ca.to_dict())))
+	T.check(spent_a > ca.level - 1 + ca.bonus_passive_points and ca2.allocated.size() == ca.allocated.size() and ca2.tree_refund.is_empty(),
+		"abyss points: a tree spending them is kept on load", "spent %d, loaded %d, refund %s" % [spent_a, ca2.allocated.size() - 1, str(ca2.tree_refund)])
 
 func _crit_count(pk: Dictionary, n: int = 200) -> int:
 	var hits := []

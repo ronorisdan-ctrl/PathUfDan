@@ -334,6 +334,8 @@ func _candidates() -> Array:
 	for e in lv.enemies:
 		if not _valid(e) or ignore.get(e.get_instance_id(), -1.0) > t:
 			continue
+		if eg.hold_wall(e):
+			continue
 		var d: float = e.global_position.distance_to(pp)
 		var seen: bool = d < 330 and lv.has_los(pp, e.global_position)
 		if seen or (e.aggro and d < 460) or e.is_boss or wave.has(e) or (e == target and d < 520):

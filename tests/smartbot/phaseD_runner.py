@@ -57,6 +57,24 @@ def cells(group):
             out.append((f"W3_rot4_{b}", lv, 900, 10, a, ["typical"], {"ranger": b}))
         for b in ("none", "m_glacial"):
             out.append((f"W3_rot4_{b}", lv, 900, 10, a, ["typical"], {"mage": b}))
+    elif group == "d2rot":     # Phase D2 dial: typical only, the four target cells
+        hx, lv = RINGS[3]
+        base = [f"--dungeon=atlas:{hx}", "--mechanic=none"]
+        out.append(("rot3", lv, 900, 10, base + ["--rot=3"], ["typical"]))
+        out.append(("rot4p", lv, 900, 10, base + ["--rot=4", PIG], ["typical"]))
+        out.append(("rot4p_s1900", lv, 1900, 10, base + ["--rot=4", PIG], ["typical"]))
+        out.append(("rot5p", lv, 900, 10, base + ["--rot=5", PIG], ["typical"]))
+    elif group == "d2warden":  # Phase D2: ring 2 + 3 Wardens at Rot 5 (ring 1 never has Rot)
+        for ring in (2, 3):
+            hx, lv = RINGS[ring]
+            a = [f"--dungeon=atlas:{hx}", "--rot=5", "--mechanic=none", "--wager=none", "--warden=1"]
+            out.append((f"W{ring}_rot5", lv, 900, 10, a, ["typical"]))
+    elif group == "dummy":     # Phase D2 (D5): ranger keystone builds on a Training Grounds dummy
+        hx, lv = RINGS[3]
+        for b in ("none", "r_glass", "r_perfect_aim", "r_far_aim", "r_wind", "r_wind_roll"):
+            for dist in (60, 140, 220):
+                a = [f"--dungeon=atlas:{hx}", f"--dummy={dist}:30"] + (["--dummy-roll=2.5"] if b == "r_wind_roll" else [])
+                out.append((f"dummy_{b}_{dist}", lv, 900, 5, a, ["typical"], {"ranger": b}))
     return [c if len(c) == 7 else c + (None,) for c in out]
 
 
@@ -80,7 +98,11 @@ def main():
     ap.add_argument("--plan-mage", default="m_embers")
     ap.add_argument("--tag", default="")
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--tune", default="", help="Phase D2: passed to smartbot as --tune=...")
+    ap.add_argument("--outdir", default="phaseD")
     a = ap.parse_args()
+    global OUT
+    OUT = os.path.join(HERE, "out", a.outdir)
     os.makedirs(OUT, exist_ok=True)
     gears = a.gears.split(",")
     todo = []
@@ -111,7 +133,8 @@ def main():
         args = [a.godot, "--headless", "--fixed-fps", "60", "--path", PROJ, "res://tests/smartbot/smartbot.tscn", "--",
                 f"--class={c}", "--tier=6", f"--level={lv}", f"--runs={runs}", f"--seed={seed}"] + extra + [
                 "--profile=Competent", "--build=balanced", f"--gear={gear}", f"--plan={plan}", f"--jobs={runs}",
-                "--out=res://tests/smartbot/out/phaseD/" + os.path.basename(out)]
+                "--out=res://tests/smartbot/out/" + a.outdir + "/" + os.path.basename(out)] + (
+                [f"--tune={a.tune}"] if a.tune else [])
         with open(out + ".log", "w") as lf:
             try:
                 subprocess.run(args, stdout=lf, stderr=subprocess.STDOUT, timeout=7200)

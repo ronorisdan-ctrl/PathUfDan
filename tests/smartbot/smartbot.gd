@@ -169,6 +169,7 @@ func _ready() -> void:
 				ov[k] = v == "true"
 			else:
 				ov[k] = float(v)
+	_apply_tune()
 	prof = Profiles.get_profile(A["profile"], ov)
 	hub.setup(self, A["build"], flags)
 	kit.hub = hub
@@ -194,6 +195,37 @@ func _ready() -> void:
 	if trace_f != null:
 		trace_f.close()
 	get_tree().quit()
+
+## Phase D2 sweeps: --tune=rot.4.damage_mult=2.2;warden.2.damage_mult=1.5;bet.frenzy.count=32
+## overrides atlas.json numbers in memory for this process (children inherit the arg).
+## rot.<n>.<key> -> rot.levels[n-1]; warden.<ring>.<key> -> wardens.rings; bet.<id>.<key> -> wager.bets.
+func _apply_tune() -> void:
+	if not A.has("tune"):
+		return
+	var cfg: Dictionary = Data.atlas_cfg
+	for item in String(A["tune"]).split(";", false):
+		var kv := item.split("=")
+		var path := kv[0].split(".")
+		if kv.size() != 2 or path.size() != 3:
+			push_error("bad --tune item " + item)
+			continue
+		var tgt = null
+		match path[0]:
+			"rot":
+				tgt = cfg["rot"]["levels"][int(path[1]) - 1]
+			"warden":
+				for w in cfg["wardens"]["rings"]:
+					if int(w["ring"]) == int(path[1]):
+						tgt = w
+			"bet":
+				for b in cfg["mechanics"]["wager"]["bets"]:
+					if str(b["id"]) == path[1]:
+						tgt = b
+		if tgt == null:
+			push_error("bad --tune target " + item)
+			continue
+		tgt[path[2]] = float(kv[1])
+		print("TUNE %s = %s" % [kv[0], kv[1]])
 
 func _dungeon_id(tier: int) -> String:
 	if A["dungeon"] != "":
@@ -549,6 +581,21 @@ func _force_wager(lv, ch) -> void:
 	lv.wager["offers"][0] = id
 	lv.wager["lim"][id] = WV.limits(id, lv._boss_chamber_links(lv.collector_pos))
 
+## Phase D2: Training Grounds dummy pass (sb_dummy.gd) instead of a dungeon run.
+func _dummy_row(c: int, r: int, run_seed: int, lvl: int, ch) -> Dictionary:
+	var res: Dictionary = await load("res://tests/smartbot/sb_dummy.gd").new().run(self, ctrl, main, ch)
+	var pw: Dictionary = hub.power(ch)
+	var note := "dummy:error=" + str(res["error"]) if res.has("error") else "dummy:dist=%d|secs=%d|dps=%.1f|hits=%d|crit=%.3f|avg_hit=%.1f|rolls=%d|bd=%s" % [
+		int(res["dist"]), int(res["secs"]), float(res["dps"]), int(res["hits"]), float(res["crit"]), float(res["avg_hit"]), int(res["rolls"]), str(res["breakdown"])]
+	return {"run_id": _run_id(c, r, lvl), "version": VERSION, "class": A["class"], "build": A["build"], "profile": A["profile"],
+		"tier": int(A["tier"]), "dungeon": "dummy", "mode": A["mode"], "chain": c, "run": r, "seed": A["seed"], "run_seed": run_seed,
+		"start_level": ch.level, "end_level": ch.level, "outcome": "error" if res.has("error") else "dummy",
+		"clear_time": "%.1f" % float(res.get("secs", 0.0)), "dps_est": int(round(float(res.get("dps", 0.0)))), "ehp_est": int(pw["ehp"]),
+		"gear_power": hub.gear_power(ch), "max_life": int(ch.final.get("max_life", 0)),
+		"keystones": "|".join(hub.planner.keystones(ch)), "passives": ch.allocated.size() - 1, "spec": ch.spec_id,
+		"hotbar": "|".join(ch.loadout.filter(func(x): return x != "")), "skill_uses": str(res.get("skill_uses", "")),
+		"flags": _flag_str(), "ts": A["ts"], "tps": A["tps"], "notes": note}
+
 func _one_run(c: int, r: int, run_seed: int, lvl: int) -> Dictionary:
 	var ch = Game.ch
 	var tier := int(A["tier"])
@@ -557,6 +604,8 @@ func _one_run(c: int, r: int, run_seed: int, lvl: int) -> Dictionary:
 	var deaths0 := int(ch.progress.get("deaths", 0))
 	hub.choose_hotbar(ch)
 	hub.runes(ch)
+	if A.has("dummy"):
+		return await _dummy_row(c, r, run_seed, lvl, ch)
 	if did.begins_with("atlas:"):
 		# Atlas runs (Endgame Phase 1): fixed atlas seed 1, target hex revealed for the bot
 		var st: Dictionary = load("res://scripts/core/atlas_rules.gd").ensure(ch, 1)

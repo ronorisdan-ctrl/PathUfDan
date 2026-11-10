@@ -392,8 +392,8 @@ func _conditional(p: Dictionary, target, origin: Vector2) -> float:
 		var d := origin.distance_to(target.global_position)
 		if d > 180:
 			m *= 1.3
-		elif d < 100:
-			m *= 0.7
+		elif d < 70:
+			m *= 0.75   # Phase D2 (Dan): was 30% less within 100 units
 	if fl.has("void_pact") and not target.statuses.is_empty():
 		m *= 1.25
 	if fl.has("clockwork_mind") and not p.get("kind", "") in ["turret", "trap", "minion"]:

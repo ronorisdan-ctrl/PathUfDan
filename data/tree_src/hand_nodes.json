@@ -686,14 +686,14 @@
   "flags": [
    "perfect_aim"
   ],
-  "desc": "Projectile hits against enemies further than 180 units deal 30% more damage. Hits against enemies closer than 100 units deal 30% less damage. +50% increased critical chance.",
+  "desc": "Projectile hits against enemies further than 180 units deal 30% more damage. Hits against enemies closer than 70 units deal 25% less damage. +50% increased critical chance.",
   "cluster": "Marksman",
   "tags": [
    "crit",
    "projectile",
    "range"
   ],
-  "drawback": "Projectile hits against enemies closer than 100 units deal 30% less damage."
+  "drawback": "Projectile hits against enemies closer than 70 units deal 25% less damage."
  },
  {
   "id": "r_gun",

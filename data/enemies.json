@@ -810,7 +810,7 @@
   "radius": 10,
   "armour": 30,
   "resist": {
-   "fire": 40,
+   "fire": 30,
    "lightning": 30,
    "void": 30
   },

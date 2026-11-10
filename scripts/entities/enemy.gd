@@ -12,6 +12,7 @@ var resist := {}
 var speed := 50.0
 var damage_mult := 1.0
 var attack_speed_mult := 1.0
+var proj_speed_mult := 1.0   # Rot (Phase D2): faster monster projectiles
 var elite_taken := 1.0
 var leech := 0.0
 var regen := 0.0
@@ -94,6 +95,7 @@ func setup(d: Dictionary, lvl: int, mods: Array, run: Dictionary = {}) -> void:
 	damage_mult *= float(run.get("damage", 1.0))
 	speed *= float(run.get("speed", 1.0))
 	attack_speed_mult *= float(run.get("attack_speed", 1.0))
+	proj_speed_mult *= float(run.get("proj_speed", 1.0))
 	armour *= float(run.get("armour", 1.0))
 	regen = float(run.get("regen", 0.0))
 	death_explode = run.get("explode", false) and not is_boss
@@ -640,7 +642,7 @@ func _fire_projectile(dir: Vector2, mult: float = 1.0) -> void:
 	p.color = Combat.TYPE_COLORS.get(convert_type if convert_type != "" else def.get("dmg_type", "physical"), Color.WHITE)
 	if p.kind == "fire":
 		p.radius = 4.0
-	p.vel = dir * float(def.get("proj_speed", 200))
+	p.vel = dir * float(def.get("proj_speed", 200)) * proj_speed_mult
 	p.max_dist = float(def.get("attack_range", 200)) * 1.5
 	p.position = global_position + Vector2(0, -6) + dir * 6
 	level.projectile_layer.add_child(p)

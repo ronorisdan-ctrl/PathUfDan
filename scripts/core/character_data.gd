@@ -1728,7 +1728,12 @@ func _load_passives(d: Dictionary) -> void:
 			push_warning("Save uses a newer passive tree (%d > %d)" % [saved_tree, cur_tree])
 		if not raw.has(start):
 			raw.push_front(start)   # older saves could miss it; not worth a refund
-		problem = TreeRules.allocation_problem(raw, start, total_passive_points(), Data.passives, raw_choices, Data.passive_flags.get("masteries", {}))
+		# Phase D2 fix: `progress` is loaded after the passives, so the Abyss milestone points
+		# come from the save itself (before, a tree using them was refunded on every load)
+		var pr = d.get("progress", {})
+		var ab := int(pr.get("abyss_best", 0)) if typeof(pr) == TYPE_DICTIONARY else 0
+		var total := (level - 1) + bonus_passive_points + abyss_passive_points(ab)
+		problem = TreeRules.allocation_problem(raw, start, total, Data.passives, raw_choices, Data.passive_flags.get("masteries", {}))
 	if problem == "":
 		allocated = raw
 		mastery_choices = raw_choices

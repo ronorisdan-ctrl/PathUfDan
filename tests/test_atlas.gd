@@ -1293,7 +1293,9 @@ func test_warden_rules() -> void:
 		var wd := AR.warden_def(bd, r)
 		check(wd.get("warden", 0) == r and str(wd["name"]).find(str(w["title"])) >= 0, "warden %d: named %s" % [r, str(wd["name"])])
 		check(wd["phases"].size() == bd["phases"].size() + 1, "warden %d: gains a final phase" % r)
-		check(float(wd["life"]) > float(bd["life"]) * 2.0 and int(wd["damage"][1]) > int(bd["damage"][1]), "warden %d: more life and damage" % r)
+		# Phase D2: a Warden's damage_mult is tuned per ring (ring 2 is below 1 because Rot 5 multiplies on top)
+		var dmx := float(w.get("damage_mult", 1.0))
+		check(float(wd["life"]) > float(bd["life"]) * 2.0 and absf(float(wd["damage"][1]) - float(bd["damage"][1]) * dmx) <= 1.0, "warden %d: more life, damage x ring damage_mult" % r, "%s vs %s x %.2f" % [str(wd["damage"]), str(bd["damage"]), dmx])
 		var ok := true
 		for pid in w.get("add", {}):
 			var used := false
@@ -1945,7 +1947,7 @@ func test_wager_vault_rules() -> void:
 	check(int(p3["gold"]) == int(round(2700 * (1.0 + br_odds) * 1.2)) and p3["rare"] and int(p3["flakes"]) == 24 and int(p3["dust"]) == 6, "2D wager: 3x pays more materials, a rare, and Rot adds 10% gold per level", str(p3))
 	check(WV.stake_refusal(899, 45, 1) != "" and WV.stake_refusal(900, 45, 1) == "", "2D wager: the stake must be affordable")
 	var brb := WV.bet_info("boss_rush")
-	var br_t := int(brb["base_time"]) + 3 * int(brb["per_chamber"])
+	var br_t := int(round(float(brb["base_time"]) + 3 * float(brb["per_chamber"])))
 	check(int(WV.limits("boss_rush", 3)["time"]) == br_t and WV.text("boss_rush", WV.limits("boss_rush", 3)) == "Slay the zone boss within %d seconds" % br_t, "2D wager: boss rush time = base + per chamber x chambers", WV.text("boss_rush", WV.limits("boss_rush", 3)))
 	var fz := WV.bet_info("frenzy")
 	check(WV.text("frenzy", WV.limits("frenzy")) == "Slay %d monsters within %d seconds" % [int(fz["count"]), int(fz["time"])] and WV.text("iron_will", WV.limits("iron_will")).find("%d%%" % int(WV.bet_info("iron_will")["life_pct"])) >= 0, "2D wager: bet texts fill their numbers")

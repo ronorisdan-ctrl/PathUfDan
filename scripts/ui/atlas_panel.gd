@@ -220,7 +220,12 @@ func _rot_lines(st: Dictionary, h: Vector2i, rot: int, d: Dictionary) -> Array:
 			int(round((float(lv.get("damage_mult", 1)) - 1) * 100)), int(lv.get("reward", 0)),
 			", elites +%d modifier" % int(lv.get("elite_mods", 0)) if int(lv.get("elite_mods", 0)) > 0 else ""])
 		if float(lv.get("heal", 1.0)) < 1.0 or float(lv.get("attack_speed", 1.0)) > 1.0:
-			out.append("[color=#b0e050]The Rot saps you:[/color] %d%% less life recovery, monsters attack %d%% faster" % [int(round((1.0 - float(lv.get("heal", 1.0))) * 100)), int(round((float(lv.get("attack_speed", 1.0)) - 1.0) * 100))])
+			var sap := "[color=#b0e050]The Rot saps you:[/color] %d%% less life recovery, monsters attack %d%% faster" % [int(round((1.0 - float(lv.get("heal", 1.0))) * 100)), int(round((float(lv.get("attack_speed", 1.0)) - 1.0) * 100))]
+			if float(lv.get("move_speed", 1.0)) > 1.0:
+				sap += ", move %d%% faster" % int(round((float(lv.get("move_speed", 1.0)) - 1.0) * 100))
+			if float(lv.get("proj_speed", 1.0)) > 1.0:
+				sap += ", their projectiles fly %d%% faster" % int(round((float(lv.get("proj_speed", 1.0)) - 1.0) * 100))
+			out.append(sap)
 		if d.get("heart", false):
 			var names := []
 			for m in AtlasRules.heart_mutations(int(st["seed"]), h, str(d.get("boss", "")), int(lv.get("mutations", 1))):

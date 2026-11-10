@@ -494,6 +494,8 @@ static func apply_rot(d: Dictionary, rot: int, seed_value: int, h: Vector2i, st:
 	out["rot_reward"] = float(lv.get("reward", 0)) * float(fx["rot_reward_mult"])
 	out["rot_heal"] = float(lv.get("heal", 1.0))             # Phase 1E: the Rot saps life recovery
 	out["rot_attack_speed"] = float(lv.get("attack_speed", 1.0))
+	out["rot_move_speed"] = float(lv.get("move_speed", 1.0))   # Phase D2: levers that reach kiting builds
+	out["rot_proj_speed"] = float(lv.get("proj_speed", 1.0))
 	var eb := int(lv.get("elite_mods", 0))
 	if eb > 0:
 		var em: Array = out.get("elite_mods", [1, 2])

@@ -217,6 +217,10 @@ func _apply_modifiers(mod_ids: Array) -> void:
 	density *= float(def.get("rot_density", 1.0))
 	reward_bonus += float(def.get("rot_reward", 0.0))
 	enemy_run["attack_speed"] = float(enemy_run.get("attack_speed", 1.0)) * float(def.get("rot_attack_speed", 1.0))
+	if def.has("rot_move_speed"):
+		enemy_run["speed"] = float(enemy_run.get("speed", 1.0)) * float(def["rot_move_speed"])
+	if def.has("rot_proj_speed"):
+		enemy_run["proj_speed"] = float(enemy_run.get("proj_speed", 1.0)) * float(def["rot_proj_speed"])
 
 func _apply_player_mods() -> void:
 	var pm := []

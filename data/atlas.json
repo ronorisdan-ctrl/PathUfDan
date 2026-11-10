@@ -17,7 +17,7 @@
   "biome_stray": 0.25,
   "bosses": ["warden", "gravemaw", "archon_velis", "iron_penitent", "malgrath", "stormheart"],
   "rot": {
-    "_doc": "Endgame Phase 1C: Rot, the spreading decay (docs/ENDGAME_PHASE1.md). Per-hex level 0-5, saved as atlas.rot {key: level}. A new atlas plants `sources` hexes at Rot `source_level` in rings >= min_ring. Each completed zone advances `fronts` (+1 per festered Heart since the last spread): a front adds +1 to the not-restored hex in rings >= min_ring that is a Rot hex or next to one, picked by a seeded score, while total Rot < cap_per_ring x rings revealed. Restored hexes never take Rot. Death in a zone adds +1 to that hex. levels[n-1] = the zone scaling at Rot n (heal = player life recovery multiplier, attack_speed = monster attack speed; Phase 1E tuning).",
+    "_doc": "Endgame Phase 1C: Rot, the spreading decay (docs/ENDGAME_PHASE1.md). Per-hex level 0-5, saved as atlas.rot {key: level}. A new atlas plants `sources` hexes at Rot `source_level` in rings >= min_ring. Each completed zone advances `fronts` (+1 per festered Heart since the last spread): a front adds +1 to the not-restored hex in rings >= min_ring that is a Rot hex or next to one, picked by a seeded score, while total Rot < cap_per_ring x rings revealed. Restored hexes never take Rot. Death in a zone adds +1 to that hex. levels[n-1] = the zone scaling at Rot n (heal = player life recovery multiplier, attack_speed = monster attack speed; Phase 1E tuning; move_speed = monster movement, proj_speed = monster projectile speed: Phase D2, the levers that reach kiting builds). Phase D2 dial (typical bots, docs/PHASE_D2_MEASUREMENTS.md): ~85% wins at Rot 3, ~65% at Rot 4 + 2 Pigments, ~45% at Rot 5 + 2 Pigments.",
     "max": 5,
     "min_ring": 2,
     "sources": 2,
@@ -29,9 +29,9 @@
     "levels": [
       {"rot": 1, "density": 1.1, "life_mult": 1.15, "damage_mult": 1.1, "reward": 15, "elite_mods": 0, "mutations": 0, "heal": 1.0, "attack_speed": 1.0},
       {"rot": 2, "density": 1.2, "life_mult": 1.3, "damage_mult": 1.2, "reward": 35, "elite_mods": 1, "mutations": 0, "heal": 1.0, "attack_speed": 1.0},
-      {"rot": 3, "density": 1.3, "life_mult": 1.5, "damage_mult": 1.4, "reward": 60, "elite_mods": 1, "mutations": 1, "heal": 0.85, "attack_speed": 1.05},
-      {"rot": 4, "density": 1.4, "life_mult": 1.75, "damage_mult": 1.6, "reward": 90, "elite_mods": 1, "mutations": 2, "heal": 0.7, "attack_speed": 1.1},
-      {"rot": 5, "density": 1.5, "life_mult": 2.0, "damage_mult": 1.8, "reward": 130, "elite_mods": 1, "mutations": 3, "heal": 0.6, "attack_speed": 1.15}
+      {"rot": 3, "density": 1.3, "life_mult": 1.5, "damage_mult": 3.0, "reward": 60, "elite_mods": 1, "mutations": 1, "heal": 0.65, "attack_speed": 1.15, "move_speed": 1.1, "proj_speed": 1.25},
+      {"rot": 4, "density": 1.4, "life_mult": 1.75, "damage_mult": 4.3, "reward": 90, "elite_mods": 1, "mutations": 2, "heal": 0.45, "attack_speed": 1.22, "move_speed": 1.18, "proj_speed": 1.4},
+      {"rot": 5, "density": 1.5, "life_mult": 2.0, "damage_mult": 4.8, "reward": 130, "elite_mods": 1, "mutations": 3, "heal": 0.38, "attack_speed": 1.25, "move_speed": 1.2, "proj_speed": 1.45}
     ],
     "heart": {"_doc": "At Rot >= heart_at the hex boss is the Heart of Rot: rot_mutations from its enemies.json entry (seeded order per hex), phase thresholds moved up by phase_shift, extra life.", "phase_shift": 0.06, "life_mult": 1.15, "light": "#9ad04a", "suffix": "Heart of Rot"},
     "harvest": {"_doc": "Harvest (fester) payout per Rot level n: a guaranteed legendary, gold = monster level x gold_per_level x n, n x material_rolls materials, (n - 2) gems, n - 2 extra rares. The hex keeps its Rot and the next spread gets +1 front.", "gold_per_level": 30, "material_rolls": 3, "extra_front": 1},
@@ -89,7 +89,7 @@
       ]
     },
     "wager": {
-      "_doc": "Endgame Phase 2D: the Collector stands in a mid-depth chamber. Interact to see `offers` bets (seeded per run, only bets the zone supports). One bet per zone. The stake (gold) = round(stake_per_level x zone level) x stake multiplier and is taken when you accept. Win: gold back = stake x (1 + odds) x (1 + rot_bonus x Rot), plus materials_per_mult x mult random materials, flakes_per_mult x mult Glaze Flakes, dust_per_mult x mult Pigment Dust, and at 3x a rare item at +rare_rarity rarity. Loss (condition broken, time out, death, or the zone boss dying first for 'next elite'/'count' bets): the stake is gone. Placeholders in text: {time} {count} {skills} {life}. boss_rush time = base_time + per_chamber x chambers from the Collector to the boss arena. Phase 2E (bot-tuned to ~60% Competent wins where a bet has a number to tune; odds set for about +15% expected gold): Unscathed allows max_hits hits; Frenzy is only offered with min_monsters monsters in the chambers from the Collector onward (Unscathed needs an elite there); Archaeology and Colourist are timed (count bets with a `time` lose when it runs out); Archaeology is refused once no sealed vault is left. Abstinence (~87%) and Economy of Means (1 skill, ~93%) have no number to tune and pay low odds instead.",
+      "_doc": "Endgame Phase 2D: the Collector stands in a mid-depth chamber. Interact to see `offers` bets (seeded per run, only bets the zone supports). One bet per zone. The stake (gold) = round(stake_per_level x zone level) x stake multiplier and is taken when you accept. Win: gold back = stake x (1 + odds) x (1 + rot_bonus x Rot), plus materials_per_mult x mult random materials, flakes_per_mult x mult Glaze Flakes, dust_per_mult x mult Pigment Dust, and at 3x a rare item at +rare_rarity rarity. Loss (condition broken, time out, death, or the zone boss dying first for 'next elite'/'count' bets): the stake is gone. Placeholders in text: {time} {count} {skills} {life}. boss_rush time = base_time + per_chamber x chambers from the Collector to the boss arena. Phase D2 (re-tuned with typical bots to ~60% wins and +15% expected gold, docs/PHASE_D2_MEASUREMENTS.md; was Phase 2E: bot-tuned to ~60% Competent wins where a bet has a number to tune; odds set for about +15% expected gold): Unscathed allows max_hits hits; Frenzy is only offered with min_monsters monsters in the chambers from the Collector onward (Unscathed needs an elite there); Archaeology and Colourist are timed (count bets with a `time` lose when it runs out); Archaeology is refused once no sealed vault is left. Abstinence (~87%) and Economy of Means (1 skill, ~93%) have no number to tune and pay low odds instead.",
       "offers": 3,
       "stake_per_level": 20,
       "mults": [1, 2, 3],
@@ -100,15 +100,15 @@
       "rare_at": 3,
       "rare_rarity": 300,
       "bets": [
-        {"id": "unscathed", "name": "Unscathed", "text": "Slay the next elite taking no more than {hits} hits", "odds": 0.95, "max_hits": 5, "needs_elites": true, "w": 2},
-        {"id": "boss_rush", "name": "Against the Clock", "text": "Slay the zone boss within {time} seconds", "odds": 0.7, "base_time": 12, "per_chamber": 8, "w": 2},
+        {"id": "unscathed", "name": "Unscathed", "text": "Slay the next elite taking no more than {hits} hits", "odds": 0.75, "max_hits": 2, "needs_elites": true, "w": 2},
+        {"id": "boss_rush", "name": "Against the Clock", "text": "Slay the zone boss within {time} seconds", "odds": 0.72, "base_time": 12, "per_chamber": 3.7, "w": 2},
         {"id": "few_skills", "name": "Economy of Means", "text": "Slay the zone boss using only {skills} skill", "odds": 0.25, "max_skills": 1, "w": 2},
-        {"id": "frenzy", "name": "Frenzy", "text": "Slay {count} monsters within {time} seconds", "odds": 1.0, "count": 25, "time": 38, "min_monsters": 35, "w": 2},
-        {"id": "abstinence", "name": "Abstinence", "text": "Slay the zone boss without drinking a flask", "odds": 0.3, "w": 1},
-        {"id": "iron_will", "name": "Iron Will", "text": "Slay the zone boss without dropping below {life}% life", "odds": 0.9, "life_pct": 70, "w": 1},
-        {"id": "flaking", "name": "Flaking", "text": "Peel {count} glaze layers before the zone boss dies", "odds": 0.6, "count": 7, "needs_mech": "glazed", "w": 2},
-        {"id": "colourist", "name": "Colourist", "text": "Paint {count} sketches within {time} seconds", "odds": 0.65, "count": 10, "time": 75, "needs_mech": "unfinished", "w": 2},
-        {"id": "archaeology", "name": "Archaeology", "text": "Open {count} Pentimento Vault within {time} seconds", "odds": 0.9, "count": 1, "time": 40, "needs_mech": "vault", "w": 2}
+        {"id": "frenzy", "name": "Frenzy", "text": "Slay {count} monsters within {time} seconds", "odds": 0.92, "count": 30, "time": 30, "min_monsters": 35, "w": 2},
+        {"id": "abstinence", "name": "Abstinence", "text": "Slay the zone boss without drinking a flask", "odds": 0.15, "w": 1},
+        {"id": "iron_will", "name": "Iron Will", "text": "Slay the zone boss without dropping below {life}% life", "odds": 1.0, "life_pct": 97, "w": 1},
+        {"id": "flaking", "name": "Flaking", "text": "Peel {count} glaze layers before the zone boss dies", "odds": 0.83, "count": 4, "needs_mech": "glazed", "w": 2},
+        {"id": "colourist", "name": "Colourist", "text": "Paint {count} sketches within {time} seconds", "odds": 0.92, "count": 12, "time": 58, "needs_mech": "unfinished", "w": 2},
+        {"id": "archaeology", "name": "Archaeology", "text": "Open {count} Pentimento Vault within {time} seconds", "odds": 0.84, "count": 1, "time": 15, "needs_mech": "vault", "w": 2}
       ]
     },
     "vault": {
@@ -249,7 +249,7 @@
     "vendor": {"per_refresh": 2, "list": [{"id": "glazed", "gold": 1500}, {"id": "unfinished", "gold": 1000}]}
   },
   "wardens": {
-    "_doc": "Endgame Phase 2A: Layer Wardens (docs/ENDGAME_PHASE2.md). Each ring has a Warden: an upgraded existing boss. Clearing a region of that ring can drop a Ground Shard of its layer (kept in atlas.shards, per ring). With `summon_cost` shards the player summons the Warden at any cleared region of that ring (atlas.summons); the next run there fights the Warden instead of the hex boss (no Heart). Shards are spent only on victory. A Warden kill drops a Ground Pigment of its layer: always on the first kill, then `ground_chance`, guaranteed after `ground_pity` dry kills. The first kill of each Warden also gives +1 passive point. Ground Pigments are banked for the pinnacle (any `pinnacle_need` of 6 layers, Phase 3).",
+    "_doc": "Endgame Phase 2A: Layer Wardens (docs/ENDGAME_PHASE2.md). Each ring has a Warden: an upgraded existing boss. Clearing a region of that ring can drop a Ground Shard of its layer (kept in atlas.shards, per ring). With `summon_cost` shards the player summons the Warden at any cleared region of that ring (atlas.summons); the next run there fights the Warden instead of the hex boss (no Heart). Shards are spent only on victory. A Warden kill drops a Ground Pigment of its layer: always on the first kill, then `ground_chance`, guaranteed after `ground_pity` dry kills. The first kill of each Warden also gives +1 passive point. Ground Pigments are banked for the pinnacle (any `pinnacle_need` of 6 layers, Phase 3). Phase D2: ring damage_mult tuned so a typical bot wins ~60% of Rot 5 Warden runs (ring 2 0.4, ring 3 1.1; ring 1 never has Rot).",
     "summon_cost": 3,
     "shard_cap": 9,
     "shard_chance": 0.45,
@@ -276,7 +276,7 @@
        "tune": {"charge": {"cooldown": 4}},
        "final_phase": {"at": 0.3, "add": ["eruption", "lacquer_fan"], "attack_speed": 1.2, "speed": 1.15, "tint": "#e8c870", "message": "The varnish cracks - Sir Morcant hardens!"}},
       {"ring": 2, "boss": "gravemaw", "title": "the Craquelure Warden", "shard": "Craquelure Shard", "ground": "Ground Craquelure",
-       "light": "#d0a070", "life_mult": 4.5, "damage_mult": 1.3, "signature": "fault_lines",
+       "light": "#d0a070", "life_mult": 4.5, "damage_mult": 0.4, "signature": "fault_lines",
        "desc": "The Gravemaw, living in the cracks. Fault lines split the floor; falling flakes at 25% life.",
        "add": {
          "fault_lines": {"type": "eruption", "w": 3, "range": [0, 360], "windup": 0.45, "count": 7, "radius": 28, "mult": 0.85, "color": "#c09060"},
@@ -286,7 +286,7 @@
        "tune": {"burrow": {"cooldown": 4.5}},
        "final_phase": {"at": 0.25, "add": ["flaking"], "attack_speed": 1.2, "speed": 1.25, "tint": "#d0a070", "message": "The ground splits beneath the Gravemaw!"}},
       {"ring": 3, "boss": "archon_velis", "title": "the Pentimento Warden", "shard": "Pentimento Shard", "ground": "Ground Pentimento",
-       "light": "#a080c0", "life_mult": 4.5, "damage_mult": 1.3, "signature": "underpainting",
+       "light": "#a080c0", "life_mult": 4.5, "damage_mult": 1.1, "signature": "underpainting",
        "desc": "Archon Velis, painted over and painted again. Underpainting spirals and ghost sigils; peels back her image at 15% life.",
        "add": {
          "underpainting": {"type": "spiral", "w": 2, "range": [0, 360], "windup": 0.8, "count": 12, "waves": 3, "proj": "orb", "proj_speed": 130, "dtype": "void", "mult": 0.6},

@@ -78,6 +78,11 @@ func tick(dt: float) -> void:
 	if log["end_t"] < 0.0 and log["accept_t"] >= 0.0 and wager_state() in ["won", "lost"]:
 		log["end_t"] = c.t
 
+## Phase D2: with an Archaeology plan the bot leaves sealed vault walls alone until it has
+## taken the bet (in D1 14/30 runs opened the vault on the way and the bet was refused).
+func hold_wall(e) -> bool:
+	return plan == "archaeology" and wager_state() in ["", "offer"] and e.def.get("object", false)
+
 func _valid_wall_target() -> bool:
 	return c._valid(c.target) and c.target.def.get("object", false)
 

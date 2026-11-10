@@ -1,5 +1,17 @@
 # Changelog
 
+## Endgame Phase D2: Rot dial, Wardens, Wager, Velis, Perfect Aim (2026-11-10)
+
+- **Rot is much more dangerous** (tuned with typical-gear bots to ~85% / ~65% / ~45% wins at Rot 3 / Rot 4 + 2 Pigments / Rot 5 + 2 Pigments):
+  - Monster damage x3.0 / x4.3 / x4.8 at Rot 3 / 4 / 5 (was x1.4 / 1.6 / 1.8); life recovery x0.65 / 0.45 / 0.38; monster attack speed +15 / 22 / 25%.
+  - New: monsters move +10 / 18 / 20% faster and their projectiles fly +25 / 40 / 45% faster (reaches kiting builds). Shown in the Atlas tooltip.
+- **Layer Wardens:** ring 2 (the Gravemaw) damage multiplier 1.3 -> 0.4 and ring 3 (Archon Velis) 1.3 -> 1.1, so a typical character wins ~60% of Rot 5 Warden runs.
+- **Archon Velis:** fire resistance 40 -> 30 (60% in ring 3). Fire builds are no longer far behind on her; she is also the Tier 3 boss.
+- **Collector's Wager re-tuned** to ~60% wins and about +15% expected gold: Unscathed max 2 hits (odds 0.75); Against the Clock 12 s + 3.7 s per chamber (0.72); Frenzy 30 kills in 30 s (0.92); Abstinence odds 0.15; Iron Will never below 97% life (1.0); Flaking 4 layers (0.83); Colourist 12 sketches in 58 s (0.92); Archaeology 1 vault in 15 s (0.84).
+- **Perfect Aim:** the drawback is now 25% less damage within 70 units (was 30% within 100).
+- **Fix:** loading a save no longer refunds the whole passive tree when it spends Endless Abyss milestone points (the check ran before progress was loaded).
+- Smartbot: `--tune` overrides for sweeps, a Training Grounds dummy mode (`--dummy`), Archaeology bot fix. New baseline `tests/smartbot/baseline/d2_v1.csv`. Report: `docs/PHASE_D2_MEASUREMENTS.md`.
+
 ## Caster itemisation (2026-11-06)
 
 - **Spells now scale with caster gear the way attacks scale with weapons.** Before this, a better wand or staff added only % increases, so from about level 20 the mage fell further behind with every gear upgrade.
