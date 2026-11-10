@@ -161,6 +161,8 @@ static func zone_def(seed_value: int, h: Vector2i, c: Dictionary = {}) -> Dictio
 	for k in ["life_mult", "damage_mult", "resist_bonus", "rarity_bonus", "mod_count", "elite_chance"]:
 		if rc.has(k):
 			d[k] = rc[k]
+	if rc.has("ambient_tint"):   # Phase 3A: rings 4-6 tint the biome's light by painting layer
+		d["ambient"] = "#" + Color(str(d.get("ambient", "#585060"))).lerp(Color(str(rc["ambient_tint"])), clampf(float(rc.get("ambient_tint_w", 0.35)), 0.0, 1.0)).to_html(false)
 	return d
 
 ## Layout seed for the n-th run of a hex (a cleared hex plays a new layout each time).
@@ -276,6 +278,10 @@ static func sanitize(raw) -> Dictionary:
 		for id in src_vs:
 			slot_varnish(st, str(id))
 	_sanitize_wardens(st, raw)   # Layer Wardens (Phase 2A)
+	# Phase 3A (save v6): the atlas grew from radius 3 to 6. Every cleared hex reveals what its clear
+	# would reveal now, so cleared ring 3 regions open their ring 4 neighbours on load.
+	for k in st["clears"].keys():
+		_reveal_from(st, parse(str(k)))
 	# Restorers' Guild (Phase 2C); loaded at runtime because guild_rules.gd preloads this script
 	var gs: Dictionary = load("res://scripts/core/guild_rules.gd").sanitize(raw.get("guild", {}))
 	if not gs.is_empty():
@@ -297,6 +303,10 @@ static func complete(st: Dictionary, h: Vector2i) -> Array:
 	if not can_enter(st, h):
 		return []
 	st["clears"][key(h)] = clears(st, h) + 1
+	return _reveal_from(st, h)
+
+## Reveals what a clear of h reveals (its neighbours; radius 2 for a vantage hex). Returns new keys.
+static func _reveal_from(st: Dictionary, h: Vector2i) -> Array:
 	var info := hex_info(int(st["seed"]), h)
 	var rad := int(cfg().get("vantage", {}).get("reveal", 2)) if info.get("vantage", false) else 1
 	var fresh := []
@@ -337,7 +347,12 @@ static func is_restored(st: Dictionary, h: Vector2i) -> bool:
 	return st.get("restored", []).has(key(h))
 
 static func _rot_eligible(st: Dictionary, h: Vector2i) -> bool:
-	return in_atlas(h) and ring_of(h) >= int(rot_cfg().get("min_ring", 2)) and not is_restored(st, h)
+	return in_atlas(h) and ring_of(h) >= int(rot_cfg().get("min_ring", 2)) and ring_of(h) <= rot_reach(st) and not is_restored(st, h)
+
+## Phase 3A: the outermost ring Rot can be in: max(reach_ring, highest revealed ring). An atlas whose
+## player is still in rings 1-3 behaves exactly like the radius-3 atlas.
+static func rot_reach(st: Dictionary) -> int:
+	return maxi(int(rot_cfg().get("reach_ring", 3)), rings_open(st))
 
 static func rot_total(st: Dictionary) -> int:
 	var t := 0

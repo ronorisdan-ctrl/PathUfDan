@@ -85,7 +85,7 @@ func refresh() -> void:
 		chosen = Vector2i(1, 0)
 	map.set_state(st, chosen)
 	var sm := AtlasRules.summary(st)
-	progress_label.text = "Cleared %d of %d regions   Revealed %d   Rot %d / %d   Next spread: %d front%s\nGreen dot: cleared   Diamond: vantage   Blotches + number: Rot   Red heart: Heart boss   Dashed: next spread   Gold frame: restored   Square: zone mechanic   Dots: Wager / Vaults   Crown: Warden summoned" % [sm["cleared"], sm["total"], sm["revealed"], AtlasRules.rot_total(st), AtlasRules.rot_cap(st), AtlasRules.fronts_next(st), "" if AtlasRules.fronts_next(st) == 1 else "s"]
+	progress_label.text = "Cleared %d of %d regions   Revealed %d   Rot %d / %d   Next spread: %d front%s\nGreen dot: cleared   Diamond: vantage   Blotches + number: Rot   Red heart: Heart boss   Dashed: next spread   Gold frame: restored   Square: zone mechanic   Dots: Wager / Vaults   Crown: Warden summoned   Wheel: zoom   Right-drag: pan" % [sm["cleared"], sm["total"], sm["revealed"], AtlasRules.rot_total(st), AtlasRules.rot_cap(st), AtlasRules.fronts_next(st), "" if AtlasRules.fronts_next(st) == 1 else "s"]
 	progress_label.text = _warden_summary(st) + "\n" + progress_label.text
 	var lines := []
 	var ring := AtlasRules.ring_of(chosen)

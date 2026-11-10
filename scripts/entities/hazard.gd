@@ -5,6 +5,8 @@ extends Node2D
 ##   vent     - periodic fire column (fire, ignites)
 ##   miasma   - lingering toxic pool (void damage over time, no burst)
 ##   lightning- run modifier strike that follows the player (lightning)
+##   pool     - Layer Warden pool (Endgame 3A): lingers `life` s, hits every `period` s with the
+##              boss's `custom_packet` (damage, status); drawn in `tint`
 
 var level = null
 var kind := "spikes"
@@ -16,6 +18,9 @@ var t := 0.0
 var phase := "idle"
 var base_damage := 7.0
 var one_shot := false
+var life := -1.0               # seconds left (pool); < 0 = permanent
+var tint := Color.WHITE        # pool colour
+var custom_packet := {}        # pool: the hit packet (from the boss)
 
 func setup(k: String, lvl: int) -> void:
 	kind = k
@@ -34,16 +39,23 @@ func setup(k: String, lvl: int) -> void:
 			period = 0.5
 			warn = 0.0
 			base_damage = 2.2
+		"pool":
+			radius = 30.0
+			period = 0.5
+			warn = 0.0
+			base_damage = 0.0
 		"lightning":
 			radius = 30.0
 			period = 0.0
 			warn = 0.9
 			base_damage = 11.0
 			one_shot = true
-	t = randf() * period
+	t = randf() * period if k != "pool" else 0.0
 	z_index = -2
 
 func _packet(mult: float) -> Dictionary:
+	if not custom_packet.is_empty():
+		return custom_packet.duplicate(true)
 	var dmg := base_damage * (1.0 + 0.13 * (mlevel - 1)) * mult
 	var dtype: String = {"spikes": "physical", "vent": "fire", "miasma": "void", "lightning": "lightning"}.get(kind, "physical")
 	var st := []
@@ -57,6 +69,11 @@ func _packet(mult: float) -> Dictionary:
 func _process(delta: float) -> void:
 	if level == null:
 		return
+	if life >= 0.0:
+		life -= delta
+		if life <= 0.0:
+			queue_free()
+			return
 	t += delta
 	match phase:
 		"idle":
@@ -93,11 +110,17 @@ func _trigger() -> void:
 			Sfx.play("crit")
 
 func _color() -> Color:
+	if kind == "pool":
+		return tint
 	return {"spikes": Color("#c8c0b0"), "vent": Color("#ff7030"), "miasma": Color("#80c040"), "lightning": Color("#c0e8ff")}.get(kind, Color.WHITE)
 
 func _draw() -> void:
 	var c := _color()
 	match kind:
+		"pool":
+			var fade := clampf(life / 0.6, 0.0, 1.0) if life >= 0.0 else 1.0
+			draw_circle(Vector2.ZERO, radius, Color(c.r, c.g, c.b, 0.32 * fade))
+			draw_arc(Vector2.ZERO, radius, 0, TAU, 28, Color(c.r, c.g, c.b, 0.55 * fade), 1.2)
 		"miasma":
 			var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() / 400.0)
 			draw_circle(Vector2.ZERO, radius, Color(c.r * 0.5, c.g * 0.6, c.b * 0.3, 0.35 + 0.1 * pulse))

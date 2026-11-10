@@ -73,6 +73,7 @@ func run_all() -> void:
 	test_guild_pace()
 	test_wager_vault_rules()
 	test_contracts_2d()
+	test_phase3a()
 	main = load("res://scripts/main.gd").new()
 	add_child(main)
 	await frames(2)
@@ -87,17 +88,18 @@ func run_all() -> void:
 	await test_live_wager()
 	await test_live_vaults()
 	await test_live_contracts_2d()
+	await test_live_3a()
 	Game.atlas_force_mechanic = ""
 
 # ------------------------------------------------------------------ data
 func test_data() -> void:
 	var c: Dictionary = Data.atlas_cfg
 	check(not c.is_empty(), "data/atlas.json loads")
-	check(int(c.get("radius", 0)) == 3 and c.get("rings", []).size() == 3, "MVP atlas: radius 3, 3 ring definitions")
+	check(int(c.get("radius", 0)) == 6 and c.get("rings", []).size() == 6, "3A atlas: radius 6, 6 ring definitions")
 	var lv := []
 	for rc in c.get("rings", []):
 		lv.append(int(rc["level"]))
-	check(lv == [40, 45, 50], "ring monster levels 40 / 45 / 50", str(lv))
+	check(lv == [40, 45, 50, 55, 60, 65], "ring monster levels 40 / 45 / 50 / 55 / 60 / 65", str(lv))
 	check(Data.dungeons.has(str(c.get("unlock_dungeon", ""))), "unlock dungeon exists")
 	check(c.get("biomes", []).size() == 3, "three biomes")
 	for b in c.get("biomes", []):
@@ -230,11 +232,11 @@ func test_state() -> void:
 			if AR.ring_of(n) >= 1 and AR.in_atlas(n) and not AR.is_revealed(st2, n):
 				all_in = false
 		check(all_in, "a vantage hex reveals everything within 2")
-	# exploring everything reveals all 36 regions
+	# exploring everything reveals all 126 regions (3A: radius 6)
 	var st3 := AR.new_state(99)
 	var steps := 0
 	var progress := true
-	while progress and steps < 100:
+	while progress and steps < 400:
 		progress = false
 		for k in st3["revealed"].duplicate():
 			var h := AR.parse(k)
@@ -243,8 +245,8 @@ func test_state() -> void:
 				steps += 1
 				progress = true
 	var sm := AR.summary(st3)
-	check(sm["revealed"] == 36 and sm["cleared"] == 36 and sm["total"] == 36, "clearing outward reveals the whole atlas", str(sm))
-	check(sm["rings"] == {1: [6, 6], 2: [12, 12], 3: [18, 18]}, "summary per ring", str(sm["rings"]))
+	check(sm["revealed"] == 126 and sm["cleared"] == 126 and sm["total"] == 126, "clearing outward reveals the whole atlas", str(sm))
+	check(sm["rings"] == {1: [6, 6], 2: [12, 12], 3: [18, 18], 4: [24, 24], 5: [30, 30], 6: [36, 36]}, "summary per ring", str(sm["rings"]))
 	# sanitize
 	var raw := {"seed": 5, "revealed": ["1,0", "9,9", "0,0", "nope", "2,0"], "clears": {"2,-1": 3, "7,0": 2, "1,0": -1}}
 	var cl := AR.sanitize(raw)
@@ -252,13 +254,13 @@ func test_state() -> void:
 	check(cl["clears"] == {"2,-1": 3}, "sanitize keeps only valid positive clear counts", str(cl["clears"]))
 	check(AR.sanitize({}).is_empty() and AR.sanitize({"seed": 0}).is_empty() and AR.sanitize("x").is_empty(), "sanitize rejects empty / seedless / malformed")
 
-# ------------------------------------------------------------------ save v5
+# ------------------------------------------------------------------ save v5/v6
 func test_save() -> void:
-	check(CharacterData.SAVE_VERSION == 5, "SAVE_VERSION is 5")
+	check(CharacterData.SAVE_VERSION == 6, "SAVE_VERSION is 6 (3A: atlas radius 6)")
 	var ch = CharacterData.new()
 	ch.setup_new("mage", "Dan")
 	var d0: Dictionary = ch.to_dict()
-	check(not d0.has("atlas") and int(d0["version"]) == 5, "a character without an atlas writes no atlas key")
+	check(not d0.has("atlas") and int(d0["version"]) == 6, "a character without an atlas writes no atlas key")
 	check(not AR.unlocked(ch), "atlas locked for a new character")
 	ch.progress["bosses_killed"]["nightmare_vaults"] = 1
 	check(AR.unlocked(ch), "atlas unlocks after Malgrath")
@@ -274,7 +276,7 @@ func test_save() -> void:
 	d4["version"] = 4
 	var ch3 = CharacterData.new()
 	ch3.from_dict(d4)
-	check(ch3.atlas.is_empty() and int(ch3.to_dict()["version"]) == 5, "v4 save loads with no atlas and re-saves as v5")
+	check(ch3.atlas.is_empty() and int(ch3.to_dict()["version"]) == 6, "v4 save loads with no atlas and re-saves as v6")
 
 # ------------------------------------------------------------------ live
 func test_live() -> void:
@@ -1286,7 +1288,7 @@ func test_live_pigments() -> void:
 # ------------------------------------------------------------------ Layer Wardens (Phase 2A)
 func test_warden_rules() -> void:
 	var wc := AR.ward_cfg()
-	check(not wc.is_empty() and AR.warden_rings() == [1, 2, 3], "wardens: rings 1-3 each have a Warden", str(AR.warden_rings()))
+	check(not wc.is_empty() and AR.warden_rings() == [1, 2, 3, 4, 5, 6], "wardens: rings 1-6 each have a Warden", str(AR.warden_rings()))
 	for r in AR.warden_rings():
 		var w := AR.warden_cfg(r)
 		var bd: Dictionary = Data.enemies[str(w["boss"])]
@@ -1336,7 +1338,7 @@ func test_warden_rules() -> void:
 	check(AR.roll_shard(st2, Vector2i(2, 0), 3, true) == 1, "shards: a Heart always drops one")
 	AR.add_shards(st2, 2, 99)
 	check(AR.shards(st2, 2) == int(wc["shard_cap"]) and AR.roll_shard(st2, Vector2i(2, 0)) == 0, "shards: capped at %d" % int(wc["shard_cap"]))
-	check(AR.add_shards(st2, 5, 1) == 0, "shards: no Warden ring, no shard")
+	check(AR.add_shards(st2, 7, 1) == 0, "shards: no Warden ring, no shard")
 	# summoning
 	var st3 := _bare_state(779)
 	var hx := Vector2i(1, -1)
@@ -2289,3 +2291,263 @@ func test_live_contracts_2d() -> void:
 	check(int(g["board"][2]["have"]) == 0 and int(g["board"][1]["have"]) == 1, "live 2D: dying in a zone breaks the streak")
 	main.go_hub(false)
 	await frames(3)
+
+# ------------------------------------------------------------------ Phase 3A: radius 6, rings 4-6, Wardens 4-6, affix tier 7
+func _radius3_cfg() -> Dictionary:
+	var c: Dictionary = Data.atlas_cfg.duplicate(true)
+	c["radius"] = 3
+	c["rings"] = c["rings"].slice(0, 3)
+	return c
+
+func test_phase3a() -> void:
+	var c: Dictionary = Data.atlas_cfg
+	var all := AR.within(Vector2i.ZERO, 6)
+	var per := {}
+	for h in all:
+		per[AR.ring_of(h)] = int(per.get(AR.ring_of(h), 0)) + 1
+	check(all.size() == 127 and per == {0: 1, 1: 6, 2: 12, 3: 18, 4: 24, 5: 30, 6: 36}, "3A: radius 6 holds 127 hexes (ring sizes 6..36)", str(per))
+	check(AR.in_atlas(Vector2i(6, 0)) and not AR.in_atlas(Vector2i(7, 0)), "3A: ring 6 is inside, ring 7 outside")
+	# rings 1-3 unchanged (D2 tuning)
+	var r1: Dictionary = c["rings"][0]
+	var r2: Dictionary = c["rings"][1]
+	var r3: Dictionary = c["rings"][2]
+	check(float(r1["life_mult"]) == 1.5 and float(r2["damage_mult"]) == 1.4 and float(r3["damage_mult"]) == 1.48 and int(r3["rarity_bonus"]) == 230 and not r3.has("ambient_tint"), "3A: ring 1-3 numbers unchanged")
+	var mono := true
+	for i in range(1, 6):
+		var a: Dictionary = c["rings"][i - 1]
+		var b: Dictionary = c["rings"][i]
+		for k in ["level", "life_mult", "damage_mult", "resist_bonus", "rarity_bonus", "elite_chance"]:
+			mono = mono and float(b[k]) > float(a[k])
+	check(mono, "3A: every ring is harder and richer than the one inside it")
+	check(str(AR.ring_cfg(4)["layer"]) == "Underpainting" and str(AR.ring_cfg(5)["layer"]) == "Drawing" and str(AR.ring_cfg(6)["layer"]) == "Bare Canvas", "3A: rings 4-6 are Underpainting, Drawing, Bare Canvas")
+	# hexes of rings 1-3 derive exactly as on the radius-3 atlas
+	var c3 := _radius3_cfg()
+	var same := true
+	var outer_bosses := {}
+	var outer_biomes := {}
+	for sd in range(1, 31):
+		for h in all:
+			var rg := AR.ring_of(h)
+			if rg >= 1 and rg <= 3:
+				same = same and str(AR.hex_info(sd, h)) == str(AR.hex_info(sd, h, c3)) and str(AR.zone_def(sd, h)) == str(AR.zone_def(sd, h, c3))
+			elif rg >= 4:
+				var hi := AR.hex_info(sd, h)
+				outer_bosses[hi["boss"]] = true
+				outer_biomes[hi["zone"]] = true
+	check(same, "3A: ring 1-3 hexes (biome, boss, vantage, zone def) are identical to the radius-3 atlas")
+	check(outer_bosses.size() == 6 and outer_biomes.size() == 3, "3A: rings 4-6 use all six bosses and three biomes", "%d / %d" % [outer_bosses.size(), outer_biomes.size()])
+	for rg in [4, 5, 6]:
+		var d := AR.zone_def(9, Vector2i(rg, 0))
+		var biome: Dictionary = Data.zones[AR.hex_info(9, Vector2i(rg, 0))["zone"]]
+		check(int(d["min_level"]) == 50 + 5 * (rg - 3) and float(d["life_mult"]) == float(AR.ring_cfg(rg)["life_mult"]), "3A: ring %d zone def at level %d with ring scaling" % [rg, 50 + 5 * (rg - 3)])
+		check(str(d["ambient"]) != str(biome["ambient"]) and str(d["ambient"]).begins_with("#") and str(biome["ambient"]) == str(Data.zones[biome["id"]]["ambient"]), "3A: ring %d tints the biome light (template untouched)" % rg, "%s -> %s" % [biome["ambient"], d["ambient"]])
+	# Rot reach
+	var src_ok := true
+	for sd in range(1, 101):
+		var st := AR.new_state(sd)
+		for k in st["rot"]:
+			var rg := AR.ring_of(AR.parse(k))
+			src_ok = src_ok and rg >= 2 and rg <= 3
+	check(src_ok, "3A: Rot sources of a new atlas stay in rings 2-3 (as on the radius-3 atlas)")
+	var st2 := AR.new_state(321)
+	for h in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(h) > 0 and not st2["revealed"].has(AR.key(h)):
+			st2["revealed"].append(AR.key(h))
+	var inner_ok := true
+	for i in 120:
+		AR.spread(st2)
+		for k in st2["rot"]:
+			inner_ok = inner_ok and AR.ring_of(AR.parse(k)) <= 3
+	check(inner_ok and AR.rot_cap(st2) == 9 and AR.rot_reach(st2) == 3, "3A: with rings 1-3 open, Rot never leaves ring 3 and the cap stays 9", str(AR.rot_total(st2)))
+	check(AR.add_death_rot(st2, Vector2i(4, 0)) == -1, "3A: no death Rot on an unreached ring")
+	st2["revealed"].append("4,0")
+	check(AR.rot_reach(st2) == 4 and AR.rot_cap(st2) == 12, "3A: revealing ring 4 lets Rot reach it (cap 12)")
+	var reached4 := false
+	var past4 := false
+	for i in 200:
+		AR.spread(st2)
+		for k in st2["rot"]:
+			reached4 = reached4 or AR.ring_of(AR.parse(k)) == 4
+			past4 = past4 or AR.ring_of(AR.parse(k)) > 4
+	check(reached4 and not past4, "3A: Rot spreads into ring 4 once it is revealed, not beyond")
+	var st6 := AR.new_state(5)
+	_open_all6(st6)
+	check(AR.rot_cap(st6) == 18 and AR.rot_reach(st6) == 6, "3A: a fully revealed atlas caps Rot at 18")
+	var san_rot := AR.sanitize({"seed": 77, "revealed": [], "clears": {}, "rot": {"5,0": 3, "3,0": 2}})
+	check(not san_rot["rot"].has("5,0") and int(san_rot["rot"].get("3,0", 0)) == 2, "3A: loaded Rot outside the reached rings is dropped")
+	# migration (save v6): a radius-3 save with cleared ring 3 hexes opens ring 4 next to them
+	var raw := {"seed": 404, "revealed": [], "clears": {"1,0": 1, "2,0": 1, "3,0": 2}}
+	for h in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(h) > 0:
+			raw["revealed"].append(AR.key(h))
+	var mig := AR.sanitize(raw)
+	var r4 := []
+	for k in mig["revealed"]:
+		if AR.ring_of(AR.parse(k)) >= 4:
+			r4.append(k)
+	var want := []
+	for n in AR.within(Vector2i(3, 0), 2 if AR.hex_info(404, Vector2i(3, 0))["vantage"] else 1):
+		if AR.ring_of(n) >= 4:
+			want.append(AR.key(n))
+	r4.sort()
+	want.sort()
+	check(r4 == want and not r4.is_empty(), "3A migration: cleared ring 3 hex reveals its ring 4 neighbours on load", str(r4))
+	check(str(AR.sanitize(mig)) == str(mig), "3A migration: sanitize is idempotent")
+	var mid := AR.sanitize({"seed": 404, "revealed": raw["revealed"], "clears": {"1,0": 1}})
+	var outer := false
+	for k in mid["revealed"]:
+		outer = outer or AR.ring_of(AR.parse(k)) >= 4
+	check(not outer, "3A migration: no ring 4 without a cleared ring 3 neighbour")
+	var st7 := AR.new_state(9)
+	_open_all6(st7)
+	var before: int = st7["revealed"].size()
+	AR.complete(st7, Vector2i(6, 0))
+	check(st7["revealed"].size() == before and AR.summary(st7)["total"] == 126, "3A: clearing ring 6 reveals nothing outside the atlas; 126 regions")
+	# Wardens 4-6
+	var bosses := []
+	for r in [4, 5, 6]:
+		bosses.append(str(AR.warden_cfg(r)["boss"]))
+	check(bosses == ["iron_penitent", "malgrath", "stormheart"], "3A: Wardens 4-6 are the Iron Penitent, Malgrath and Stormheart", str(bosses))
+	var sigs := {}
+	for r in AR.warden_rings():
+		sigs[str(AR.warden_cfg(r)["signature"])] = true
+	check(sigs.size() == 6, "3A: six distinct Warden signatures (Overpainter phase 1)")
+	var w4 := AR.warden_def(Data.enemies["iron_penitent"], 4)
+	var w5 := AR.warden_def(Data.enemies["malgrath"], 5)
+	var w6 := AR.warden_def(Data.enemies["stormheart"], 6)
+	check(w4["patterns"]["dead_colour"].has("pool") and w6["patterns"]["gesso"].has("pool") and w5["patterns"]["contour_lines"].get("line", false) and w5["patterns"]["cross_hatch"].get("cross", false), "3A: Warden 4/6 pools and Warden 5 lines in the data")
+	check(w6["phases"].size() == 4 and float(w6["phases"][3]["at"]) == 0.25 and w6["phases"][3]["patterns"].has("gesso_field"), "3A: Stormheart Warden adds a 4th phase at 25% with the gesso field")
+	var stp := _bare_state(31)
+	stp["ground"] = {"1": 1, "2": 1, "3": 1}
+	check(not AR.pinnacle_ready(stp), "3A: 3 layers still short")
+	stp["ground"]["5"] = 1
+	check(AR.pinnacle_ready(stp) and AR.ground_kinds(stp) == 4, "3A: 4 of 6 layers open the pinnacle (a ring 5 Ground Pigment counts)")
+	var sw := AR.sanitize({"seed": 31, "revealed": [], "clears": {}, "ground": {"6": 2, "7": 1}, "shards": {"4": 3}})
+	check(sw["ground"] == {"6": 2} and sw["shards"] == {"4": 3}, "3A: rings 4-6 warden state loads; ring 7 dropped", str(sw["ground"]))
+	# boss line points
+	var B = load("res://scripts/entities/boss.gd").new()
+	var lp: Array = B.line_points({"count": 5, "spacing": 40}, Vector2(0, 0), Vector2(100, 0))
+	check(lp.size() == 5 and lp[0] == Vector2(40, 0) and lp[4] == Vector2(200, 0), "3A: a line eruption sweeps from the boss through the target", str(lp))
+	var lc: Array = B.line_points({"count": 3, "spacing": 40, "cross": true}, Vector2(0, 0), Vector2(100, 0))
+	check(lc.size() == 6 and lc[4] == Vector2(100, 0) and lc[3].x == 100.0 and absf(lc[3].y) == 40.0, "3A: cross adds the perpendicular line through the target", str(lc))
+	B.free()
+	# affix tier 7 (item level 55)
+	var t7 := 0
+	var t7_ok := true
+	var aff: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/affixes.json"))
+	for a in aff:
+		var tiers: Array = a["tiers"]
+		if int(tiers[tiers.size() - 1][0]) == 55:
+			t7 += 1
+			var t6: Array = tiers[tiers.size() - 2]
+			var tt: Array = tiers[tiers.size() - 1]
+			t7_ok = t7_ok and tiers.size() >= 2 and int(t6[0]) == 42 and int(tt[1]) >= int(t6[1]) and int(tt[2]) > int(t6[2]) and int(tt[1]) <= int(tt[2])
+	check(t7 == 46 and t7_ok, "3A: 46 affixes gain a tier at item level 55 above their item-level-42 tier", str(t7))
+	var brutal := {}
+	for a in aff:
+		if a["id"] == "brutal":
+			brutal = a
+	var low_max := 0
+	var hi_seen := false
+	for i in 400:
+		var r54: Dictionary = Loot.roll_affix(brutal, 54)
+		low_max = maxi(low_max, int(r54["tier"]))
+		var r60: Dictionary = Loot.roll_affix(brutal, 60)
+		hi_seen = hi_seen or (int(r60["tier"]) == 7 and int(r60["tier_ilvl"]) == 55 and float(r60["value"]) >= 130.0)
+	check(low_max == 6 and hi_seen, "3A: tier 7 rolls only from item level 55", "max below 55: T%d" % low_max)
+	var it := Loot.make_item(Data.item_base_list[0]["id"], "rare", 60)
+	it["affixes"] = [Loot.roll_affix(brutal, 60, 40)]
+	Loot._update_req(it)
+	check(int(it["affixes"][0]["tier"]) == 7 and int(it["req_level"]) >= 55, "3A: a tier 7 affix needs level 55 to equip", str(it["req_level"]))
+
+func _open_all6(st: Dictionary) -> void:
+	for h in AR.within(Vector2i.ZERO, 6):
+		if AR.ring_of(h) > 0 and not st["revealed"].has(AR.key(h)):
+			st["revealed"].append(AR.key(h))
+
+func test_live_3a() -> void:
+	var st: Dictionary = AR.ensure(Game.ch)
+	_open_all6(st)
+	Game.atlas_force_mechanic = "none"
+	st["easel"] = []
+	st["varnish_slots"] = []
+	for k in ["shards", "shard_dry", "summons", "ground", "ground_dry", "warden_kills"]:
+		st[k] = {}
+	# a ring 4 Warden run with the pool signature
+	var h := Vector2i(4, 0)
+	st["rot"].erase(AR.key(h))
+	st["restored"].erase(AR.key(h))
+	st["clears"][AR.key(h)] = maxi(1, AR.clears(st, h))
+	AR.add_shards(st, 4, 3)
+	check(AR.summon(st, h), "live 3A: summon the Underpainting Warden")
+	main.enter_atlas(h)
+	await frames(3)
+	var lv = Game.level
+	check(lv.warden == 4 and int(lv.monster_level) == 55, "live 3A: the ring 4 Warden run is a level 55 zone", "%d / %d" % [lv.warden, int(lv.monster_level)])
+	var p = lv.player
+	for o in lv.objectives:
+		if o["type"] != "boss":
+			o["done"] = true
+	lv._update_seal()
+	p.global_position = lv.cell_center(lv.rooms[lv.layout["boss"]]["anchor"])
+	await frames(20)
+	var b = lv.boss
+	check(b != null and is_instance_valid(b) and str(b.display_name).find("Underpainting Warden") >= 0 and int(b.mlevel) == 58, "live 3A: the Iron Penitent spawns as the Underpainting Warden at level 58 (55 + 1 + 2)", (str(b.display_name) + " L%d" % int(b.mlevel)) if b != null else "none")
+	if b != null and is_instance_valid(b):
+		b.target = p
+		b.global_position = p.global_position + Vector2(60, 0)
+		b._start_pattern("dead_colour")
+		b.process_mode = Node.PROCESS_MODE_DISABLED   # no further casts of its own while we count
+		var n_aoe: int = b.windup_aoes.size()
+		check(n_aoe == 7, "live 3A: Dead Colour throws 7 blots", str(n_aoe))
+		var pools := 0
+		for i in 150:
+			await frames(1)
+			pools = 0
+			for ch in lv.floor_layer.get_children():
+				if ch.get("kind") == "pool":
+					pools += 1
+			if pools >= 3:
+				break
+		check(pools >= 3, "live 3A: Dead Colour blots leave lingering pools", str(pools))
+		# pools fade (each lives 4 s; the last blot lands about 1.9 s after the cast)
+		var left := -1
+		var waited := 0
+		var lives := []
+		while waited < 900:
+			await frames(30)
+			waited += 30
+			left = 0
+			lives = []
+			for ch in lv.floor_layer.get_children():
+				if ch.get("kind") == "pool":
+					left += 1
+					lives.append("%.2f" % float(ch.life))
+			if left == 0:
+				break
+		check(left == 0 and waited <= 480, "live 3A: pools fade after their lifetime", "%d left after %d frames %s" % [left, waited, str(lives)])
+		b._start_pattern("dead_colour")
+		b.interrupt_windup()
+		await frames(90)
+		var after := 0
+		for ch in lv.floor_layer.get_children():
+			if ch.get("kind") == "pool":
+				after += 1
+		check(after == 0, "live 3A: an interrupted blot leaves no pool", str(after))
+	await _kill_boss(lv)
+	check(lv.warden_result.get("ground", false) and AR.ground_count(st, 4) == 1, "live 3A: the Underpainting Warden drops Ground Underpainting")
+	main.go_hub(true)
+	await frames(3)
+	# Atlas panel draws radius 6
+	var ui = main.ui
+	if ui != null:
+		ui.toggle("atlas")
+		var ap = ui.panels["atlas"]
+		ap.select(Vector2i(6, 0))
+		check(ap.detail.text.find("Bare Canvas") >= 0 and ap.detail.text.find("Monster level 65") >= 0, "Atlas panel: ring 6 region shows Bare Canvas, level 65", ap.detail.text.substr(0, 120))
+		check(ap.progress_label.text.find("of 126 regions") >= 0, "Atlas panel counts 126 regions")
+		if args.has("shot"):
+			await _shot("atlas_radius6")
+		ui.close_all()
+	AR.unsummon(st, 4)
+	Game.atlas_force_mechanic = ""

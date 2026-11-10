@@ -1,5 +1,15 @@
 # Changelog
 
+## Endgame Phase 3A: the Atlas grows to six rings (2026-11-10)
+
+- **The Atlas of Ruin is now radius 6 (126 regions).** Three new rings: **Underpainting** (ring 4, monster level 55), **Drawing** (ring 5, level 60) and **Bare Canvas** (ring 6, level 65), each tougher and richer than the last (up to +112% life, +72% damage, +45% resistances, +320% rarity, 3 modifiers). Each new layer tints the zone's light (umber, graphite, linen). Rings 1-3 are unchanged.
+- **Three new Layer Wardens:** the Iron Penitent as the Underpainting Warden (Dead Colour: blots that leave slowing umber pools; Underwash), Malgrath as the Drawing Warden (Contour Lines swept through you; Cross-Hatch) and Stormheart as the Bare Canvas Warden (Gesso: strikes that leave void pools; a 4th phase at 25%). Their Shards, Ground Pigments and first-kill passive points work like rings 1-3. All six layers now count toward the pinnacle (4 of 6).
+- **Rot reaches the new rings** once you reveal them (it spreads in from ring 3). While you are still in rings 1-3, Rot behaves exactly as before. The Rot cap grows to 18 with all six rings.
+- **New affix tier 7** (item level 55+, so from ring 4 on): 46 affixes gain a tier about 20% above their best (e.g. Brutal 130-149% physical damage, Hale 105-120 life). Needs level 55 to equip. +Spell skill levels get no new tier.
+- **Atlas map:** mouse wheel zooms, right-drag pans; the map fits the rings you have explored.
+- Old saves load (save version 6): cleared ring 3 regions reveal their ring 4 neighbours.
+- Tests: `atlas_only` 629/0, `tree_only` 844/0, full suite 48015/0, smartbot frozen baseline 60/60 identical to `d2_v1.csv`. Details: `docs/ENDGAME_PHASE3.md`.
+
 ## Endgame Phase D2: Rot dial, Wardens, Wager, Velis, Perfect Aim (2026-11-10)
 
 - **Rot is much more dangerous** (tuned with typical-gear bots to ~85% / ~65% / ~45% wins at Rot 3 / Rot 4 + 2 Pigments / Rot 5 + 2 Pigments):

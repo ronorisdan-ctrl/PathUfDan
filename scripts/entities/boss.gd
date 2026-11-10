@@ -5,6 +5,12 @@ extends "res://scripts/entities/enemy.gd"
 ##
 ## Pattern library: cleave, charge, ring, eruption, mortar, fan, spiral, summon,
 ## teleport, burrow, ward, vent.
+## Options (Endgame 3A, Layer Wardens 4-6): eruption `line` (a sweep from the boss through the
+## target, `spacing` apart) and `cross` (adds the perpendicular line through the target);
+## mortar/eruption `pool` {life, radius, tick, mult, status, dtype, color}: each blast that lands
+## leaves a lingering pool (scripts/entities/hazard.gd kind "pool"); a cancelled windup leaves none.
+
+const HazardScene = preload("res://scripts/entities/hazard.gd")
 
 var phase := 1
 var phase_idx := 0
@@ -172,7 +178,11 @@ func _start_pattern(n: String) -> void:
 		"ring":
 			windup_aoes.append(_spawn_aoe(global_position, float(current.get("radius", 80)), delay, "slam", col, mult))
 		"eruption":
-			if _target_ok():
+			if _target_ok() and current.get("line", false):
+				var pts := line_points(current, global_position, target.global_position)
+				for i in pts.size():
+					windup_aoes.append(_spawn_aoe(pts[i], float(current.get("radius", 34)), delay + 0.07 * i, "slam", col, mult))
+			elif _target_ok():
 				for i in int(current.get("count", 3)):
 					var off := Vector2(randf_range(-36, 36), randf_range(-36, 36)) if i > 0 else Vector2.ZERO
 					windup_aoes.append(_spawn_aoe(level.clamp_to_floor(global_position, target.global_position + off), float(current.get("radius", 34)), delay + 0.35 * i, "slam", col, mult))
@@ -187,6 +197,57 @@ func _start_pattern(n: String) -> void:
 					if level.is_solid(at):
 						at = c
 					windup_aoes.append(_spawn_aoe(at, float(current.get("radius", 36)), delay + float(current.get("interval", 0.25)) * i + 0.5, "explosion", col, mult))
+	if current.has("pool") and current.get("type", "") in ["mortar", "eruption"]:
+		var pc: Dictionary = current["pool"]
+		for a in windup_aoes:
+			if is_instance_valid(a):
+				a.on_trigger = _spawn_pool.bind(pc)
+
+## Points of a `line` eruption: `count` blasts `spacing` apart from the boss toward (and past) the
+## target, stopped by walls; with `cross`, a second line through the target at right angles.
+func line_points(pd: Dictionary, from: Vector2, to: Vector2) -> Array:
+	var dir := (to - from).normalized() if from.distance_to(to) > 1.0 else Vector2.RIGHT
+	var sp := float(pd.get("spacing", 40))
+	var n := int(pd.get("count", 6))
+	var out := []
+	for i in n:
+		var p := from + dir * sp * (i + 1)
+		var c: Vector2 = level.clamp_to_floor(from, p) if level != null else p
+		if c.distance_to(p) > 2.0:
+			break
+		out.append(p)
+	if pd.get("cross", false):
+		var perp := dir.orthogonal()
+		for j in n:
+			var q := to + perp * sp * (j - (n - 1) / 2.0)
+			if level == null or not level.is_solid(q):
+				out.append(q)
+	return out
+
+## A lingering pool where a `pool` blast landed (hurts the player and minions, never monsters).
+func _spawn_pool(at: Vector2, pc: Dictionary) -> void:
+	if level == null or not is_instance_valid(level):
+		return
+	var h = HazardScene.new()
+	h.level = level
+	h.setup("pool", mlevel)
+	h.radius = float(pc.get("radius", 30))
+	h.period = maxf(0.05, float(pc.get("tick", 0.5)) - 0.25)   # a hit every `tick` s (0.25 s active phase)
+	h.life = float(pc.get("life", 4.0))
+	h.tint = Color(str(pc.get("color", "#6a4a22")))
+	var pk := Combat.enemy_packet(self, float(pc.get("mult", 0.12)))
+	pk["is_attack"] = false
+	pk["crit_chance"] = 0.0
+	if pc.has("dtype"):
+		var total := [0.0, 0.0]
+		for k in pk["dmg"]:
+			total[0] += float(pk["dmg"][k][0])
+			total[1] += float(pk["dmg"][k][1])
+		pk["dmg"] = {str(pc["dtype"]): total}
+	pk["status"] = [{"type": str(pc["status"]), "chance": 100.0}] if pc.has("status") else []
+	h.custom_packet = pk
+	h.position = at
+	level.floor_layer.add_child(h)
 
 func _target_ok() -> bool:
 	return target != null and is_instance_valid(target) and target.alive

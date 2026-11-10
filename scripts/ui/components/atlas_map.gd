@@ -3,6 +3,8 @@ extends Control
 ## Hidden hexes next to a revealed one are drawn as faint fog outlines; the rest stay dark.
 ## Rot (Phase 1C): green stain + level number, a heart mark at Heart levels, a gold inner frame on
 ## Restored hexes and a dashed green ring on the hexes the next completion will spread to.
+## Phase 3A (radius 6): the view fits the explored rings (highest revealed ring + 1, at least 3),
+## the mouse wheel zooms (1x-3x) and right- or middle-drag pans.
 
 const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 const UIKit = preload("res://scripts/ui/ui_kit.gd")
@@ -14,9 +16,13 @@ var selected := Vector2i(9999, 9999)
 var hover := Vector2i(9999, 9999)
 var hex_size := 30.0
 var forecast := []   # keys the next spread will raise (set_state)
+var zoom := 1.0
+var pan := Vector2.ZERO
+var dragging := false
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	clip_contents = true
 	custom_minimum_size = Vector2(400, 360)
 
 func set_state(st: Dictionary, sel: Vector2i) -> void:
@@ -25,18 +31,36 @@ func set_state(st: Dictionary, sel: Vector2i) -> void:
 	forecast = AtlasRules.forecast(st) if not st.is_empty() else []
 	queue_redraw()
 
+## Rings the view fits: the explored rings plus the fog ring, at least 3, at most the atlas.
+func view_radius() -> int:
+	if state.is_empty():
+		return mini(3, AtlasRules.radius())
+	return clampi(AtlasRules.rings_open(state) + 1, mini(3, AtlasRules.radius()), AtlasRules.radius())
+
 func _fit() -> void:
-	var rad := AtlasRules.radius()
+	var rad := view_radius()
 	var by_w := size.x / (sqrt(3.0) * (2 * rad + 1) + 0.6)
 	var by_h := size.y / (3.0 * rad + 2.4)
-	hex_size = maxf(8.0, minf(by_w, by_h))
+	hex_size = maxf(6.0, minf(by_w, by_h)) * zoom
 
 func hex_center(h: Vector2i) -> Vector2:
-	return size / 2 + AtlasRules.to_pixel(h, hex_size)
+	return size / 2 + pan + AtlasRules.to_pixel(h, hex_size)
 
 func hex_at(p: Vector2) -> Vector2i:
 	_fit()
-	return AtlasRules.from_pixel(p - size / 2, hex_size)
+	return AtlasRules.from_pixel(p - size / 2 - pan, hex_size)
+
+func set_zoom(z: float, about: Vector2) -> void:
+	var nz := clampf(z, 1.0, 3.0)
+	if is_equal_approx(nz, zoom):
+		return
+	var rel := about - size / 2 - pan
+	pan += rel - rel * (nz / zoom)
+	zoom = nz
+	if is_equal_approx(zoom, 1.0):
+		pan = Vector2.ZERO
+	pan = pan.clamp(-size * zoom, size * zoom)
+	queue_redraw()
 
 func _corners(c: Vector2, s: float) -> PackedVector2Array:
 	var pts := PackedVector2Array()
@@ -46,6 +70,18 @@ func _corners(c: Vector2, s: float) -> PackedVector2Array:
 	return pts
 
 func _gui_input(e: InputEvent) -> void:
+	if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		set_zoom(zoom * (1.15 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0 / 1.15), e.position)
+		accept_event()
+		return
+	if e is InputEventMouseButton and e.button_index in [MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE]:
+		dragging = e.pressed
+		accept_event()
+		return
+	if e is InputEventMouseMotion and dragging:
+		pan = (pan + e.relative).clamp(-size * zoom, size * zoom)
+		queue_redraw()
+		return
 	if e is InputEventMouseMotion:
 		var h := hex_at(e.position)
 		if h != hover:
@@ -71,6 +107,8 @@ func _draw() -> void:
 	var s0 := int(state.get("seed", 0))
 	var font := get_theme_default_font()
 	for h in AtlasRules.within(Vector2i.ZERO, AtlasRules.radius()):
+		if AtlasRules.ring_of(h) > view_radius() and zoom <= 1.0:
+			continue
 		var c := hex_center(h)
 		var pts := _corners(c, hex_size - 1.5)
 		var ring := AtlasRules.ring_of(h)

@@ -16,6 +16,7 @@ var style := "explosion"    # explosion | slam | rain | meteor | frost
 var show_telegraph := true
 var origin := Vector2.INF
 var on_hit: Callable
+var on_trigger: Callable     # called with the blast position when it lands (boss `pool` patterns)
 var done := false
 
 func _ready() -> void:
@@ -48,6 +49,8 @@ func _trigger() -> void:
 		Combat.deal(packet, source, target, origin)
 		if on_hit.is_valid():
 			on_hit.call(target)
+	if on_trigger.is_valid():
+		on_trigger.call(global_position)
 
 func _draw() -> void:
 	if done or not show_telegraph:

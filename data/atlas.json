@@ -1,13 +1,16 @@
 {
-  "_doc": "Endgame Phase 1A: the Atlas of Ruin (docs/ENDGAME_PHASE1.md). Hex map in axial coords (q, r); the hub is the centre hex (ring 0). Each ring is one painting layer. A hex's biome, boss, vantage flag and base modifiers derive from hash(atlas_seed, q, r); only revealed hexes and clear counts are saved (character save key 'atlas'). Ring stats replace the biome zone def's tier scaling.",
-  "radius": 3,
+  "_doc": "Endgame Phase 1A: the Atlas of Ruin (docs/ENDGAME_PHASE1.md). Hex map in axial coords (q, r); the hub is the centre hex (ring 0). Each ring is one painting layer. A hex's biome, boss, vantage flag and base modifiers derive from hash(atlas_seed, q, r); only revealed hexes and clear counts are saved (character save key 'atlas'). Ring stats replace the biome zone def's tier scaling. Phase 3A: radius 6 (127 hexes); rings 4-6 (Underpainting, Drawing, Bare Canvas) at levels 55/60/65 (affix tier 7 rolls from item level 55). A ring's optional `ambient_tint` blends into the biome's ambient light by `ambient_tint_w` (rings 1-3 have none, so they look as before).",
+  "radius": 6,
   "unlock_dungeon": "nightmare_vaults",
   "unlock_text": "Defeat Malgrath in the Nightmare Vaults (Tier 5)",
   "tier": 6,
   "rings": [
     {"ring": 1, "layer": "Varnish", "color": "#d8b46a", "level": 40, "life_mult": 1.5, "damage_mult": 1.32, "resist_bonus": 20, "rarity_bonus": 170, "mod_count": [1, 1], "elite_chance": 0.38},
     {"ring": 2, "layer": "Craquelure", "color": "#b8875a", "level": 45, "life_mult": 1.62, "damage_mult": 1.4, "resist_bonus": 25, "rarity_bonus": 200, "mod_count": [1, 2], "elite_chance": 0.42},
-    {"ring": 3, "layer": "Pentimento", "color": "#8a6a9a", "level": 50, "life_mult": 1.75, "damage_mult": 1.48, "resist_bonus": 30, "rarity_bonus": 230, "mod_count": [2, 2], "elite_chance": 0.46}
+    {"ring": 3, "layer": "Pentimento", "color": "#8a6a9a", "level": 50, "life_mult": 1.75, "damage_mult": 1.48, "resist_bonus": 30, "rarity_bonus": 230, "mod_count": [2, 2], "elite_chance": 0.46},
+    {"ring": 4, "layer": "Underpainting", "color": "#7a5a3a", "level": 55, "life_mult": 1.88, "damage_mult": 1.56, "resist_bonus": 35, "rarity_bonus": 260, "mod_count": [2, 3], "elite_chance": 0.5, "ambient_tint": "#6a4a2a", "ambient_tint_w": 0.35},
+    {"ring": 5, "layer": "Drawing", "color": "#5a5a62", "level": 60, "life_mult": 2.0, "damage_mult": 1.64, "resist_bonus": 40, "rarity_bonus": 290, "mod_count": [3, 3], "elite_chance": 0.54, "ambient_tint": "#4a4a54", "ambient_tint_w": 0.4},
+    {"ring": 6, "layer": "Bare Canvas", "color": "#cfc6b0", "level": 65, "life_mult": 2.12, "damage_mult": 1.72, "resist_bonus": 45, "rarity_bonus": 320, "mod_count": [3, 3], "elite_chance": 0.58, "ambient_tint": "#9a9488", "ambient_tint_w": 0.4}
   ],
   "biomes": [
     {"zone": "zone_overgrown_ruin", "w": 1, "short": "Overgrown Ruin", "color": "#6e8a4a"},
@@ -17,9 +20,10 @@
   "biome_stray": 0.25,
   "bosses": ["warden", "gravemaw", "archon_velis", "iron_penitent", "malgrath", "stormheart"],
   "rot": {
-    "_doc": "Endgame Phase 1C: Rot, the spreading decay (docs/ENDGAME_PHASE1.md). Per-hex level 0-5, saved as atlas.rot {key: level}. A new atlas plants `sources` hexes at Rot `source_level` in rings >= min_ring. Each completed zone advances `fronts` (+1 per festered Heart since the last spread): a front adds +1 to the not-restored hex in rings >= min_ring that is a Rot hex or next to one, picked by a seeded score, while total Rot < cap_per_ring x rings revealed. Restored hexes never take Rot. Death in a zone adds +1 to that hex. levels[n-1] = the zone scaling at Rot n (heal = player life recovery multiplier, attack_speed = monster attack speed; Phase 1E tuning; move_speed = monster movement, proj_speed = monster projectile speed: Phase D2, the levers that reach kiting builds). Phase D2 dial (typical bots, docs/PHASE_D2_MEASUREMENTS.md): ~85% wins at Rot 3, ~65% at Rot 4 + 2 Pigments, ~45% at Rot 5 + 2 Pigments.",
+    "_doc": "Endgame Phase 1C: Rot, the spreading decay (docs/ENDGAME_PHASE1.md). Per-hex level 0-5, saved as atlas.rot {key: level}. A new atlas plants `sources` hexes at Rot `source_level` in rings >= min_ring. Each completed zone advances `fronts` (+1 per festered Heart since the last spread): a front adds +1 to the not-restored hex in rings >= min_ring that is a Rot hex or next to one, picked by a seeded score, while total Rot < cap_per_ring x rings revealed. Restored hexes never take Rot. Phase 3A: Rot (sources, fronts, loaded state) only reaches rings up to max(reach_ring, the highest revealed ring), so an atlas whose player is still in rings 1-3 plays exactly as the radius-3 atlas did; the cap (cap_per_ring x highest revealed ring) grows to 18 at ring 6. Death in a zone adds +1 to that hex. levels[n-1] = the zone scaling at Rot n (heal = player life recovery multiplier, attack_speed = monster attack speed; Phase 1E tuning; move_speed = monster movement, proj_speed = monster projectile speed: Phase D2, the levers that reach kiting builds). Phase D2 dial (typical bots, docs/PHASE_D2_MEASUREMENTS.md): ~85% wins at Rot 3, ~65% at Rot 4 + 2 Pigments, ~45% at Rot 5 + 2 Pigments.",
     "max": 5,
     "min_ring": 2,
+    "reach_ring": 3,
     "sources": 2,
     "source_level": 1,
     "fronts": 2,
@@ -214,7 +218,7 @@
     "contracts": [
       {"id": "zones", "text": "Complete %d Atlas zones", "stat": "zones", "need": [3, 5], "rep": 3, "seals": 0.4, "w": 3},
       {"id": "ring2", "text": "Complete %d zones in ring 2 or deeper", "stat": "zones", "min_ring": 2, "need": [2, 4], "rep": 4, "seals": 0.5, "w": 2, "req": {"ring": 2}},
-      {"id": "ring3", "text": "Complete %d zones in ring 3", "stat": "zones", "min_ring": 3, "need": [2, 3], "rep": 5, "seals": 0.6, "w": 2, "req": {"ring": 3}},
+      {"id": "ring3", "text": "Complete %d zones in ring 3 or deeper", "stat": "zones", "min_ring": 3, "need": [2, 3], "rep": 5, "seals": 0.6, "w": 2, "req": {"ring": 3}},
       {"id": "rot2", "text": "Complete %d zones at Rot 2 or higher", "stat": "zones", "min_rot": 2, "need": [2, 3], "rep": 5, "seals": 0.6, "w": 2, "req": {"rot": 2}},
       {"id": "hearts", "text": "Slay %d Hearts of Rot", "stat": "hearts", "need": [1, 2], "rep": 9, "seals": 1.0, "w": 2, "req": {"rot": 2}},
       {"id": "restore", "text": "Restore %d region", "stat": "restore", "need": [1, 1], "rep": 10, "seals": 1.0, "w": 1, "req": {"rot": 2}},
@@ -249,7 +253,7 @@
     "vendor": {"per_refresh": 2, "list": [{"id": "glazed", "gold": 1500}, {"id": "unfinished", "gold": 1000}]}
   },
   "wardens": {
-    "_doc": "Endgame Phase 2A: Layer Wardens (docs/ENDGAME_PHASE2.md). Each ring has a Warden: an upgraded existing boss. Clearing a region of that ring can drop a Ground Shard of its layer (kept in atlas.shards, per ring). With `summon_cost` shards the player summons the Warden at any cleared region of that ring (atlas.summons); the next run there fights the Warden instead of the hex boss (no Heart). Shards are spent only on victory. A Warden kill drops a Ground Pigment of its layer: always on the first kill, then `ground_chance`, guaranteed after `ground_pity` dry kills. The first kill of each Warden also gives +1 passive point. Ground Pigments are banked for the pinnacle (any `pinnacle_need` of 6 layers, Phase 3). Phase D2: ring damage_mult tuned so a typical bot wins ~60% of Rot 5 Warden runs (ring 2 0.4, ring 3 1.1; ring 1 never has Rot).",
+    "_doc": "Endgame Phase 2A: Layer Wardens (docs/ENDGAME_PHASE2.md). Each ring has a Warden: an upgraded existing boss. Clearing a region of that ring can drop a Ground Shard of its layer (kept in atlas.shards, per ring). With `summon_cost` shards the player summons the Warden at any cleared region of that ring (atlas.summons); the next run there fights the Warden instead of the hex boss (no Heart). Shards are spent only on victory. A Warden kill drops a Ground Pigment of its layer: always on the first kill, then `ground_chance`, guaranteed after `ground_pity` dry kills. The first kill of each Warden also gives +1 passive point. Ground Pigments are banked for the pinnacle (any `pinnacle_need` of 6 layers, Phase 3). Phase 3A: Wardens of rings 4-6 (Iron Penitent, Malgrath, Stormheart); pattern options `pool` (mortar/eruption leave lingering pools: life s, radius, tick s, mult of the boss hit, status) and `line` / `cross` (eruption: a sweeping line from the boss through the target; cross adds the perpendicular line). Rings 4-6 numbers are starting values for 3E. Phase D2: ring damage_mult tuned so a typical bot wins ~60% of Rot 5 Warden runs (ring 2 0.4, ring 3 1.1; ring 1 never has Rot).",
     "summon_cost": 3,
     "shard_cap": 9,
     "shard_chance": 0.45,
@@ -294,7 +298,40 @@
        },
        "unlock": [["underpainting", 0], ["ghost_sigils", 1]],
        "tune": {"teleport": {"cooldown": 3.5}},
-       "final_phase": {"at": 0.15, "add": [], "attack_speed": 1.35, "tint": "#d0b0ff", "message": "Velis peels back her own image!"}}
+       "final_phase": {"at": 0.15, "add": [], "attack_speed": 1.35, "tint": "#d0b0ff", "message": "Velis peels back her own image!"}},
+      {"ring": 4, "boss": "iron_penitent", "title": "the Underpainting Warden", "shard": "Underpainting Shard", "ground": "Ground Underpainting",
+       "light": "#a0703a", "life_mult": 4.5, "damage_mult": 1.0, "signature": "dead_colour",
+       "desc": "The Iron Penitent, blocked in with dead colour. Umber blots pool and slow; the underwash sweeps the floor at 30% life.",
+       "add": {
+         "dead_colour": {"type": "mortar", "w": 3, "range": [0, 420], "windup": 0.55, "count": 7, "radius": 34, "interval": 0.2, "mult": 0.8, "color": "#8a5a2a",
+                         "pool": {"life": 4.0, "radius": 30, "tick": 0.5, "mult": 0.12, "status": "chill", "color": "#6a4a22"}},
+         "underwash": {"type": "eruption", "w": 2, "range": [0, 380], "windup": 0.6, "count": 8, "radius": 30, "mult": 0.85, "color": "#a0703a", "line": true, "spacing": 40}
+       },
+       "unlock": [["dead_colour", 0], ["underwash", 1]],
+       "tune": {"overheat": {"cooldown": 11}},
+       "final_phase": {"at": 0.3, "add": ["underwash", "shockwave"], "attack_speed": 1.2, "speed": 1.1, "tint": "#a0703a", "message": "The underpainting bleeds through - the Penitent darkens!"}},
+      {"ring": 5, "boss": "malgrath", "title": "the Drawing Warden", "shard": "Drawing Shard", "ground": "Ground Drawing",
+       "light": "#b0b0c0", "life_mult": 4.5, "damage_mult": 1.0, "signature": "contour_lines",
+       "desc": "Malgrath, sketched in charcoal. Contour lines sweep across the arena; at 30% life he cross-hatches them.",
+       "add": {
+         "contour_lines": {"type": "eruption", "w": 3, "range": [0, 400], "windup": 0.55, "count": 9, "radius": 28, "mult": 0.9, "color": "#b0b0c0", "line": true, "spacing": 38},
+         "cross_hatch": {"type": "eruption", "w": 2, "range": [0, 400], "windup": 0.6, "count": 7, "radius": 26, "mult": 0.85, "color": "#d0d0e0", "line": true, "cross": true, "spacing": 38}
+       },
+       "unlock": [["contour_lines", 0]],
+       "tune": {"ward": {"cooldown": 16}},
+       "final_phase": {"at": 0.3, "add": ["cross_hatch", "hymn"], "attack_speed": 1.2, "speed": 1.15, "tint": "#c0c0d0", "message": "Malgrath cross-hatches the page!"}},
+      {"ring": 6, "boss": "stormheart", "title": "the Bare Canvas Warden", "shard": "Bare Canvas Shard", "ground": "Ground Canvas",
+       "light": "#f0ead8", "life_mult": 4.5, "damage_mult": 1.0, "signature": "gesso",
+       "desc": "Stormheart, primed white. Gesso strikes leave blank, burning canvas; at 25% life the gesso spreads further and lasts longer.",
+       "add": {
+         "gesso": {"type": "mortar", "w": 3, "range": [0, 460], "windup": 0.45, "count": 8, "radius": 32, "interval": 0.18, "mult": 0.8, "color": "#f0ead8", "on_player": true,
+                   "pool": {"life": 5.0, "radius": 30, "tick": 0.5, "mult": 0.15, "dtype": "void", "color": "#e8e2d0"}},
+         "gesso_field": {"type": "mortar", "w": 2, "range": [0, 460], "windup": 0.5, "count": 12, "radius": 32, "interval": 0.14, "mult": 0.75, "color": "#ffffff",
+                   "pool": {"life": 8.0, "radius": 34, "tick": 0.5, "mult": 0.15, "dtype": "void", "color": "#f4f0e4"}}
+       },
+       "unlock": [["gesso", 0]],
+       "tune": {"summon": {"cooldown": 18}},
+       "final_phase": {"at": 0.25, "add": ["gesso_field", "spiral"], "attack_speed": 1.2, "speed": 1.2, "tint": "#ffffff", "message": "The canvas is bare - Stormheart primes the world white!"}}
     ]
   }
 }
