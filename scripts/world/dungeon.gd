@@ -12,6 +12,8 @@ const AtlasCraft = preload("res://scripts/core/atlas_craft_rules.gd")
 const GuildRules = preload("res://scripts/core/guild_rules.gd")
 const WV = preload("res://scripts/core/wager_vault_rules.gd")
 const VaultSeal = preload("res://scripts/world/vault_seal.gd")
+const ZoneFire = preload("res://scripts/world/zone_fire.gd")
+const ZoneWells = preload("res://scripts/world/zone_wells.gd")
 
 var def := {}
 var layout := {}
@@ -62,6 +64,11 @@ var mechanic := ""             # the first active mechanic (compat); mechanics =
 var mechanics := []
 var glaze_tune := {}            # mechanic tuning with Pigment modifiers applied (Phase 1E)
 var sketch_tune := {}
+var burn_tune := {}              # Endgame 3C: Burning Canvas / Pigment Wells tuning (Pigment modifiers applied)
+var wells_tune := {}
+var burn = null                 # ZoneFire (the Burning Canvas) or null
+var wells = null                # ZoneWells (Pigment Wells) or null
+var mech_obj_t := 0.0           # refreshes the objective text while the fire / wells change
 var pigment_uids := []          # Easel Pigments used by this run (a death spends more charges)
 var death_charged := false
 var afx := {}                  # The Atelier's zone effects (AtlasRules.atelier_fx; Phase 3B)
@@ -129,6 +136,8 @@ func setup(d: Dictionary, ch, seed_value: int = 0, run: Dictionary = {}) -> bool
 	afx = d.get("atelier_fx", {})
 	glaze_tune = AtlasRules.mech_tuning("glazed", pmods.get("glazed", []))
 	sketch_tune = AtlasRules.mech_tuning("unfinished", pmods.get("unfinished", []))
+	burn_tune = AtlasRules.mech_tuning("burning", pmods.get("burning", []))
+	wells_tune = AtlasRules.mech_tuning("wells", pmods.get("wells", []))
 	if not afx.is_empty():   # The Atelier (Phase 3B): Drawing smalls
 		for k in ["min_layers", "max_layers"]:
 			glaze_tune[k] = int(glaze_tune.get(k, 2)) + int(afx.get("glaze_layers", 0))
@@ -189,6 +198,12 @@ func setup(d: Dictionary, ch, seed_value: int = 0, run: Dictionary = {}) -> bool
 	_place_vault_walls()
 	if has_mech("wager"):
 		_place_collector()
+	if has_mech("burning"):   # Endgame 3C
+		burn = ZoneFire.new()
+		burn.setup(self, burn_tune)
+	if has_mech("wells"):
+		wells = ZoneWells.new()
+		wells.setup(self, wells_tune, bool(afx.get("umber_well", false)))
 	if is_zone:
 		update_sleep()
 	return true
@@ -244,7 +259,7 @@ func loot_bonus() -> float:
 	return 1.0 + reward_bonus / 100.0
 
 func rarity_bonus() -> float:
-	return float(def.get("rarity_bonus", 0)) + reward_bonus
+	return float(def.get("rarity_bonus", 0)) + reward_bonus + (float(burn_tune.get("rarity", 0)) if burn != null else 0.0)
 
 func xp_bonus() -> float:
 	return 1.0 + reward_bonus / 100.0
@@ -471,6 +486,10 @@ func _mech_line(m: String) -> String:
 			return wager_line()
 		"vault":
 			return vault_line()
+		"burning":
+			return burn.line() if burn != null else ""
+		"wells":
+			return wells.line() if wells != null else ""
 	return ""
 
 func _place_hazards() -> void:
@@ -682,6 +701,24 @@ func _physics_process(delta: float) -> void:
 			boss_t += delta
 	if wager.get("state", "") == "active":
 		_tick_wager(delta)
+	if burn != null:
+		burn.tick(delta)
+	if wells != null:
+		wells.tick(delta)
+	if (burn != null or wells != null) and not boss_dead:
+		mech_obj_t -= delta
+		if mech_obj_t <= 0.0:
+			mech_obj_t = 1.0
+			Events.objective_changed.emit(objective_text())
+
+## Endgame 3C: extra minimap markers (cisterns, wells, the easel): [{pos, color}].
+func minimap_marks() -> Array:
+	var out := []
+	if burn != null:
+		out.append_array(burn.marks())
+	if wells != null:
+		out.append_array(wells.marks())
+	return out
 
 func _track_room() -> void:
 	var pc := to_cell(player.global_position)
@@ -927,6 +964,10 @@ func on_enemy_killed(e) -> void:
 		return
 	if not boss_dead:
 		zone_kills += 1
+	if burn != null:   # Endgame 3C: Ash, the front's kill speed, well fill
+		burn.on_kill(e, e == boss)
+	if wells != null:
+		wells.on_kill(e)
 	if wager.get("state", "") == "active":
 		_wager_kill(e)
 	if not vaults.is_empty():
@@ -1020,6 +1061,8 @@ func _on_boss_dead(e) -> void:
 				Events.message.emit("Abyss depth %d: +1 Passive Skill Point!" % depth, Color("#ffd040"))
 		_add_portal(e.global_position + Vector2(-40, 30), "Descend to depth %d" % (depth + 1), "descend", Color("#ff4060"))
 	_add_portal(e.global_position + Vector2(0, 30), "Exit Portal", "exit_portal", Color("#ffd060"))
+	if wells != null:   # Endgame 3C: the easel that mixes the wells
+		wells.on_zone_done(e.global_position)
 	Events.boss_died.emit(e)
 	Events.objective_changed.emit(objective_text())
 	Events.message.emit("%s has fallen!" % e.display_name, Color("#ffd060"))
@@ -1030,7 +1073,19 @@ func on_interact(it: Dictionary) -> void:
 	if k == "town_portal":
 		Game.main.go_hub(false)
 	elif k == "exit_portal":
+		if wells != null and wells.pending() and not wells.warned:   # Endgame 3C: one warning
+			wells.warned = true
+			Events.message.emit("The Pigment Easel still holds your wells. Leave anyway? (use the portal again)", Color("#ff9070"))
+			return
 		Game.main.go_hub(true)
+	elif k.begins_with("cistern_"):
+		if burn != null:
+			burn.start_channel(burn.cistern_index(k))
+		Events.objective_changed.emit(objective_text())
+	elif k == "wells_easel":
+		if wells != null:
+			wells.mix()
+		Events.objective_changed.emit(objective_text())
 	elif k == "collector":
 		if Game.main != null and Game.main.ui != null:
 			Game.main.ui.open("wager")
@@ -1133,7 +1188,8 @@ func _credit_guild() -> void:
 		"pigment_zones": 1 if not pigment_uids.is_empty() else 0, "wardens": 1 if warden > 0 else 0,
 		"kills": zone_kills, "bosses": 1 if last_light.is_empty() else last_light.get("times", []).size(), "time": run_t, "boss_time": boss_fight if boss_fight >= 0.0 else 9999.0,
 		"pigments": pigment_uids.size(), "wagers_won": int(wv_stats["wagers_won"]), "wager_3x": int(wv_stats["wager_3x"]),
-		"vaults": int(wv_stats["vaults"]), "trap_vaults": int(wv_stats["trap_vaults"]), "riddle_vaults": int(wv_stats["riddle_vaults"])}
+		"vaults": int(wv_stats["vaults"]), "trap_vaults": int(wv_stats["trap_vaults"]), "riddle_vaults": int(wv_stats["riddle_vaults"]),
+		"cisterns": int(burn.stats["cisterns"]) if burn != null else 0, "wells_full": int(wells.stats["full"]) if wells != null else 0}
 	if not last_light.is_empty():
 		guild_report["boss_times"] = last_light.get("times", []).duplicate()   # each Lantern-bearer counts as a boss
 	guild_result = GuildRules.credit(st, guild_report)
@@ -1300,7 +1356,7 @@ func _reveal_around(p: Vector2, rad: int) -> void:
 				reveal[i] = 1
 				changed = true
 				if grid[i] == FLOOR:
-					minimap_img.set_pixel(x, y, Color(0.55, 0.5, 0.6, 0.9))
+					minimap_img.set_pixel(x, y, burn.c_mm if burn != null and burn.is_burnt_idx(i) else Color(0.55, 0.5, 0.6, 0.9))
 				elif _near_floor(x, y):
 					minimap_img.set_pixel(x, y, Color(0.25, 0.22, 0.28, 0.9))
 	if changed:
@@ -1308,6 +1364,8 @@ func _reveal_around(p: Vector2, rad: int) -> void:
 
 func cleanup() -> void:
 	_wager_disconnect()
+	if burn != null:
+		burn.cleanup()
 	super.cleanup()
 
 # ------------------------------------------------------------------ Endgame 2D: helpers on mech_rng

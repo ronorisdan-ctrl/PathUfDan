@@ -174,6 +174,8 @@ func _on_level(_l) -> void:
 	pending_level = true
 
 func death_cause() -> String:
+	if t - last_dmg_t > 0.6 and p != null and is_instance_valid(p) and lv != null and "burn" in lv and lv.burn != null and lv.burn.is_burnt(p.global_position):
+		return "burning_canvas"
 	if t - last_dmg_t > 0.6 and p != null and is_instance_valid(p):
 		for s in ["ignite", "bleed", "poison", "agony"]:
 			if p.statuses.has(s):
@@ -334,7 +336,7 @@ func _candidates() -> Array:
 	for e in lv.enemies:
 		if not _valid(e) or ignore.get(e.get_instance_id(), -1.0) > t:
 			continue
-		if eg.hold_wall(e):
+		if eg.hold_wall(e) or eg.skip_enemy(e):   # 2E vault walls; 3C packs left to the fire
 			continue
 		var d: float = e.global_position.distance_to(pp)
 		var seen: bool = d < 330 and lv.has_los(pp, e.global_position)
@@ -411,7 +413,14 @@ func _movement() -> Vector2:
 	goal_loot_id = 0
 	if t < retreat_until:
 		return _away_dir(240.0)
+	var hg = eg.hold_goal()   # Endgame 3C: stand at the cistern while pumping it
+	if hg != null:
+		goal_kind = "fire:pump"
+		return _path_dir(hg) if pp.distance_to(hg) > 10.0 else Vector2.ZERO
 	if loot_mode:
+		var pg = eg.post_goal()   # Endgame 3C: mix the Pigment Wells before looting
+		if pg != null:
+			return _path_dir(pg)
 		var g0 = _loot_goal(400.0)
 		return _path_dir(g0) if g0 != null else Vector2.ZERO
 	if _valid(target):

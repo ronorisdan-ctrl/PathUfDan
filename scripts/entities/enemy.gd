@@ -19,6 +19,7 @@ var regen := 0.0
 var death_explode := false
 var convert_type := ""
 var on_hit_status := ""
+var extra_status := []        # Endgame 3C: statuses a Pigment Well lends ([{type, chance}])
 var elite_mods := []
 var elite_color := Color.WHITE
 var loot_mult := 1.0

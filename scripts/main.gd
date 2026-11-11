@@ -133,6 +133,7 @@ func enter_atlas(h: Vector2i, seed_value: int = 0) -> bool:
 				mechs.append(fm)
 	def["mechanics"] = mechs
 	def["mechanic"] = mechs[0] if mechs.size() > 0 else ""
+	AtlasRules.mark_seen(st, mechs)   # Phase 3C: met mechanics unlock their Guild contracts
 	def["pigment_mods"] = AtlasRules.pigment_mods(pigs)
 	def["pigment_uids"] = pigs.map(func(p): return int(p["uid"]))
 	def["pigment_reward"] = (float(AtlasRules.pig_cfg().get("reward", 10)) + float(fx["pigment_reward"])) * pigs.size()

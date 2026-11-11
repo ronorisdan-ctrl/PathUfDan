@@ -9,6 +9,8 @@ extends Node
 ## Phase 1E: Pigments (craft, slots, charges, modifiers), the Easel.
 ## Phase 3B: the Atelier (board, points, paths, respec, every node's rule, save v7 Varnish migration,
 ##   ring 4-6 Rot sources, Last Light live run, the Atelier panel).
+## Phase 3C: the Burning Canvas and the Pigment Wells (rules, Study in Fire / Umber Well, Ash and Wells
+##   Pigments, contracts, save v8 atlas.seen, live fire front / cisterns / Ash, live wells / easel mix).
 ##   godot --headless --fixed-fps 60 --path . res://tests/atlas_only.tscn [-- --shot]
 ## Writes tests/atlas_only_results.txt. --shot (windowed) saves tests/screens_out_atlas/*.png.
 
@@ -79,6 +81,7 @@ func run_all() -> void:
 	test_wager_vault_rules()
 	test_contracts_2d()
 	test_phase3a()
+	test_phase3c()
 	main = load("res://scripts/main.gd").new()
 	add_child(main)
 	await frames(2)
@@ -95,6 +98,8 @@ func run_all() -> void:
 	await test_live_contracts_2d()
 	await test_live_3a()
 	await test_live_atelier()
+	await test_live_burning()
+	await test_live_wells()
 	Game.atlas_force_mechanic = ""
 
 # ------------------------------------------------------------------ data
@@ -262,11 +267,11 @@ func test_state() -> void:
 
 # ------------------------------------------------------------------ save v5/v6
 func test_save() -> void:
-	check(CharacterData.SAVE_VERSION == 7, "SAVE_VERSION is 7 (3B: the Atelier)")
+	check(CharacterData.SAVE_VERSION == 8, "SAVE_VERSION is 8 (3C: atlas.seen)")
 	var ch = CharacterData.new()
 	ch.setup_new("mage", "Dan")
 	var d0: Dictionary = ch.to_dict()
-	check(not d0.has("atlas") and int(d0["version"]) == 7, "a character without an atlas writes no atlas key")
+	check(not d0.has("atlas") and int(d0["version"]) == 8, "a character without an atlas writes no atlas key")
 	check(not AR.unlocked(ch), "atlas locked for a new character")
 	ch.progress["bosses_killed"]["nightmare_vaults"] = 1
 	check(AR.unlocked(ch), "atlas unlocks after Malgrath")
@@ -282,7 +287,7 @@ func test_save() -> void:
 	d4["version"] = 4
 	var ch3 = CharacterData.new()
 	ch3.from_dict(d4)
-	check(ch3.atlas.is_empty() and int(ch3.to_dict()["version"]) == 7, "v4 save loads with no atlas and re-saves as v7")
+	check(ch3.atlas.is_empty() and int(ch3.to_dict()["version"]) == 8, "v4 save loads with no atlas and re-saves as v8")
 
 # ------------------------------------------------------------------ live
 func test_live() -> void:
@@ -733,7 +738,7 @@ func _shot(nm: String) -> void:
 # ------------------------------------------------------------------ Phase 1D: zone mechanics
 func test_mechanic_rules() -> void:
 	var mc := AR.mech_cfg()
-	check(mc.get("list", []).size() == 4 and not AR.mechanic_info("glazed").is_empty() and not AR.mechanic_info("unfinished").is_empty(), "mechanics: Glazed Elites and The Unfinished are defined (plus the 2D minor mechanics)")
+	check(mc.get("list", []).size() == 6 and not AR.mechanic_info("glazed").is_empty() and not AR.mechanic_info("unfinished").is_empty() and not AR.mechanic_info("burning").is_empty() and not AR.mechanic_info("wells").is_empty(), "mechanics: Glazed Elites, The Unfinished, the Burning Canvas and the Pigment Wells are defined (plus the 2D minor mechanics)")
 	check(Data.materials.has("glaze_flake") and Data.materials.has("pigment_dust"), "mechanics: Glaze Flake and Pigment Dust materials exist")
 	check(float(Data.materials["glaze_flake"].get("weight", 1)) == 0.0 and float(Data.materials["pigment_dust"].get("weight", 1)) == 0.0, "mechanics: the new materials never drop at random (weight 0)")
 	var seen := {}
@@ -758,7 +763,7 @@ func test_mechanic_rules() -> void:
 	var rate := float(hits) / float(tot)
 	check(stable, "mechanics: the natural roll is deterministic per (seed, hex, clears)")
 	check(rate > 0.22 and rate < 0.38, "mechanics: about 30% of runs roll a natural mechanic", "%.3f" % rate)
-	check(int(kinds.get("glazed", 0)) > hits * 0.3 and int(kinds.get("unfinished", 0)) > hits * 0.3, "mechanics: both mechanics come up", str(kinds))
+	check(int(kinds.get("glazed", 0)) > hits * 0.15 and int(kinds.get("unfinished", 0)) > hits * 0.15 and int(kinds.get("burning", 0)) > hits * 0.15 and int(kinds.get("wells", 0)) > hits * 0.15, "mechanics: all four main mechanics come up (3C: 1 in 4 each)", str(kinds))
 	check(AR.natural_mechanic(1, Vector2i.ZERO, 0) == "", "mechanics: the hub has no mechanic")
 	check(AR.sketch_colours(1, 0) == 1 and AR.sketch_colours(2, 2) == 1 and AR.sketch_colours(2, 3) == 2 and AR.sketch_colours(3, 0) == 2 and AR.sketch_colours(3, 5) == 2, "mechanics: sketches need 1 colour, 2 at Rot 3+ or ring 3")
 	check(AR.colour_for_status("ignite").get("id", "") == "vermilion" and AR.colour_for_status("freeze").get("id", "") == "ultramarine" and AR.colour_for_status("chill").get("id", "") == "ultramarine", "mechanics: ignite = vermilion, chill/freeze = ultramarine")
@@ -999,9 +1004,13 @@ func _bare_state(sd: int) -> Dictionary:
 
 func test_pigment_rules() -> void:
 	var pc := AR.pig_cfg()
-	check(pc.get("list", []).size() == 2 and pc["mods"]["glazed"].size() == 4 and pc["mods"]["unfinished"].size() == 4, "pigments: 2 Pigments with 4 modifiers each")
+	check(pc.get("list", []).size() == 4 and pc["mods"]["glazed"].size() == 4 and pc["mods"]["unfinished"].size() == 4 and pc["mods"]["burning"].size() == 4 and pc["mods"]["wells"].size() == 4, "pigments: 4 Pigments with 4 modifiers each (3C: Ash, Wells)")
 	for p in pc["list"]:
-		check(Data.materials.has(str(p["material"])), "pigments: %s costs a real material" % p["id"])
+		var pcost := AR.pigment_costs(_bare_state(1), str(p["id"]))
+		var real := not pcost.is_empty()
+		for k in pcost:
+			real = real and Data.materials.has(k)
+		check(real, "pigments: %s costs real materials" % p["id"], str(pcost))
 	var st := _bare_state(4242)
 	var a := AR.add_pigment(st, "glazed")
 	var st2 := _bare_state(4242)
@@ -1130,7 +1139,7 @@ func test_atelier_rules() -> void:
 	for k in vmap:
 		vm_ok = vm_ok and str(AR.atelier_node(str(vmap[k])).get("kind", "")) in ["tip", "notable"]
 	check(vm_ok, "atelier: the 6 old Varnishes map to rule-changers / notables")
-	check(AR.atelier_node("bare_notable").get("needs_3c", false) and AR.atelier_option(AR.atelier_node("draw_choice"), "c").get("needs_3c", false), "atelier: Umber Well and the Burning Canvas pick wait for Phase 3C")
+	check(not AR.atelier_node("bare_notable").get("needs_3c", false) and not AR.atelier_option(AR.atelier_node("draw_choice"), "c").get("needs_3c", false), "atelier: Umber Well and Study in Fire are unlocked (3C)")
 	# neutral without nodes
 	var base := _bare_state(31)
 	check(AR.atelier_fx(base) == AR._FX_NEUTRAL, "atelier: no nodes = neutral zone parameters")
@@ -1165,7 +1174,7 @@ func test_atelier_rules() -> void:
 	check(ATR.refund_refusal(p, "var_notable") != "" and ATR.refund_refusal(p, "var_s2") != "" and ATR.refund(p, "var_tip"), "atelier: refund only what nothing needs (tip first)")
 	check(ATR.take(p, "var_s1") and ATR.refund(p, "var_s2"), "atelier: a third small lets another small go")
 	check(ATR.choice_of(p, "var_choice") == "b" and ATR.refund(p, "var_notable") and ATR.refund(p, "var_choice") and ATR.choice_of(p, "var_choice") == "", "atelier: refunding a choice clears its pick")
-	check(ATR.take_refusal(p, "bare_notable") != "" and ATR.take_refusal(p, "draw_choice", "c") != "", "atelier: 3C nodes cannot be taken")
+	check(ATR.take_refusal(p, "bare_notable").find("3C") < 0 and ATR.take_refusal(p, "draw_choice", "c").find("3C") < 0, "atelier: the 3C nodes are no longer gated")
 	# budget
 	var b := _bare_state(34)
 	ATR.state(b)["bonus"] = 2
@@ -1197,11 +1206,11 @@ func test_atelier_rules() -> void:
 	check(ATR.taken(fx2).is_empty() and fx2.get("atelier_reset", false), "atelier: an overspent board is refunded on load (with a message)")
 	# set_nodes (smartbot / dev) and the old Varnish ids
 	var sn := _bare_state(38)
-	check(ATR.set_nodes(sn, ["thin_varnish", "pent_choice:c", "bogus", "draw_choice:c"]) == ["var_tip", "pent_choice"] and ATR.choice_of(sn, "pent_choice") == "c", "atelier: set_nodes maps old Varnish ids, takes choice picks, skips unknown and 3C picks")
+	check(ATR.set_nodes(sn, ["thin_varnish", "pent_choice:c", "bogus", "draw_choice:c"]) == ["var_tip", "pent_choice", "draw_choice"] and ATR.choice_of(sn, "pent_choice") == "c" and ATR.choice_of(sn, "draw_choice") == "c", "atelier: set_nodes maps old Varnish ids, takes choice picks (Study in Fire too, 3C), skips unknown ids")
 	# node status for the UI
 	var ns := _bare_state(39)
 	ATR.state(ns)["bonus"] = 1
-	check(ATR.node_status(ns, "var_s1") == "open" and ATR.node_status(ns, "var_tip") == "locked" and ATR.node_status(ns, "bare_notable") == "3c", "atelier: node status open / locked / 3c")
+	check(ATR.node_status(ns, "var_s1") == "open" and ATR.node_status(ns, "var_tip") == "locked" and ATR.node_status(ns, "bare_notable") == "locked", "atelier: node status open / locked (Umber Well is a normal notable since 3C)")
 	ATR.state(ns)["bonus"] = 0
 	check(ATR.node_status(ns, "var_s1") == "poor", "atelier: node status poor without points")
 
@@ -1411,7 +1420,7 @@ func test_atelier_save() -> void:
 	ATR.take(ch.atlas, "pent_choice", "c")
 	var ch2 = CharacterData.new()
 	ch2.from_dict(JSON.parse_string(JSON.stringify(ch.to_dict())))
-	check(int(ch.to_dict()["version"]) == 7 and ATR.taken(ch2.atlas) == ["pent_s1", "pent_s2", "pent_choice"] and ATR.choice_of(ch2.atlas, "pent_choice") == "c" and str(ch2.atlas["atelier"]) == str(ch.atlas["atelier"]) and ch2.atlas["ring_sources"] == ch.atlas["ring_sources"], "save v7: the Atelier survives a JSON save", str(ch2.atlas.get("atelier")))
+	check(int(ch.to_dict()["version"]) == 8 and ATR.taken(ch2.atlas) == ["pent_s1", "pent_s2", "pent_choice"] and ATR.choice_of(ch2.atlas, "pent_choice") == "c" and str(ch2.atlas["atelier"]) == str(ch.atlas["atelier"]) and ch2.atlas["ring_sources"] == ch.atlas["ring_sources"], "save v7: the Atelier survives a JSON save", str(ch2.atlas.get("atelier")))
 	var bad := ch.to_dict()
 	bad["atlas"]["atelier"] = {"taken": ["bogus", "bare_notable", "pent_choice"], "choices": {"pent_choice": "z"}, "bonus": "x"}
 	var ch3 = CharacterData.new()
@@ -2895,3 +2904,468 @@ func test_live_3a() -> void:
 		ui.close_all()
 	AR.unsummon(st, 4)
 	Game.atlas_force_mechanic = ""
+
+# ------------------------------------------------------------------ Phase 3C: Burning Canvas + Pigment Wells
+const BRR = preload("res://scripts/core/burning_rules.gd")
+const WLR = preload("res://scripts/core/wells_rules.gd")
+
+func test_phase3c() -> void:
+	var bt := AR.mech_tuning("burning")
+	var wt := AR.mech_tuning("wells")
+	check(not AR.mechanic_info("burning").get("minor", false) and not AR.mechanic_info("wells").get("minor", false) and float(AR.mechanic_info("burning").get("weight", 0)) == 1.0 and float(AR.mechanic_info("wells").get("weight", 0)) == 1.0, "3C data: Burning Canvas and Pigment Wells are main natural mechanics, weight 1")
+	check(not bt.is_empty() and not wt.is_empty() and float(bt["grace"]) == 15.0 and not bool(bt["pause_at_boss"]) and int(bt["cisterns"]) == 2 and int(bt["rot_cisterns"]) == 1, "3C data: grace 15 s, no pause at the boss, 2 cisterns + 1 with Rot")
+	check(Data.materials.has("ash") and float(Data.materials["ash"].get("weight", 1)) == 0.0, "3C data: Ash is a material that never drops at random")
+	check(GR.template("cisterns").get("req", {}).get("seen", "") == "burning" and GR.template("wells_full").get("req", {}).get("seen", "") == "wells", "3C data: the two new contracts need the mechanic seen")
+	var dang: Dictionary = AR.atelier_cfg().get("pigment_danger", {})
+	var dok := true
+	for m in ["burning", "wells"]:
+		var ids := []
+		for md in AR.pig_cfg()["mods"][m]:
+			ids.append(str(md["id"]))
+		ids.sort()
+		var dl: Array = dang.get(m, []).duplicate()
+		dl.sort()
+		dok = dok and ids == dl
+	check(dok, "3C data: atelier.pigment_danger orders the Ash and Wells modifiers")
+	# Study in Fire
+	var hits := {}
+	var other := 0
+	for sd in range(1, 40):
+		for n in 6:
+			var m := AR.natural_mechanic(sd, Vector2i(2, -1), n, 1.0, 0.0, "burning|wells")
+			if m == "":
+				continue
+			if m in ["burning", "wells"]:
+				hits[m] = int(hits.get(m, 0)) + 1
+			else:
+				other += 1
+	check(other == 0 and int(hits.get("burning", 0)) > 10 and int(hits.get("wells", 0)) > 10, "3C Study in Fire: the natural mechanic is always the Burning Canvas or the Wells (both come up)", str(hits))
+	check(AR.natural_mechanic(5, Vector2i(2, -1), 3, 9.0, 0.0, "burning|wells") == AR.natural_mechanic(5, Vector2i(2, -1), 3, 9.0, 0.0, "burning|wells"), "3C Study in Fire: the pick is seeded")
+	var sf := _atelier_state(61, ["draw_choice:c"])
+	check(str(AR.atelier_fx(sf)["natural_force"]) == "burning|wells", "3C Study in Fire: the node sets the force")
+	var um := _atelier_state(62, ["bare_notable"])
+	check(bool(AR.atelier_fx(um)["umber_well"]), "3C Umber Well: the notable works")
+	# the distance field
+	var g := PackedByteArray()
+	g.resize(7 * 3)
+	g.fill(0)
+	for x in 6:
+		g[1 * 7 + x] = 1
+	g[0 * 7 + 6] = 1   # unreachable corner
+	var df := BRR.dist_field(g, 7, 3, Vector2i(0, 1))
+	check(df[1 * 7 + 0] == 0 and df[1 * 7 + 5] == 5 and df[0 * 7 + 6] == -1 and df[0] == -1, "3C fire: the front distance follows the floor (walls and unreachable cells: -1)")
+	# speed, damage, cisterns
+	check(is_equal_approx(BRR.kill_mult(0, bt), 1.0) and is_equal_approx(BRR.kill_mult(40, bt), 1.2) and is_equal_approx(BRR.kill_mult(500, bt), 1.5), "3C fire: +0.5% speed per kill, capped at +50%")
+	check(is_equal_approx(BRR.base_speed(int(bt["arena_time"]), bt), 1.0) and is_equal_approx(BRR.base_speed(125, {"arena_time": 250}), 0.5), "3C fire: base speed = arena distance / arena_time")
+	check(BRR.dot_dps(60, bt) > BRR.dot_dps(50, bt) and is_equal_approx(BRR.dot_dps(50, bt), 0.03 * 30 * 50), "3C fire: burn damage = 3% of a reference life that grows with the zone level")
+	check(BRR.cistern_count(0, bt) == 2 and BRR.cistern_count(3, bt) == 3 and BRR.cistern_fracs(0, bt) == [0.33, 0.67] and BRR.cistern_fracs(2, bt) == [0.33, 0.5, 0.67], "3C fire: 2 cisterns at 1/3 and 2/3, a Rot zone's third in between")
+	var parched := AR.mech_tuning("burning", ["parched"])
+	check(BRR.cistern_count(0, parched) == 1 and BRR.cistern_fracs(0, parched) == [0.5] and float(parched["rarity"]) == 100.0, "3C fire: Parched leaves one cistern (+100 rarity)")
+	check(is_equal_approx(BRR.pushed(100.0, 120, bt), 70.0) and BRR.pushed(10.0, 120, bt) == 0.0, "3C fire: a cistern pushes the front back 25% of the arena distance, never behind the entrance")
+	check(BRR.burns("item", "common", bt) and BRR.burns("item", "uncommon", bt) and BRR.burns("gold", "", bt) and not BRR.burns("item", "rare", bt) and not BRR.burns("item", "legendary", bt) and not BRR.burns("material", "", bt) and not BRR.burns("gem", "", bt), "3C fire: normal and magic items and gold burn; rares and better, materials and gems are safe")
+	var r := RandomNumberGenerator.new()
+	r.seed = 77
+	var plain := 0
+	var ahead := 0
+	for i in 2000:
+		plain += BRR.ash_for_kill(r, false, false, false, bt)
+		ahead += BRR.ash_for_kill(r, false, false, true, bt)
+	check(plain > 400 and plain < 600 and ahead > 1.7 * plain and ahead < 2.3 * plain, "3C fire: 25% Ash per kill, double just ahead of the front", "%d / %d" % [plain, ahead])
+	check(BRR.ash_for_kill(r, false, true, false, bt) == 3 and BRR.ash_for_kill(r, true, false, false, bt) >= 1, "3C fire: the boss drops 3 Ash, an elite at least 1")
+	var kin := AR.mech_tuning("burning", ["kindled"])
+	var roar := AR.mech_tuning("burning", ["roaring"])
+	var sear := AR.mech_tuning("burning", ["searing"])
+	check(float(kin["grace"]) == 10.0 and is_equal_approx(float(kin["ash_mult"]), 1.25) and is_equal_approx(float(roar["speed_mult"]), 1.2) and int(roar["ahead_mult"]) == 3 and is_equal_approx(BRR.dot_dps(50, sear), 1.5 * BRR.dot_dps(50, bt)) and int(sear["elite_ash"]) == 2, "3C fire: the Ash Pigment modifiers (Kindled, Roaring, Searing)")
+	# wells
+	var rr := RandomNumberGenerator.new()
+	rr.seed = 5
+	var counts := {}
+	var distinct := true
+	for i in 200:
+		var n := WLR.roll_count(rr, wt)
+		counts[n] = int(counts.get(n, 0)) + 1
+		var cs := WLR.pick_colours(rr, n, wt)
+		var u := {}
+		for c in cs:
+			u[c] = true
+		distinct = distinct and u.size() == n
+	check(counts.keys().size() == 2 and int(counts.get(2, 0)) > 60 and int(counts.get(3, 0)) > 60 and distinct, "3C wells: 2 or 3 wells (about 50/50), distinct colours", str(counts))
+	check(WLR.roll_count(rr, AR.mech_tuning("wells", ["triptych"])) == 3, "3C wells: Triptych always has 3")
+	check(is_equal_approx(WLR.kill_fill(false, wt), 0.04) and is_equal_approx(WLR.kill_fill(true, wt), 0.15) and is_equal_approx(WLR.time_fill(10.0, wt), 0.1), "3C wells: 4% per kill, 15% per elite, 1% per second nearby")
+	var pat := AR.mech_tuning("wells", ["patient"])
+	check(is_equal_approx(WLR.time_fill(10.0, pat), 0.2) and is_equal_approx(WLR.kill_fill(false, pat), 0.032), "3C wells: Patient doubles time fill, kills 20% less")
+	var dc := WLR.danger("crimson", 1.0, wt)
+	var dh := WLR.danger("ochre", 0.5, wt)
+	var dv := WLR.danger("verdigris", 1.0, AR.mech_tuning("wells", ["bright"]))
+	check(is_equal_approx(dc["fire"], 0.25) and dc["ignite"] > 0.0 and is_equal_approx(dh["armour"], 0.3) and dh["fire"] == 0.0 and is_equal_approx(dv["poison"], 90.0), "3C wells: crimson burn, ochre armour, verdigris poison, scaled by fill (Bright x1.5)")
+	var mp := WLR.mix({"crimson": 1.0, "ochre": 0.2, "verdigris": 0.0}, -1.0, 0, wt)
+	check(mp["kind"] == "pure" and mp["dominant"] == "crimson" and mp["draws"] == ["crimson"], "3C mix: crimson over half the fill is a pure crimson chest (1 draw for 1.2 fill)", str(mp))
+	var mb := WLR.mix({"crimson": 0.5, "ochre": 0.5, "verdigris": 0.5}, -1.0, 0, wt)
+	check(mb["kind"] == "balanced" and mb["draws"].size() == 3 and mb["draws"].has("ochre") and mb["draws"].has("verdigris") and is_equal_approx(float(mb["legendary"]), 0.3), "3C mix: an even 3-well mix is balanced: one draw of each and a legendary chance", str(mb))
+	var m2 := WLR.mix({"crimson": 0.6, "verdigris": 0.5}, -1.0, 0, wt)
+	var m2b := WLR.mix({"crimson": 0.8, "verdigris": 0.3}, -1.0, 4, wt)
+	check(m2["kind"] == "balanced" and m2b["kind"] == "pure" and m2b["draws"].size() == 3, "3C mix: 2 wells within 15 points are balanced; Rot adds a draw per 2 Rot", "%s / %s" % [str(m2), str(m2b)])
+	var mm := WLR.mix({"crimson": 0.48, "ochre": 0.32, "verdigris": 0.2}, -1.0, 0, wt)
+	check(mm["kind"] == "mixed" and mm["draws"] == ["crimson", "ochre"], "3C mix: mixed but not balanced: the dominant colour plus one draw of the second", str(mm))
+	var mz := WLR.mix({"crimson": 0.0, "ochre": 0.0}, 0.6, 0, wt)
+	var mu := WLR.mix({"crimson": 0.3, "ochre": 0.0}, 1.0, 0, wt)
+	check(mz["kind"] == "none" and mz["draws"].is_empty() and mu["kind"] == "pure" and is_equal_approx(float(mu["unique"]), 1.0), "3C mix: empty wells pay nothing; a full umber well is a sure unique")
+	check(WLR.mix({"crimson": 1.0, "ochre": 0.0}, -1.0, 0, AR.mech_tuning("wells", ["deep"]))["draws"].size() == 2, "3C mix: Deep adds a draw")
+	var wd := WLR.roll_draw("crimson", 50, "warrior", true, 0.0, wt)
+	var od := WLR.roll_draw("ochre", 50, "warrior", false, 0.0, wt)
+	var vd := WLR.roll_draw("verdigris", 50, "mage", false, 0.0, wt)
+	var w_ok: bool = wd.size() == 1 and wd[0]["kind"] == "item" and str(wd[0]["item"]["slot"]) in ["main_hand", "off_hand"] and Data.rarity_index(str(wd[0]["item"]["rarity"])) >= Data.rarity_index("rare")
+	var gold := 0
+	var ash := 0
+	for d in od:
+		if d["kind"] == "gold":
+			gold += int(d["amount"])
+		if d["kind"] == "material" and d["id"] == "ash":
+			ash += int(d["amount"])
+	check(w_ok and WLR.has_stat_affix(wd[0]["item"], wt["crimson"]["offensive"]), "3C mix: a crimson draw is a rare+ weapon / off-hand with an offensive affix", str(wd[0]["item"].get("affixes", [])) if not wd.is_empty() else "none")
+	check(gold == 6000 and ash == 3 and od.size() == 7, "3C mix: an ochre draw is 120 gold per level, 3 materials, Flakes, Dust and Ash", str(od.size()))
+	check(vd.size() == 1 and (vd[0]["kind"] == "gem" or str(vd[0]["item"]["slot"]) in ["ring", "amulet", "belt", "charm"]), "3C mix: a verdigris draw is jewellery or a gem")
+	# Pigments: costs and crafting
+	var st := _bare_state(4343)
+	var wc := AR.pigment_costs(st, "wells")
+	check(wc.size() == 3 and int(wc["glaze_flake"]) == 120 and int(wc["pigment_dust"]) == 30 and int(wc["ash"]) == int(round(AR.pigment_cost(st, "burning") / 2.0)), "3C pigments: the Wells Pigment costs Flakes + Dust + half an Ash Pigment", str(wc))
+	var ch = CharacterData.new()
+	ch.materials = {"glaze_flake": 500, "pigment_dust": 100, "ash": 300}
+	var res := AR.craft_pigment(st, ch, "wells")
+	check(res.get("ok", false) and int(ch.materials["glaze_flake"]) == 380 and int(ch.materials["pigment_dust"]) == 70 and int(ch.materials["ash"]) == 300 - int(wc["ash"]), "3C pigments: crafting the Wells Pigment pays all three", str(ch.materials))
+	ch.materials = {"ash": 1}
+	check(not AR.craft_pigment(st, ch, "burning").get("ok", true) and AR.craft_pigment(st, ch, "burning").get("msg", "").find("Ash") >= 0, "3C pigments: the Ash Pigment needs Ash")
+	var cm := _atelier_state(63, ["under_s1"])
+	var cmw := AR.pigment_costs(cm, "wells")
+	check(int(cmw["glaze_flake"]) == 144 and int(cmw["pigment_dust"]) == 36 and int(cmw["ash"]) == int(round(float(AR.pigment_info("wells")["materials"]["ash"]) * 1.2)) and AR.pigment_cost(cm, "burning") == int(round(float(AR.pigment_info("burning")["cost"]) * 1.2)), "3C pigments: the Atelier's +20% craft cost applies to the new Pigments", str(cmw))
+	check(AR.pigment_materials() == ["glaze_flake", "pigment_dust", "ash"], "3C pigments: the Easel lists Flakes, Dust and Ash", str(AR.pigment_materials()))
+	# seen mechanics and contracts
+	var ss := _bare_state(4444)
+	check(not GR.eligible(ss, GR.template("cisterns")) and not GR.eligible(ss, GR.template("wells_full")), "3C contracts: not offered before the mechanic is met")
+	AR.mark_seen(ss, ["burning", "bogus"])
+	check(AR.has_seen(ss, "burning") and not AR.has_seen(ss, "bogus") and GR.eligible(ss, GR.template("cisterns")) and not GR.eligible(ss, GR.template("wells_full")), "3C contracts: meeting the Burning Canvas unlocks the cistern contract")
+	check(GR.progress_of({"tpl": "cisterns"}, {"cisterns": 2}) == 2 and GR.progress_of({"tpl": "wells_full"}, {"wells_full": 3}) == 3, "3C contracts: cisterns doused and wells filled count")
+	var ld := AR.sanitize(JSON.parse_string(JSON.stringify(ss)))
+	var old := ss.duplicate(true)
+	old.erase("seen")
+	var lo := AR.sanitize(old)
+	check(ld["seen"] == ["burning"] and lo["seen"] == [], "3C save v8: atlas.seen survives a save; older atlases start with none")
+
+func _col_near(a: Color, b: Color) -> bool:
+	return absf(a.r - b.r) < 0.01 and absf(a.g - b.g) < 0.01 and absf(a.b - b.b) < 0.01
+
+## Advances game time until cond() is true or `secs` of game time pass (polls the zone's run clock).
+func _until(lv, cond: Callable, secs: float) -> bool:
+	var t0: float = Time.get_ticks_msec()
+	var gt := 0.0
+	while gt < secs:
+		if cond.call():
+			return true
+		await get_tree().physics_frame
+		gt += get_physics_process_delta_time()
+		if Time.get_ticks_msec() - t0 > 60000:
+			break
+	return cond.call()
+
+func _fire_cell(lv, lo: int, hi: int) -> Vector2i:
+	for k in range(lv.burn.start_of[lo], lv.burn.start_of[mini(hi, lv.burn.max_d) + 1]):
+		var i: int = lv.burn.order[k]
+		var c := Vector2i(i % lv.gw, int(i / lv.gw))
+		if lv.cell(c.x + 1, c.y) == 1 and lv.cell(c.x - 1, c.y) == 1 and lv.cell(c.x, c.y + 1) == 1 and lv.cell(c.x, c.y - 1) == 1:
+			return c
+	return Vector2i(-1, -1)
+
+func test_live_burning() -> void:
+	var st: Dictionary = AR.ensure(Game.ch)
+	_open_atlas_all(st)
+	st["easel"] = []
+	st["summons"] = {}
+	ATR.set_nodes(st, [])
+	st["seen"] = []
+	var h := Vector2i(3, 0)
+	st["restored"].erase(AR.key(h))
+	st["rot"].erase(AR.key(h))
+	Game.atlas_force_mechanic = "burning"
+	main.enter_atlas(h, 8181)
+	await frames(3)
+	var lv = Game.level
+	var b = lv.burn
+	check(lv.has_mech("burning") and b != null and AR.has_seen(st, "burning"), "live fire: a forced Burning Canvas run has the fire (and marks it seen)")
+	if b == null:
+		main.go_hub(false)
+		await frames(3)
+		return
+	var br: Dictionary = lv.rooms[lv.layout["boss"]]
+	var c_rooms := {}
+	var c_ok := true
+	for c in b.cisterns:
+		c_rooms[c["room"]] = true
+		c_ok = c_ok and lv.rooms[c["room"]]["kind"] == "normal" and lv.nearest_interactable(c["pos"]) != null
+	check(b.cisterns.size() == 2 and c_rooms.size() == 2 and c_ok, "live fire: 2 cisterns in different normal chambers (none in the arena)", str(b.cisterns.size()))
+	check(b.cisterns.size() == 2 and b.cisterns[0]["d"] < b.cisterns[1]["d"] and b.cisterns[1]["d"] < b.arena_d, "live fire: the cisterns sit before the arena, nearest first")
+	check(b.arena_d > 20 and b.max_d >= b.arena_d and b.dist[lv.to_cell(lv.cell_center(br["anchor"])).y * lv.gw + lv.to_cell(lv.cell_center(br["anchor"])).x] >= b.arena_d, "live fire: the distance field reaches the arena", "%d / %d" % [b.arena_d, b.max_d])
+	check(b.front < 0.0 and lv.objective_text().find("Burning Canvas") >= 0, "live fire: nothing burns during the grace period; the panel shows the fire")
+	# grace -> the fire starts (game time)
+	lv.run_t = float(b.t["grace"]) - 0.5
+	var started: bool = await _until(lv, func(): return b.front >= 0.0, 2.0)
+	check(started and float(b.stats["start_t"]) >= float(b.t["grace"]) - 0.01, "live fire: the front starts after the grace period")
+	var f0: float = b.front
+	var adv: bool = await _until(lv, func(): return b.front >= f0 + b.speed * 1.5, 4.0)
+	check(adv, "live fire: the front advances at its base speed (game time)", "%.2f -> %.2f at %.3f c/s" % [f0, b.front, b.speed])
+	b.kills = 100
+	check(is_equal_approx(b.cur_speed(), b.speed * 1.5), "live fire: kills speed the front up (capped +50%)")
+	b.kills = 0
+	# burn a stretch and check the overlay, minimap, loot and the burn
+	b.front = 30.0
+	b._repaint()
+	var cb: Vector2i = _fire_cell(lv, 5, 25)
+	var ca: Vector2i = _fire_cell(lv, 45, 80)
+	check(cb.x >= 0 and ca.x >= 0 and b.is_burnt(lv.cell_center(cb)) and not b.is_burnt(lv.cell_center(ca)), "live fire: cells behind the front are burnt, ahead are not")
+	check(b.img.get_pixel(cb.x, cb.y).a > 0.3 and b.img.get_pixel(ca.x, ca.y).a == 0.0, "live fire: the scorched tint covers the burnt floor")
+	lv._reveal_around(lv.cell_center(cb), 3)
+	check(_col_near(lv.minimap_img.get_pixel(cb.x, cb.y), b.c_mm), "live fire: the minimap shows burnt floor", str(lv.minimap_img.get_pixel(cb.x, cb.y)))
+	var cbp: Vector2 = lv.cell_center(cb)
+	var common := Loot.roll_item(50, 0.0, "warrior", "common")
+	var magic := Loot.roll_item(50, 0.0, "warrior", "uncommon")
+	var rare := Loot.roll_item(50, 0.0, "warrior", "rare")
+	var n0: int = lv.loot.size()
+	lv.spawn_drop({"kind": "item", "item": common}, cbp)
+	lv.spawn_drop({"kind": "item", "item": magic}, cbp)
+	lv.spawn_drop({"kind": "item", "item": rare}, cbp)
+	lv.spawn_drop({"kind": "gold", "amount": 77}, cbp)
+	lv.spawn_drop({"kind": "material", "id": "scrap", "amount": 1}, cbp)
+	lv.spawn_drop({"kind": "item", "item": Loot.roll_item(50, 0.0, "warrior", "common")}, lv.cell_center(ca))
+	var nodes: Array = lv.loot.slice(n0)
+	var b0: int = int(b.stats["burnt_items"])
+	var burnt_ok: bool = await _until(lv, func(): return int(b.stats["burnt_items"]) >= b0 + 2 and int(b.stats["burnt_gold"]) >= 77, 1.0)
+	var kinds := {}
+	for n in nodes:
+		if is_instance_valid(n) and not n.picked:
+			kinds[n.kind + ":" + (str(n.item.get("rarity", "")) if n.kind == "item" else "")] = int(kinds.get(n.kind + ":" + (str(n.item.get("rarity", "")) if n.kind == "item" else ""), 0)) + 1
+	check(nodes.size() == 6 and burnt_ok and kinds.get("item:rare", 0) == 1 and kinds.get("material:", 0) == 1 and kinds.get("item:common", 0) == 1 and not kinds.has("item:uncommon") and not kinds.has("gold:"), "live fire: normal / magic items and gold burn; the rare and the material survive; loot ahead is safe", str(kinds))
+	# burn damage (fire resistance applies)
+	var p = lv.player
+	p.global_position = cbp
+	p.max_life = 50000.0   # a long look at the burn without dying
+	p.life = p.max_life
+	var l0: float = p.life
+	b.hold = 99.0
+	await _until(lv, func(): return p.life < l0 - 0.5, 1.5)
+	var want: float = BRR.dot_dps(int(lv.monster_level), b.t) * p.dot_resist("fire")
+	check(p.life < l0 and float(b.stats["burn_t"]) > 0.0 and int(b.stats["caught"]) >= 1, "live fire: standing on burnt floor burns you", "%.1f -> %.1f (%.1f/s)" % [l0, p.life, want])
+	var dmg0: float = float(b.stats["burn_dmg"])
+	await _until(lv, func(): return false, 2.0)
+	var per_s: float = (float(b.stats["burn_dmg"]) - dmg0) / 2.0
+	check(per_s > want * 0.6 and per_s < want * 1.4, "live fire: the burn deals about 3% of the reference life per second, less fire resistance", "%.1f vs %.1f" % [per_s, want])
+	# Ash: an elite killed just ahead of the front
+	var ce: Vector2i = _fire_cell(lv, 32, 35)
+	var ash0: int = int(b.stats["ash"])
+	var e = _fresh_enemy(lv, [Data.elite_mod_list[0]["id"]])
+	e.global_position = lv.cell_center(ce)
+	e.die(p)
+	await frames(2)
+	var ash_drops := 0
+	for n in lv.loot:
+		if is_instance_valid(n) and n.kind == "material" and n.mat_id == "ash":
+			ash_drops += int(n.amount)
+	check(ce.x >= 0 and int(b.stats["ash"]) - ash0 >= 2 and int(b.stats["ash_ahead"]) >= 2 and ash_drops >= 2, "live fire: an elite killed just ahead of the front drops double Ash", "%d" % (int(b.stats["ash"]) - ash0))
+	# a cistern: channel, push back, hold; grey on the minimap
+	b.hold = 0.0
+	b.front = float(b.arena_d) * 0.8
+	b._repaint()
+	var cz: Dictionary = b.cisterns[0]
+	p.global_position = cz["pos"]
+	p.life = p.max_life
+	lv.on_interact(lv.nearest_interactable(cz["pos"]))
+	check(b.channeling(), "live fire: interacting with a cistern starts the channel")
+	var front_before: float = b.front
+	var doused: bool = await _until(lv, func(): return cz["used"], 2.0)
+	check(doused and b.front < front_before - float(b.arena_d) * 0.2 and b.hold > 0.0 and int(b.stats["cisterns"]) == 1, "live fire: after the channel the front falls back 25% and holds", "%.1f -> %.1f" % [front_before, b.front])
+	var still: float = b.front
+	await _until(lv, func(): return false, 1.0)
+	check(is_equal_approx(b.front, still), "live fire: the front holds still after a douse")
+	check(lv.nearest_interactable(cz["pos"]) == null or lv.nearest_interactable(cz["pos"])["kind"] != cz["key"], "live fire: a used cistern cannot be used again")
+	var grey := false
+	for mk in lv.minimap_marks():
+		if mk["pos"] == cz["pos"]:
+			grey = mk["color"] == Color(str(b.t["colors"]["used"]))
+	check(grey, "live fire: a dry cistern is greyed out on the minimap")
+	check(_col_near(lv.minimap_img.get_pixel(cb.x, cb.y), b.c_mm) and b.front > 0.0, "live fire: the floor near the entrance stays burnt after a douse")
+	# interrupt: a heavy hit cancels the channel
+	var c2: Dictionary = b.cisterns[1]
+	p.global_position = c2["pos"]
+	b.start_channel(1)
+	Events.player_damaged.emit(p.max_life * 0.2)
+	check(not b.channeling() and not c2["used"], "live fire: a heavy hit interrupts the channel")
+	b.start_channel(1)
+	Events.player_damaged.emit(p.max_life * 0.05)
+	p.global_position = c2["pos"] + Vector2(200, 0)
+	await frames(2)
+	check(not b.channeling() and not c2["used"], "live fire: walking away cancels the channel (a light hit does not)")
+	if args.has("shot"):
+		b.hold = 0.0
+		b.front = float(b.arena_d) * 0.55
+		b._repaint()
+		var sc: Vector2i = _fire_cell(lv, int(b.front) + 4, int(b.front) + 12)
+		p.global_position = lv.cell_center(sc)
+		lv._reveal_around(p.global_position, 14)
+		lv.update_sleep()
+		await frames(40)
+		await _shot("burning_zone")
+	# the boss dies: the fire goes out, the burn stops, the zone report counts cisterns
+	var g := GR.ensure(st)
+	g["board"] = [_contract("cisterns", 1), _contract("kills", 9999)]
+	g["zones"] = 0
+	await _kill_boss(lv)
+	await frames(3)
+	check(b.done and int(lv.guild_report.get("cisterns", -1)) == 1 and g["board"][0]["done"], "live fire: the fire stops when the boss dies; doused cisterns are credited", str(lv.guild_report.get("cisterns", -1)))
+	var lf: float = p.life
+	p.global_position = cbp
+	await _until(lv, func(): return false, 1.0)
+	check(p.life >= lf, "live fire: no burn after the boss")
+	main.go_hub(true)
+	await frames(3)
+	# Rot adds a cistern; the Ash Pigment guarantees the fire with its modifier
+	st["rot"][AR.key(h)] = 3
+	st["easel"] = []
+	st["pigments"] = []
+	AR.add_pigment(st, "burning", "roaring")
+	AR.slot_pigment(st, 0)
+	Game.atlas_force_mechanic = "none"
+	main.enter_atlas(h, 8182)
+	await frames(3)
+	lv = Game.level
+	check(lv.burn != null and lv.burn.cisterns.size() == 3 and is_equal_approx(float(lv.burn.t["speed_mult"]), 1.2), "live fire: a Rot zone has 3 cisterns; a Roaring Ash Pigment brings a faster fire", "%d" % (lv.burn.cisterns.size() if lv.burn != null else -1))
+	main.go_hub(false)
+	await frames(3)
+	st["rot"].erase(AR.key(h))
+	st["easel"] = []
+	st["pigments"] = []
+
+func test_live_wells() -> void:
+	var st: Dictionary = AR.ensure(Game.ch)
+	_open_atlas_all(st)
+	st["easel"] = []
+	st["summons"] = {}
+	ATR.set_nodes(st, [])
+	st["seen"] = []
+	var h := Vector2i(2, -1)
+	st["restored"].erase(AR.key(h))
+	st["rot"].erase(AR.key(h))
+	Game.atlas_force_mechanic = "wells"
+	main.enter_atlas(h, 9191)
+	await frames(3)
+	var lv = Game.level
+	var ws = lv.wells
+	check(ws != null and AR.has_seen(st, "wells") and GR.eligible(st, GR.template("wells_full")), "live wells: a forced Wells run has wells (and unlocks the contract)")
+	if ws == null:
+		main.go_hub(false)
+		await frames(3)
+		return
+	var rooms := {}
+	var ok := true
+	for w in ws.wells:
+		rooms[w["room"]] = true
+		ok = ok and lv.rooms[w["room"]]["kind"] == "normal"
+	check(ws.wells.size() in [2, 3] and rooms.size() == ws.wells.size() and ok, "live wells: 2-3 wells in different normal chambers", str(ws.wells.size()))
+	var w0: Dictionary = ws.wells[0]
+	# kills in the chamber fill it; elites more
+	var e = _fresh_enemy(lv, [])
+	e.global_position = w0["pos"] + Vector2(12, 0)
+	e.die(lv.player)
+	await frames(2)
+	var f1: float = w0["fill"]
+	var el = _fresh_enemy(lv, [Data.elite_mod_list[0]["id"]])
+	el.global_position = w0["pos"] + Vector2(-12, 0)
+	el.die(lv.player)
+	await frames(2)
+	check(is_equal_approx(f1, 0.04) and is_equal_approx(float(w0["fill"]), 0.19), "live wells: a kill adds 4%, an elite 15%", "%.3f / %.3f" % [f1, float(w0["fill"])])
+	# time near the well
+	lv.player.global_position = w0["pos"] + Vector2(20, 0)
+	var fa: float = w0["fill"]
+	var filled: bool = await _until(lv, func(): return float(w0["fill"]) >= fa + 0.02, 3.0)
+	check(filled, "live wells: standing by a well fills it over time", "%.3f -> %.3f" % [fa, float(w0["fill"])])
+	lv.player.global_position = lv.cell_center(lv.rooms[lv.layout["start"]]["anchor"])
+	# danger: a full crimson / ochre well strengthens its chamber
+	var wc := {}
+	for w in ws.wells:
+		if w["id"] in ["crimson", "ochre", "verdigris"]:
+			wc[w["id"]] = w
+	var buffed = _fresh_enemy(lv, [])
+	buffed.global_position = w0["pos"] + Vector2(0, 14)
+	var af0: float = buffed.added_fire
+	var ar0: float = buffed.armour
+	ws._add_fill(w0, 1.0)
+	ws._apply_danger()
+	var dg := WLR.danger(str(w0["id"]), 1.0, ws.t)
+	check(is_equal_approx(buffed.added_fire, af0 + float(dg["fire"])) and is_equal_approx(buffed.armour, ar0 * (1.0 + float(dg["armour"]))) and (buffed.extra_status.size() > 0) == (float(dg["ignite"]) + float(dg["poison"]) > 0.0), "live wells: a full well lends its chamber's monsters its colour", "%s: %s" % [str(w0["id"]), str(dg)])
+	var pk: Dictionary = Combat.enemy_packet(buffed)
+	var has_st := false
+	for s in pk["status"]:
+		has_st = has_st or s["type"] in ["ignite", "poison"]
+	check(has_st == (float(dg["ignite"]) + float(dg["poison"]) > 0.0), "live wells: the well's status rides on the monster's hits")
+	ws._apply_danger()
+	check(is_equal_approx(buffed.added_fire, af0 + float(dg["fire"])) and is_equal_approx(buffed.armour, ar0 * (1.0 + float(dg["armour"]))), "live wells: the bonus is replaced, never stacked")
+	check(int(ws.stats["full"]) == 1 and lv.objective_text().find("Pigment Wells") >= 0, "live wells: a full well is counted; the panel shows the wells")
+	if args.has("shot"):
+		lv.player.global_position = w0["pos"] + Vector2(-40, 30)
+		lv._reveal_around(lv.player.global_position, 14)
+		lv.update_sleep()
+		await frames(40)
+		await _shot("wells_well")
+	# the boss: the easel appears; the exit portal warns once; mixing pays the chest
+	var g := GR.ensure(st)
+	g["board"] = [_contract("wells_full", 1), _contract("kills", 9999)]
+	g["zones"] = 0
+	await _kill_boss(lv)
+	await frames(3)
+	var easel = lv.nearest_interactable(ws.easel_pos)
+	check(ws.done and ws.easel and easel != null and easel["kind"] == "wells_easel" and int(lv.guild_report.get("wells_full", -1)) == 1 and g["board"][0]["done"], "live wells: the easel stands in the arena after the boss; the full well is credited")
+	var fill_after: float = w0["fill"]
+	var e2 = _fresh_enemy(lv, [])
+	e2.global_position = w0["pos"]
+	e2.die(lv.player)
+	check(is_equal_approx(float(w0["fill"]), fill_after), "live wells: no fill after the boss")
+	var lv_before = Game.level
+	var exit_it := {}
+	for it in lv.interactables:
+		if it["kind"] == "exit_portal":
+			exit_it = it
+	lv.on_interact(exit_it)
+	await frames(2)
+	check(Game.level == lv_before and ws.warned, "live wells: the exit portal warns once while the easel is unmixed")
+	if args.has("shot"):
+		lv.player.global_position = ws.easel_pos + Vector2(-50, 20)
+		await frames(40)
+		await _shot("wells_easel")
+	var d0 := _drop_count(lv)
+	lv.player.global_position = ws.easel_pos
+	lv.on_interact(lv.nearest_interactable(ws.easel_pos))
+	await frames(2)
+	check(ws.mixed and not ws.result.is_empty() and str(ws.result["kind"]) in ["pure", "mixed", "balanced"] and _drop_count(lv) > d0 and ws.line().find("mixed") >= 0, "live wells: mixing pays the chest at the easel", str(ws.result.get("kind", "")))
+	check(ws.result["dominant"] == w0["id"] or ws.result["kind"] == "balanced", "live wells: the fullest well decides the chest")
+	main.go_hub(true)
+	await frames(3)
+	# the Umber Well (Atelier): a 4th well, a full one gives a unique
+	ATR.set_nodes(st, ["bare_notable"])
+	main.enter_atlas(h, 9192)
+	await frames(3)
+	lv = Game.level
+	ws = lv.wells
+	var umb := {}
+	for w in ws.wells:
+		if w["umber"]:
+			umb = w
+	check(ws.wells.size() >= 3 and not umb.is_empty() and ws.colour_wells().size() == ws.wells.size() - 1, "live wells: the Umber Well node adds a 4th, umber well", str(ws.wells.size()))
+	if not umb.is_empty():
+		ws._add_fill(umb, 1.0)
+		ws._add_fill(ws.colour_wells()[0], 0.5)
+		await _kill_boss(lv)
+		await frames(3)
+		lv.player.global_position = ws.easel_pos
+		ws.mix()
+		check(ws.result.get("got_unique", false) and float(ws.result["unique"]) == 1.0, "live wells: a full umber well guarantees a unique")
+	main.go_hub(true)
+	await frames(3)
+	ATR.set_nodes(st, [])
+	Game.atlas_force_mechanic = "none"

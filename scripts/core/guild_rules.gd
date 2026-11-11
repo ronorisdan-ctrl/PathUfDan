@@ -13,7 +13,8 @@ extends RefCounted
 const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 
 const STATS := ["zones", "hearts", "restore", "harvest", "peels", "painted", "elites", "pigment_zones", "wardens",
-	"kills", "bosses", "wagers_won", "wager_3x", "vaults", "trap_vaults", "riddle_vaults"]   # Phase 2D adds the second row
+	"kills", "bosses", "wagers_won", "wager_3x", "vaults", "trap_vaults", "riddle_vaults",   # Phase 2D adds the second row
+	"cisterns", "wells_full"]   # Phase 3C
 
 static func cfg() -> Dictionary:
 	return Data.atlas_cfg.get("guild", {})
@@ -150,6 +151,8 @@ static func eligible(st: Dictionary, t: Dictionary) -> bool:
 				any = true
 		if not any:
 			return false
+	if req.has("seen") and not AtlasRules.has_seen(st, str(req["seen"])):   # Phase 3C: met the mechanic
+		return false
 	if req.has("clears"):
 		var n := 0
 		for k in st.get("clears", {}):

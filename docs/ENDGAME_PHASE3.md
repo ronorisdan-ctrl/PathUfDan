@@ -168,11 +168,106 @@ When ring 4, 5 or 6 is first revealed it gets **1 extra Rot source** at `source_
 
 ## Results
 
-@@RESULTS@@
+`atlas_only` **704/0** (+75), `tree_only` **844/0**, full suite **48016/0**. Smartbot with no Atelier nodes: frozen baseline vs `d2_v1.csv` **60/60 identical**; the D2 Rot cell (ring 3 hex 3,0, Rot 4 + 2 Pigments, typical, seed 900) **21/30, identical run for run** to D2. A flaky 3A check ("pools fade") was rewritten to check each pool's lifetime instead of a frame budget. Screenshot: `tests/screens_out_atlas/atelier.png`. (Filled in during 3C: the 3B commit left this placeholder.)
 
 ## Open items / for 3C-3E
 
-1. **3C nodes:** Study in Fire (Drawing choice c) and Umber Well (Bare Canvas notable) are in the data, shown, and locked until 3C.
+1. **3C nodes:** Study in Fire (Drawing choice c) and Umber Well (Bare Canvas notable) are in the data, shown, and locked until 3C. (Done in 3C.)
 2. **Smartbot and Last Light:** the bot fights the waves like any pack, but its runners have no Last Light cells yet; 3E measures it (target: a win rate close to a boss run, shorter time) and the 3x boss-contract pace.
 3. All node numbers are first guesses; 3E checks the specialisers with the bot (zone outcomes only, no build retests).
 4. Contracts: no Atelier-specific contracts; boss contracts go ~3x faster with Last Light.
+
+# Stage 3C: Burning Canvas + Pigment Wells (2026-11-12, Claude)
+
+Two new main natural mechanics and the two Atelier nodes that waited for them. Dan's decisions (2026-11-12): fire speed to be tested; no pause at the boss (data flag); Rot adds a cistern; the Ash Pigment hard to get (4-5 runs of Ash); wells fill from kills + time, 2-3 per zone; then **"yes to defaults"** for everything else (`claude/endgame_phase3c_questions.md`, 26 items).
+
+## What was built
+
+| File | What |
+|---|---|
+| `data/atlas.json` | `mechanics.list`: `burning` (Burning Canvas, fire orange `#ff8a3a`) and `wells` (Pigment Wells, `#4ab8a0`), both main, weight 1. New tuning blocks `mechanics.burning` and `mechanics.wells` (with `_doc`). `pigments.list`: **Ash Pigment** (`burning`, 240 Ash) and **Wells Pigment** (`wells`, a `materials` block: 120 Flakes + 30 Dust + 120 Ash); 4 modifiers each. Atelier: Study in Fire (`natural_force: "burning|wells"`) and Umber Well unlocked (`needs_3c` removed); `pigment_danger` for both. Guild: contracts `cisterns` and `wells_full` (`req.seen`). |
+| `data/loot.json` | New material **Ash** (weight 0: only from the Burning Canvas and ochre chests). |
+| `scripts/core/burning_rules.gd` (new) | Pure rules: the 4-way distance field from the entrance, kill speed-up, base speed, burn damage, cistern count / depth fractions, push-back, what burns, Ash per kill. |
+| `scripts/core/wells_rules.gd` (new) | Pure rules: well count / colours, fill per kill / second, danger per colour, **the mix** (pure / mixed / balanced, draws, legendary and unique chances) and the chest tables (`roll_draw`). |
+| `scripts/world/zone_fire.gd` (new) | The live fire: front, scorched overlay (one pixel per cell, glowing edge, embers), minimap, burn, loot burning, Ash, cisterns (channel, interrupt, push, hold, greyed out). |
+| `scripts/world/zone_wells.gd`, `well_visual.gd` (new) | The live wells: placement, fill, danger on monsters, the easel and the mix; the well drawing (basin, fill ring, label). |
+| `scripts/world/dungeon.gd` | Creates `burn` / `wells` from the mechanics (tuning with Pigment modifiers), ticks them, kill hooks, easel after the boss, cistern / easel interactions, one exit-portal warning, burnt cells on the minimap, Parched rarity, Guild report `cisterns` / `wells_full`, `minimap_marks()`, cleanup. |
+| `scripts/core/atlas_rules.gd` | `natural_mechanic` force `a|b` (seeded pick); `pigment_costs` (several materials), `pigment_cost` = their sum, `cost_text`, `pigment_materials`; `_MECH_MULT` multipliers for the new modifiers; `mark_seen` / `has_seen`; `atlas.seen` in the state and `sanitize`. |
+| `scripts/core/guild_rules.gd` | `req.seen`; stats `cisterns`, `wells_full`. |
+| `scripts/main.gd` | Marks a run's mechanics as seen. |
+| `scripts/entities/enemy.gd`, `scripts/combat/combat.gd` | `extra_status` (a well's ignite / poison) rides on monster hits. |
+| `scripts/ui/hud.gd` | Minimap markers for cisterns (dry = grey), wells and the easel. |
+| `scripts/ui/easel_panel.gd` | Ash next to Flakes and Dust; multi-material costs. |
+| `scripts/core/character_data.gd` | `SAVE_VERSION` 7 -> **8** (`atlas.seen`). |
+| `tests/test_atlas.gd` | `test_phase3c` (rules) and `test_live_burning`, `test_live_wells`; 3B tests that expected the nodes locked now expect them open; save v8. `tests/test_runner.gd`: SAVE_VERSION 8. |
+| `tests/smartbot/sb_endgame.gd`, `sb_controller.gd`, `smartbot.gd` | Bot behaviour for both mechanics, run notes, `--tune=mech.<id>.<key>`. |
+| `tests/smartbot/run_atlas_p3c.ps1`, `p3c_summary.py` (new) | The 3C runner and its summary. |
+
+## The Burning Canvas (as built)
+
+- **The front** is a distance along the floor from the entrance (4-way flood fill over the zone, the arena seal ignored), so it follows corridors and never jumps chambers. It starts after **15 s** and moves at *arena distance / `arena_time`* cells per second (**`arena_time` 250**, from the sweep below), **+0.5% per kill, up to +50%**. `pause_at_boss` (off) can stop it while the boss is awake. It stops when the boss dies (Last Light: the last wave).
+- **Burnt floor:** a scorched tint with a glowing edge and embers; burnt cells show on the minimap. Normal and magic items and gold on the ground burn; rares and better, gems and materials are safe. Standing there deals fire damage of **3% of a reference life (30 x zone level) per second**, less fire resistance (45/s at level 50 before resistance). Monsters are unharmed.
+- **Ash:** a normal kill drops 1 at 25%, an elite 1 (+1 at 25%), the boss 3; kills within 6 cells ahead of the front drop double.
+- **Cisterns:** 2 per zone (+1 in a Rot zone), in the normal chambers nearest 1/3 and 2/3 of the arena distance (the Rot one at 1/2). Interact: a 1 s channel (a hit of 10% of max life or stepping 40 px away cancels it); the front goes back 25% of the arena distance (never behind the entrance) and holds for 8 s. One use each; a dry cistern is grey on the map and minimap.
+- **Ash Pigment (240 Ash, about 4.5 typical runs):** Kindled (fire 5 s sooner; +25% Ash), Roaring (20% faster; triple Ash ahead of it), Parched (1 fewer cistern; +100 rarity), Searing (burn +50%; elites +1 Ash). Danger order: Kindled < Parched < Roaring < Searing.
+
+## The Pigment Wells (as built)
+
+- **2 or 3 wells** (50/50, seeded), each in a different normal chamber spread by depth (never the entrance or the arena), colours crimson / ochre / verdigris without repeats. The Atelier's **Umber Well** adds a 4th, umber well.
+- **Fill:** a kill in the well's chamber (or within 6 cells) adds 4%, an elite or miniboss 15%; standing within 4 cells adds 1% per second. No fill after the boss. (Monsters have no "magic" rank in Path of Dan, so the proposed 6% magic step does not exist.)
+- **Danger** (monsters in the well's chamber, x fill): crimson +25% of their damage as added fire and a 50% ignite chance; ochre +60% armour; verdigris a 60% poison chance. Bonuses are replaced every 0.5 s, never stacked.
+- **The mix:** after the boss an easel stands in the arena. Draws = the colour fills summed and rounded (at least 1 if anything filled) + 1 per 2 Rot. **Balanced** (3 wells: no share over 45%; 2 wells: shares within 15 points): the draws cycle through the colours + a legendary at 25% (+10% per fill over 1, max 60%). **Pure** (a share of 50%+): every draw from that colour. **Mixed** (otherwise): the dominant colour's draws + 1 of the second. Umber's fill = the chance of a unique usable at the zone level.
+- **Tables:** crimson a rare weapon / off-hand with at least one offensive affix (the first at +400 rarity); ochre 120 gold x zone level, 3 crafting materials, 20 Flakes, 5 Dust, 3 Ash; verdigris a rare ring / amulet / belt / charm or a gem (2:1).
+- Leaving without mixing forfeits the chest; the exit portal warns once.
+- **Wells Pigment (120 Flakes + 30 Dust + 120 Ash):** Patient (time fill x2, kills -20%), Deep (fill -25%, +1 draw), Triptych (always 3 wells, kills +10%), Bright (danger +50%, chest items +150 rarity). Danger order: Patient < Deep < Triptych < Bright.
+
+## Hooks
+
+- Natural roll: the four main mechanics at weight 1 (`natural_chance` 0.3 unchanged), so each is about 7.5% of runs; Glazed and The Unfinished each went from 1 in 2 to 1 in 4 of the natural rolls (as intended).
+- **Study in Fire** (Drawing choice c): the natural mechanic is the Burning Canvas or the Wells, 50/50 seeded on the same roll. **Umber Well** (Bare Canvas notable): unlocked.
+- Atelier Pigment nodes apply to the new Pigments (charges, +20% craft cost, danger roll, slots, damage); the -25% choices stay Glazed / Unfinished. The Guild vendor does not sell the new Pigments.
+- **Contracts:** "Douse N cisterns in the Burning Canvas" and "Fill N Pigment Wells" (2-4, rep 1.5, Seals 0.25 per unit, weight 1). They are offered only after the mechanic has been met (`atlas.seen`).
+- Any pair of natural mechanics can share a zone (Double Study / Blooming Varnish); Warden and Heart runs handle them like Glazed / Unfinished. No new Wager bets.
+- Atlas panel and map: the new mechanics in their colours with their one-line descriptions (the panel and map read the mechanic list).
+
+## Save v8
+
+`atlas.seen` lists the zone mechanics the character has met (written when a run starts). Older atlases load with an empty list (sanitize drops unknown ids). v4-v7 saves load (the save tests cover v4 and the v7 Atelier round trip).
+
+## Smartbot
+
+- **Burning Canvas:** with the front within 8 cells the bot stops for loot, leaves packs behind it and heads for the arena; with the front within 14 cells and an unused cistern ahead of the front within 320 px it pumps the cistern (standing still while it fights). Knobs: `--fire_flee`, `--fire_cistern`. Deaths on burnt floor are `burning_canvas`.
+- **Wells:** the bot stands by each revealed, unfilled well it passes for up to 12 s (`--wells_linger`) and fights there; after the boss it mixes at the easel before looting (the run waits for it).
+- Run notes: `burn:ash=..|ahead_ash|cist=used/total|fire_t|burn_t|ahead_pct|caught|burnt_items|burnt_gold|dmg|arena_d|reach_arena|front_end|kills|flee_t|min_gap|speed` and `wells:<colour>=fill+..|full|kind|dom|draws|drops|value|leg|uniq|kill_fill|time_fill|near_t`.
+- `--pigments=burning,wells` (Pigment ids) works through the existing Pigment list; `--mechanic=burning|wells` forces the mechanic; `--tune=mech.burning.arena_time=200` overrides tuning.
+
+## Results
+
+Tests: `atlas_only` **790/0** (+86), `tree_only` **844/0**, full suite **48015/0**. Screenshots: `tests/screens_out_atlas/burning_zone.png` (front, scorched floor, minimap, cistern messages), `wells_well.png` (a full well), `wells_easel.png` (the easel after the boss), updated `easel.png` (Ash and the new Pigments) and `atelier.png` (the 3C nodes unlocked).
+
+**Unchanged checks.** Frozen baseline (`run_baseline.ps1` vs `baseline/d2_v1.csv`, dungeon tiers): **60/60 identical**. D2 Rot cell (ring 3 hex 3,0, Rot 4 + 2 Pigments, typical, seed 900): **21/30, identical run for run** to 3B. No run rolled a new mechanic: that cell uses `--mechanic=none`, which replaces the natural roll, so the new weights cannot reach it.
+
+**Burning Canvas** (`run_atlas_p3c.ps1`, ring 3 hex 3,0, level 50, typical gear, 10 runs per class, seed 900; summary `tests/smartbot/out/p3c/p3c_summary_v1.md`). "Never caught" = runs in which the bot never stood on burnt floor before the boss died. "Time ahead" = share of the burning time spent ahead of the front.
+
+| | Rot 0: wins | clear s | never caught | time ahead | Rot 3: wins | clear s | never caught | time ahead |
+|---|---|---|---|---|---|---|---|---|
+| no mechanic (reference) | 30/30 | 103 | - | - | 26/30 | 114 | - | - |
+| arena_time 140 | 30/30 | 101 | 16/30 | 91% | 24/30 | 106 | 14/30 | 87% |
+| arena_time 170 | 30/30 | 105 | 19/30 | 95% | 25/30 | 113 | 17/30 | 92% |
+| arena_time 205 | 30/30 | 107 | 21/30 | 98% | 26/30 | 118 | 18/30 | 94% |
+| **arena_time 250 (set)** | 30/30 | 108 | **24/30** | 99% | 24/30 | 113 | **22/30** | 96% |
+
+- The fire changed no win rate beyond noise and killed nobody (240 runs, 0 deaths on burnt floor; all Rot 3 losses are mage / ranger deaths to monsters, as without the mechanic). Mean burn damage per run: 2-410 (mage highest, ranger and warrior often under 100).
+- **`arena_time` 250** meets the default target (a typical bot never caught in ~80% of runs: 80% at Rot 0, 73% at Rot 3). With kills the front still runs up to 1.5x faster; it reached the arena at about 115 / 135 / 160 / 190 s for 140 / 170 / 205 / 250.
+- **Ash per run:** 44.5 at Rot 0 and 60.6 at Rot 3 (mean 52.6, about the same at every speed; about 2% of it from kills ahead of the front). Ash Pigment = 4.5 x 52.6 = **240** (about 5.4 runs at Rot 0, 4 at Rot 3); Wells Pigment Ash = half, **120**.
+- Cisterns: 0.1-0.4 used per run (the bot is usually past them when the front comes close).
+
+**Pigment Wells** (same hex, Rot 0, 6 runs per class, seed 900): 18/18 wins. Mean fill crimson 0.67, ochre 0.49, verdigris 0.80; 1.6 full wells per run. Chests: 9 balanced, 9 pure (no mixed); 1.7 draws per run; mean value about 2,700 (gold + item sell values; an ochre draw alone is 6,000 gold at level 50); 6 legendaries in 18 runs (all from balanced chests). Fills were 0 or 1 in 17 of 18 runs: a well in a chamber the bot fights through fills completely from kills.
+
+## Open items / for 3D-3E
+
+1. **The fire is gentle.** Over 240 typical runs the burn never killed anyone; the mean burn damage per run was 2-410 (mage highest). If Dan wants the fire to bite, raise `dot_pct` (e.g. 6-8%) and/or use `arena_time` 205 or 170; the sweep shows the "caught" share for each.
+2. **Wells fill fast.** Wells in chambers the bot fights through reach 100% (fills were 0 or 1 in 17 of 18 runs), so the chest depends on the route more than on feeding one well. 3E could halve `kill_fill` / `elite_fill` so feeding a well is a choice.
+3. The bot rarely uses cisterns (0-0.4 per run): by the time the front is close it is usually past them. Players may use them more; the contract needs 2-4.
+4. Not built (as agreed): Cinder items, the front revealing Pentimento Vaults, Wager bets for the new mechanics, vendor Pigments.
+5. All numbers are first values for 3E (`mechanics.burning`, `mechanics.wells`, Pigment costs and modifiers).

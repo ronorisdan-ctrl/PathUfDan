@@ -240,6 +240,12 @@ func _minimap(lv, p, vs: Vector2) -> void:
 		var ip: Vector2 = origin + it["pos"] / float(lv.T) * mscale
 		if mr.has_point(ip):
 			draw_circle(ip, 3, Color("#ffd060") if it["kind"] == "exit_portal" else Color("#6080ff"))
+	if lv.has_method("minimap_marks"):   # Endgame 3C: cisterns (dry ones grey), wells, the easel
+		for mk in lv.minimap_marks():
+			var kp: Vector2 = origin + mk["pos"] / float(lv.T) * mscale
+			if mr.has_point(kp):
+				draw_circle(kp, 3.5, Color.BLACK)
+				draw_circle(kp, 2.5, mk["color"])
 	# loot filter minimap icons
 	for n in lv.loot:
 		if is_instance_valid(n) and not n.picked and n.visible and n.kind == "item":

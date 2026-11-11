@@ -99,8 +99,7 @@ func refresh() -> void:
 	var ch = Game.ch
 	var pc := AtlasRules.pig_cfg()
 	var mats := []
-	for p in pc.get("list", []):
-		var mid := str(p.get("material", ""))
+	for mid in AtlasRules.pigment_materials():   # Phase 3C: Flakes, Dust and Ash
 		mats.append("%s: %d" % [str(Data.materials.get(mid, {}).get("name", mid)), int(ch.materials.get(mid, 0))])
 	var fx := AtlasRules.atelier_fx(st)
 	info.text = "[color=#8a8494]Each slotted Pigment guarantees its mechanic in the zones it fits, adds one modifier and +%d%% rewards. Entering a zone spends 1 charge; dying there spends %d more. Zones have %d Pigment slot (+1 in ring %d or a Restored region%s).[/color]\n%s   [color=#8a8494]Pigments %d / %d[/color]" % [
@@ -111,11 +110,10 @@ func refresh() -> void:
 	for p in pc.get("list", []):
 		var id := str(p.get("id", ""))
 		var mech := AtlasRules.mechanic_info(id)
-		var mid := str(p.get("material", ""))
-		var price := AtlasRules.pigment_cost(st, id)
-		var r := _row(craft_box, "[color=%s]%s[/color]  [color=#8a8494]%d %s, %d charges, random modifier[/color]" % [str(mech.get("color", "#ffffff")), str(p.get("name", id)), price, str(Data.materials.get(mid, {}).get("name", mid)), int(pc.get("charges", 4)) + int(fx["pigment_charges"])])
+		var cost := AtlasRules.pigment_costs(st, id)
+		var r := _row(craft_box, "[color=%s]%s[/color]  [color=#8a8494]%s, %d charges, random modifier[/color]" % [str(mech.get("color", "#ffffff")), str(p.get("name", id)), AtlasRules.cost_text(cost), int(pc.get("charges", 4)) + int(fx["pigment_charges"])])
 		var b := UIKit.button("Craft", func(): _craft(id))
-		b.disabled = not ch.has_materials({mid: price}) or AtlasRules.pigment_count(st) >= int(pc.get("stock_cap", 12))
+		b.disabled = not ch.has_materials(cost) or AtlasRules.pigment_count(st) >= int(pc.get("stock_cap", 12))
 		r.add_child(b)
 	# slotted
 	var easel: Array = st.get("easel", [])

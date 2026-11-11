@@ -197,6 +197,7 @@ func _ready() -> void:
 	get_tree().quit()
 
 ## Phase D2 sweeps: --tune=rot.4.damage_mult=2.2;warden.2.damage_mult=1.5;bet.frenzy.count=32
+## (Endgame 3C: mech.<mechanic>.<key>, e.g. mech.burning.arena_time=200)
 ## overrides atlas.json numbers in memory for this process (children inherit the arg).
 ## rot.<n>.<key> -> rot.levels[n-1]; warden.<ring>.<key> -> wardens.rings; bet.<id>.<key> -> wager.bets.
 func _apply_tune() -> void:
@@ -221,6 +222,8 @@ func _apply_tune() -> void:
 				for b in cfg["mechanics"]["wager"]["bets"]:
 					if str(b["id"]) == path[1]:
 						tgt = b
+			"mech":   # Endgame 3C: mech.burning.arena_time=200, mech.wells.kill_fill=0.05
+				tgt = cfg["mechanics"].get(path[1], null)
 		if tgt == null:
 			push_error("bad --tune target " + item)
 			continue
@@ -680,7 +683,7 @@ func _one_run(c: int, r: int, run_seed: int, lvl: int) -> Dictionary:
 				boss_hp = 0.0
 				ctrl.loot_mode = true
 				trace("BOSS killed")
-			if t_run - clear_t > 15.0 or not ctrl.loot_left():
+			if t_run - clear_t > 15.0 or (not ctrl.loot_left() and not ctrl.eg.post_pending()):
 				outcome = "boss_killed"
 				break
 		if t_run >= timeout:

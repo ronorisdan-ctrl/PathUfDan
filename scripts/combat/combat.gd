@@ -258,6 +258,9 @@ func enemy_packet(e, mult: float = 1.0) -> Dictionary:
 	var statuses := []
 	if e.on_hit_status != "":
 		statuses.append({"type": e.on_hit_status, "chance": 100.0})
+	if "extra_status" in e:   # Endgame 3C: a Pigment Well's ignite / poison
+		for s in e.extra_status:
+			statuses.append(s)
 	var st: Dictionary = e.def.get("status", {})
 	if not st.is_empty():
 		statuses.append({"type": st["type"], "chance": float(st.get("chance", 0))})

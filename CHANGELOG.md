@@ -1,5 +1,15 @@
 # Changelog
 
+## Endgame Phase 3C: the Burning Canvas and the Pigment Wells (2026-11-12)
+
+- **Burning Canvas** (new zone mechanic): 15 s after you enter, the painting catches fire at the entrance and the fire front follows you through the corridors to the arena. It speeds up a little with every kill and keeps burning during the boss fight. Burnt floor (scorched, shown on the minimap) burns normal and magic items and gold left on the ground, and standing on it burns you (fire resistance helps). Kills just ahead of the front drop **Ash** at double rate. **Cisterns** (2 per zone, 3 with Rot): pump one for a second to push the fire back and hold it for 8 s.
+- **Pigment Wells** (new zone mechanic): 2-3 crimson, ochre or verdigris wells hide in the chambers. Kills near a well and standing by it fill it, but a filling well empowers the monsters around it (crimson: fire damage and burning; ochre: armour; verdigris: poison). After the boss, mix them at the **Pigment Easel**: the ratio picks the chest. Crimson pays weapons with offensive affixes, ochre gold and materials, verdigris jewellery and gems, and a balanced mix a bit of each plus a legendary chance.
+- **New Pigments** at the Easel: the **Ash Pigment** (240 Ash) guarantees the Burning Canvas, and the **Wells Pigment** (120 Glaze Flakes, 30 Pigment Dust and 120 Ash) guarantees the Wells. Each has 4 modifiers. Ash shows next to Flakes and Dust.
+- **Atelier:** *Study in Fire* (natural mechanic always the Burning Canvas or the Wells) and *Umber Well* (a 4th well that pays unique items) are unlocked.
+- Natural rolls now pick from four main mechanics (Glazed Elites, The Unfinished, the Burning Canvas and the Pigment Wells) instead of two.
+- **Commission Board:** "Douse N cisterns" and "Fill N Pigment Wells", offered once you have met the mechanic.
+- Save version 8 (remembers which mechanics you have met); older saves load. Tests: `atlas_only` 790/0, `tree_only` 844/0, full suite 48015/0, smartbot frozen baseline 60/60 identical to `d2_v1.csv`. Details: `docs/ENDGAME_PHASE3.md`.
+
 ## Endgame Phase 3B: the Atelier (2026-11-11)
 
 - **The Atelier replaces the Varnish slots.** It is a board of 36 nodes in six wedges, one for each painting layer: Rot, packs and elites, Vaults and the Collector, Pigments, natural mechanics, and Wardens. Each wedge has 3 small nodes, a choice node (pick 1 of 3), a notable and a rule-changer at the tip. Nodes change zones only, never your character. Most pair a bonus with a cost. Open it from the Atlas (the **Atelier** button) or the Easel.
@@ -10,7 +20,7 @@
 - **Your Varnishes become Guild Seals** (2 each, up to the Seal cap). A one-time message tells you how many. Hearts of Rot no longer drop Varnishes.
 - **Rot in rings 4-6:** when you first reveal ring 4, 5 or 6, one extra Rot source appears there. Nothing changes while you are in rings 1-3.
 - Dev panel: Atelier row (+5 points, take all nodes, respec). Smartbot: `--atelier=` (old `--varnish=` runs still work).
-- Save version 7; v4-v6 saves load. Tests: @@TESTS@@. Details: `docs/ENDGAME_PHASE3.md`.
+- Save version 7; v4-v6 saves load. Tests: `atlas_only` 704/0, `tree_only` 844/0, full suite 48016/0, smartbot frozen baseline 60/60 identical to `d2_v1.csv`. Details: `docs/ENDGAME_PHASE3.md`.
 
 ## Endgame Phase 3A: the Atlas grows to six rings (2026-11-10)
 

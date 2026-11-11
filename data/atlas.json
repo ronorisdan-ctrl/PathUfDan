@@ -49,6 +49,8 @@
     "list": [
       {"id": "glazed", "name": "Glazed Elites", "weight": 1, "color": "#e0c890", "desc": "Elites wear layers of glaze, one per modifier. Each poise break peels the outer layer: the modifier is gone and a Glaze Flake drops."},
       {"id": "unfinished", "name": "The Unfinished", "weight": 1, "color": "#e06a4a", "desc": "Some packs are only sketches: immune until painted with the status colours on their outline (or slowly by any hits). Painted sketches drop loot as one rank higher and Pigment Dust."},
+      {"id": "burning", "name": "Burning Canvas", "weight": 1, "color": "#ff8a3a", "desc": "The painting catches fire at the entrance and the burn chases you to the arena. Burnt floor scorches you and burns common and magic loot and gold; kills just ahead of the front drop Ash. Cisterns push the fire back."},
+      {"id": "wells", "name": "Pigment Wells", "weight": 1, "color": "#4ab8a0", "desc": "Crimson, ochre and verdigris wells hide in the chambers. Kills near a well (and standing by it) fill it, but a filling well strengthens the monsters around it. Mix them at the easel after the boss: the ratio picks the reward chest."},
       {"id": "wager", "name": "The Collector's Wager", "minor": true, "chance": 0.2, "color": "#c89be8", "desc": "A gaunt art collector waits mid-zone and offers 3 bets on your own play. Stake gold at 1x, 2x or 3x; a win pays the stake back with profit plus materials, a loss costs only the stake."},
       {"id": "vault", "name": "Pentimento Vaults", "minor": true, "chance": 0.2, "color": "#8fc4d8", "desc": "Shimmering walls hide painted-over rooms. Damage the wall to scrape it away; its plaque tells you first whether it holds Treasure, a Trap (elite ambush, double loot) or a Riddle (strike the sigils in order)."}
     ],
@@ -136,6 +138,75 @@
       "riddle": {"sigils": 3, "wrong_pack": true, "bonus_rares": 1, "names": [["Crimson", "#d84a3a"], ["Ochre", "#d8a040"], ["Verdigris", "#3fb08a"]]},
       "shard_chance": 0.08,
       "shard_rot_bonus": 0.02
+    },
+    "burning": {
+      "_doc": "Endgame Phase 3C (docs/ENDGAME_PHASE3.md, Stage 3C): the Burning Canvas. The fire front is a distance along the zone's floor from the entrance (4-way flood fill, so it follows the corridors and never jumps chambers). It starts `grace` s after you enter, at speed = (distance from the entrance to the arena) / arena_time cells per second x speed_mult, +kill_speed per kill (zone kills) up to +kill_cap. pause_at_boss (default off): the front stands still while the boss is awake. It stops for good when the boss dies (Last Light: the last wave). Behind the front (burnt floor): items of burn_rarities and gold on the ground burn (rares and better, gems, materials are safe); standing there deals fire damage per second = dot_pct x (ref_life_base + ref_life_per_level x zone level) x dot_mult, reduced by fire resistance, in dot_tick steps. Monsters take none. Ash: a non-elite kill drops 1 at ash_chance, an elite elite_ash (+1 at elite_ash_extra), the boss boss_ash; kills within ahead_cells ahead of the front drop x ahead_mult; all x ash_mult (seeded rounding). Cisterns: `cisterns` (+rot_cisterns at Rot >= 1, at least 1) in normal chambers nearest cistern_at x the arena distance (the Rot one at rot_cistern_at), never in the arena. Interact: a channel of `channel` s (cancelled by a hit of interrupt_pct of max life or by walking away); then the front goes back push_frac x the arena distance (never behind the entrance) and holds still for `hold` s. One use each. Pigment modifiers: grace / ahead_mult / cisterns / elite_ash / rarity add, speed_mult / dot_mult / ash_mult multiply. 3C bot measurements (docs/ENDGAME_PHASE3.md): arena_time 250 = typical bots at ring 3 never caught by the front in 80% (Rot 0) / 73% (Rot 3) of runs; typical Ash per run 45 (Rot 0) / 61 (Rot 3), so the Ash Pigment costs 240 (~4.5 runs) and the Wells Pigment half that.",
+      "grace": 15,
+      "arena_time": 250,
+      "kill_speed": 0.005,
+      "kill_cap": 0.5,
+      "speed_mult": 1.0,
+      "pause_at_boss": false,
+      "dot_pct": 0.03,
+      "ref_life_base": 0,
+      "ref_life_per_level": 30,
+      "dot_mult": 1.0,
+      "dot_tick": 0.5,
+      "burn_rarities": ["common", "uncommon"],
+      "burn_gold": true,
+      "edge_cells": 2,
+      "ash_chance": 0.25,
+      "elite_ash": 1,
+      "elite_ash_extra": 0.25,
+      "boss_ash": 3,
+      "ahead_cells": 6,
+      "ahead_mult": 2,
+      "ash_mult": 1.0,
+      "rarity": 0,
+      "cisterns": 2,
+      "rot_cisterns": 1,
+      "cistern_at": [0.33, 0.67],
+      "rot_cistern_at": 0.5,
+      "channel": 1.0,
+      "interrupt_pct": 0.1,
+      "cistern_reach": 40,
+      "push_frac": 0.25,
+      "hold": 8.0,
+      "colors": {"burnt": "#3a1a0c", "edge": "#ff7a20", "minimap": "#a0502a", "cistern": "#60b0ff", "used": "#6a6a70", "ash": "#9a9088"}
+    },
+    "wells": {
+      "_doc": "Endgame Phase 3C (docs/ENDGAME_PHASE3.md, Stage 3C): Pigment Wells. `count` [2, 3] wells (seeded, 50/50; min_count from a Pigment), each in a different normal chamber spread by depth (never the entrance or the arena), colours seeded from `colours` (no repeats). The Atelier's Umber Well adds a 4th, umber well. Fill 0..1: a kill in the well's chamber or within radius_cells adds kill_fill (elites and minibosses elite_fill) x kill_fill_mult x fill_mult; standing within near_cells adds time_fill per second x time_fill_mult x fill_mult. No fill after the boss dies. Danger: monsters in a well's chamber get its colour's effect x fill x danger_mult: crimson +fire x their damage as added fire and an ignite chance (%), ochre +armour more armour, verdigris a poison chance (%). The mix (the easel in the arena after the boss): draws = the sum of the colour fills (umber excluded), rounded, at least 1 if anything filled, + 1 per rot_draws_per Rot, + draws (Pigment). Shares = fill / total. Balanced: with 3 colour wells no share over balanced_3, with 2 the shares within balanced_2 of each other: draws cycle through the colours, + a legendary at legendary + legendary_per_fill x (total - 1) (max legendary_max). Pure (a share >= pure_share): every draw from that colour. Otherwise mixed: the dominant colour's draws + 1 from the second. Umber: its fill is the chance of a unique usable at the zone level (1.0 = sure). Tables: crimson a rare weapon / off-hand with at least one offensive affix (first draw at +first_rarity rarity); ochre gold_per_level x zone level gold, `materials` random crafting materials, flakes Flakes, dust Dust and ash Ash; verdigris a rare ring / amulet / belt / charm (item_w) or a gem (gem_w). chest_rarity (Pigment) adds rarity to every item. Leaving without mixing forfeits the chest (the exit portal warns once).",
+      "count": [2, 3],
+      "min_count": 0,
+      "colours": [
+        {"id": "crimson", "name": "Crimson", "color": "#d84a3a", "fire": 0.25, "ignite": 50},
+        {"id": "ochre", "name": "Ochre", "color": "#d8a040", "armour": 0.6},
+        {"id": "verdigris", "name": "Verdigris", "color": "#3fb08a", "poison": 60}
+      ],
+      "umber": {"id": "umber", "name": "Umber", "color": "#9a6a40"},
+      "radius_cells": 6,
+      "near_cells": 4,
+      "kill_fill": 0.04,
+      "elite_fill": 0.15,
+      "time_fill": 0.01,
+      "kill_fill_mult": 1.0,
+      "time_fill_mult": 1.0,
+      "fill_mult": 1.0,
+      "danger_mult": 1.0,
+      "draws": 0,
+      "chest_rarity": 0,
+      "rot_draws_per": 2,
+      "pure_share": 0.5,
+      "balanced_3": 0.45,
+      "balanced_2": 0.15,
+      "legendary": 0.25,
+      "legendary_per_fill": 0.1,
+      "legendary_max": 0.6,
+      "crimson": {"slots": ["main_hand", "off_hand"], "first_rarity": 400, "tries": 8,
+        "offensive": ["physical_damage", "added_fire", "added_cold", "added_lightning", "added_physical", "spell_damage", "fire_damage", "cold_damage", "lightning_damage", "melee_damage", "attack_speed", "cast_speed", "crit_chance", "crit_multi", "projectile_damage", "added_spell_fire", "added_spell_cold", "added_spell_lightning", "damage_vs_elite", "minion_damage", "turret_damage", "trap_damage"]},
+      "ochre": {"gold_per_level": 120, "materials": 3, "flakes": 20, "dust": 5, "ash": 3},
+      "verdigris": {"slots": ["ring", "amulet", "belt", "charm"], "item_w": 2, "gem_w": 1},
+      "easel_color": "#e8d8a0"
     }
   },
   "pigments": {
@@ -150,7 +221,9 @@
     "reward": 10,
     "list": [
       {"id": "glazed", "name": "Glazed Pigment", "material": "glaze_flake", "cost": 120},
-      {"id": "unfinished", "name": "Unfinished Pigment", "material": "pigment_dust", "cost": 30}
+      {"id": "unfinished", "name": "Unfinished Pigment", "material": "pigment_dust", "cost": 30},
+      {"id": "burning", "name": "Ash Pigment", "material": "ash", "cost": 240},
+      {"id": "wells", "name": "Wells Pigment", "materials": {"glaze_flake": 120, "pigment_dust": 30, "ash": 120}}
     ],
     "mods": {
       "glazed": [
@@ -164,6 +237,18 @@
         {"id": "crowded_sketch", "name": "Crowded", "desc": "15% more packs are sketches; painted sketches drop +100 rarity.", "pack_chance": 0.15, "painted_rarity": 100},
         {"id": "stubborn_sketch", "name": "Stubborn", "desc": "Raw fill needs 85% of life instead of 60%; filled-in sketches always drop Dust.", "raw_fill": 0.25, "filled_dust_chance": 1.0},
         {"id": "vivid_sketch", "name": "Vivid", "desc": "Sketches deal 20% more damage; a status paints its colour and adds 15% raw fill.", "sketch_damage": 1.2, "status_raw": 0.15}
+      ],
+      "burning": [
+        {"id": "kindled", "name": "Kindled", "desc": "The fire starts 5 s sooner; +25% Ash.", "grace": -5, "ash_mult": 1.25},
+        {"id": "roaring", "name": "Roaring", "desc": "The fire spreads 20% faster; kills just ahead of it drop triple Ash.", "speed_mult": 1.2, "ahead_mult": 1},
+        {"id": "parched", "name": "Parched", "desc": "One fewer cistern (at least 1); +100 item rarity.", "cisterns": -1, "rarity": 100},
+        {"id": "searing", "name": "Searing", "desc": "Burnt floor deals 50% more damage; elites drop +1 Ash.", "dot_mult": 1.5, "elite_ash": 1}
+      ],
+      "wells": [
+        {"id": "patient", "name": "Patient", "desc": "Standing by a well fills it twice as fast; kills fill it 20% less.", "time_fill_mult": 2.0, "kill_fill_mult": 0.8},
+        {"id": "deep", "name": "Deep", "desc": "Wells fill 25% slower; the chest gets +1 draw.", "fill_mult": 0.75, "draws": 1},
+        {"id": "triptych", "name": "Triptych", "desc": "Always 3 wells; kills fill them 10% more.", "min_count": 3, "kill_fill_mult": 1.1},
+        {"id": "bright", "name": "Bright", "desc": "Well danger +50%; the chest's items get +150 rarity.", "danger_mult": 1.5, "chest_rarity": 150}
       ]
     }
   },
@@ -229,7 +314,7 @@
         {"id": "draw_choice", "kind": "choice", "name": "Study", "options": [
           {"id": "a", "name": "Study in Glaze", "bonus": "When a natural mechanic rolls, it is always Glazed Elites.", "fx": {"natural_force": "glazed"}},
           {"id": "b", "name": "Study in Line", "bonus": "When a natural mechanic rolls, it is always The Unfinished.", "fx": {"natural_force": "unfinished"}},
-          {"id": "c", "name": "Study in Fire", "bonus": "When a natural mechanic rolls, it is always the Burning Canvas or the Pigment Wells.", "fx": {"natural_force": "burning"}, "needs_3c": true}
+          {"id": "c", "name": "Study in Fire", "bonus": "When a natural mechanic rolls, it is always the Burning Canvas or the Pigment Wells.", "fx": {"natural_force": "burning|wells"}}
         ]},
         {"id": "draw_notable", "kind": "notable", "name": "Double Study", "bonus": "A zone may roll 2 natural mechanics.", "cost": "Monsters have 10% more life.", "fx": {"natural_rolls": 1, "life_mult": 1.1}},
         {"id": "draw_tip", "kind": "tip", "name": "Blooming Varnish", "bonus": "Natural zone mechanics roll twice as often.", "cost": "Monsters deal 10% more damage.", "fx": {"natural_mult": 2.0, "damage_mult": 1.1}}
@@ -243,7 +328,7 @@
           {"id": "b", "name": "Master's Lesson", "bonus": "Each Warden's first kill gives +1 extra Atelier point.", "fx": {"warden_points": 1}},
           {"id": "c", "name": "Deep Pockets", "bonus": "You can hold up to 12 Ground Shards per layer.", "fx": {"shard_cap": 12}}
         ]},
-        {"id": "bare_notable", "kind": "notable", "name": "Umber Well", "bonus": "The Pigment Wells get a 4th well that fills with unique items.", "fx": {"umber_well": true}, "needs_3c": true},
+        {"id": "bare_notable", "kind": "notable", "name": "Umber Well", "bonus": "The Pigment Wells get a 4th well that fills with unique items.", "fx": {"umber_well": true}},
         {"id": "bare_tip", "kind": "tip", "name": "Last Light", "bonus": "Ordinary zones have no boss: entering the arena wakes the Last Light, three packs led by Lantern-bearers that come in waves. Each Lantern-bearer counts as a boss for contracts.", "cost": "Lantern-bearers are tough and carry 2 extra modifiers.", "fx": {"last_light": true}}
       ]}
     ],
@@ -257,7 +342,7 @@
     "varnish_map": {"thin_varnish": "var_tip", "dense_varnish": "craq_notable", "lacquer_varnish": "craq_tip", "binder_varnish": "under_tip", "bloom_varnish": "draw_tip", "greed_varnish": "pent_tip"},
     "varnish_seals": 2,
     "preview_pool": 4,
-    "pigment_danger": {"glazed": ["crowded_glaze", "thick_glaze", "hardened_glaze", "biting_glaze"], "unfinished": ["crowded_sketch", "two_tone", "stubborn_sketch", "vivid_sketch"]}
+    "pigment_danger": {"glazed": ["crowded_glaze", "thick_glaze", "hardened_glaze", "biting_glaze"], "unfinished": ["crowded_sketch", "two_tone", "stubborn_sketch", "vivid_sketch"], "burning": ["kindled", "parched", "roaring", "searing"], "wells": ["patient", "deep", "triptych", "bright"]}
   },
   "fixative": {
     "_doc": "Endgame 2B. Blacksmith craft 'Apply Fixative': lowers an item's crafting corruption by `reduce` (never below 0). At most `max_uses` per item (item field `fixative`). Refused at 100% (sealed) and on Abyssal-Brand corrupted items. Exempt from the corruption roll. Cost: `flakes` Glaze Flakes + gold_base + gold_per_ilvl x item level.",
@@ -320,7 +405,9 @@
       {"id": "streak", "text": "Complete %d Atlas zones in a row without dying", "stat": "zones", "streak": true, "need": [3, 5], "rep": 4.5, "seals": 0.7, "w": 1},
       {"id": "fast_zone", "text": "Complete %d zones in under 4 minutes", "stat": "zones", "max_time": 240, "need": [2, 3], "rep": 4.5, "seals": 0.7, "w": 1},
       {"id": "two_pigments", "text": "Complete %d zones with 2 Pigments slotted", "stat": "zones", "min_pigments": 2, "need": [1, 2], "rep": 7, "seals": 1.0, "w": 1, "req": {"ring": 3, "clears": 10}},
-      {"id": "rot4", "text": "Complete %d zones at Rot 4 or higher", "stat": "zones", "min_rot": 4, "need": [1, 2], "rep": 8, "seals": 1.2, "w": 1, "req": {"rot": 4}}
+      {"id": "rot4", "text": "Complete %d zones at Rot 4 or higher", "stat": "zones", "min_rot": 4, "need": [1, 2], "rep": 8, "seals": 1.2, "w": 1, "req": {"rot": 4}},
+      {"id": "cisterns", "text": "Douse %d cisterns in the Burning Canvas", "stat": "cisterns", "need": [2, 4], "rep": 1.5, "seals": 0.25, "w": 1, "req": {"seen": "burning"}},
+      {"id": "wells_full", "text": "Fill %d Pigment Wells", "stat": "wells_full", "need": [2, 4], "rep": 1.5, "seals": 0.25, "w": 1, "req": {"seen": "wells"}}
     ],
     "caches": [
       {"id": "weapon", "name": "Armoury Cache", "desc": "3 weapons or off-hands: 2 rares and one with +400 rarity.", "w": 1, "slots": ["main_hand", "off_hand"], "items": 3, "rarity": 400},

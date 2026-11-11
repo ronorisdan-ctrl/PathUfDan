@@ -11,7 +11,7 @@ const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
 const CorruptionEffects = preload("res://scripts/core/corruption_effects.gd")
 const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 
-const SAVE_VERSION := 7   # 2: adds the pets block; 3: stash tabs (stash_extra_tabs); 4: tree_version (full passive refund when the tree changes); 5: atlas (Endgame Phase 1A); 6: atlas radius 6 (Endgame 3A; AtlasRules.sanitize reveals ring 4 next to cleared ring 3 regions); 7: the Atelier replaces the Varnish slots (Endgame 3B; Varnishes -> 2 Guild Seals each, atlas.atelier, atlas.ring_sources)
+const SAVE_VERSION := 8   # 2: adds the pets block; 3: stash tabs (stash_extra_tabs); 4: tree_version (full passive refund when the tree changes); 5: atlas (Endgame Phase 1A); 6: atlas radius 6 (Endgame 3A; AtlasRules.sanitize reveals ring 4 next to cleared ring 3 regions); 7: the Atelier replaces the Varnish slots (Endgame 3B; Varnishes -> 2 Guild Seals each, atlas.atelier, atlas.ring_sources); 8: atlas.seen, the zone mechanics met (Endgame 3C; Guild contracts for the Burning Canvas / Pigment Wells; older saves start with none)
 const BAG_SIZE := 40
 const EQUIP_SLOTS := ["main_hand", "off_hand", "helmet", "chest", "gloves", "boots", "belt", "amulet", "ring1", "ring2", "charm"]
 const HOTBAR_SIZE := 7

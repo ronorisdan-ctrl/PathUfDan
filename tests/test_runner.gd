@@ -3686,7 +3686,7 @@ func test_corruption_crafting() -> void:
 	var olditem := Loot.make_item(it["base"], "rare", 20)
 	olditem.erase("corruption")
 	check(R.get_level(olditem) == 0, "corruption persist: items without the field read as 0%")
-	check(CharDataT.SAVE_VERSION == 7, "corruption persist: SAVE_VERSION is unchanged by corruption (4 since the passive tree Phase 1, 5 since the Atlas, 6 since Atlas radius 6, 7 since the Atelier)")
+	check(CharDataT.SAVE_VERSION == 8, "corruption persist: SAVE_VERSION is unchanged by corruption (4 since the passive tree Phase 1, 5 since the Atlas, 6 since Atlas radius 6, 7 since the Atelier, 8 since atlas.seen)")
 	# equipped item keeps its value
 	var eq := Loot.make_item("rusty_sword" if Data.item_bases.has("rusty_sword") else Data.item_base_list[0]["id"], "rare", 5)
 	R.set_level(eq, 100)

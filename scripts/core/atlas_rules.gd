@@ -198,7 +198,7 @@ static func new_state(seed_value: int) -> Dictionary:
 			rev.append(key(h))
 	var st := {"seed": seed_value, "revealed": rev, "clears": {}, "rot": {}, "restored": [], "spreads": 0, "fester": 0,
 		"pigments": [], "easel": [], "crafted": 0, "atelier": {"taken": [], "choices": {}, "bonus": 0}, "ring_sources": [],
-		"shards": {}, "shard_dry": {}, "summons": {}, "ground": {}, "ground_dry": {}, "warden_kills": {}}
+		"shards": {}, "shard_dry": {}, "summons": {}, "ground": {}, "ground_dry": {}, "warden_kills": {}, "seen": []}
 	seed_rot(st)
 	return st
 
@@ -282,6 +282,12 @@ static func sanitize(raw) -> Dictionary:
 	for k in st["clears"].keys():
 		_reveal_from(st, parse(str(k)))
 	plant_ring_sources(st)   # Phase 3B: saves that revealed ring 4+ before 3B get their source once
+	# Phase 3C (save v8): the zone mechanics this character has met (Guild contracts need them). Older saves: none.
+	var src_seen = raw.get("seen", [])
+	if typeof(src_seen) == TYPE_ARRAY:
+		for m in src_seen:
+			if not mechanic_info(str(m)).is_empty() and not st["seen"].has(str(m)):
+				st["seen"].append(str(m))
 	# Restorers' Guild (Phase 2C); loaded at runtime because guild_rules.gd preloads this script
 	var gs: Dictionary = load("res://scripts/core/guild_rules.gd").sanitize(raw.get("guild", {}))
 	if not gs.is_empty():
@@ -714,6 +720,14 @@ static func natural_mechanic(seed_value: int, h: Vector2i, clears: int, chance_m
 	var rng := _rng(seed_value, h, 300 + clears + roll * 5000)
 	if rng.randf() >= (float(mc.get("natural_chance", 0.3)) + chance_add) * chance_mult:
 		return ""
+	if force.contains("|"):   # Phase 3C Study in Fire: "burning|wells" picks one, seeded on the same roll
+		var opts := []
+		for f in force.split("|", false):
+			var fo := mechanic_info(f)
+			if not fo.is_empty() and not fo.get("minor", false):
+				opts.append(f)
+		if not opts.is_empty():
+			return str(opts[rng.randi_range(0, opts.size() - 1)])
 	var fm := mechanic_info(force)
 	if not fm.is_empty() and not fm.get("minor", false):
 		return force
@@ -968,10 +982,45 @@ static func easel_slots(st: Dictionary) -> int:
 	return clampi(int(pc.get("easel_slots", 2)) + int(atelier_fx(st)["pigment_slots"]), 1, int(pc.get("max_slots", 3)))
 
 ## Material cost of crafting Pigment `id` (Atelier: craft_cost_mult x glazed/unfinished_cost_mult).
+## Phase 3C: a Pigment with a `materials` block (the Wells Pigment) costs several; this is their sum.
 static func pigment_cost(st: Dictionary, id: String) -> int:
+	var n := 0
+	var c := pigment_costs(st, id)
+	for k in c:
+		n += int(c[k])
+	return n
+
+## Phase 3C: {material id: amount} to craft Pigment `id` (`material` + `cost`, or a `materials` block),
+## each x the Atelier's craft_cost_mult x <id>_cost_mult, rounded, at least 1.
+static func pigment_costs(st: Dictionary, id: String) -> Dictionary:
+	var info := pigment_info(id)
 	var fx := atelier_fx(st)
 	var m := float(fx["craft_cost_mult"]) * float(fx.get(id + "_cost_mult", 1.0))
-	return maxi(1, int(round(float(pigment_info(id).get("cost", 1)) * m)))
+	var src: Dictionary = info.get("materials", {}) if typeof(info.get("materials", {})) == TYPE_DICTIONARY else {}
+	if src.is_empty() and str(info.get("material", "")) != "":
+		src = {str(info["material"]): info.get("cost", 1)}
+	var out := {}
+	for k in src:
+		out[str(k)] = maxi(1, int(round(float(src[k]) * m)))
+	return out
+
+## Phase 3C: "120 Glaze Flake, 30 Pigment Dust, 20 Ash".
+static func cost_text(cost: Dictionary) -> String:
+	var parts := []
+	for k in cost:
+		parts.append("%d %s" % [int(cost[k]), str(Data.materials.get(k, {}).get("name", k))])
+	return ", ".join(parts)
+
+## Phase 3C: the materials the Easel shows (every Pigment's, in list order, no repeats).
+static func pigment_materials() -> Array:
+	var out := []
+	for p in pig_cfg().get("list", []):
+		var src: Dictionary = p.get("materials", {}) if typeof(p.get("materials", {})) == TYPE_DICTIONARY else {}
+		var ids: Array = src.keys() if not src.is_empty() else [str(p.get("material", ""))]
+		for k in ids:
+			if str(k) != "" and not out.has(str(k)):
+				out.append(str(k))
+	return out
 
 ## Crafts a Pigment of mechanic `id` into the stock, paying its material from ch. The modifier is
 ## seeded by (atlas seed, craft count). {ok, msg, pigment}
@@ -982,10 +1031,9 @@ static func craft_pigment(st: Dictionary, ch, id: String) -> Dictionary:
 	var pc := pig_cfg()
 	if pigment_count(st) >= int(pc.get("stock_cap", 12)):
 		return {"ok": false, "msg": "The Easel holds at most %d Pigments" % int(pc.get("stock_cap", 12))}
-	var price := pigment_cost(st, id)
-	var cost := {str(info.get("material", "")): price}
+	var cost := pigment_costs(st, id)
 	if not ch.pay(cost):
-		return {"ok": false, "msg": "Needs %d %s" % [price, str(Data.materials.get(info.get("material", ""), {}).get("name", info.get("material", "")))]}
+		return {"ok": false, "msg": "Needs " + cost_text(cost)}
 	return {"ok": true, "msg": "Crafted", "pigment": add_pigment(st, id)}
 
 ## Adds a Pigment (seeded modifier unless mod_id is given) to the stock without a cost (crafting, dev, bots).
@@ -1026,6 +1074,19 @@ static func unslot_pigment(st: Dictionary, i: int) -> bool:
 		return false
 	st["pigments"].append(easel.pop_at(i))
 	return true
+
+## Phase 3C: records the mechanics of a run as met (atlas.seen; the Guild's cistern / well contracts need them).
+static func mark_seen(st: Dictionary, mechs: Array) -> void:
+	if st.is_empty():
+		return
+	if typeof(st.get("seen")) != TYPE_ARRAY:
+		st["seen"] = []
+	for m in mechs:
+		if not mechanic_info(str(m)).is_empty() and not st["seen"].has(str(m)):
+			st["seen"].append(str(m))
+
+static func has_seen(st: Dictionary, mech: String) -> bool:
+	return typeof(st.get("seen")) == TYPE_ARRAY and st["seen"].has(mech)
 
 ## The slotted Pigments a run of hex h uses (the first pigment_slots of the Easel).
 static func run_pigments(st: Dictionary, h: Vector2i) -> Array:
@@ -1084,7 +1145,8 @@ static func spend_pigments(st: Dictionary, uids: Array, n: int = 1) -> Array:
 	st["easel"] = keep
 	return gone
 
-const _MECH_MULT := ["elite_chance_mult", "fill_fraction", "elite_damage", "sketch_damage"]
+const _MECH_MULT := ["elite_chance_mult", "fill_fraction", "elite_damage", "sketch_damage",
+	"speed_mult", "dot_mult", "ash_mult", "kill_fill_mult", "time_fill_mult", "fill_mult", "danger_mult"]   # Phase 3C
 
 ## The mechanic's tuning block with Pigment modifiers applied (multipliers for _MECH_MULT keys,
 ## otherwise added). Extra keys a modifier introduces start from 0 (or 1 for multipliers).
