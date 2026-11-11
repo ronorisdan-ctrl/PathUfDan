@@ -34,13 +34,14 @@ static func bet_ok(b: Dictionary, mechs: Array, elites_left: int, monsters_left:
 		return false
 	return true
 
-## `n` distinct bet ids (weighted, without repeats) drawn with rng.
-static func offers(rng: RandomNumberGenerator, mechs: Array, elites_left: int, n: int = -1, monsters_left: int = -1) -> Array:
+## `n` distinct bet ids (weighted, without repeats) drawn with rng. `exclude`: bet ids not offered
+## (Phase 3B: the boss bets in a Last Light zone).
+static func offers(rng: RandomNumberGenerator, mechs: Array, elites_left: int, n: int = -1, monsters_left: int = -1, exclude: Array = []) -> Array:
 	if n < 0:
 		n = int(wcfg().get("offers", 3))
 	var pool := []
 	for b in bets():
-		if bet_ok(b, mechs, elites_left, monsters_left):
+		if bet_ok(b, mechs, elites_left, monsters_left) and not exclude.has(str(b.get("id", ""))):
 			pool.append(b)
 	var out := []
 	while out.size() < n and not pool.is_empty():
@@ -76,10 +77,14 @@ static func text(id: String, lim: Dictionary) -> String:
 	s = s.replace("{hits}", str(int(lim.get("hits", 0))))
 	return s
 
-static func mults() -> Array:
+## The stake multipliers on offer; max_mult (the Atelier's High Stakes, 4) adds every step up to it.
+static func mults(max_mult: int = 0) -> Array:
 	var out := []
 	for m in wcfg().get("mults", [1, 2, 3]):
 		out.append(int(m))
+	var top: int = out.max() if not out.is_empty() else 1
+	for m in range(top + 1, max_mult + 1):
+		out.append(m)
 	return out
 
 ## Gold staked at multiplier `mult` in a zone of this level.
@@ -161,12 +166,14 @@ static func shard_chance(rot: int) -> float:
 	return clampf(float(v.get("shard_chance", 0.08)) + float(v.get("shard_rot_bonus", 0.02)) * maxi(0, rot), 0.0, 1.0)
 
 ## The cache of an opened vault: {rares, rarity, gems, materials, gold, legendary_chance}.
-## A solved riddle adds riddle.bonus_rares.
-static func cache(level: int, rot: int, kind: String) -> Dictionary:
+## A solved riddle adds riddle.bonus_rares; treasure_extra: the Atelier's Richer Caches.
+static func cache(level: int, rot: int, kind: String, treasure_extra: int = 0) -> Dictionary:
 	var c: Dictionary = vcfg().get("cache", {})
 	var rares := int(c.get("rares", 2)) + int(c.get("rares_per_2_rot", 1)) * int(maxi(0, rot) / 2)
 	if kind == "riddle":
 		rares += int(vcfg().get("riddle", {}).get("bonus_rares", 1))
+	if kind == "treasure":
+		rares += maxi(0, treasure_extra)
 	return {"rares": rares, "rarity": float(c.get("rarity", 300)), "gems": int(c.get("gems", 1)),
 		"materials": int(c.get("materials", 3)), "gold": int(c.get("gold_per_level", 15)) * maxi(1, level),
 		"legendary_chance": float(c.get("legendary_chance", 0.08))}

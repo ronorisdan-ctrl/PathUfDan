@@ -1,15 +1,17 @@
 extends "res://scripts/ui/base_panel.gd"
-## The Easel (Endgame Phase 1E): craft Pigments from Glaze Flakes / Pigment Dust, slot them for the
-## next Atlas runs, and slot Varnishes (rule-changers dropped by Hearts of Rot). Opened from the Atlas.
+## The Easel (Endgame Phase 1E): craft Pigments from Glaze Flakes / Pigment Dust and slot them for
+## the next Atlas runs. Opened from the Atlas. Phase 3B: the Varnish slots are gone; the right column
+## shows the Atelier (the board that replaced them) and opens it.
 
 const Chrome = preload("res://scripts/ui/components/station_chrome.gd")
 const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
+const AtelierRules = preload("res://scripts/core/atelier_rules.gd")
 
 var info: RichTextLabel
 var craft_box: VBoxContainer
 var easel_box: VBoxContainer
 var stock_box: VBoxContainer
-var varnish_box: VBoxContainer
+var atelier_box: VBoxContainer
 var last_msg := ""
 
 func _init() -> void:
@@ -40,11 +42,11 @@ func _init() -> void:
 	var right := VBoxContainer.new()
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(right)
-	right.add_child(Chrome.caption("Varnish"))
+	right.add_child(Chrome.caption("The Atelier"))
 	var sc2 := Chrome.reading_scroll(right, 360)
-	varnish_box = VBoxContainer.new()
-	varnish_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	sc2.add_child(varnish_box)
+	atelier_box = VBoxContainer.new()
+	atelier_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc2.add_child(atelier_box)
 	var hb := HBoxContainer.new()
 	hb.add_child(UIKit.button("Back to the Atlas", func(): ui.toggle("atlas")))
 	body.add_child(hb)
@@ -88,7 +90,7 @@ func _craft(id: String) -> void:
 		_act(false, str(res.get("msg", "")))
 
 func refresh() -> void:
-	for b in [craft_box, easel_box, stock_box, varnish_box]:
+	for b in [craft_box, easel_box, stock_box, atelier_box]:
 		_clear(b)
 	var st := state()
 	if st.is_empty():
@@ -100,17 +102,20 @@ func refresh() -> void:
 	for p in pc.get("list", []):
 		var mid := str(p.get("material", ""))
 		mats.append("%s: %d" % [str(Data.materials.get(mid, {}).get("name", mid)), int(ch.materials.get(mid, 0))])
-	info.text = "[color=#8a8494]Each slotted Pigment guarantees its mechanic in the zones it fits, adds one modifier and +%d%% rewards. Entering a zone spends 1 charge; dying there spends %d more. Zones have %d Pigment slot (%d in ring %d or a Restored region).[/color]\n%s   [color=#8a8494]Pigments %d / %d[/color]" % [
-		int(pc.get("reward", 10)), int(pc.get("death_charges", 1)), int(pc.get("slots", 1)), int(pc.get("max_slots", 2)), int(pc.get("extra_slot_ring", 3)),
+	var fx := AtlasRules.atelier_fx(st)
+	info.text = "[color=#8a8494]Each slotted Pigment guarantees its mechanic in the zones it fits, adds one modifier and +%d%% rewards. Entering a zone spends 1 charge; dying there spends %d more. Zones have %d Pigment slot (+1 in ring %d or a Restored region%s).[/color]\n%s   [color=#8a8494]Pigments %d / %d[/color]" % [
+		int(float(pc.get("reward", 10)) + float(fx["pigment_reward"])), 0 if fx["death_no_charge"] else int(pc.get("death_charges", 1)), int(pc.get("slots", 1)) + int(fx["pigment_slots"]), int(pc.get("extra_slot_ring", 3)),
+		"; at most %d with Binding Varnish" % int(fx["pigment_slots_max"]) if int(fx["pigment_slots_max"]) < 99 else "",
 		"   ".join(mats), AtlasRules.pigment_count(st), int(pc.get("stock_cap", 12))]
 	# craft
 	for p in pc.get("list", []):
 		var id := str(p.get("id", ""))
 		var mech := AtlasRules.mechanic_info(id)
 		var mid := str(p.get("material", ""))
-		var r := _row(craft_box, "[color=%s]%s[/color]  [color=#8a8494]%d %s, %d charges, random modifier[/color]" % [str(mech.get("color", "#ffffff")), str(p.get("name", id)), int(p.get("cost", 1)), str(Data.materials.get(mid, {}).get("name", mid)), int(pc.get("charges", 4)) + int(AtlasRules.varnish_fx(st)["pigment_charges"])])
+		var price := AtlasRules.pigment_cost(st, id)
+		var r := _row(craft_box, "[color=%s]%s[/color]  [color=#8a8494]%d %s, %d charges, random modifier[/color]" % [str(mech.get("color", "#ffffff")), str(p.get("name", id)), price, str(Data.materials.get(mid, {}).get("name", mid)), int(pc.get("charges", 4)) + int(fx["pigment_charges"])])
 		var b := UIKit.button("Craft", func(): _craft(id))
-		b.disabled = not ch.has_materials({mid: int(p.get("cost", 1))}) or AtlasRules.pigment_count(st) >= int(pc.get("stock_cap", 12))
+		b.disabled = not ch.has_materials({mid: price}) or AtlasRules.pigment_count(st) >= int(pc.get("stock_cap", 12))
 		r.add_child(b)
 	# slotted
 	var easel: Array = st.get("easel", [])
@@ -130,24 +135,14 @@ func refresh() -> void:
 		var r := _row(stock_box, "%s  [color=#8a8494]%s[/color]" % [AtlasRules.pigment_label(p), str(AtlasRules.pigment_mod(str(p["id"]), str(p["mod"])).get("desc", ""))])
 		var idx := i
 		var b := UIKit.button("Slot", func(): _act(AtlasRules.slot_pigment(state(), idx), ""))
-		b.disabled = easel.size() >= int(pc.get("max_slots", 2))
+		b.disabled = easel.size() >= AtlasRules.easel_slots(st)
 		r.add_child(b)
-	# varnish
-	var slots: Array = st.get("varnish_slots", [])
-	var nslots := AtlasRules.varnish_slot_count(st)
-	_row(varnish_box, "[color=#8a8494]Varnishes drop from Hearts of Rot (always on Harvest, sometimes on Restore). Slotted ones stay until you unslot them. Slots: %d of %d used (+1 per ring fully cleared, up to %d).[/color]" % [slots.size(), nslots, int(AtlasRules.varn_cfg().get("max_slots", 3))])
-	var owned: Dictionary = st.get("varnish", {})
-	if owned.is_empty():
-		_row(varnish_box, "[color=#8a8494]You own no Varnish yet.[/color]")
-	for v in AtlasRules.varn_cfg().get("list", []):
-		var id := str(v.get("id", ""))
-		if int(owned.get(id, 0)) <= 0:
-			continue
-		var on: bool = slots.has(id)
-		var r := _row(varnish_box, "[color=%s]%s[/color] x%d%s\n[color=#8a8494]%s[/color]" % ["#e8d8a0" if on else "#c8b890", str(v.get("name", id)), int(owned[id]), "  [color=#80e080](slotted)[/color]" if on else "", str(v.get("desc", ""))])
-		if on:
-			r.add_child(UIKit.button("Unslot", func(): _act(AtlasRules.unslot_varnish(state(), id), "")))
-		else:
-			var b := UIKit.button("Slot", func(): _act(AtlasRules.slot_varnish(state(), id), ""))
-			b.disabled = slots.size() >= nslots
-			r.add_child(b)
+	# the Atelier (Phase 3B: replaced the Varnish slots)
+	_row(atelier_box, "[color=#8a8494]The Varnish slots are gone. The Atelier is a board of zone rules: earn points by clearing ring 2+ regions for the first time and by defeating each Layer Warden, then spend them on nodes. Respec is free.[/color]")
+	_row(atelier_box, "[color=#e8d8a0]%s[/color]   [color=#80e080]%d free[/color]" % [AtelierRules.summary_text(st), AtelierRules.points_free(st)])
+	var names := []
+	for id in AtelierRules.taken(st):
+		names.append(str(AtlasRules.atelier_node(str(id)).get("name", id)))
+	_row(atelier_box, "[color=#8a8494]Taken:[/color] %s" % (", ".join(names) if not names.is_empty() else "none yet"))
+	var ob := _row(atelier_box, "")
+	ob.add_child(UIKit.button("Open the Atelier", func(): ui.toggle("atelier")))

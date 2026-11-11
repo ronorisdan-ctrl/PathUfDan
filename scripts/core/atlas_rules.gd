@@ -170,10 +170,11 @@ static func layout_seed(seed_value: int, h: Vector2i, clears: int) -> int:
 	return maxi(1, _rng(seed_value, h, 100 + clears).randi())
 
 ## Base modifiers for the n-th run of a hex, drawn from dungeon_mods.json.
-static func run_mods(seed_value: int, h: Vector2i, clears: int, d: Dictionary) -> Array:
+## extra: more modifiers (the Atelier's base_mods); the first ones match the roll without it.
+static func run_mods(seed_value: int, h: Vector2i, clears: int, d: Dictionary, extra: int = 0) -> Array:
 	var mc: Array = d.get("mod_count", [0, 0])
 	var rng := _rng(seed_value, h, 200 + clears)
-	var n := rng.randi_range(int(mc[0]), int(mc[1]))
+	var n := rng.randi_range(int(mc[0]), int(mc[1])) + maxi(0, extra)
 	var ids := []
 	for m in Data.dungeon_mod_list:
 		ids.append(m["id"])
@@ -196,7 +197,7 @@ static func new_state(seed_value: int) -> Dictionary:
 		if ring_of(h) == 1:
 			rev.append(key(h))
 	var st := {"seed": seed_value, "revealed": rev, "clears": {}, "rot": {}, "restored": [], "spreads": 0, "fester": 0,
-		"pigments": [], "easel": [], "crafted": 0, "varnish": {}, "varnish_slots": [],
+		"pigments": [], "easel": [], "crafted": 0, "atelier": {"taken": [], "choices": {}, "bonus": 0}, "ring_sources": [],
 		"shards": {}, "shard_dry": {}, "summons": {}, "ground": {}, "ground_dry": {}, "warden_kills": {}}
 	seed_rot(st)
 	return st
@@ -268,25 +269,69 @@ static func sanitize(raw) -> Dictionary:
 			elif st["pigments"].size() + st["easel"].size() < int(pc.get("stock_cap", 12)) + int(pc.get("max_slots", 2)):
 				st["pigments"].append(cp)
 			st["crafted"] = maxi(int(st["crafted"]), int(cp["uid"]) + 1)
-	var src_v = raw.get("varnish", {})
-	if typeof(src_v) == TYPE_DICTIONARY:
-		for id in src_v:
-			if not varnish_info(str(id)).is_empty() and int(src_v[id]) > 0:
-				st["varnish"][str(id)] = mini(99, int(src_v[id]))
-	var src_vs = raw.get("varnish_slots", [])
-	if typeof(src_vs) == TYPE_ARRAY:
-		for id in src_vs:
-			slot_varnish(st, str(id))
 	_sanitize_wardens(st, raw)   # Layer Wardens (Phase 2A)
+	# Phase 3B: ring 4-6 Rot sources already planted (never twice)
+	var src_rs = raw.get("ring_sources", [])
+	if typeof(src_rs) == TYPE_ARRAY:
+		for r in src_rs:
+			var ri := int(r) if (r is int or r is float or str(r).is_valid_int()) else 0
+			if ri > int(rot_cfg().get("reach_ring", 3)) and ri <= radius() and not st["ring_sources"].has(ri):
+				st["ring_sources"].append(ri)
 	# Phase 3A (save v6): the atlas grew from radius 3 to 6. Every cleared hex reveals what its clear
 	# would reveal now, so cleared ring 3 regions open their ring 4 neighbours on load.
 	for k in st["clears"].keys():
 		_reveal_from(st, parse(str(k)))
+	plant_ring_sources(st)   # Phase 3B: saves that revealed ring 4+ before 3B get their source once
 	# Restorers' Guild (Phase 2C); loaded at runtime because guild_rules.gd preloads this script
 	var gs: Dictionary = load("res://scripts/core/guild_rules.gd").sanitize(raw.get("guild", {}))
 	if not gs.is_empty():
 		st["guild"] = gs
+	# The Atelier (Phase 3B). Save v7: Varnishes (owned and slotted) become varnish_seals Guild Seals
+	# each; atlas.varnish_converted keeps the count for a one-time message.
+	_migrate_varnish(st, raw)
+	st["atelier"] = _clean_atelier(raw.get("atelier", {}))
+	load("res://scripts/core/atelier_rules.gd").fix(st)   # path and budget (runtime load: it preloads this script)
 	return st
+
+## Save v7: each owned Varnish (slotted ones are owned too) becomes varnish_seals Guild Seals, up to
+## the Seal cap. The number converted and the Seals given are kept in atlas.varnish_converted
+## {varnish, seals} until the player has seen the message (ack_varnish_message).
+static func _migrate_varnish(st: Dictionary, raw: Dictionary) -> void:
+	var conv = raw.get("varnish_converted", {})
+	if typeof(conv) == TYPE_DICTIONARY and not conv.is_empty():
+		st["varnish_converted"] = {"varnish": maxi(0, int(conv.get("varnish", 0))), "seals": maxi(0, int(conv.get("seals", 0)))}
+	var src_v = raw.get("varnish", {})
+	if typeof(src_v) != TYPE_DICTIONARY:
+		return
+	var vmap: Dictionary = atelier_cfg().get("varnish_map", {})
+	var n := 0
+	for id in src_v:
+		if vmap.has(str(id)):
+			n += clampi(int(src_v[id]), 0, 99)
+	if n <= 0:
+		return
+	var gr = load("res://scripts/core/guild_rules.gd")
+	var g: Dictionary = st["guild"] if typeof(st.get("guild")) == TYPE_DICTIONARY and not st["guild"].is_empty() else gr.new_guild()
+	var cap := int(gr.cfg().get("seal_cap", 99))
+	var before := int(g.get("seals", 0))
+	g["seals"] = mini(cap, before + n * int(atelier_cfg().get("varnish_seals", 2)))
+	st["guild"] = g
+	var prev: Dictionary = st.get("varnish_converted", {"varnish": 0, "seals": 0})
+	st["varnish_converted"] = {"varnish": int(prev.get("varnish", 0)) + n, "seals": int(prev.get("seals", 0)) + int(g["seals"]) - before}
+
+## The one-time Varnish conversion message ("" when there is none); ack_varnish_message clears it.
+static func varnish_message(st: Dictionary) -> String:
+	var c: Dictionary = st.get("varnish_converted", {})
+	if c.is_empty() or int(c.get("varnish", 0)) <= 0:
+		return ""
+	var t := "The Varnish slots are gone: the Atelier replaces them. Your %d Varnish%s became %d Guild Seal%s." % [
+		int(c["varnish"]), "" if int(c["varnish"]) == 1 else "es", int(c.get("seals", 0)), "" if int(c.get("seals", 0)) == 1 else "s"]
+	if int(c.get("seals", 0)) < int(c["varnish"]) * int(atelier_cfg().get("varnish_seals", 2)):
+		t += " (The Seal cap kept the rest.)"
+	return t
+
+static func ack_varnish_message(st: Dictionary) -> void:
+	st.erase("varnish_converted")
 
 static func is_revealed(st: Dictionary, h: Vector2i) -> bool:
 	return st.get("revealed", []).has(key(h))
@@ -314,6 +359,8 @@ static func _reveal_from(st: Dictionary, h: Vector2i) -> Array:
 		if ring_of(n) >= 1 and in_atlas(n) and not is_revealed(st, n):
 			st["revealed"].append(key(n))
 			fresh.append(key(n))
+	if not fresh.is_empty():
+		plant_ring_sources(st)
 	return fresh
 
 ## Counts for the UI and tests: {revealed, cleared, total, rings: {ring: [cleared, total]}}.
@@ -383,6 +430,33 @@ static func rot_level(n: int) -> Dictionary:
 static func _score(seed_value: int, h: Vector2i, draw: int) -> float:
 	return _rng(seed_value, h, 1000 + draw).randf()
 
+## Phase 3B (Dan, 2026-11-11): when a ring beyond reach_ring (4-6) is first revealed it gets
+## ring_sources extra Rot source(s) at source_level, seeded by (atlas seed, ring). Recorded in
+## atlas.ring_sources so a ring is never planted twice. Nothing happens while only rings <= reach_ring
+## are revealed. Returns the keys planted.
+static func plant_ring_sources(st: Dictionary) -> Array:
+	var out := []
+	var rc := rot_cfg()
+	if not st.has("ring_sources"):
+		st["ring_sources"] = []
+	if not st.has("rot") or typeof(st["rot"]) != TYPE_DICTIONARY:
+		st["rot"] = {}
+	var open := rings_open(st)
+	var sd := int(st.get("seed", 1))
+	for rg in range(int(rc.get("reach_ring", 3)) + 1, mini(open, radius()) + 1):
+		if st["ring_sources"].has(rg):
+			continue
+		st["ring_sources"].append(rg)
+		var cands := []
+		for h in within(Vector2i.ZERO, rg):
+			if ring_of(h) == rg and _rot_eligible(st, h) and rot_of(st, h) == 0:
+				cands.append(h)
+		cands.sort_custom(func(a, b): return _score(sd + rg * 7919, a, 7000 + rg) < _score(sd + rg * 7919, b, 7000 + rg))
+		for h in cands.slice(0, int(rc.get("ring_sources", 1))):
+			st["rot"][key(h)] = int(rc.get("source_level", 1))
+			out.append(key(h))
+	return out
+
 ## Plants the seeded Rot sources of a new atlas (rings >= min_ring, lowest scores).
 static func seed_rot(st: Dictionary) -> Array:
 	var rc := rot_cfg()
@@ -422,14 +496,17 @@ static func spread_candidates(st: Dictionary) -> Array:
 	return out
 
 static func fronts_next(st: Dictionary) -> int:
-	return maxi(1, int(rot_cfg().get("fronts", 2)) + int(varnish_fx(st)["fronts"])) + int(st.get("fester", 0))
+	return maxi(1, int(rot_cfg().get("fronts", 2)) + int(atelier_fx(st)["fronts"])) + int(st.get("fester", 0))
 
 ## One spread step (call once per completed zone). Returns the keys raised, in order.
-static func spread(st: Dictionary) -> Array:
+## `from` = the hex just completed: with the Atelier's spread_local, a front only raises revealed
+## hexes that are `from` or next to it; with none of those, any revealed hex (the front isn't lost).
+static func spread(st: Dictionary, from: Vector2i = Vector2i(9999, 9999)) -> Array:
 	if not st.has("rot"):
 		st["rot"] = {}
 	var sd := int(st["seed"])
 	var fronts := fronts_next(st)
+	var local: bool = atelier_fx(st)["spread_local"] and in_atlas(from)
 	var draw := int(st.get("spreads", 0))
 	st["fester"] = 0
 	st["spreads"] = draw + 1
@@ -438,6 +515,8 @@ static func spread(st: Dictionary) -> Array:
 		if rot_total(st) >= rot_cap(st):
 			break
 		var cands := spread_candidates(st)
+		if local:
+			cands = _local_candidates(st, cands, from)
 		if cands.is_empty():
 			break
 		var best: Vector2i = cands[0]
@@ -451,19 +530,36 @@ static func spread(st: Dictionary) -> Array:
 		out.append(key(best))
 	return out
 
+## Atelier spread_local: the candidates limited to revealed hexes at or next to `from`, else to
+## revealed hexes.
+static func _local_candidates(st: Dictionary, cands: Array, from: Vector2i) -> Array:
+	var near := []
+	var rev := []
+	for h in cands:
+		if not is_revealed(st, h):
+			continue
+		rev.append(h)
+		if h == from or neighbours(from).has(h):
+			near.append(h)
+	return near if not near.is_empty() else rev
+
 ## What the next completion will spread to, from the current state (shown on the map).
-## Restoring or harvesting the zone you finish can still change it.
-static func forecast(st: Dictionary) -> Array:
+## Restoring or harvesting the zone you finish can still change it. `from` = the hex you would
+## complete (only matters with the Atelier's spread_local; forecast_depends_on_hex says so).
+static func forecast(st: Dictionary, from: Vector2i = Vector2i(9999, 9999)) -> Array:
 	if st.is_empty():
 		return []
-	return spread(st.duplicate(true))
+	return spread(st.duplicate(true), from)
+
+static func forecast_depends_on_hex(st: Dictionary) -> bool:
+	return bool(atelier_fx(st)["spread_local"])
 
 ## A finished run: reveal (complete) then one Rot spread. {revealed: [keys], spread: [keys]}
 static func complete_run(st: Dictionary, h: Vector2i) -> Dictionary:
 	if not can_enter(st, h):
 		return {"revealed": [], "spread": []}
 	var rev := complete(st, h)
-	return {"revealed": rev, "spread": spread(st)}
+	return {"revealed": rev, "spread": spread(st, h)}
 
 ## Death in a zone: the hex gains death_rot (not on the safety ring or a Restored hex; the
 ## spread cap does not apply). Returns the hex's new Rot, or -1 when nothing changed.
@@ -471,34 +567,50 @@ static func add_death_rot(st: Dictionary, h: Vector2i) -> int:
 	if not _rot_eligible(st, h):
 		return -1
 	var rc := rot_cfg()
-	var n := mini(int(rc.get("max", 5)), rot_of(st, h) + int(rc.get("death_rot", 1)) + int(varnish_fx(st)["death_rot"]))
+	var fx := atelier_fx(st)
+	var extra := int(fx["death_rot"]) + (int(fx["death_rot_on_rot"]) if rot_of(st, h) >= 1 else 0)
+	var n := mini(int(rc.get("max", 5)), rot_of(st, h) + int(rc.get("death_rot", 1)) + extra)
 	if n == rot_of(st, h):
 		return -1
 	st["rot"][key(h)] = n
 	return n
 
-## Cleanse: the hex drops to Rot 0 and becomes Restored (a permanent firebreak).
-static func restore(st: Dictionary, h: Vector2i) -> void:
+## Cleanse: the hex drops to Rot 0 and becomes Restored (a permanent firebreak). With the Atelier's
+## restore_neighbours, each neighbour also loses that much Rot. Returns the neighbour keys lowered.
+static func restore(st: Dictionary, h: Vector2i) -> Array:
 	st.get("rot", {}).erase(key(h))
 	if not st["restored"].has(key(h)):
 		st["restored"].append(key(h))
+	var out := []
+	var nr := int(atelier_fx(st)["restore_neighbours"])
+	if nr > 0:
+		for n in neighbours(h):
+			var r := rot_of(st, n)
+			if r <= 0:
+				continue
+			if r - nr <= 0:
+				st["rot"].erase(key(n))
+			else:
+				st["rot"][key(n)] = r - nr
+			out.append(key(n))
+	return out
 
 ## Fester: the hex keeps its Rot and the next spread gets extra fronts.
 static func fester(st: Dictionary, _h: Vector2i) -> void:
 	st["fester"] = int(st.get("fester", 0)) + int(rot_cfg().get("harvest", {}).get("extra_front", 1))
 
-## heart_at: the Rot level a Heart appears at (-1 = the data's; heart_at_for(st) adds Varnish).
+## heart_at: the Rot level a Heart appears at (-1 = the data's; heart_at_for(st) adds the Atelier).
 static func is_heart(rot: int, heart_at: int = -1) -> bool:
 	return rot >= (heart_at if heart_at > 0 else int(rot_cfg().get("heart_at", 3)))
 
 static func heart_at_for(st: Dictionary) -> int:
-	return int(rot_cfg().get("heart_at", 3)) + int(varnish_fx(st)["heart_at"])
+	return int(rot_cfg().get("heart_at", 3)) + int(atelier_fx(st)["heart_at"])
 
 ## Scales an Atlas zone def for Rot n (returns a copy). Keys read by dungeon.gd:
 ## rot, rot_density, rot_reward, heart, heart_mutations.
 static func apply_rot(d: Dictionary, rot: int, seed_value: int, h: Vector2i, st: Dictionary = {}) -> Dictionary:
 	var out := d.duplicate(true)
-	var fx := varnish_fx(st)
+	var fx := atelier_fx(st)
 	out["rot"] = rot
 	var lv := rot_level(rot)
 	if lv.is_empty():
@@ -506,7 +618,7 @@ static func apply_rot(d: Dictionary, rot: int, seed_value: int, h: Vector2i, st:
 	out["life_mult"] = float(out.get("life_mult", 1.0)) * float(lv.get("life_mult", 1.0))
 	out["damage_mult"] = float(out.get("damage_mult", 1.0)) * float(lv.get("damage_mult", 1.0))
 	out["rot_density"] = float(lv.get("density", 1.0))
-	out["rot_reward"] = float(lv.get("reward", 0)) * float(fx["rot_reward_mult"])
+	out["rot_reward"] = float(lv.get("reward", 0)) * rot_reward_mult(st)
 	out["rot_heal"] = float(lv.get("heal", 1.0))             # Phase 1E: the Rot saps life recovery
 	out["rot_attack_speed"] = float(lv.get("attack_speed", 1.0))
 	out["rot_move_speed"] = float(lv.get("move_speed", 1.0))   # Phase D2: levers that reach kiting builds
@@ -521,6 +633,7 @@ static func apply_rot(d: Dictionary, rot: int, seed_value: int, h: Vector2i, st:
 		for m in heart_mutations(seed_value, h, str(out.get("boss", "")), int(lv.get("mutations", 1))):
 			ms.append(str(m.get("id", "")))
 		out["heart_mutations"] = ms
+		out["heart_life"] = float(fx["heart_life"])   # Atelier (Phase 3B): x the Heart's life
 	return out
 
 ## The first n rot_mutations of a boss in this hex's seeded order (so Rot 4 keeps Rot 3's).
@@ -591,14 +704,19 @@ static func mechanic_info(id: String) -> Dictionary:
 
 ## The natural mechanic of the n-th run of a hex ("" = none): rolls natural_chance, then a weighted
 ## pick, from (seed, hex, clear count), so the Atlas panel can show the next run's mechanic.
-static func natural_mechanic(seed_value: int, h: Vector2i, clears: int, chance_mult: float = 1.0) -> String:
+## Atelier (Phase 3B): chance_add is added to natural_chance before chance_mult; force (a non-minor
+## mechanic id) replaces the pick; roll > 0 is an extra roll on its own seed (Double Study).
+static func natural_mechanic(seed_value: int, h: Vector2i, clears: int, chance_mult: float = 1.0, chance_add: float = 0.0, force: String = "", roll: int = 0) -> String:
 	var mc := mech_cfg()
 	var lst: Array = mc.get("list", [])
 	if lst.is_empty() or ring_of(h) < 1:
 		return ""
-	var rng := _rng(seed_value, h, 300 + clears)
-	if rng.randf() >= float(mc.get("natural_chance", 0.3)) * chance_mult:
+	var rng := _rng(seed_value, h, 300 + clears + roll * 5000)
+	if rng.randf() >= (float(mc.get("natural_chance", 0.3)) + chance_add) * chance_mult:
 		return ""
+	var fm := mechanic_info(force)
+	if not fm.is_empty() and not fm.get("minor", false):
+		return force
 	var items := []
 	for m in lst:
 		if not m.get("minor", false):   # Phase 2D: minor mechanics roll on their own
@@ -608,19 +726,32 @@ static func natural_mechanic(seed_value: int, h: Vector2i, clears: int, chance_m
 	return str(_weighted(rng, items).get("id", ""))
 
 ## Endgame Phase 2D: the minor mechanics (Collector's Wager, Pentimento Vaults) of the n-th run of
-## a hex. Each rolls on its own at its `chance` (x chance_mult), seeded by (seed, hex, clear count).
-static func minor_mechanics(seed_value: int, h: Vector2i, clears: int, chance_mult: float = 1.0) -> Array:
+## a hex. Each rolls on its own at its `chance` (x chance_mult x mults[id]), seeded by (seed, hex,
+## clear count). one_of (the Atelier's vault_or_collector): exactly one of them - if none hits, the
+## one closest to hitting is added; if several hit, the most decisive hit (lowest roll / chance) stays.
+static func minor_mechanics(seed_value: int, h: Vector2i, clears: int, chance_mult: float = 1.0, mults: Dictionary = {}, one_of: bool = false) -> Array:
 	var out := []
 	if ring_of(h) < 1:
 		return out
 	var i := 0
+	var best := ""
+	var best_q := INF
 	for m in mech_cfg().get("list", []):
 		if not m.get("minor", false):
 			continue
 		i += 1
+		var id := str(m.get("id", ""))
 		var rng := _rng(seed_value, h, 2000 * i + clears)
-		if rng.randf() < float(m.get("chance", 0.2)) * chance_mult:
-			out.append(str(m.get("id", "")))
+		var ch := float(m.get("chance", 0.2)) * chance_mult * float(mults.get(id, 1.0))
+		var r := rng.randf()
+		if r < ch:
+			out.append(id)
+		var q := r / maxf(ch, 0.0001)
+		if q < best_q:
+			best_q = q
+			best = id
+	if one_of and best != "":
+		out = [best]
 	return out
 
 ## How many status colours a sketch needs in a zone of this ring / Rot.
@@ -644,15 +775,144 @@ static func glaze_layers(n: int) -> int:
 	var g: Dictionary = mech_cfg().get("glazed", {})
 	return clampi(maxi(n, int(g.get("min_layers", 2))), 1, int(g.get("max_layers", 4)))
 
-# ------------------------------------------------------------------ Pigments & Varnish (Phase 1E)
+# ------------------------------------------------------------------ The Atelier (Phase 3B): zone-rule effects
+## The Atelier's taken nodes edit zone parameters only. atelier_fx(st) is the single source of
+## zone-rule effects (it replaced the Phase 1E varnish_fx). Points, paths and respec live in
+## atelier_rules.gd. Combine modes (data/atlas.json atelier.fx_doc): ints/floats add, _FX_MULT
+## multiply, _FX_MIN / _FX_MAX keep the lowest / highest, bools are true if any node sets them,
+## strings: the last node wins.
+const _FX_NEUTRAL := {
+	"fronts": 0, "heart_at": 0, "death_rot": 0, "death_rot_on_rot": 0, "rot_reward": 0.0, "reward": 0.0,
+	"elite_mods": 0, "boss_elite_mods": 0, "boss_rares": 0, "last_chamber_packs": 0, "trap_elites": 0,
+	"treasure_rares": 0, "riddle_mistakes": 0, "pigment_charges": 0, "pigment_reward": 0.0, "pigment_damage": 0.0,
+	"pigment_slots": 0, "vendor_extra": 0, "glaze_layers": 0, "glaze_flakes": 0, "sketch_colours": 0,
+	"natural_chance": 0.0, "natural_rolls": 0, "base_mods": 0, "shard_chance": 0.0, "warden_rares": 0,
+	"summon_cost": 0, "warden_rot_shard": 0, "warden_points": 0, "heart_material_rolls": 0, "harvest_gems": 0,
+	"restore_neighbours": 0,
+	"density": 1.0, "elite_mult": 1.0, "damage_mult": 1.0, "life_mult": 1.0, "natural_mult": 1.0,
+	"major_natural_mult": 1.0, "vault_mult": 1.0, "wager_mult": 1.0, "vault_wall_life": 1.0, "craft_cost_mult": 1.0,
+	"glazed_cost_mult": 1.0, "unfinished_cost_mult": 1.0, "dust_mult": 1.0, "warden_life": 1.0, "heart_life": 1.0,
+	"harvest_gold_mult": 1.0,
+	"pigment_slots_max": 99, "ground_pity": 99, "shard_cap": 0, "wager_max_mult": 0, "restore_shard_chance": 0.0,
+	"spread_local": false, "restore_no_slot": false, "elite_preview": false, "first_elite_rare": false,
+	"vault_or_collector": false, "pigment_danger_roll": false, "death_no_charge": false, "umber_well": false,
+	"last_light": false, "natural_force": ""}
+const _FX_MULT := ["density", "elite_mult", "damage_mult", "life_mult", "natural_mult", "major_natural_mult", "vault_mult",
+	"wager_mult", "vault_wall_life", "craft_cost_mult", "glazed_cost_mult", "unfinished_cost_mult", "dust_mult",
+	"warden_life", "heart_life", "harvest_gold_mult"]
+const _FX_MIN := ["pigment_slots_max", "ground_pity"]
+const _FX_MAX := ["shard_cap", "wager_max_mult", "restore_shard_chance"]
+
+static func atelier_cfg() -> Dictionary:
+	return cfg().get("atelier", {})
+
+## Every node of the board, in wedge order (each with its "wedge" id added).
+static func atelier_nodes() -> Array:
+	var out := []
+	for w in atelier_cfg().get("wedges", []):
+		for n in w.get("nodes", []):
+			var c: Dictionary = n.duplicate()
+			c["wedge"] = str(w.get("id", ""))
+			out.append(c)
+	return out
+
+static func atelier_node(id: String) -> Dictionary:
+	for n in atelier_nodes():
+		if str(n.get("id", "")) == id:
+			return n
+	return {}
+
+## A choice node's option ({} if none).
+static func atelier_option(node: Dictionary, opt: String) -> Dictionary:
+	for o in node.get("options", []):
+		if str(o.get("id", "")) == opt:
+			return o
+	return {}
+
+## Cleans a loaded atelier block: known ids, no 3C-gated nodes or options, choices only for taken
+## choice nodes. Path and budget are checked by AtelierRules.fix.
+static func _clean_atelier(raw) -> Dictionary:
+	var out := {"taken": [], "choices": {}, "bonus": 0}
+	if typeof(raw) != TYPE_DICTIONARY:
+		return out
+	out["bonus"] = clampi(int(raw.get("bonus", 0)) if (raw.get("bonus", 0) is int or raw.get("bonus", 0) is float) else 0, 0, 99)   # dev-granted points
+	var src_t = raw.get("taken", [])
+	var src_c = raw.get("choices", {})
+	if typeof(src_c) != TYPE_DICTIONARY:
+		src_c = {}
+	if typeof(src_t) == TYPE_ARRAY:
+		for id in src_t:
+			var n := atelier_node(str(id))
+			if n.is_empty() or n.get("needs_3c", false) or out["taken"].has(str(id)):
+				continue
+			if str(n.get("kind", "")) == "choice":
+				var o := atelier_option(n, str(src_c.get(str(id), "")))
+				if o.is_empty() or o.get("needs_3c", false):
+					continue
+				out["choices"][str(id)] = str(o["id"])
+			out["taken"].append(str(id))
+	return out
+
+## The effects of a list of node ids (choices: {choice node id: option id}). Ids that are unknown,
+## 3C-gated or a choice without a valid pick are ignored.
+static func fx_of(ids: Array, choices: Dictionary = {}) -> Dictionary:
+	var fx := _FX_NEUTRAL.duplicate()
+	for id in ids:
+		var n := atelier_node(str(id))
+		if n.is_empty() or n.get("needs_3c", false):
+			continue
+		var src: Dictionary = n.get("fx", {})
+		if str(n.get("kind", "")) == "choice":
+			var o := atelier_option(n, str(choices.get(str(id), "")))
+			if o.is_empty() or o.get("needs_3c", false):
+				continue
+			src = o.get("fx", {})
+		for k in src:
+			if not fx.has(k):
+				continue
+			var v = src[k]
+			if k in _FX_MULT:
+				fx[k] = float(fx[k]) * float(v)
+			elif k in _FX_MIN:
+				fx[k] = mini(int(fx[k]), int(v))
+			elif k in _FX_MAX:
+				fx[k] = maxf(float(fx[k]), float(v)) if typeof(_FX_NEUTRAL[k]) == TYPE_FLOAT else maxi(int(fx[k]), int(v))
+			elif typeof(_FX_NEUTRAL[k]) == TYPE_BOOL:
+				fx[k] = bool(fx[k]) or bool(v)
+			elif typeof(_FX_NEUTRAL[k]) == TYPE_STRING:
+				fx[k] = str(v)
+			elif typeof(_FX_NEUTRAL[k]) == TYPE_FLOAT:
+				fx[k] = float(fx[k]) + float(v)
+			else:
+				fx[k] = int(fx[k]) + int(v)
+	return fx
+
+## Combined effect of the character's taken Atelier nodes (neutral values with none).
+static func atelier_fx(st: Dictionary) -> Dictionary:
+	var a: Dictionary = st.get("atelier", {}) if typeof(st.get("atelier", {})) == TYPE_DICTIONARY else {}
+	return fx_of(a.get("taken", []), a.get("choices", {}))
+
+## Connoisseur's Eye: the elite modifier ids the n-th run of h can roll (atelier.preview_pool of
+## them, seeded by seed, hex and clear count). The zone's elites draw only from this pool.
+static func elite_preview(seed_value: int, h: Vector2i, clears: int) -> Array:
+	var ids := []
+	for m in Data.elite_mod_list:
+		ids.append(str(m["id"]))
+	var rng := _rng(seed_value, h, 900 + clears)
+	var out := []
+	while out.size() < int(atelier_cfg().get("preview_pool", 4)) and not ids.is_empty():
+		out.append(ids.pop_at(rng.randi_range(0, ids.size() - 1)))
+	return out
+
+## Multiplier on Rot rewards: 1 + the summed rot_reward percent (never below 0).
+static func rot_reward_mult(st: Dictionary) -> float:
+	return maxf(0.0, 1.0 + float(atelier_fx(st)["rot_reward"]) / 100.0)
+
+# ------------------------------------------------------------------ Pigments (Phase 1E)
 ## Pigments are crafted at the Easel from their mechanic's material. Slotted ones (atlas.easel, in
 ## order) guarantee their mechanic in the zones they fit, add a seeded modifier and spend charges.
-## Varnishes are rule-changers (a bonus with a penalty) slotted for good; they edit zone parameters only.
 static func pig_cfg() -> Dictionary:
 	return cfg().get("pigments", {})
-
-static func varn_cfg() -> Dictionary:
-	return cfg().get("varnish", {})
 
 static func pigment_info(id: String) -> Dictionary:
 	for p in pig_cfg().get("list", []):
@@ -686,42 +946,32 @@ static func _clean_pigment(p) -> Dictionary:
 		return {}
 	return {"id": id, "mod": mod, "charges": c, "uid": maxi(0, int(p.get("uid", 0)))}
 
-static func varnish_info(id: String) -> Dictionary:
-	for v in varn_cfg().get("list", []):
-		if str(v.get("id", "")) == id:
-			return v
-	return {}
-
-const _VFX_ADD := ["fronts", "heart_at", "reward", "elite_mods", "pigment_charges", "death_rot"]
-
-## Combined effect of the slotted Varnishes (neutral values with none).
-static func varnish_fx(st: Dictionary) -> Dictionary:
-	var fx := {"fronts": 0, "heart_at": 0, "density": 1.0, "reward": 0.0, "elite_mult": 1.0, "elite_mods": 0,
-		"pigment_charges": 0, "pigment_slots_max": 99, "natural_mult": 1.0, "damage_mult": 1.0, "rot_reward_mult": 1.0, "death_rot": 0}
-	for id in st.get("varnish_slots", []):
-		var v := varnish_info(str(id))
-		for k in v:
-			if not fx.has(k):
-				continue
-			if k in _VFX_ADD:
-				fx[k] = fx[k] + v[k]
-			elif k == "pigment_slots_max":
-				fx[k] = mini(int(fx[k]), int(v[k]))
-			else:
-				fx[k] = float(fx[k]) * float(v[k])
-	return fx
-
 # ---- Pigments
 static func pigment_count(st: Dictionary) -> int:
 	return st.get("pigments", []).size() + st.get("easel", []).size()
 
-## Pigment slots for a run of hex h: base, +1 in ring extra_slot_ring+ or a Restored region.
+## Pigment slots for a run of hex h: base, +1 in ring extra_slot_ring+ or a Restored region (not
+## with the Atelier's restore_no_slot), + the Atelier's pigment_slots; at most pigment_slots_max
+## (Binding Varnish) and max_slots.
 static func pigment_slots(st: Dictionary, h: Vector2i) -> int:
 	var pc := pig_cfg()
+	var fx := atelier_fx(st)
 	var n := int(pc.get("slots", 1))
-	if ring_of(h) >= int(pc.get("extra_slot_ring", 3)) or is_restored(st, h):
+	if ring_of(h) >= int(pc.get("extra_slot_ring", 3)) or (is_restored(st, h) and not fx["restore_no_slot"]):
 		n += 1
-	return clampi(mini(n, int(varnish_fx(st)["pigment_slots_max"])), 0, int(pc.get("max_slots", 2)))
+	n += int(fx["pigment_slots"])
+	return clampi(mini(n, int(fx["pigment_slots_max"])), 0, int(pc.get("max_slots", 3)))
+
+## How many Pigments the Easel holds: easel_slots (2), + the Atelier's pigment_slots, at most max_slots.
+static func easel_slots(st: Dictionary) -> int:
+	var pc := pig_cfg()
+	return clampi(int(pc.get("easel_slots", 2)) + int(atelier_fx(st)["pigment_slots"]), 1, int(pc.get("max_slots", 3)))
+
+## Material cost of crafting Pigment `id` (Atelier: craft_cost_mult x glazed/unfinished_cost_mult).
+static func pigment_cost(st: Dictionary, id: String) -> int:
+	var fx := atelier_fx(st)
+	var m := float(fx["craft_cost_mult"]) * float(fx.get(id + "_cost_mult", 1.0))
+	return maxi(1, int(round(float(pigment_info(id).get("cost", 1)) * m)))
 
 ## Crafts a Pigment of mechanic `id` into the stock, paying its material from ch. The modifier is
 ## seeded by (atlas seed, craft count). {ok, msg, pigment}
@@ -732,9 +982,10 @@ static func craft_pigment(st: Dictionary, ch, id: String) -> Dictionary:
 	var pc := pig_cfg()
 	if pigment_count(st) >= int(pc.get("stock_cap", 12)):
 		return {"ok": false, "msg": "The Easel holds at most %d Pigments" % int(pc.get("stock_cap", 12))}
-	var cost := {str(info.get("material", "")): int(info.get("cost", 1))}
+	var price := pigment_cost(st, id)
+	var cost := {str(info.get("material", "")): price}
 	if not ch.pay(cost):
-		return {"ok": false, "msg": "Needs %d %s" % [int(info.get("cost", 1)), str(Data.materials.get(info.get("material", ""), {}).get("name", info.get("material", "")))]}
+		return {"ok": false, "msg": "Needs %d %s" % [price, str(Data.materials.get(info.get("material", ""), {}).get("name", info.get("material", "")))]}
 	return {"ok": true, "msg": "Crafted", "pigment": add_pigment(st, id)}
 
 ## Adds a Pigment (seeded modifier unless mod_id is given) to the stock without a cost (crafting, dev, bots).
@@ -743,10 +994,16 @@ static func add_pigment(st: Dictionary, id: String, mod_id: String = "") -> Dict
 	if pigment_info(id).is_empty() or mods.is_empty():
 		return {}
 	var uid := int(st.get("crafted", 0))
+	var fx := atelier_fx(st)
 	if pigment_mod(id, mod_id).is_empty():
 		var rng := _rng(int(st.get("seed", 1)), Vector2i(uid, 7), 500)
 		mod_id = str(mods[rng.randi_range(0, mods.size() - 1)].get("id", ""))
-	var p := {"id": id, "mod": mod_id, "charges": int(pig_cfg().get("charges", 4)) + int(varnish_fx(st)["pigment_charges"]), "uid": uid}
+		if fx["pigment_danger_roll"]:   # Atelier: roll twice, keep the more dangerous (atelier.pigment_danger)
+			var other := str(mods[rng.randi_range(0, mods.size() - 1)].get("id", ""))
+			var order: Array = atelier_cfg().get("pigment_danger", {}).get(id, [])
+			if order.find(other) > order.find(mod_id):
+				mod_id = other
+	var p := {"id": id, "mod": mod_id, "charges": int(pig_cfg().get("charges", 4)) + int(fx["pigment_charges"]), "uid": uid}
 	st["crafted"] = uid + 1
 	if not st.has("pigments"):
 		st["pigments"] = []
@@ -758,7 +1015,7 @@ static func slot_pigment(st: Dictionary, i: int) -> bool:
 	var stock: Array = st.get("pigments", [])
 	if not st.has("easel"):
 		st["easel"] = []
-	if i < 0 or i >= stock.size() or st["easel"].size() >= int(pig_cfg().get("max_slots", 2)):
+	if i < 0 or i >= stock.size() or st["easel"].size() >= easel_slots(st):
 		return false
 	st["easel"].append(stock.pop_at(i))
 	return true
@@ -781,14 +1038,26 @@ static func run_mechanics(st: Dictionary, h: Vector2i, pigs: Array = []) -> Arra
 	for p in pigs:
 		if not out.has(str(p.get("id", ""))):
 			out.append(str(p.get("id", "")))
-	var nm := float(varnish_fx(st)["natural_mult"])
-	var nat := natural_mechanic(int(st.get("seed", 1)), h, clears(st, h), nm)
-	if nat != "" and not out.has(nat):
-		out.append(nat)
-	for m in minor_mechanics(int(st.get("seed", 1)), h, clears(st, h), nm):   # Phase 2D
+	var nx := next_mechanics(st, h)
+	for m in nx["natural"] + nx["minor"]:   # minor: Phase 2D
 		if not out.has(m):
 			out.append(m)
 	return out
+
+## The natural and minor mechanics the next run of h rolls (before Pigments), with the Atelier:
+## {natural: [ids], minor: [ids]}. Without Atelier nodes this is exactly the Phase 2D roll.
+static func next_mechanics(st: Dictionary, h: Vector2i) -> Dictionary:
+	var fx := atelier_fx(st)
+	var sd := int(st.get("seed", 1))
+	var n := clears(st, h)
+	var nm := float(fx["natural_mult"])
+	var nat := []
+	for roll in 1 + int(fx["natural_rolls"]):
+		var m := natural_mechanic(sd, h, n, nm * float(fx["major_natural_mult"]), float(fx["natural_chance"]), str(fx["natural_force"]), roll)
+		if m != "" and not nat.has(m):
+			nat.append(m)
+	var mults := {"vault": float(fx["vault_mult"]), "wager": float(fx["wager_mult"])}
+	return {"natural": nat, "minor": minor_mechanics(sd, h, n, nm, mults, bool(fx["vault_or_collector"]))}
 
 ## {mechanic: [modifier ids]} for a list of Pigments (the same modifier twice stacks).
 static func pigment_mods(pigs: Array) -> Dictionary:
@@ -836,51 +1105,6 @@ static func mech_tuning(mech: String, mod_ids: Array = []) -> Dictionary:
 		out["max_colours"] = mini(int(out["max_colours"]), out.get("palette", []).size())
 	return out
 
-# ---- Varnish
-## Varnish slots: base + 1 per ring with every region cleared at least once, max max_slots.
-static func varnish_slot_count(st: Dictionary) -> int:
-	var vc := varn_cfg()
-	var n := int(vc.get("slots", 1))
-	var rings: Dictionary = summary(st)["rings"]
-	for rg in rings:
-		if int(rings[rg][1]) > 0 and int(rings[rg][0]) >= int(rings[rg][1]):
-			n += 1
-	return mini(n, int(vc.get("max_slots", 3)))
-
-static func slot_varnish(st: Dictionary, id: String) -> bool:
-	if not st.has("varnish_slots"):
-		st["varnish_slots"] = []
-	if varnish_info(id).is_empty() or int(st.get("varnish", {}).get(id, 0)) <= 0 or st["varnish_slots"].has(id):
-		return false
-	if st["varnish_slots"].size() >= varnish_slot_count(st):
-		return false
-	st["varnish_slots"].append(id)
-	return true
-
-static func unslot_varnish(st: Dictionary, id: String) -> bool:
-	if not st.get("varnish_slots", []).has(id):
-		return false
-	st["varnish_slots"].erase(id)
-	return true
-
-static func add_varnish(st: Dictionary, id: String, n: int = 1) -> void:
-	if varnish_info(id).is_empty():
-		return
-	if not st.has("varnish"):
-		st["varnish"] = {}
-	st["varnish"][id] = mini(99, int(st["varnish"].get(id, 0)) + n)
-
-## The Varnish a Heart of Rot drops ("" = none): always on Harvest, restore_chance on Restore.
-## Seeded by (atlas seed, hex, clears, spreads) so it is reproducible.
-static func heart_varnish(st: Dictionary, h: Vector2i, choice: String) -> String:
-	var lst: Array = varn_cfg().get("list", [])
-	if lst.is_empty():
-		return ""
-	var rng := _rng(int(st.get("seed", 1)), h, 600 + clears(st, h) * 7 + int(st.get("spreads", 0)))
-	if choice != "harvest" and rng.randf() >= float(varn_cfg().get("restore_chance", 0.34)):
-		return ""
-	return str(lst[rng.randi_range(0, lst.size() - 1)].get("id", ""))
-
 # ------------------------------------------------------------------ Layer Wardens (Endgame Phase 2A)
 ## Each ring has a Warden (an upgraded existing boss). Clears in a ring drop Ground Shards of that
 ## layer; summon_cost shards summon the Warden at a cleared region of the ring, and the next run
@@ -919,15 +1143,31 @@ static func _wset(st: Dictionary, k: String, ring: int, n: int) -> void:
 static func shards(st: Dictionary, ring: int) -> int:
 	return _wget(st, "shards", ring)
 
-static func summon_cost() -> int:
-	return int(ward_cfg().get("summon_cost", 3))
+## Shards a Warden summon needs (+ the Atelier's summon_cost when st is given).
+static func summon_cost(st: Dictionary = {}) -> int:
+	return int(ward_cfg().get("summon_cost", 3)) + (int(atelier_fx(st)["summon_cost"]) if not st.is_empty() else 0)
 
-## Adds n shards of a ring (capped). Returns how many were really added.
+## Shards held per layer at most (the Atelier's shard_cap can raise it).
+static func shard_cap(st: Dictionary = {}) -> int:
+	var c := int(ward_cfg().get("shard_cap", 9))
+	return maxi(c, int(atelier_fx(st)["shard_cap"])) if not st.is_empty() else c
+
+## The highest shard cap any Atelier pick can give (loading never cuts shards below it).
+static func shard_cap_max() -> int:
+	var c := int(ward_cfg().get("shard_cap", 9))
+	for n in atelier_nodes():
+		c = maxi(c, int(n.get("fx", {}).get("shard_cap", 0)))
+		for o in n.get("options", []):
+			c = maxi(c, int(o.get("fx", {}).get("shard_cap", 0)))
+	return c
+
+## Adds n shards of a ring (capped; shards above the cap, e.g. after a respec, are kept). Returns
+## how many were really added.
 static func add_shards(st: Dictionary, ring: int, n: int = 1) -> int:
 	if warden_cfg(ring).is_empty():
 		return 0
 	var have := shards(st, ring)
-	var nv := clampi(have + n, 0, int(ward_cfg().get("shard_cap", 9)))
+	var nv := maxi(0, mini(have + n, maxi(have, shard_cap(st))))
 	_wset(st, "shards", ring, nv)
 	return nv - have
 
@@ -939,9 +1179,9 @@ static func roll_shard(st: Dictionary, h: Vector2i, rot: int = 0, heart: bool = 
 	var wc := ward_cfg()
 	if warden_cfg(ring).is_empty():
 		return 0
-	if shards(st, ring) >= int(wc.get("shard_cap", 9)):
+	if shards(st, ring) >= shard_cap(st):
 		return 0
-	var chance := float(wc.get("shard_chance", 0.45)) + float(wc.get("shard_rot_bonus", 0.1)) * rot
+	var chance := float(wc.get("shard_chance", 0.45)) + float(wc.get("shard_rot_bonus", 0.1)) * rot + float(atelier_fx(st)["shard_chance"])
 	var hit := _rng(int(st.get("seed", 0)), h, 500 + clears(st, h)).randf() < chance
 	if heart and wc.get("heart_shard", true):
 		hit = true
@@ -973,8 +1213,8 @@ static func summon_refusal(st: Dictionary, h: Vector2i) -> String:
 		return "Clear this region first"
 	if warden_at(st, h) > 0:
 		return "The Warden is already summoned here"
-	if shards(st, ring) < summon_cost():
-		return "Needs %d %ss (you have %d)" % [summon_cost(), str(wc.get("shard", "Shard")), shards(st, ring)]
+	if shards(st, ring) < summon_cost(st):
+		return "Needs %d %ss (you have %d)" % [summon_cost(st), str(wc.get("shard", "Shard")), shards(st, ring)]
 	return ""
 
 ## Summons (or moves) the ring's Warden to cleared hex h. Shards are not spent yet.
@@ -1055,26 +1295,31 @@ static func warden_def(bd: Dictionary, ring: int) -> Dictionary:
 
 ## A Warden victory: spends the summon's shards, clears the summon, counts the kill and rolls the
 ## Ground Pigment (first kill always; then ground_chance; guaranteed after ground_pity dry kills).
-## Returns {ground: bool, first: bool, kills: n}.
-static func warden_victory(st: Dictionary, ring: int) -> Dictionary:
+## rot = the hex's Rot (the Atelier's warden_rot_shard gives shards back at Rot 3+).
+## Returns {ground: bool, first: bool, kills: n, rot_shards: n}.
+static func warden_victory(st: Dictionary, ring: int, rot: int = 0) -> Dictionary:
 	var wc := ward_cfg()
 	if warden_cfg(ring).is_empty():
-		return {"ground": false, "first": false, "kills": 0}
-	_wset(st, "shards", ring, shards(st, ring) - summon_cost())
+		return {"ground": false, "first": false, "kills": 0, "rot_shards": 0}
+	var fx := atelier_fx(st)
+	_wset(st, "shards", ring, shards(st, ring) - summon_cost(st))
 	unsummon(st, ring)
 	var kills := _wget(st, "warden_kills", ring) + 1
 	_wset(st, "warden_kills", ring, kills)
 	var got := kills == 1
 	if not got:
 		got = _rng(int(st.get("seed", 0)), Vector2i(ring, 0), 600 + kills).randf() < float(wc.get("ground_chance", 0.34))
-	if _wget(st, "ground_dry", ring) >= int(wc.get("ground_pity", 3)):
+	if _wget(st, "ground_dry", ring) >= mini(int(wc.get("ground_pity", 3)), int(fx["ground_pity"])):
 		got = true
 	if got:
 		_wset(st, "ground", ring, _wget(st, "ground", ring) + 1)
 		_wset(st, "ground_dry", ring, 0)
 	else:
 		_wset(st, "ground_dry", ring, _wget(st, "ground_dry", ring) + 1)
-	return {"ground": got, "first": kills == 1, "kills": kills}
+	var rs := 0
+	if rot >= 3 and int(fx["warden_rot_shard"]) > 0:
+		rs = add_shards(st, ring, int(fx["warden_rot_shard"]))
+	return {"ground": got, "first": kills == 1, "kills": kills, "rot_shards": rs}
 
 static func warden_kills(st: Dictionary, ring: int) -> int:
 	return _wget(st, "warden_kills", ring)
@@ -1105,7 +1350,7 @@ static func _sanitize_wardens(st: Dictionary, raw: Dictionary) -> void:
 			var r := int(str(rk))
 			var n := int(src[rk])
 			if rings.has(r) and n > 0:
-				st[k][str(r)] = mini(n, int(ward_cfg().get("shard_cap", 9)) if k == "shards" else 9999)
+				st[k][str(r)] = mini(n, shard_cap_max() if k == "shards" else 9999)
 	st["summons"] = {}
 	var ss = raw.get("summons", {})
 	if typeof(ss) == TYPE_DICTIONARY:

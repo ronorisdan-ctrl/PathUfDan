@@ -1,5 +1,17 @@
 # Changelog
 
+## Endgame Phase 3B: the Atelier (2026-11-11)
+
+- **The Atelier replaces the Varnish slots.** It is a board of 36 nodes in six wedges, one for each painting layer: Rot, packs and elites, Vaults and the Collector, Pigments, natural mechanics, and Wardens. Each wedge has 3 small nodes, a choice node (pick 1 of 3), a notable and a rule-changer at the tip. Nodes change zones only, never your character. Most pair a bonus with a cost. Open it from the Atlas (the **Atelier** button) or the Easel.
+- **Points:** +1 for the first clear of each ring 2+ region (up to 18) and +2 for each Layer Warden's first kill, 30 in all. Existing characters get the points they have already earned. **Respec is free.** Warden first kills still give their passive point.
+- The six Varnishes are now rule-changers and a notable: Thin, Lacquered, Greedy, Binding and Blooming Varnish are wedge tips, and Dense Varnish is a notable. New tip **Last Light**: ordinary zones end in three waves of packs led by tough **Lantern-bearers** (2 extra modifiers each) instead of a boss. Each Lantern-bearer counts as a boss for contracts. Hearts of Rot and Wardens are unchanged.
+- **3rd Pigment slot:** the Underpainting notable *The Third Colour*.
+- Other new rules include Rot that spreads only next to the region you cleared, elite modifiers shown on the map before you enter, a Vault or the Collector in every zone, 4x Wager stakes, riddles that forgive one mistake, two natural mechanics in a zone, a Shard cap of 12, and more.
+- **Your Varnishes become Guild Seals** (2 each, up to the Seal cap). A one-time message tells you how many. Hearts of Rot no longer drop Varnishes.
+- **Rot in rings 4-6:** when you first reveal ring 4, 5 or 6, one extra Rot source appears there. Nothing changes while you are in rings 1-3.
+- Dev panel: Atelier row (+5 points, take all nodes, respec). Smartbot: `--atelier=` (old `--varnish=` runs still work).
+- Save version 7; v4-v6 saves load. Tests: @@TESTS@@. Details: `docs/ENDGAME_PHASE3.md`.
+
 ## Endgame Phase 3A: the Atlas grows to six rings (2026-11-10)
 
 - **The Atlas of Ruin is now radius 6 (126 regions).** Three new rings: **Underpainting** (ring 4, monster level 55), **Drawing** (ring 5, level 60) and **Bare Canvas** (ring 6, level 65), each tougher and richer than the last (up to +112% life, +72% damage, +45% resistances, +320% rarity, 3 modifiers). Each new layer tints the zone's light (umber, graphite, linen). Rings 1-3 are unchanged.

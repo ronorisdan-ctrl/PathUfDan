@@ -111,10 +111,13 @@ func enter_atlas(h: Vector2i, seed_value: int = 0) -> bool:
 	var def := AtlasRules.zone_def(s0, h)
 	if def.is_empty():
 		return false
-	def = AtlasRules.apply_rot(def, AtlasRules.rot_of(st, h), s0, h, st)   # Rot (Phase 1C; Varnish-aware)
+	def = AtlasRules.apply_rot(def, AtlasRules.rot_of(st, h), s0, h, st)   # Rot (Phase 1C; Atelier-aware)
 	var wr := AtlasRules.warden_at(st, h)   # Layer Warden summoned here (Phase 2A): replaces the boss, no Heart
 	if wr > 0:
 		def = AtlasRules.apply_warden(def, wr)
+	var fx := AtlasRules.atelier_fx(st)   # The Atelier (Phase 3B): zone parameters only
+	if fx["last_light"] and wr == 0 and not def.get("heart", false):
+		def["last_light"] = true   # Bare Canvas tip: the arena holds waves of Lantern-bearer packs, no boss
 	var n := AtlasRules.clears(st, h)
 	# Zone mechanics: the slotted Pigments' (Phase 1E) plus the hex's natural roll (Phase 1D).
 	# Game.atlas_force_mechanic ("none" = off, or an id) replaces the natural roll for bots/tests.
@@ -132,21 +135,22 @@ func enter_atlas(h: Vector2i, seed_value: int = 0) -> bool:
 	def["mechanic"] = mechs[0] if mechs.size() > 0 else ""
 	def["pigment_mods"] = AtlasRules.pigment_mods(pigs)
 	def["pigment_uids"] = pigs.map(func(p): return int(p["uid"]))
-	def["pigment_reward"] = float(AtlasRules.pig_cfg().get("reward", 10)) * pigs.size()
-	# Varnish (Phase 1E): zone parameters only
-	var fx := AtlasRules.varnish_fx(st)
-	def["varnish_fx"] = fx
-	def["damage_mult"] = float(def.get("damage_mult", 1.0)) * float(fx["damage_mult"])
+	def["pigment_reward"] = (float(AtlasRules.pig_cfg().get("reward", 10)) + float(fx["pigment_reward"])) * pigs.size()
+	def["atelier_fx"] = fx
+	def["damage_mult"] = float(def.get("damage_mult", 1.0)) * float(fx["damage_mult"]) * (1.0 + float(fx["pigment_damage"]) * pigs.size())
+	def["life_mult"] = float(def.get("life_mult", 1.0)) * float(fx["life_mult"])
 	if int(fx["elite_mods"]) != 0:
 		var em: Array = def.get("elite_mods", [1, 2])
 		def["elite_mods"] = [int(em[0]) + int(fx["elite_mods"]), int(em[1]) + int(fx["elite_mods"])]
+	if fx["elite_preview"]:   # Connoisseur's Eye: the run's elite modifier pool (shown on the Atlas)
+		def["elite_pool"] = AtlasRules.elite_preview(s0, h, n)
 	if not pigs.is_empty():
 		var gone := AtlasRules.spend_pigments(st, def["pigment_uids"], 1)
 		if not gone.is_empty() and ui != null:
 			ui.toast("Used up: %s" % ", ".join(gone), Color("#e0c890"))
 	if seed_value == 0:
 		seed_value = AtlasRules.layout_seed(s0, h, n)
-	return _start_run(def, seed_value, {"mods": AtlasRules.run_mods(s0, h, n, def), "depth": 1, "atlas": AtlasRules.key(h)})
+	return _start_run(def, seed_value, {"mods": AtlasRules.run_mods(s0, h, n, def, int(fx["base_mods"])), "depth": 1, "atlas": AtlasRules.key(h)})
 
 func _start_run(def: Dictionary, seed_value: int, run: Dictionary) -> bool:
 	Game.autosave()   # snapshot before the run starts

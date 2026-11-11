@@ -21,6 +21,7 @@ const PANELS := {
 	"dungeon": "res://scripts/ui/dungeon_panel.gd",
 	"atlas": "res://scripts/ui/atlas_panel.gd",
 	"easel": "res://scripts/ui/easel_panel.gd",
+	"atelier": "res://scripts/ui/atelier_panel.gd",
 	"guild": "res://scripts/ui/guild_panel.gd",
 	"wager": "res://scripts/ui/wager_panel.gd",
 	"pause": "res://scripts/ui/pause_panel.gd",
@@ -146,8 +147,8 @@ func toggle(n: String) -> void:
 					open_set.erase(o)
 					panels[o].visible = false
 					panels[o].on_close()
-		if n in ["passives", "skills", "dungeon", "spec", "atlas", "easel", "guild"]:
-			for o in ["passives", "skills", "dungeon", "spec", "atlas", "easel", "guild"]:
+		if n in ["passives", "skills", "dungeon", "spec", "atlas", "easel", "atelier", "guild"]:
+			for o in ["passives", "skills", "dungeon", "spec", "atlas", "easel", "atelier", "guild"]:
 				if o != n:
 					close(o)
 		open(n)

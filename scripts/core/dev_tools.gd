@@ -17,6 +17,7 @@ const PetRules = preload("res://scripts/core/pet_rules.gd")
 const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
 const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 const GuildRules = preload("res://scripts/core/guild_rules.gd")
+const AtelierRules = preload("res://scripts/core/atelier_rules.gd")
 
 signal changed   # enabled state or a flag changed (panel, HUD)
 
@@ -844,7 +845,7 @@ func atlas_open_vaults() -> Dictionary:
 			n += 1
 	return _ok("Opened %d vault%s" % [n, "" if n == 1 else "s"])
 
-## +Flakes/+Dust, one Pigment of every modifier and one of each Varnish.
+## +Flakes/+Dust and one Pigment of every modifier.
 func atlas_grant() -> Dictionary:
 	var why := _gate()
 	if why != "":
@@ -859,9 +860,46 @@ func atlas_grant() -> Dictionary:
 			if AtlasRules.pigment_count(st) < int(AtlasRules.pig_cfg().get("stock_cap", 12)):
 				AtlasRules.add_pigment(st, str(mech), str(m.get("id", "")))
 				n += 1
-	for v in AtlasRules.varn_cfg().get("list", []):
-		AtlasRules.add_varnish(st, str(v.get("id", "")))
-	return _ok("Granted 300 Flakes, 100 Dust, %d Pigments and every Varnish" % n)
+	return _ok("Granted 300 Flakes, 100 Dust and %d Pigments" % n)
+
+## The Atelier (Phase 3B): +n dev points (atlas.atelier.bonus, max 99).
+func atelier_grant(n: int) -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	var a: Dictionary = AtelierRules.state(st)
+	a["bonus"] = clampi(int(a.get("bonus", 0)) + n, 0, 99)
+	return _ok("Atelier: +%d points (%d free)" % [n, AtelierRules.points_free(st)])
+
+## The Atelier: takes every node that can be taken (choice nodes: option a), granting the points needed.
+func atelier_take_all() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	var a: Dictionary = AtelierRules.state(st)
+	var need := 0
+	for nd in AtlasRules.atelier_nodes():
+		if not nd.get("needs_3c", false):
+			need += AtelierRules.cost_of(nd)
+	a["bonus"] = clampi(maxi(int(a.get("bonus", 0)), need - AtelierRules.points_total(st) + int(a.get("bonus", 0))), 0, 99)
+	var n := 0
+	for pass_i in 4:   # smalls, choice, notable, tip
+		for nd in AtlasRules.atelier_nodes():
+			if AtelierRules.take(st, str(nd["id"]), "a" if str(nd.get("kind", "")) == "choice" else ""):
+				n += 1
+	return _ok("Atelier: took %d nodes (%d / %d points)" % [n, AtelierRules.points_spent(st), AtelierRules.points_total(st)])
+
+## The Atelier: free respec (dev points stay).
+func atelier_respec() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	return _ok("Atelier: %d points refunded" % AtelierRules.respec(st))
 
 ## Layer Wardens (Phase 2A): +3 Ground Shards of every warded ring.
 func atlas_grant_shards() -> Dictionary:
@@ -871,8 +909,8 @@ func atlas_grant_shards() -> Dictionary:
 	_taint()
 	var st: Dictionary = AtlasRules.ensure(Game.ch)
 	for r in AtlasRules.warden_rings():
-		AtlasRules.add_shards(st, r, AtlasRules.summon_cost())
-	return _ok("+%d Ground Shards of each layer" % AtlasRules.summon_cost())
+		AtlasRules.add_shards(st, r, AtlasRules.summon_cost(st))
+	return _ok("+%d Ground Shards of each layer" % AtlasRules.summon_cost(st))
 
 ## Restorers' Guild (Phase 2C): +rep reputation and +seals Seals.
 func atlas_guild_grant(rep: int, seals: int) -> Dictionary:
@@ -920,8 +958,8 @@ func atlas_summon_warden(hex_key: String) -> Dictionary:
 	if AtlasRules.clears(st, h) <= 0:
 		st["clears"][AtlasRules.key(h)] = 1
 	var ring := AtlasRules.ring_of(h)
-	if AtlasRules.shards(st, ring) < AtlasRules.summon_cost():
-		AtlasRules.add_shards(st, ring, AtlasRules.summon_cost() - AtlasRules.shards(st, ring))
+	if AtlasRules.shards(st, ring) < AtlasRules.summon_cost(st):
+		AtlasRules.add_shards(st, ring, AtlasRules.summon_cost(st) - AtlasRules.shards(st, ring))
 	AtlasRules.unsummon(st, ring)
 	if not AtlasRules.summon(st, h):
 		return _fail(AtlasRules.summon_refusal(st, h))

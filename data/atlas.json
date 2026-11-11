@@ -20,11 +20,12 @@
   "biome_stray": 0.25,
   "bosses": ["warden", "gravemaw", "archon_velis", "iron_penitent", "malgrath", "stormheart"],
   "rot": {
-    "_doc": "Endgame Phase 1C: Rot, the spreading decay (docs/ENDGAME_PHASE1.md). Per-hex level 0-5, saved as atlas.rot {key: level}. A new atlas plants `sources` hexes at Rot `source_level` in rings >= min_ring. Each completed zone advances `fronts` (+1 per festered Heart since the last spread): a front adds +1 to the not-restored hex in rings >= min_ring that is a Rot hex or next to one, picked by a seeded score, while total Rot < cap_per_ring x rings revealed. Restored hexes never take Rot. Phase 3A: Rot (sources, fronts, loaded state) only reaches rings up to max(reach_ring, the highest revealed ring), so an atlas whose player is still in rings 1-3 plays exactly as the radius-3 atlas did; the cap (cap_per_ring x highest revealed ring) grows to 18 at ring 6. Death in a zone adds +1 to that hex. levels[n-1] = the zone scaling at Rot n (heal = player life recovery multiplier, attack_speed = monster attack speed; Phase 1E tuning; move_speed = monster movement, proj_speed = monster projectile speed: Phase D2, the levers that reach kiting builds). Phase D2 dial (typical bots, docs/PHASE_D2_MEASUREMENTS.md): ~85% wins at Rot 3, ~65% at Rot 4 + 2 Pigments, ~45% at Rot 5 + 2 Pigments.",
+    "_doc": "Endgame Phase 1C: Rot, the spreading decay (docs/ENDGAME_PHASE1.md). Per-hex level 0-5, saved as atlas.rot {key: level}. A new atlas plants `sources` hexes at Rot `source_level` in rings >= min_ring. Each completed zone advances `fronts` (+1 per festered Heart since the last spread): a front adds +1 to the not-restored hex in rings >= min_ring that is a Rot hex or next to one, picked by a seeded score, while total Rot < cap_per_ring x rings revealed. Restored hexes never take Rot. Phase 3A: Rot (sources, fronts, loaded state) only reaches rings up to max(reach_ring, the highest revealed ring), so an atlas whose player is still in rings 1-3 plays exactly as the radius-3 atlas did; the cap (cap_per_ring x highest revealed ring) grows to 18 at ring 6. Death in a zone adds +1 to that hex. Phase 3B (Dan, 2026-11-11): when ring 4, 5 or 6 is first revealed it gets `ring_sources` extra seeded Rot source(s) at source_level (seeded by atlas seed + ring, recorded in atlas.ring_sources so never planted twice). levels[n-1] = the zone scaling at Rot n (heal = player life recovery multiplier, attack_speed = monster attack speed; Phase 1E tuning; move_speed = monster movement, proj_speed = monster projectile speed: Phase D2, the levers that reach kiting builds). Phase D2 dial (typical bots, docs/PHASE_D2_MEASUREMENTS.md): ~85% wins at Rot 3, ~65% at Rot 4 + 2 Pigments, ~45% at Rot 5 + 2 Pigments.",
     "max": 5,
     "min_ring": 2,
     "reach_ring": 3,
     "sources": 2,
+    "ring_sources": 1,
     "source_level": 1,
     "fronts": 2,
     "cap_per_ring": 3,
@@ -51,7 +52,7 @@
       {"id": "wager", "name": "The Collector's Wager", "minor": true, "chance": 0.2, "color": "#c89be8", "desc": "A gaunt art collector waits mid-zone and offers 3 bets on your own play. Stake gold at 1x, 2x or 3x; a win pays the stake back with profit plus materials, a loss costs only the stake."},
       {"id": "vault", "name": "Pentimento Vaults", "minor": true, "chance": 0.2, "color": "#8fc4d8", "desc": "Shimmering walls hide painted-over rooms. Damage the wall to scrape it away; its plaque tells you first whether it holds Treasure, a Trap (elite ambush, double loot) or a Riddle (strike the sigils in order)."}
     ],
-    "minor_doc": "Endgame Phase 2D: 'minor' mechanics (wager, vault) never take the main natural roll; each rolls on its own at `chance` (x the Blooming Varnish multiplier), seeded by (atlas seed, hex, clear count), so a zone can have Glazed/Unfinished plus a Wager and Vaults.",
+    "minor_doc": "Endgame Phase 2D: 'minor' mechanics (wager, vault) never take the main natural roll; each rolls on its own at `chance` (x the Atelier's natural_mult, x its vault_mult / wager_mult), seeded by (atlas seed, hex, clear count), so a zone can have Glazed/Unfinished plus a Wager and Vaults.",
     "glazed": {
       "_doc": "elite_chance_mult on the zone's elite chance; every elite is glazed with layers = its modifiers, raised to min_layers (extra random modifiers) and capped at max_layers. Burst poise: a hit adds damage / max life / fill_fraction x 100 (big hits up to big_hit_multiplier); a stun or freeze adds stun_poise; the bar drains decay_per_sec all the time, so only fast damage or frequent stuns fill it. 100 = peel the outer layer (1 Flake), then stagger s and peel_immunity s of poise immunity. On death the remaining layers shatter into Flakes: all if killed within shatter_fast s of the first hit, none after shatter_slow s, linear between. Every layer gone (peeled + shattered): +full_bonus Flakes, +1 per 2 Rot, +full_rarity_bonus rarity.",
       "elite_chance_mult": 1.5,
@@ -138,10 +139,11 @@
     }
   },
   "pigments": {
-    "_doc": "Endgame Phase 1E: Pigments (docs/ENDGAME_PHASE1.md). Crafted at the Easel from the mechanic's own material; kept in atlas.pigments (stock) and atlas.easel (slotted, in order). Each slotted Pigment that fits the zone's slot count guarantees its mechanic, adds its modifier and `reward`% quantity/rarity/XP, and spends 1 charge on entering; a death in the zone spends death_charges more. Slots: `slots` base, +1 in rings >= extra_slot_ring or a Restored region, max max_slots. A modifier is seeded per craft (atlas seed + craft count); the same modifier twice stacks.",
+    "_doc": "Endgame Phase 1E: Pigments (docs/ENDGAME_PHASE1.md). Crafted at the Easel from the mechanic's own material; kept in atlas.pigments (stock) and atlas.easel (slotted, in order). Each slotted Pigment that fits the zone's slot count guarantees its mechanic, adds its modifier and `reward`% quantity/rarity/XP, and spends 1 charge on entering; a death in the zone spends death_charges more. Slots: `slots` base, +1 in rings >= extra_slot_ring or a Restored region, + the Atelier (Phase 3B: The Third Colour +1, Binding Varnish caps at 1), max max_slots (3; the 3rd slot only comes from the Atelier). The Easel holds easel_slots Pigments (+1 with The Third Colour). A modifier is seeded per craft (atlas seed + craft count); the same modifier twice stacks.",
     "slots": 1,
     "extra_slot_ring": 3,
-    "max_slots": 2,
+    "easel_slots": 2,
+    "max_slots": 3,
     "charges": 4,
     "death_charges": 1,
     "stock_cap": 12,
@@ -165,19 +167,97 @@
       ]
     }
   },
-  "varnish": {
-    "_doc": "Endgame Phase 1E: Varnish slots, the light version of the Easel board. Varnishes are rule-changers (a bonus with a penalty) that edit zone parameters only, never character stats. They drop from Hearts of Rot: guaranteed on Harvest, restore_chance on Restore. Kept as counts in atlas.varnish; atlas.varnish_slots holds the slotted ids (one of each). Slots: `slots` base + 1 per ring fully cleared, max max_slots. Slotted Varnishes are never used up.",
-    "slots": 1,
-    "max_slots": 3,
-    "restore_chance": 0.34,
-    "list": [
-      {"id": "thin_varnish", "name": "Thin Varnish", "desc": "Rot spreads 1 fewer front (at least 1), but a Heart of Rot only appears from Rot 4.", "fronts": -1, "heart_at": 1},
-      {"id": "dense_varnish", "name": "Dense Varnish", "desc": "Packs are 25% larger and drop 20% more items, but elites are 30% rarer.", "density": 1.25, "reward": 20, "elite_mult": 0.7},
-      {"id": "lacquer_varnish", "name": "Lacquered Varnish", "desc": "Elites are 50% more common with +1 modifier, but packs are 15% smaller.", "elite_mult": 1.5, "elite_mods": 1, "density": 0.85},
-      {"id": "binder_varnish", "name": "Binding Varnish", "desc": "Pigments you craft have +2 charges, but you can slot only 1 Pigment per zone.", "pigment_charges": 2, "pigment_slots_max": 1},
-      {"id": "bloom_varnish", "name": "Blooming Varnish", "desc": "Natural zone mechanics roll twice as often, but monsters deal 10% more damage.", "natural_mult": 2.0, "damage_mult": 1.1},
-      {"id": "greed_varnish", "name": "Greedy Varnish", "desc": "Rot rewards are 50% higher, but dying in a zone adds +1 more Rot.", "rot_reward_mult": 1.5, "death_rot": 1}
-    ]
+  "atelier": {
+    "_doc": "Endgame Phase 3B: the Atelier (docs/ENDGAME_PHASE3.md), the choice-based board that replaced the Varnish slots. Per character (atlas.atelier = {taken: [node ids], choices: {node id: option id}}). Points are computed from the atlas, never stored: points.region per first clear of a region in ring >= points.region_min_ring (max points.region_cap) + points.warden per Layer Warden's first kill (+ the Bare Canvas choice b's extra). 6 wedges x 6 nodes: 3 small, 1 choice (pick 1 of `options`), 1 notable, 1 tip (rule-changer); `costs` by kind. Path: the smalls are open from the hub in any order, the choice needs `choice_needs` smalls of its wedge, the notable needs the choice, the tip the notable. Free respec; a single node can be refunded when nothing taken needs it and the points still cover the rest. Nodes edit zone parameters only, never character stats. `fx` keys and how they combine are documented in fx_doc; AtlasRules.atelier_fx(st) is the single source of zone-rule effects. `needs_3c` nodes / options are shown but cannot be taken until Phase 3C. The old Varnish ids map to their nodes in varnish_map (save v7 migration, smartbot --varnish).",
+    "points": {"region": 1, "region_min_ring": 2, "region_cap": 18, "warden": 2},
+    "costs": {"small": 1, "choice": 1, "notable": 2, "tip": 3},
+    "choice_needs": 2,
+    "fx_doc": "add: fronts, heart_at, death_rot, death_rot_on_rot, rot_reward (% points, x(1 + sum/100) on Rot rewards), reward (% quantity/rarity), elite_mods, boss_elite_mods, boss_rares, last_chamber_packs, trap_elites, treasure_rares, riddle_mistakes, pigment_charges, pigment_reward, pigment_damage (per slotted Pigment), pigment_slots, vendor_extra, glaze_layers, glaze_flakes, sketch_colours, natural_chance, natural_rolls, base_mods, shard_chance, warden_rares, summon_cost, warden_rot_shard, warden_points, heart_material_rolls, harvest_gems, restore_neighbours. mult: density, elite_mult, damage_mult, life_mult, natural_mult, major_natural_mult, vault_mult, wager_mult, vault_wall_life, craft_cost_mult, glazed_cost_mult, unfinished_cost_mult, dust_mult, warden_life, heart_life, harvest_gold_mult. min: pigment_slots_max, ground_pity. max: shard_cap, wager_max_mult, restore_shard_chance. flag (true if any): spread_local, restore_no_slot, elite_preview, first_elite_rare, vault_or_collector, pigment_danger_roll, death_no_charge, umber_well, last_light. set (last wins): natural_force.",
+    "wedges": [
+      {"id": "var", "name": "Varnish", "theme": "Rot", "color": "#d8b46a", "nodes": [
+        {"id": "var_s1", "kind": "small", "name": "Contained Bloom", "bonus": "Rot spreads only into revealed regions next to the one you completed (the forecast shows it per region).", "cost": "Rot rewards -10%.", "fx": {"spread_local": true, "rot_reward": -10}},
+        {"id": "var_s2", "kind": "small", "name": "Ripened Hearts", "bonus": "Hearts of Rot drop +1 material roll per Rot level.", "cost": "Hearts of Rot have +15% life.", "fx": {"heart_material_rolls": 1, "heart_life": 1.15}},
+        {"id": "var_s3", "kind": "small", "name": "Gilded Firebreak", "bonus": "Restoring a region also clears 1 Rot from each neighbour.", "cost": "Restored regions no longer give +1 Pigment slot.", "fx": {"restore_neighbours": 1, "restore_no_slot": true}},
+        {"id": "var_choice", "kind": "choice", "name": "The Heart's Due", "options": [
+          {"id": "a", "name": "Golden Harvest", "bonus": "Harvest gold +50%.", "fx": {"harvest_gold_mult": 1.5}},
+          {"id": "b", "name": "Gemmed Harvest", "bonus": "Harvest drops +1 gem.", "fx": {"harvest_gems": 1}},
+          {"id": "c", "name": "Shard of the Restored", "bonus": "Restore drops a Ground Shard of that ring 50% of the time.", "fx": {"restore_shard_chance": 0.5}}
+        ]},
+        {"id": "var_notable", "kind": "notable", "name": "Fermentation", "bonus": "Rot rewards +40%.", "cost": "Every Rot spread has +1 front.", "fx": {"rot_reward": 40, "fronts": 1}},
+        {"id": "var_tip", "kind": "tip", "name": "Thin Varnish", "bonus": "Rot spreads 1 fewer front (at least 1).", "cost": "A Heart of Rot only appears from Rot 4.", "fx": {"fronts": -1, "heart_at": 1}}
+      ]},
+      {"id": "craq", "name": "Craquelure", "theme": "Packs and elites", "color": "#b8875a", "nodes": [
+        {"id": "craq_s1", "kind": "small", "name": "Swollen Packs", "bonus": "Packs are 10% larger.", "cost": "Elites are 10% rarer.", "fx": {"density": 1.1, "elite_mult": 0.9}},
+        {"id": "craq_s2", "kind": "small", "name": "Fine Cracks", "bonus": "Elites are 15% more common.", "cost": "Packs are 5% smaller.", "fx": {"elite_mult": 1.15, "density": 0.95}},
+        {"id": "craq_s3", "kind": "small", "name": "Connoisseur's Eye", "bonus": "The elite modifiers of a region's next run are shown on the Atlas before you enter.", "cost": "Monsters deal 5% more damage.", "fx": {"elite_preview": true, "damage_mult": 1.05}},
+        {"id": "craq_choice", "kind": "choice", "name": "Fracture", "options": [
+          {"id": "a", "name": "Crowned Bosses", "bonus": "Zone bosses and Hearts of Rot gain 1 elite modifier and drop +1 rare (not Wardens).", "fx": {"boss_elite_mods": 1, "boss_rares": 1}},
+          {"id": "b", "name": "Crowded Finale", "bonus": "The last chamber holds 2 extra elite packs.", "fx": {"last_chamber_packs": 2}},
+          {"id": "c", "name": "First Blood", "bonus": "The first elite killed in a zone drops a guaranteed rare.", "fx": {"first_elite_rare": true}}
+        ]},
+        {"id": "craq_notable", "kind": "notable", "name": "Dense Varnish", "bonus": "Packs are 25% larger and drop 20% more items.", "cost": "Elites are 30% rarer.", "fx": {"density": 1.25, "reward": 20, "elite_mult": 0.7}},
+        {"id": "craq_tip", "kind": "tip", "name": "Lacquered Varnish", "bonus": "Elites are 50% more common with +1 modifier.", "cost": "Packs are 15% smaller.", "fx": {"elite_mult": 1.5, "elite_mods": 1, "density": 0.85}}
+      ]},
+      {"id": "pent", "name": "Pentimento", "theme": "Vaults and the Collector", "color": "#8a6a9a", "nodes": [
+        {"id": "pent_s1", "kind": "small", "name": "Hidden Rooms", "bonus": "Pentimento Vaults appear 50% more often.", "cost": "The Collector's Wager appears 25% less often.", "fx": {"vault_mult": 1.5, "wager_mult": 0.75}},
+        {"id": "pent_s2", "kind": "small", "name": "The Collector's Favour", "bonus": "The Collector appears 50% more often.", "cost": "Vaults appear 25% less often.", "fx": {"wager_mult": 1.5, "vault_mult": 0.75}},
+        {"id": "pent_s3", "kind": "small", "name": "Thin Plaster", "bonus": "Vault walls take 30% less damage to break.", "cost": "Trap Vaults hold +1 elite.", "fx": {"vault_wall_life": 0.7, "trap_elites": 1}},
+        {"id": "pent_choice", "kind": "choice", "name": "Beneath the Paint", "options": [
+          {"id": "a", "name": "Richer Caches", "bonus": "Treasure Vaults drop +1 rare.", "fx": {"treasure_rares": 1}},
+          {"id": "b", "name": "Forgiving Riddles", "bonus": "Riddle Vaults allow 1 mistake.", "fx": {"riddle_mistakes": 1}},
+          {"id": "c", "name": "High Stakes", "bonus": "The Collector accepts stakes up to 4x.", "fx": {"wager_max_mult": 4}}
+        ]},
+        {"id": "pent_notable", "kind": "notable", "name": "Always Something Beneath", "bonus": "Every zone has a Pentimento Vault or the Collector (never both).", "cost": "Glazed Elites and The Unfinished roll naturally 30% less often.", "fx": {"vault_or_collector": true, "major_natural_mult": 0.7}},
+        {"id": "pent_tip", "kind": "tip", "name": "Greedy Varnish", "bonus": "Rot rewards +50%.", "cost": "Dying in a zone adds +1 more Rot.", "fx": {"rot_reward": 50, "death_rot": 1}}
+      ]},
+      {"id": "under", "name": "Underpainting", "theme": "Pigments", "color": "#7a5a3a", "nodes": [
+        {"id": "under_s1", "kind": "small", "name": "Generous Grind", "bonus": "Crafted Pigments have +1 charge.", "cost": "Crafting Pigments costs 20% more material.", "fx": {"pigment_charges": 1, "craft_cost_mult": 1.2}},
+        {"id": "under_s2", "kind": "small", "name": "Bold Mixing", "bonus": "Each slotted Pigment gives +5% more reward.", "cost": "A crafted Pigment's modifier rolls twice and keeps the more dangerous one.", "fx": {"pigment_reward": 5, "pigment_danger_roll": true}},
+        {"id": "under_s3", "kind": "small", "name": "Steady Hand", "bonus": "Dying in a zone spends no extra Pigment charge.", "cost": "Dying in a region at Rot 1+ adds +1 more Rot.", "fx": {"death_no_charge": true, "death_rot_on_rot": 1}},
+        {"id": "under_choice", "kind": "choice", "name": "Palette Knife", "options": [
+          {"id": "a", "name": "Cheap Glaze", "bonus": "Glazed Pigments cost 25% less.", "fx": {"glazed_cost_mult": 0.75}},
+          {"id": "b", "name": "Cheap Sketches", "bonus": "Unfinished Pigments cost 25% less.", "fx": {"unfinished_cost_mult": 0.75}},
+          {"id": "c", "name": "Guild Supplier", "bonus": "The Guild vendor sells +1 Pigment per refresh.", "fx": {"vendor_extra": 1}}
+        ]},
+        {"id": "under_notable", "kind": "notable", "name": "The Third Colour", "bonus": "+1 Pigment slot in every region (up to 3).", "cost": "Each slotted Pigment makes monsters deal 5% more damage.", "fx": {"pigment_slots": 1, "pigment_damage": 0.05}},
+        {"id": "under_tip", "kind": "tip", "name": "Binding Varnish", "bonus": "Crafted Pigments have +2 charges.", "cost": "You can slot only 1 Pigment per zone.", "fx": {"pigment_charges": 2, "pigment_slots_max": 1}}
+      ]},
+      {"id": "draw", "name": "Drawing", "theme": "Natural mechanics", "color": "#5a5a62", "nodes": [
+        {"id": "draw_s1", "kind": "small", "name": "Thick Glaze", "bonus": "Glazed Elites give +1 Flake per layer.", "cost": "Glazed Elites wear +1 layer.", "fx": {"glaze_flakes": 1, "glaze_layers": 1}},
+        {"id": "draw_s2", "kind": "small", "name": "Loose Sketching", "bonus": "Sketches need 1 fewer colour (at least 1).", "cost": "Sketches drop 20% less Pigment Dust.", "fx": {"sketch_colours": -1, "dust_mult": 0.8}},
+        {"id": "draw_s3", "kind": "small", "name": "Busy Canvas", "bonus": "Natural mechanic chance +10 points.", "cost": "Zones roll +1 base modifier.", "fx": {"natural_chance": 0.1, "base_mods": 1}},
+        {"id": "draw_choice", "kind": "choice", "name": "Study", "options": [
+          {"id": "a", "name": "Study in Glaze", "bonus": "When a natural mechanic rolls, it is always Glazed Elites.", "fx": {"natural_force": "glazed"}},
+          {"id": "b", "name": "Study in Line", "bonus": "When a natural mechanic rolls, it is always The Unfinished.", "fx": {"natural_force": "unfinished"}},
+          {"id": "c", "name": "Study in Fire", "bonus": "When a natural mechanic rolls, it is always the Burning Canvas or the Pigment Wells.", "fx": {"natural_force": "burning"}, "needs_3c": true}
+        ]},
+        {"id": "draw_notable", "kind": "notable", "name": "Double Study", "bonus": "A zone may roll 2 natural mechanics.", "cost": "Monsters have 10% more life.", "fx": {"natural_rolls": 1, "life_mult": 1.1}},
+        {"id": "draw_tip", "kind": "tip", "name": "Blooming Varnish", "bonus": "Natural zone mechanics roll twice as often.", "cost": "Monsters deal 10% more damage.", "fx": {"natural_mult": 2.0, "damage_mult": 1.1}}
+      ]},
+      {"id": "bare", "name": "Bare Canvas", "theme": "Wardens and the pinnacle", "color": "#cfc6b0", "nodes": [
+        {"id": "bare_s1", "kind": "small", "name": "Shard Seeker", "bonus": "Ground Shard chance +10 points.", "cost": "Wardens have 10% more life.", "fx": {"shard_chance": 0.1, "warden_life": 1.1}},
+        {"id": "bare_s2", "kind": "small", "name": "Warden's Tithe", "bonus": "Warden fights drop +1 rare.", "cost": "Summoning a Warden costs +1 Shard.", "fx": {"warden_rares": 1, "summon_cost": 1}},
+        {"id": "bare_s3", "kind": "small", "name": "Rot-Fed Wardens", "bonus": "A Warden killed at Rot 3+ drops +1 Ground Shard of its ring.", "fx": {"warden_rot_shard": 1}},
+        {"id": "bare_choice", "kind": "choice", "name": "Ground Truth", "options": [
+          {"id": "a", "name": "Patient Grinding", "bonus": "A Ground Pigment is guaranteed after 2 dry Warden kills (instead of 3).", "fx": {"ground_pity": 2}},
+          {"id": "b", "name": "Master's Lesson", "bonus": "Each Warden's first kill gives +1 extra Atelier point.", "fx": {"warden_points": 1}},
+          {"id": "c", "name": "Deep Pockets", "bonus": "You can hold up to 12 Ground Shards per layer.", "fx": {"shard_cap": 12}}
+        ]},
+        {"id": "bare_notable", "kind": "notable", "name": "Umber Well", "bonus": "The Pigment Wells get a 4th well that fills with unique items.", "fx": {"umber_well": true}, "needs_3c": true},
+        {"id": "bare_tip", "kind": "tip", "name": "Last Light", "bonus": "Ordinary zones have no boss: entering the arena wakes the Last Light, three packs led by Lantern-bearers that come in waves. Each Lantern-bearer counts as a boss for contracts.", "cost": "Lantern-bearers are tough and carry 2 extra modifiers.", "fx": {"last_light": true}}
+      ]}
+    ],
+    "last_light": {
+      "_doc": "Bare Canvas tip (Dan, 2026-11-11). Ordinary zone bosses (not Hearts of Rot, not Wardens) are replaced: entering the arena starts `waves` waves (+ the Craquelure choice b's last_chamber_packs). A wave is a pack of `elites` elites + pack_size normals from the zone pool; the next wave comes when `next_at` monsters or fewer of the current one are alive. The first elite of a wave is a Lantern-bearer: life x `leader_life`, +`leader_mods` elite modifiers (1 boss-like + 1 as the node's cost), level + `leader_level`; it drops `leader_rares` rares and counts as a boss for contracts (boss time per wave). The last kill of the last wave is the zone's boss death (clear, Rot spread, shard, Guild, tier loot, exit). Waves are never sketches. The Wager does not offer `no_bets` there.",
+      "waves": 3, "elites": 2, "pack_size": [3, 5], "next_at": 1,
+      "leader_life": 2.5, "leader_mods": 2, "leader_level": 1, "leader_rares": 1,
+      "color": "#ffe9a8", "name": "Lantern-bearer",
+      "no_bets": ["boss_rush", "few_skills", "abstinence", "iron_will"]
+    },
+    "varnish_map": {"thin_varnish": "var_tip", "dense_varnish": "craq_notable", "lacquer_varnish": "craq_tip", "binder_varnish": "under_tip", "bloom_varnish": "draw_tip", "greed_varnish": "pent_tip"},
+    "varnish_seals": 2,
+    "preview_pool": 4,
+    "pigment_danger": {"glazed": ["crowded_glaze", "thick_glaze", "hardened_glaze", "biting_glaze"], "unfinished": ["crowded_sketch", "two_tone", "stubborn_sketch", "vivid_sketch"]}
   },
   "fixative": {
     "_doc": "Endgame 2B. Blacksmith craft 'Apply Fixative': lowers an item's crafting corruption by `reduce` (never below 0). At most `max_uses` per item (item field `fixative`). Refused at 100% (sealed) and on Abyssal-Brand corrupted items. Exempt from the corruption roll. Cost: `flakes` Glaze Flakes + gold_base + gold_per_ilvl x item level.",

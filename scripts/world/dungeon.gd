@@ -64,7 +64,9 @@ var glaze_tune := {}            # mechanic tuning with Pigment modifiers applied
 var sketch_tune := {}
 var pigment_uids := []          # Easel Pigments used by this run (a death spends more charges)
 var death_charged := false
-var varnish_drop := ""          # Varnish dropped by the Heart (tests / UI)
+var afx := {}                  # The Atelier's zone effects (AtlasRules.atelier_fx; Phase 3B)
+var first_elite_done := false   # Atelier First Blood: the first elite kill dropped its rare
+var last_light := {}           # Atelier Last Light: {active, wave, waves, members: [], leaders: [], t, times: [], done}
 # Layer Wardens (Endgame Phase 2A): the ring whose Warden this run fights (0 = none)
 var warden := 0
 var warden_result := {}         # AtlasRules.warden_victory result (tests / UI)
@@ -124,8 +126,15 @@ func setup(d: Dictionary, ch, seed_value: int = 0, run: Dictionary = {}) -> bool
 			mechanics.append(str(m))
 	mechanic = mechanics[0] if mechanics.size() > 0 else ""
 	var pmods: Dictionary = d.get("pigment_mods", {})
+	afx = d.get("atelier_fx", {})
 	glaze_tune = AtlasRules.mech_tuning("glazed", pmods.get("glazed", []))
 	sketch_tune = AtlasRules.mech_tuning("unfinished", pmods.get("unfinished", []))
+	if not afx.is_empty():   # The Atelier (Phase 3B): Drawing smalls
+		for k in ["min_layers", "max_layers"]:
+			glaze_tune[k] = int(glaze_tune.get(k, 2)) + int(afx.get("glaze_layers", 0))
+		for k in ["peel_flakes", "shatter_flakes"]:
+			glaze_tune[k] = int(glaze_tune.get(k, 0)) + int(afx.get("glaze_flakes", 0))
+		sketch_tune["colours"] = int(sketch_tune.get("colours", 1)) + int(afx.get("sketch_colours", 0))
 	pigment_uids = d.get("pigment_uids", []).duplicate()
 	if not mechanics.is_empty():
 		mech_rng.seed = run_seed * 31 + 7
@@ -133,13 +142,12 @@ func setup(d: Dictionary, ch, seed_value: int = 0, run: Dictionary = {}) -> bool
 			elite_mult *= float(glaze_tune.get("elite_chance_mult", 1.0))
 		for m in mechanics:
 			level_name += "  - " + str(AtlasRules.mechanic_info(m).get("name", m))
-	# Pigments and Varnish (Phase 1E): rewards, pack size, elite chance
+	# Pigments (Phase 1E) and the Atelier (Phase 3B): rewards, pack size, elite chance
 	reward_bonus += float(d.get("pigment_reward", 0.0))
-	var vfx: Dictionary = d.get("varnish_fx", {})
-	if not vfx.is_empty():
-		density *= float(vfx.get("density", 1.0))
-		elite_mult *= float(vfx.get("elite_mult", 1.0))
-		reward_bonus += float(vfx.get("reward", 0.0))
+	if not afx.is_empty():
+		density *= float(afx.get("density", 1.0))
+		elite_mult *= float(afx.get("elite_mult", 1.0))
+		reward_bonus += float(afx.get("reward", 0.0))
 	is_zone = d.get("generator", "") == "zone"
 	var gen = ZoneGen.new() if is_zone else DungeonGen.new()
 	layout = gen.generate(d, run_seed)
@@ -293,6 +301,19 @@ func _populate() -> void:
 			var pk := _spawn_pack(pool, anchor, monster_level + int(r["depth"] / 3), rng.randf() < float(def.get("elite_chance", 0.15)) * elite_mult, r["id"])
 			if not mechanics.is_empty():
 				_packs.append(pk)
+	# The Atelier, Craquelure choice b (Crowded Finale): extra elite packs in the deepest normal chamber
+	# (with Last Light they become extra waves instead)
+	var extra := int(afx.get("last_chamber_packs", 0))
+	if extra > 0 and not def.get("last_light", false):
+		var deep := {}
+		for r in rooms:
+			if r["kind"] == "normal" and (deep.is_empty() or int(r["depth"]) > int(deep["depth"])):
+				deep = r
+		if not deep.is_empty():
+			for i in extra:
+				var pk := _spawn_pack(pool, deep["anchor"], monster_level + int(deep["depth"] / 3), true, deep["id"])
+				if not mechanics.is_empty():
+					_packs.append(pk)
 
 func _spawn_pack(pool: Array, anchor: Vector2i, lvl: int, elite: bool, room_id: int) -> Array:
 	var out := []
@@ -336,9 +357,7 @@ func _weighted_enemy(pool: Array) -> String:
 	return pool[0]["id"] if pool.size() > 0 else "ghoul"
 
 func _roll_elite_mods(n: int) -> Array:
-	var ids := []
-	for m in Data.elite_mod_list:
-		ids.append(m["id"])
+	var ids := _elite_mod_ids()
 	var out := []
 	for i in n:
 		if ids.is_empty():
@@ -347,6 +366,16 @@ func _roll_elite_mods(n: int) -> Array:
 		ids.erase(id)
 		out.append(id)
 	return out
+
+## The elite modifier ids elites can roll: all, or the run's pool (Atelier Connoisseur's Eye).
+func _elite_mod_ids() -> Array:
+	var pool: Array = def.get("elite_pool", [])
+	if not pool.is_empty():
+		return pool.duplicate()
+	var ids := []
+	for m in Data.elite_mod_list:
+		ids.append(m["id"])
+	return ids
 
 # ------------------------------------------------------------------ zone mechanics (Phase 1D)
 func has_mech(id: String) -> bool:
@@ -357,9 +386,9 @@ func _glaze_mods(em_list: Array) -> Array:
 	var want := clampi(maxi(em_list.size(), int(glaze_tune.get("min_layers", 2))), 1, int(glaze_tune.get("max_layers", 4)))
 	var out := em_list.slice(0, want)
 	var ids := []
-	for m in Data.elite_mod_list:
-		if not out.has(m["id"]):
-			ids.append(m["id"])
+	for id in _elite_mod_ids():
+		if not out.has(id):
+			ids.append(id)
 	while out.size() < want and not ids.is_empty():
 		out.append(ids.pop_at(mech_rng.randi_range(0, ids.size() - 1)))
 	return out
@@ -551,6 +580,10 @@ func _obj_name(o: Dictionary) -> String:
 			var bd: Dictionary = Data.enemies.get(_boss_id(), {})
 			if warden_name != "":
 				return "Defeat %s" % warden_name
+			if def.get("last_light", false):   # Atelier Last Light
+				if last_light.get("active", false):
+					return "Survive the Last Light (wave %d/%d)" % [int(last_light["wave"]), int(last_light["waves"])]
+				return "Survive the Last Light in the arena"
 			return "Defeat %s" % bd.get("name", "the boss")
 	return o["type"]
 
@@ -668,6 +701,9 @@ func _boss_id() -> String:
 	return def.get("boss", "warden")
 
 func _spawn_boss(r: Dictionary) -> void:
+	if def.get("last_light", false):
+		_start_last_light(r)
+		return
 	boss_spawned = true
 	var bd: Dictionary = Data.enemies.get(_boss_id(), {})
 	if bd.is_empty():
@@ -675,11 +711,19 @@ func _spawn_boss(r: Dictionary) -> void:
 	var blvl := monster_level + 1
 	if def.get("heart", false):
 		bd = AtlasRules.heart_def(bd, def.get("heart_mutations", []))
+		bd["life"] = float(bd.get("life", 100)) * float(def.get("heart_life", 1.0))   # Atelier Ripened Hearts
+	var bmods := []
 	if warden > 0:
 		bd = AtlasRules.warden_def(bd, warden)
 		blvl += int(AtlasRules.ward_cfg().get("level_bonus", 2))
+		bd["life"] = float(bd.get("life", 100)) * float(afx.get("warden_life", 1.0))   # Atelier Shard Seeker
+	elif int(afx.get("boss_elite_mods", 0)) > 0 and atlas_hex != "":
+		# Atelier Crowned Bosses: elite modifiers on the boss (the miniboss path: no elite life x2.6)
+		bmods = _roll_elite_mods(int(afx["boss_elite_mods"]))
+		bd = bd.duplicate(true)
+		bd["miniboss"] = true
 	var pos := cell_center(r["anchor"])
-	boss = spawn_enemy(bd, blvl, [], pos)
+	boss = spawn_enemy(bd, blvl, bmods, pos)
 	boss.aggro = true
 	boss_t = 0.0
 	add_fx(VFX.make("nova", pos, Color(bd.get("light", "#60d0c0")), 0.9, 80))
@@ -692,6 +736,100 @@ func _spawn_boss(r: Dictionary) -> void:
 		for m in bd.get("heart_applied", []):
 			names.append(str(m.get("name", "")))
 		Events.message.emit("The Rot has mutated it: %s" % ", ".join(names), Color("#b0e050"))
+
+# ------------------------------------------------------------------ Last Light (Atelier, Phase 3B)
+## Bare Canvas tip: an ordinary Atlas zone has no boss. Entering the arena starts waves of packs,
+## each led by a Lantern-bearer (atlas.json atelier.last_light). The last kill of the last wave is
+## the zone's boss death (_on_boss_dead), so the clear, Rot, shards, Guild and loot all follow.
+func _ll_cfg() -> Dictionary:
+	return AtlasRules.atelier_cfg().get("last_light", {})
+
+func _start_last_light(r: Dictionary) -> void:
+	boss_spawned = true
+	var ll := _ll_cfg()
+	last_light = {"active": true, "wave": 0, "waves": maxi(1, int(ll.get("waves", 3)) + int(afx.get("last_chamber_packs", 0))),
+		"members": [], "leaders": [], "leader_t0": {}, "times": [], "anchor": r["anchor"], "room": r["id"], "killed": 0}
+	boss_t = 0.0
+	var pos := cell_center(r["anchor"])
+	add_fx(VFX.make("nova", pos, Color(str(ll.get("color", "#ffe9a8"))), 0.9, 90))
+	shake(2.0)
+	Sfx.play("boss", 0.0)
+	Events.message.emit("The Last Light wakes: %d packs come out of the dark." % int(last_light["waves"]), Color(str(ll.get("color", "#ffe9a8"))))
+	_ll_next_wave()
+
+func _ll_next_wave() -> void:
+	var ll := _ll_cfg()
+	last_light["wave"] = int(last_light["wave"]) + 1
+	var anchor: Vector2i = last_light["anchor"]
+	var pool: Array = def.get("pool", [])
+	var em: Array = def.get("elite_mods", [1, 2])
+	var lvl := monster_level + 1
+	var spawned := []
+	var ne := maxi(1, int(ll.get("elites", 2)))
+	for i in ne:
+		var ed: Dictionary = Data.enemies.get(_weighted_enemy(pool), {})
+		if ed.is_empty():
+			continue
+		var leader := i == 0
+		var n := rng.randi_range(int(em[0]), int(em[1])) + (int(ll.get("leader_mods", 2)) if leader else 0)
+		var em_list := _roll_elite_mods(n)
+		if has_mech("glazed"):
+			em_list = _glaze_mods(em_list)
+		var e = spawn_enemy(ed, lvl + (int(ll.get("leader_level", 1)) if leader else 0), em_list, random_floor_near(anchor, 3))
+		if leader:
+			e.max_life *= float(ll.get("leader_life", 2.5))
+			e.life = e.max_life
+			e.display_name = "%s, %s" % [str(ed.get("name", "")), str(ll.get("name", "Lantern-bearer"))]
+			last_light["leaders"].append(e)
+			last_light["leader_t0"][e.get_instance_id()] = run_t
+		if has_mech("glazed") and e.is_elite and not e.is_miniboss:
+			e.make_glazed(glaze_tune)
+			e.damage_mult *= float(glaze_tune.get("elite_damage", 1.0))
+			mech_stats["glazed"] += 1
+		spawned.append(e)
+	var ps: Array = ll.get("pack_size", [3, 5])
+	var cnt := int(round(rng.randi_range(int(ps[0]), int(ps[1])) * density))
+	for i in cnt:
+		var ed: Dictionary = Data.enemies.get(_weighted_enemy(pool), {})
+		if not ed.is_empty():
+			spawned.append(spawn_enemy(ed, monster_level, [], random_floor_near(anchor, 3)))
+	for e in spawned:
+		e.room_id = int(last_light["room"])
+		e.aggro = true
+		total_enemies += 1
+		last_light["members"].append(e)
+	Events.message.emit("Wave %d of %d: a %s approaches" % [int(last_light["wave"]), int(last_light["waves"]), str(ll.get("name", "Lantern-bearer"))], Color(str(ll.get("color", "#ffe9a8"))))
+	Events.objective_changed.emit(objective_text())
+
+## Alive members of the Last Light waves.
+func _ll_alive() -> Array:
+	return last_light.get("members", []).filter(func(m): return is_instance_valid(m) and m.alive)
+
+func _ll_on_kill(e) -> void:
+	var ll := _ll_cfg()
+	if not last_light["members"].has(e):
+		Events.objective_changed.emit(objective_text())
+		return
+	last_light["killed"] = int(last_light["killed"]) + 1
+	if last_light["leaders"].has(e):
+		var t0 := float(last_light["leader_t0"].get(e.get_instance_id(), run_t))
+		last_light["times"].append(run_t - t0)
+		for i in int(ll.get("leader_rares", 1)):
+			spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, 300.0 + rarity_bonus(), player.ch.class_id, "rare")}, e.global_position)
+	var alive := _ll_alive()
+	if int(last_light["wave"]) < int(last_light["waves"]):
+		# the next wave comes when the waves alive are down to next_at monsters
+		if alive.size() <= int(ll.get("next_at", 1)):
+			_ll_next_wave()
+		else:
+			Events.objective_changed.emit(objective_text())
+		return
+	if alive.is_empty():
+		last_light["active"] = false
+		last_light["done"] = true
+		_on_boss_dead(e)
+	else:
+		Events.objective_changed.emit(objective_text())
 
 # ------------------------------------------------------------------ zone: pack sleeping
 func chamber_at(p: Vector2) -> int:
@@ -799,11 +937,21 @@ func on_enemy_killed(e) -> void:
 		if e.painted_by != "colour":
 			# filled in by raw hits (Phase 1E): a chance at 1 Dust (elites always)
 			dn = 1 if (e.is_elite or mech_rng.randf() < float(u.get("filled_dust_chance", 0.0))) else 0
+		var dm := float(afx.get("dust_mult", 1.0))
+		if dn > 0 and dm != 1.0:   # Atelier Loose Sketching: x dust_mult, seeded rounding
+			var x := dn * dm
+			dn = int(floor(x)) + (1 if mech_rng.randf() < x - floor(x) else 0)
 		if dn > 0:
 			mech_stats["dust"] += dn
 			spawn_drop({"kind": "material", "id": "pigment_dust", "amount": dn}, e.global_position)
-	if atlas_hex != "" and e.is_elite and not boss_dead:
+	if atlas_hex != "" and e.is_elite and not boss_dead and e != boss:
 		elite_kills += 1
+		if bool(afx.get("first_elite_rare", false)) and not first_elite_done:   # Atelier First Blood
+			first_elite_done = true
+			spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level, 200.0 + rarity_bonus(), player.ch.class_id, "rare")}, e.global_position)
+	if last_light.get("active", false):
+		_ll_on_kill(e)
+		return
 	if e == guardian:
 		for o in objectives:
 			if o["type"] == "guardian":
@@ -861,6 +1009,9 @@ func _on_boss_dead(e) -> void:
 		spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, 300.0 + rarity_bonus(), ch.class_id)}, e.global_position)
 	if tier >= 5 and rng.randf() < 0.25 + 0.03 * depth:
 		spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, 0.0, ch.class_id, "legendary")}, e.global_position)
+	if atlas_hex != "" and warden == 0 and last_light.is_empty():   # Atelier Crowned Bosses
+		for i in int(afx.get("boss_rares", 0)):
+			spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, 300.0 + rarity_bonus(), ch.class_id, "rare")}, e.global_position)
 	if def.get("endless", false):
 		if not ch.dev_used:   # developer-tainted characters never set depth records
 			var abyss_pts: int = ch.abyss_passive_points()
@@ -927,17 +1078,16 @@ func choose_heart(choice: String) -> bool:
 	var pos: Vector2 = player.global_position
 	_take_interactable("rot_restore")
 	_take_interactable("rot_harvest")
-	varnish_drop = AtlasRules.heart_varnish(st, h, choice)   # Phase 1E
-	if varnish_drop != "":
-		AtlasRules.add_varnish(st, varnish_drop)
-		Events.message.emit("The Heart leaves a Varnish: %s. Slot it at the Easel." % str(AtlasRules.varnish_info(varnish_drop).get("name", varnish_drop)), Color("#e8d8a0"))
 	var hrep := {"zones": 0, "ring": AtlasRules.ring_of(h), "rot": rot}
 	hrep[choice] = 1
 	_announce_guild(GuildRules.credit(st, hrep))
 	if choice == "restore":
-		AtlasRules.restore(st, h)
+		var eased := AtlasRules.restore(st, h)
 		add_fx(VFX.make("nova", pos, Color("#e8c060"), 0.9, 90))
 		Events.message.emit("The region is restored. Rot will never take it again.", Color("#e8c060"))
+		if not eased.is_empty():   # Atelier Gilded Firebreak
+			Events.message.emit("The gilding eases the Rot in %d neighbouring region%s." % [eased.size(), "" if eased.size() == 1 else "s"], Color("#e8c060"))
+		_restore_payout(st, h, pos)
 	else:
 		AtlasRules.fester(st, h)
 		_harvest_payout(pos)
@@ -947,14 +1097,28 @@ func choose_heart(choice: String) -> bool:
 	Game.save_game()
 	return true
 
+## Restore payout from the Atelier (none without nodes): Ripened Hearts' material rolls per Rot
+## level, Shard of the Restored's Ground Shard chance (seeded by atlas seed, hex and clears).
+func _restore_payout(st: Dictionary, h: Vector2i, pos: Vector2) -> void:
+	for i in maxi(1, rot) * int(afx.get("heart_material_rolls", 0)):
+		spawn_drop({"kind": "material", "id": Loot._roll_material(), "amount": 1}, pos)
+	var sc := float(afx.get("restore_shard_chance", 0.0))
+	if sc > 0.0 and AtlasRules._rng(int(st.get("seed", 1)), h, 650 + AtlasRules.clears(st, h)).randf() < sc:
+		var ring := AtlasRules.ring_of(h)
+		if AtlasRules.add_shards(st, ring, 1) > 0:
+			var wc := AtlasRules.warden_cfg(ring)
+			Events.message.emit("%s found in the restored region (%d/%d)" % [str(wc.get("shard", "Ground Shard")), AtlasRules.shards(st, ring), AtlasRules.summon_cost(st)], Color(str(AtlasRules.ward_cfg().get("colors", {}).get("shard", "#e8d8a0"))))
+
 func _harvest_payout(pos: Vector2) -> void:
 	var hv: Dictionary = AtlasRules.rot_cfg().get("harvest", {})
 	var n := maxi(1, rot)
 	var cid: String = player.ch.class_id
 	spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, 0.0, cid, "legendary")}, pos)
-	spawn_drop({"kind": "gold", "amount": monster_level * int(hv.get("gold_per_level", 30)) * n}, pos)
-	for i in n * int(hv.get("material_rolls", 3)):
+	spawn_drop({"kind": "gold", "amount": int(round(monster_level * int(hv.get("gold_per_level", 30)) * n * float(afx.get("harvest_gold_mult", 1.0))))}, pos)
+	for i in n * (int(hv.get("material_rolls", 3)) + int(afx.get("heart_material_rolls", 0))):
 		spawn_drop({"kind": "material", "id": Loot._roll_material(), "amount": 1}, pos)
+	for i in int(afx.get("harvest_gems", 0)):   # Atelier Gemmed Harvest
+		spawn_drop({"kind": "gem", "id": Loot.random_gem(monster_level)}, pos)
 	for i in maxi(0, n - 2):
 		spawn_drop({"kind": "gem", "id": Loot.random_gem(monster_level)}, pos)
 		spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, 300.0 + rarity_bonus(), cid, "rare")}, pos)
@@ -967,9 +1131,11 @@ func _credit_guild() -> void:
 		"hearts": 1 if def.get("heart", false) else 0, "peels": int(mech_stats["peels"]),
 		"painted": int(mech_stats["painted"]) + int(mech_stats["filled"]), "elites": elite_kills,
 		"pigment_zones": 1 if not pigment_uids.is_empty() else 0, "wardens": 1 if warden > 0 else 0,
-		"kills": zone_kills, "bosses": 1, "time": run_t, "boss_time": boss_fight if boss_fight >= 0.0 else 9999.0,
+		"kills": zone_kills, "bosses": 1 if last_light.is_empty() else last_light.get("times", []).size(), "time": run_t, "boss_time": boss_fight if boss_fight >= 0.0 else 9999.0,
 		"pigments": pigment_uids.size(), "wagers_won": int(wv_stats["wagers_won"]), "wager_3x": int(wv_stats["wager_3x"]),
 		"vaults": int(wv_stats["vaults"]), "trap_vaults": int(wv_stats["trap_vaults"]), "riddle_vaults": int(wv_stats["riddle_vaults"])}
+	if not last_light.is_empty():
+		guild_report["boss_times"] = last_light.get("times", []).duplicate()   # each Lantern-bearer counts as a boss
 	guild_result = GuildRules.credit(st, guild_report)
 	_announce_guild(guild_result)
 
@@ -992,7 +1158,7 @@ func _roll_shard() -> void:
 	if shard_drop > 0:
 		var ring := AtlasRules.ring_of(h)
 		var wc := AtlasRules.warden_cfg(ring)
-		var need := AtlasRules.summon_cost()
+		var need := AtlasRules.summon_cost(st)
 		var have := AtlasRules.shards(st, ring)
 		var tail := " - summon the Warden from the Atlas!" if have >= need and AtlasRules.summoned_hex(st, ring) == "" else ""
 		Events.message.emit("%s found (%d/%d)%s" % [str(wc.get("shard", "Ground Shard")), have, need, tail], Color(str(AtlasRules.ward_cfg().get("colors", {}).get("shard", "#e8d8a0"))))
@@ -1003,10 +1169,12 @@ func _on_warden_dead(e) -> void:
 	var st: Dictionary = AtlasRules.ensure(ch)
 	var wc := AtlasRules.warden_cfg(warden)
 	var wcfg := AtlasRules.ward_cfg()
-	warden_result = AtlasRules.warden_victory(st, warden)
+	warden_result = AtlasRules.warden_victory(st, warden, rot)
 	var gold := Color(str(wcfg.get("colors", {}).get("summon", "#ffe070")))
 	if warden_result.get("ground", false):
 		Events.message.emit("%s obtained! Ground Pigments: %d of %d layers (%d open the pinnacle)" % [str(wc.get("ground", "Ground Pigment")), AtlasRules.ground_kinds(st), int(wcfg.get("layers_total", 6)), int(wcfg.get("pinnacle_need", 4))], gold)
+	if int(warden_result.get("rot_shards", 0)) > 0:   # Atelier Rot-Fed Wardens
+		Events.message.emit("The Rot feeds the Warden's remains: +%d %s" % [int(warden_result["rot_shards"]), str(wc.get("shard", "Ground Shard"))], gold)
 	var pk := "atlas_warden_%d" % warden
 	var first: bool = not ch.progress["bosses_killed"].has(pk)
 	ch.progress["bosses_killed"][pk] = int(ch.progress["bosses_killed"].get(pk, 0)) + 1
@@ -1018,7 +1186,7 @@ func _on_warden_dead(e) -> void:
 	var cid: String = ch.class_id
 	for i in int(rw.get("legendary", 1)):
 		spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, 0.0, cid, "legendary")}, pos)
-	for i in int(rw.get("rares", 2)):
+	for i in int(rw.get("rares", 2)) + int(afx.get("warden_rares", 0)):
 		spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, float(rw.get("rarity", 300)) + rarity_bonus(), cid, "rare")}, pos)
 	spawn_drop({"kind": "gold", "amount": monster_level * int(rw.get("gold_per_level", 40))}, pos)
 	add_fx(VFX.make("nova", pos, gold, 1.0, 110))
@@ -1043,7 +1211,7 @@ func apply_death_rot() -> int:
 			Events.message.emit("Your fall breaks a Commission streak", Color("#ff8080"))
 	if atlas_hex == "" or boss_dead or player == null:
 		return death_rot
-	if not death_charged and not pigment_uids.is_empty():   # Phase 1E: a death spends extra Pigment charges
+	if not death_charged and not pigment_uids.is_empty() and not bool(afx.get("death_no_charge", false)):   # Phase 1E: a death spends extra Pigment charges (not with the Atelier's Steady Hand)
 		death_charged = true
 		AtlasRules.spend_pigments(AtlasRules.ensure(player.ch), pigment_uids, int(AtlasRules.pig_cfg().get("death_charges", 1)))
 	death_rot = AtlasRules.add_death_rot(AtlasRules.ensure(player.ch), AtlasRules.parse(atlas_hex))
@@ -1210,18 +1378,22 @@ func _place_collector() -> void:
 		ahead += 1
 		if e.is_elite:
 			elites += 1
-	var ids := WV.offers(mech_rng, mechanics, elites, -1, ahead)
+	var ids := WV.offers(mech_rng, mechanics, elites, -1, ahead, _ll_cfg().get("no_bets", []) if def.get("last_light", false) else [])
 	var links := _boss_chamber_links(collector_pos)
 	var lim := {}
 	for id in ids:
 		lim[id] = WV.limits(id, links)
 	wager = {"state": "offer", "offers": ids, "lim": lim, "elites": elites, "ahead": ahead}
 
+## The stake multipliers the Collector accepts here (the Atelier's High Stakes adds 4x).
+func wager_mults() -> Array:
+	return WV.mults(int(afx.get("wager_max_mult", 0)))
+
 ## Takes the bet: the stake is paid now. Returns "" or why not.
 func accept_wager(id: String, mult: int) -> String:
 	if wager.get("state", "") != "offer":
 		return "The Collector has no bet to offer"
-	if not wager["offers"].has(id) or not WV.mults().has(mult):
+	if not wager["offers"].has(id) or not wager_mults().has(mult):
 		return "No such bet"
 	if boss_dead or player == null or not player.alive:
 		return "Too late for that"
@@ -1534,7 +1706,7 @@ func _place_vault_walls() -> void:
 	for v in vaults:
 		var ti := WV.type_info(str(v["type"]))
 		var wd := {"id": "pentimento_wall", "name": "Pentimento Vault", "sprite": "pentimento_wall", "category": "object",
-			"life": float(WV.vcfg().get("life", 90)), "damage": [0, 0], "dmg_type": "physical", "speed": 0, "radius": 8,
+			"life": float(WV.vcfg().get("life", 90)) * float(afx.get("vault_wall_life", 1.0)), "damage": [0, 0], "dmg_type": "physical", "speed": 0, "radius": 8,
 			"armour": 0, "evasion": 0, "resist": {}, "detect": 0, "attack": "none", "attack_range": 0, "windup": 1.0, "recover": 1.0,
 			"xp": 0, "loot_mult": 0.0, "object": true, "plaque": "Vault: %s" % str(ti.get("name", v["type"])), "plaque_color": str(ti.get("color", "#8fc4d8"))}
 		var pos := cell_center(v["f"]) + Vector2(v["perp"]) * (T * 0.5)
@@ -1598,13 +1770,13 @@ func open_vault(v: Dictionary) -> void:
 		if AtlasRules.add_shards(st, ring, 1) > 0:
 			wv_stats["vault_shards"] += 1
 			var wc := AtlasRules.warden_cfg(ring)
-			Events.message.emit("%s found in the vault (%d/%d)" % [str(wc.get("shard", "Ground Shard")), AtlasRules.shards(st, ring), AtlasRules.summon_cost()], Color(str(AtlasRules.ward_cfg().get("colors", {}).get("shard", "#e8d8a0"))))
+			Events.message.emit("%s found in the vault (%d/%d)" % [str(wc.get("shard", "Ground Shard")), AtlasRules.shards(st, ring), AtlasRules.summon_cost(st)], Color(str(AtlasRules.ward_cfg().get("colors", {}).get("shard", "#e8d8a0"))))
 	match str(v["type"]):
 		"trap":
 			var tc: Dictionary = WV.vcfg().get("trap", {})
 			var pool: Array = def.get("pool", [])
 			var em: Array = tc.get("elite_mods", [2, 3])
-			for i in int(tc.get("elites", 2)):
+			for i in int(tc.get("elites", 2)) + int(afx.get("trap_elites", 0)):
 				var ed: Dictionary = Data.enemies.get(_mech_enemy_id(pool), {})
 				if ed.is_empty():
 					continue
@@ -1680,6 +1852,9 @@ func strike_sigil(key: String) -> bool:
 			_vault_done(v)
 		else:
 			Events.message.emit("The %s Sigil glows (%d/%d)" % [WV.sigil_name(si), int(v["next"]), v["order"].size()], Color(WV.sigil_color(si)))
+	elif int(v.get("mistakes", 0)) < int(afx.get("riddle_mistakes", 0)):   # Atelier Forgiving Riddles
+		v["mistakes"] = int(v.get("mistakes", 0)) + 1
+		Events.message.emit("Wrong sigil - the vault forgives you once. Try again.", Color("#80c0ff"))
 	else:
 		v["next"] = 0
 		Events.message.emit("Wrong sigil - the order resets and the vault wakes its guardians!", Color("#ff6060"))
@@ -1701,7 +1876,7 @@ func _vault_done(v: Dictionary) -> void:
 	v["done"] = true
 	var kind := str(v["type"])
 	wv_stats["%s_vaults" % kind] = int(wv_stats.get("%s_vaults" % kind, 0)) + 1
-	var c := WV.cache(monster_level, rot, kind)
+	var c := WV.cache(monster_level, rot, kind, int(afx.get("treasure_rares", 0)))
 	var pos := cell_center(v["centre"])
 	var cid: String = player.ch.class_id
 	for i in int(c["rares"]):

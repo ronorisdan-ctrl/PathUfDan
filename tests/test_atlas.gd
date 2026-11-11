@@ -6,7 +6,9 @@ extends Node
 ## Phase 2B: Fixative crafting and Rot-touched implicits (rules, Blacksmith, live Rot drops).
 ## Phase 2C: Commission Board + Restorers' Guild (rules, pace sim, Fixative gate, live credit, panel).
 ## Phase 2D: Collector's Wager + Pentimento Vaults (rules, live bets, live vaults) and the new contracts.
-## Phase 1E: Pigments (craft, slots, charges, modifiers), Varnish slots, Heart Varnish drops, the Easel.
+## Phase 1E: Pigments (craft, slots, charges, modifiers), the Easel.
+## Phase 3B: the Atelier (board, points, paths, respec, every node's rule, save v7 Varnish migration,
+##   ring 4-6 Rot sources, Last Light live run, the Atelier panel).
 ##   godot --headless --fixed-fps 60 --path . res://tests/atlas_only.tscn [-- --shot]
 ## Writes tests/atlas_only_results.txt. --shot (windowed) saves tests/screens_out_atlas/*.png.
 
@@ -14,6 +16,7 @@ const AR = preload("res://scripts/core/atlas_rules.gd")
 const AC = preload("res://scripts/core/atlas_craft_rules.gd")
 const GR = preload("res://scripts/core/guild_rules.gd")
 const WV = preload("res://scripts/core/wager_vault_rules.gd")
+const ATR = preload("res://scripts/core/atelier_rules.gd")
 const CharacterData = preload("res://scripts/core/character_data.gd")
 
 var fails := 0
@@ -65,7 +68,9 @@ func run_all() -> void:
 	test_heart_defs()
 	test_mechanic_rules()
 	test_pigment_rules()
-	test_varnish_rules()
+	test_atelier_rules()
+	test_atelier_nodes()
+	test_atelier_save()
 	test_warden_rules()
 	test_fixative()
 	test_rot_touched_rules()
@@ -89,6 +94,7 @@ func run_all() -> void:
 	await test_live_vaults()
 	await test_live_contracts_2d()
 	await test_live_3a()
+	await test_live_atelier()
 	Game.atlas_force_mechanic = ""
 
 # ------------------------------------------------------------------ data
@@ -256,11 +262,11 @@ func test_state() -> void:
 
 # ------------------------------------------------------------------ save v5/v6
 func test_save() -> void:
-	check(CharacterData.SAVE_VERSION == 6, "SAVE_VERSION is 6 (3A: atlas radius 6)")
+	check(CharacterData.SAVE_VERSION == 7, "SAVE_VERSION is 7 (3B: the Atelier)")
 	var ch = CharacterData.new()
 	ch.setup_new("mage", "Dan")
 	var d0: Dictionary = ch.to_dict()
-	check(not d0.has("atlas") and int(d0["version"]) == 6, "a character without an atlas writes no atlas key")
+	check(not d0.has("atlas") and int(d0["version"]) == 7, "a character without an atlas writes no atlas key")
 	check(not AR.unlocked(ch), "atlas locked for a new character")
 	ch.progress["bosses_killed"]["nightmare_vaults"] = 1
 	check(AR.unlocked(ch), "atlas unlocks after Malgrath")
@@ -276,7 +282,7 @@ func test_save() -> void:
 	d4["version"] = 4
 	var ch3 = CharacterData.new()
 	ch3.from_dict(d4)
-	check(ch3.atlas.is_empty() and int(ch3.to_dict()["version"]) == 6, "v4 save loads with no atlas and re-saves as v6")
+	check(ch3.atlas.is_empty() and int(ch3.to_dict()["version"]) == 7, "v4 save loads with no atlas and re-saves as v7")
 
 # ------------------------------------------------------------------ live
 func test_live() -> void:
@@ -1072,86 +1078,428 @@ func test_pigment_rules() -> void:
 	AR.add_pigment(ch6.atlas, "glazed", "biting_glaze")
 	AR.add_pigment(ch6.atlas, "unfinished", "vivid_sketch")
 	AR.slot_pigment(ch6.atlas, 1)
-	AR.add_varnish(ch6.atlas, "thin_varnish", 2)
-	AR.slot_varnish(ch6.atlas, "thin_varnish")
 	var ch7 = CharacterData.new()
 	ch7.from_dict(JSON.parse_string(JSON.stringify(ch6.to_dict())))
-	check(str(ch7.atlas) == str(ch6.atlas), "pigments: Pigments, Easel and Varnish survive a JSON save", str(ch7.atlas))
+	check(str(ch7.atlas) == str(ch6.atlas), "pigments: Pigments and the Easel survive a JSON save", str(ch7.atlas))
 	var raw: Dictionary = ch6.to_dict()["atlas"].duplicate(true)
 	raw["pigments"].append({"id": "glazed", "mod": "nope", "charges": 3})
 	raw["pigments"].append({"id": "glazed", "mod": "thick_glaze", "charges": 0})
-	raw["varnish"]["bogus"] = 3
-	raw["varnish_slots"].append("bogus")
 	var cl := AR.sanitize(raw)
-	check(cl["pigments"].size() == 1 and not cl["varnish"].has("bogus") and cl["varnish_slots"] == ["thin_varnish"], "pigments: bad Pigments / Varnishes are dropped on load")
+	check(cl["pigments"].size() == 1, "pigments: bad Pigments are dropped on load")
 	var old := {"seed": 5, "revealed": [], "clears": {}}
 	var cl2 := AR.sanitize(old)
-	check(cl2["pigments"].is_empty() and cl2["easel"].is_empty() and cl2["varnish"].is_empty() and cl2["varnish_slots"].is_empty(), "pigments: a 1D atlas loads with an empty Easel")
+	check(cl2["pigments"].is_empty() and cl2["easel"].is_empty() and cl2["atelier"]["taken"].is_empty() and not cl2.has("varnish"), "pigments: a 1D atlas loads with an empty Easel and Atelier")
 
-func test_varnish_rules() -> void:
-	var vc := AR.varn_cfg()
-	check(vc.get("list", []).size() == 6, "varnish: 6 rule-changers")
-	var st := _bare_state(21)
-	check(AR.varnish_slot_count(st) == 1, "varnish: 1 slot at the start")
-	check(not AR.slot_varnish(st, "thin_varnish"), "varnish: an unowned Varnish cannot be slotted")
-	AR.add_varnish(st, "thin_varnish")
-	AR.add_varnish(st, "greed_varnish")
-	check(AR.slot_varnish(st, "thin_varnish") and not AR.slot_varnish(st, "thin_varnish") and not AR.slot_varnish(st, "greed_varnish"), "varnish: one of each, slot limit holds")
-	for hx in AR.within(Vector2i.ZERO, 1):
-		if AR.ring_of(hx) == 1:
-			st["clears"][AR.key(hx)] = 1
-	check(AR.varnish_slot_count(st) == 2 and AR.slot_varnish(st, "greed_varnish"), "varnish: clearing a whole ring adds a slot")
-	for hx in AR.within(Vector2i.ZERO, 3):
-		if AR.ring_of(hx) > 0:
-			st["clears"][AR.key(hx)] = 1
-	check(AR.varnish_slot_count(st) == 3, "varnish: at most 3 slots in the MVP")
-	# effects
-	var base := _bare_state(22)
-	var thin := _bare_state(22)
-	AR.add_varnish(thin, "thin_varnish")
-	AR.slot_varnish(thin, "thin_varnish")
-	check(AR.fronts_next(thin) == AR.fronts_next(base) - 1, "varnish: Thin spreads one fewer front")
-	check(AR.heart_at_for(thin) == AR.heart_at_for(base) + 1, "varnish: Thin moves the Heart to Rot 4")
+# ------------------------------------------------------------------ The Atelier (Phase 3B)
+## A state with the given nodes set directly (paths and points ignored).
+func _atelier_state(sd: int, specs: Array) -> Dictionary:
+	var st := _bare_state(sd)
+	ATR.set_nodes(st, specs)
+	return st
+
+func test_atelier_rules() -> void:
+	var ac := AR.atelier_cfg()
+	var ws: Array = ac.get("wedges", [])
+	check(ws.size() == 6, "atelier: 6 wedges", str(ws.size()))
+	var all_ok := true
+	var ids := {}
+	for w in ws:
+		var kinds := {}
+		var cost := 0
+		for n in w.get("nodes", []):
+			kinds[str(n["kind"])] = int(kinds.get(str(n["kind"]), 0)) + 1
+			cost += ATR.cost_of(n)
+			ids[str(n["id"])] = true
+			if str(n["kind"]) == "choice":
+				all_ok = all_ok and n.get("options", []).size() == 3
+			else:
+				all_ok = all_ok and n.has("bonus") and n.has("fx")
+		all_ok = all_ok and w["nodes"].size() == 6 and kinds == {"small": 3, "choice": 1, "notable": 1, "tip": 1} and cost == 9
+	check(all_ok and ids.size() == 36, "atelier: each wedge has 3 small, 1 choice (3 options), 1 notable, 1 tip; 9 points; 36 nodes")
+	var fxk_ok := true
+	for n in AR.atelier_nodes():
+		var srcs := [n.get("fx", {})]
+		for o in n.get("options", []):
+			srcs.append(o.get("fx", {}))
+		for f in srcs:
+			for k in f:
+				fxk_ok = fxk_ok and AR._FX_NEUTRAL.has(k)
+	check(fxk_ok, "atelier: every node effect key is a known zone parameter")
+	var vmap: Dictionary = ac.get("varnish_map", {})
+	var vm_ok := vmap.size() == 6
+	for k in vmap:
+		vm_ok = vm_ok and str(AR.atelier_node(str(vmap[k])).get("kind", "")) in ["tip", "notable"]
+	check(vm_ok, "atelier: the 6 old Varnishes map to rule-changers / notables")
+	check(AR.atelier_node("bare_notable").get("needs_3c", false) and AR.atelier_option(AR.atelier_node("draw_choice"), "c").get("needs_3c", false), "atelier: Umber Well and the Burning Canvas pick wait for Phase 3C")
+	# neutral without nodes
+	var base := _bare_state(31)
+	check(AR.atelier_fx(base) == AR._FX_NEUTRAL, "atelier: no nodes = neutral zone parameters")
+	# points
+	var st := _bare_state(32)
+	check(ATR.points_total(st) == 0, "atelier: a new atlas has 0 points")
+	var n2 := 0
+	for h in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(h) == 1:
+			st["clears"][AR.key(h)] = 1
+	check(ATR.points_total(st) == 0, "atelier: ring 1 clears give no points")
+	for h in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(h) >= 2 and n2 < 5:
+			st["clears"][AR.key(h)] = 3
+			n2 += 1
+	check(ATR.points_total(st) == 5, "atelier: +1 per cleared ring 2+ region (not per clear)", str(ATR.points_total(st)))
+	for h in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(h) >= 2:
+			st["clears"][AR.key(h)] = 1
+	check(ATR.region_points(st) == 18, "atelier: region points cap at 18", str(ATR.region_points(st)))
+	st["warden_kills"] = {"1": 2, "3": 1}
+	check(ATR.points_total(st) == 22, "atelier: +2 per Layer Warden first kill", str(ATR.points_total(st)))
+	check(ATR.points_max() == 30, "atelier: 30 points in all (18 + 6 x 2)", str(ATR.points_max()))
+	# paths
+	var p := _bare_state(33)
+	ATR.state(p)["bonus"] = 30
+	check(ATR.take_refusal(p, "var_choice", "a") != "" and ATR.take_refusal(p, "var_notable") != "" and ATR.take_refusal(p, "var_tip") != "", "atelier: choice, notable and tip are locked from the hub")
+	check(ATR.take(p, "var_s2") and not ATR.take(p, "var_choice", "a"), "atelier: 1 small is not enough for the choice")
+	check(ATR.take(p, "var_s3") and ATR.take_refusal(p, "var_choice") != "" and ATR.take(p, "var_choice", "b"), "atelier: 2 smalls open the choice (an option must be picked)")
+	check(ATR.take(p, "var_notable") and ATR.take(p, "var_tip"), "atelier: notable then tip")
+	check(ATR.points_spent(p) == 8, "atelier: the cheapest path to a tip is 8 points", str(ATR.points_spent(p)))
+	check(ATR.refund_refusal(p, "var_notable") != "" and ATR.refund_refusal(p, "var_s2") != "" and ATR.refund(p, "var_tip"), "atelier: refund only what nothing needs (tip first)")
+	check(ATR.take(p, "var_s1") and ATR.refund(p, "var_s2"), "atelier: a third small lets another small go")
+	check(ATR.choice_of(p, "var_choice") == "b" and ATR.refund(p, "var_notable") and ATR.refund(p, "var_choice") and ATR.choice_of(p, "var_choice") == "", "atelier: refunding a choice clears its pick")
+	check(ATR.take_refusal(p, "bare_notable") != "" and ATR.take_refusal(p, "draw_choice", "c") != "", "atelier: 3C nodes cannot be taken")
+	# budget
+	var b := _bare_state(34)
+	ATR.state(b)["bonus"] = 2
+	check(ATR.take(b, "craq_s1") and ATR.take(b, "craq_s2") and ATR.take_refusal(b, "craq_s3").begins_with("Needs"), "atelier: points limit what can be taken")
+	check(ATR.respec(b) == 2 and ATR.taken(b).is_empty() and ATR.points_free(b) == 2, "atelier: free respec refunds everything")
+	# Master's Lesson: +1 per Warden first kill; it cannot be refunded while its points are spent
+	var ml := _bare_state(35)
+	ml["warden_kills"] = {"1": 1, "2": 1, "3": 1}
+	check(ATR.points_total(ml) == 6, "atelier: 3 Warden kills = 6 points")
+	ATR.take(ml, "bare_s1")
+	ATR.take(ml, "bare_s2")
+	check(ATR.take(ml, "bare_choice", "b") and ATR.points_total(ml) == 9, "atelier: Master's Lesson adds +1 per Warden first kill (retroactive)", str(ATR.points_total(ml)))
+	ATR.take(ml, "bare_s3")
+	ATR.take(ml, "var_s1")
+	ATR.take(ml, "var_s2")
+	check(ATR.points_spent(ml) == 6 and ATR.refund_refusal(ml, "bare_choice") == "", "atelier: Master's Lesson can be refunded while the rest is covered")
+	ATR.take(ml, "var_s3")
+	ATR.take(ml, "craq_s1")
+	check(ATR.points_spent(ml) == 8 and ATR.refund_refusal(ml, "bare_choice") != "", "atelier: ... but not when its points are spent elsewhere", str(ATR.points_spent(ml)))
+	# fix on load: a broken path loses the outer nodes; an overspent set is refunded
+	var fx1 := _bare_state(36)
+	ATR.state(fx1)["bonus"] = 30
+	fx1["atelier"]["taken"] = ["pent_tip", "pent_s1"]
+	ATR.fix(fx1)
+	check(fx1["atelier"]["taken"] == ["pent_s1"] and not fx1.has("atelier_reset"), "atelier: a node whose path broke is dropped on load")
+	var fx2 := _bare_state(37)
+	ATR.set_nodes(fx2, ["craq_s1", "craq_s2"])
+	ATR.fix(fx2)
+	check(ATR.taken(fx2).is_empty() and fx2.get("atelier_reset", false), "atelier: an overspent board is refunded on load (with a message)")
+	# set_nodes (smartbot / dev) and the old Varnish ids
+	var sn := _bare_state(38)
+	check(ATR.set_nodes(sn, ["thin_varnish", "pent_choice:c", "bogus", "draw_choice:c"]) == ["var_tip", "pent_choice"] and ATR.choice_of(sn, "pent_choice") == "c", "atelier: set_nodes maps old Varnish ids, takes choice picks, skips unknown and 3C picks")
+	# node status for the UI
+	var ns := _bare_state(39)
+	ATR.state(ns)["bonus"] = 1
+	check(ATR.node_status(ns, "var_s1") == "open" and ATR.node_status(ns, "var_tip") == "locked" and ATR.node_status(ns, "bare_notable") == "3c", "atelier: node status open / locked / 3c")
+	ATR.state(ns)["bonus"] = 0
+	check(ATR.node_status(ns, "var_s1") == "poor", "atelier: node status poor without points")
+
+func test_atelier_nodes() -> void:
 	var d: Dictionary = AR.zone_def(22, Vector2i(2, 0))
-	check(AR.apply_rot(d, 3, 22, Vector2i(2, 0), base).get("heart", false) and not AR.apply_rot(d, 3, 22, Vector2i(2, 0), thin).get("heart", false) and AR.apply_rot(d, 4, 22, Vector2i(2, 0), thin).get("heart", false), "varnish: with Thin, Rot 3 has no Heart, Rot 4 has")
-	var greed := _bare_state(22)
-	AR.add_varnish(greed, "greed_varnish")
-	AR.slot_varnish(greed, "greed_varnish")
-	check(is_equal_approx(float(AR.apply_rot(d, 2, 22, Vector2i(2, 0), greed)["rot_reward"]), float(AR.apply_rot(d, 2, 22, Vector2i(2, 0), base)["rot_reward"]) * 1.5), "varnish: Greedy raises Rot rewards 50%")
-	var gh := Vector2i(2, 0)
-	greed["rot"].erase(AR.key(gh))
-	check(AR.add_death_rot(greed, gh) == 2, "varnish: Greedy makes a death add +2 Rot")
-	var binder := _bare_state(23)
-	AR.add_varnish(binder, "binder_varnish")
-	AR.slot_varnish(binder, "binder_varnish")
-	check(AR.pigment_slots(binder, Vector2i(3, 0)) == 1 and int(AR.add_pigment(binder, "glazed")["charges"]) == int(AR.pig_cfg()["charges"]) + 2, "varnish: Binding gives +2 charges but 1 Pigment slot")
-	var bloom := _bare_state(24)
-	AR.add_varnish(bloom, "bloom_varnish")
-	AR.slot_varnish(bloom, "bloom_varnish")
+	var base := _bare_state(22)
+	# the old Varnishes (now tips / a notable) keep their effects
+	var thin := _atelier_state(22, ["var_tip"])
+	check(AR.fronts_next(thin) == AR.fronts_next(base) - 1 and AR.heart_at_for(thin) == AR.heart_at_for(base) + 1, "atelier Thin: one fewer front, Hearts from Rot 4")
+	check(not AR.apply_rot(d, 3, 22, Vector2i(2, 0), thin).get("heart", false) and AR.apply_rot(d, 4, 22, Vector2i(2, 0), thin).get("heart", false), "atelier Thin: Rot 3 has no Heart, Rot 4 has")
+	var greed := _atelier_state(22, ["pent_tip"])
+	check(is_equal_approx(float(AR.apply_rot(d, 2, 22, Vector2i(2, 0), greed)["rot_reward"]), float(AR.apply_rot(d, 2, 22, Vector2i(2, 0), base)["rot_reward"]) * 1.5), "atelier Greedy: Rot rewards +50%")
+	greed["rot"].erase("2,0")
+	check(AR.add_death_rot(greed, Vector2i(2, 0)) == 2, "atelier Greedy: a death adds +2 Rot")
+	var bind := _atelier_state(23, ["under_tip"])
+	check(AR.pigment_slots(bind, Vector2i(3, 0)) == 1 and int(AR.add_pigment(bind, "glazed")["charges"]) == int(AR.pig_cfg()["charges"]) + 2, "atelier Binding: +2 charges, 1 Pigment slot")
+	var bloom := _atelier_state(24, ["draw_tip"])
 	var n0 := 0
 	var n1 := 0
 	for hx in AR.within(Vector2i.ZERO, 3):
 		for c in 6:
 			if AR.ring_of(hx) > 0:
 				n0 += 1 if AR.natural_mechanic(24, hx, c) != "" else 0
-				n1 += 1 if AR.natural_mechanic(24, hx, c, float(AR.varnish_fx(bloom)["natural_mult"])) != "" else 0
-	check(n1 > n0 * 1.6, "varnish: Blooming roughly doubles natural mechanics", "%d -> %d" % [n0, n1])
-	# Heart drops
-	var harvest_all := true
-	var restores := 0
-	var n := 0
-	for i in 200:
-		var s2 := _bare_state(300 + i)
-		var hx := Vector2i(2, -1)
-		harvest_all = harvest_all and AR.heart_varnish(s2, hx, "harvest") != ""
-		if AR.heart_varnish(s2, hx, "restore") != "":
-			restores += 1
-		n += 1
-	check(harvest_all, "varnish: Harvest always drops a Varnish")
-	check(restores > 40 and restores < 100, "varnish: Restore drops one about a third of the time", "%d / %d" % [restores, n])
-	var s3 := _bare_state(77)
-	check(AR.heart_varnish(s3, Vector2i(2, 0), "harvest") == AR.heart_varnish(s3, Vector2i(2, 0), "harvest"), "varnish: the drop is seeded")
-	check(AR.unslot_varnish(st, "thin_varnish") and not st["varnish_slots"].has("thin_varnish"), "varnish: unslot")
+				n1 += 1 if AR.natural_mechanic(24, hx, c, float(AR.atelier_fx(bloom)["natural_mult"])) != "" else 0
+	check(n1 > n0 * 1.6, "atelier Blooming: natural mechanics roughly double", "%d -> %d" % [n0, n1])
+	# Rot wedge
+	var a := _bare_state(40)
+	var fx := AR.atelier_fx(_atelier_state(40, ["var_notable"]))
+	check(int(fx["fronts"]) == 1 and is_equal_approx(AR.rot_reward_mult(_atelier_state(40, ["var_notable", "pent_tip", "var_s1"])), 1.8), "atelier: Fermentation +1 front; Rot reward bonuses add (+40 +50 -10)")
+	var loc := _atelier_state(41, ["var_s1"])
+	var far := Vector2i(-2, 2)
+	var near_ok := true
+	for i in 8:
+		var s2 := loc.duplicate(true)
+		var raised := AR.spread(s2, far)
+		for k in raised:
+			var kh := AR.parse(str(k))
+			near_ok = near_ok and AR.is_revealed(s2, kh)
+	check(near_ok, "atelier Contained Bloom: Rot only spreads into revealed regions")
+	var lo := _atelier_state(42, ["var_s1"])
+	lo["rot"] = {"2,0": 1, "-2,2": 1}
+	var raised2 := AR.spread(lo.duplicate(true), Vector2i(-2, 2))
+	var close := true
+	for k in raised2:
+		var kh := AR.parse(str(k))
+		close = close and (kh == Vector2i(-2, 2) or AR.neighbours(Vector2i(-2, 2)).has(kh))
+	check(close and not raised2.is_empty(), "atelier Contained Bloom: Rot spreads next to the completed region", str(raised2))
+	check(AR.forecast_depends_on_hex(lo) and not AR.forecast_depends_on_hex(a), "atelier Contained Bloom: the forecast depends on the region")
+	var rs := _atelier_state(43, ["var_s3"])
+	rs["rot"] = {"2,0": 2, "3,0": 2, "2,1": 1}
+	var eased := AR.restore(rs, Vector2i(2, 0))
+	check(AR.rot_of(rs, Vector2i(3, 0)) == 1 and AR.rot_of(rs, Vector2i(2, 1)) == 0 and eased.size() == 2, "atelier Gilded Firebreak: Restore clears 1 Rot from each neighbour", str(rs["rot"]))
+	check(AR.pigment_slots(rs, Vector2i(2, 0)) == 1 and AR.pigment_slots(a, Vector2i(2, 0)) == 1, "atelier Gilded Firebreak: a Restored region gives no extra Pigment slot")
+	var rs0 := _bare_state(43)
+	AR.restore(rs0, Vector2i(2, 0))
+	check(AR.pigment_slots(rs0, Vector2i(2, 0)) == 2, "(without it a Restored region still gives +1 slot)")
+	var hv := AR.apply_rot(d, 3, 22, Vector2i(2, 0), _atelier_state(22, ["var_s2"]))
+	check(is_equal_approx(float(hv.get("heart_life", 1.0)), 1.15), "atelier Ripened Hearts: Hearts +15% life")
+	# Craquelure
+	var cq := AR.atelier_fx(_atelier_state(44, ["craq_s1", "craq_s2"]))
+	check(is_equal_approx(float(cq["density"]), 1.1 * 0.95) and is_equal_approx(float(cq["elite_mult"]), 0.9 * 1.15), "atelier: pack / elite multipliers multiply")
+	var pv := AR.elite_preview(44, Vector2i(2, 0), 0)
+	check(pv.size() == int(AR.atelier_cfg().get("preview_pool", 4)) and pv == AR.elite_preview(44, Vector2i(2, 0), 0) and pv != AR.elite_preview(44, Vector2i(2, 0), 1), "atelier Connoisseur's Eye: a seeded elite modifier pool per run")
+	# Pentimento
+	var one := _atelier_state(45, ["pent_notable"])
+	var exact := true
+	var both0 := 0
+	for hx in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(hx) == 0:
+			continue
+		exact = exact and AR.next_mechanics(one, hx)["minor"].size() == 1
+		both0 += 1 if AR.next_mechanics(_bare_state(45), hx)["minor"].is_empty() else 0
+	check(exact and both0 > 0, "atelier Always Something Beneath: every zone has exactly one of Vault / Collector")
+	check(WV.mults(4) == [1, 2, 3, 4] and WV.mults() == [1, 2, 3], "atelier High Stakes: the Collector takes 4x")
+	check(not WV.offers(RandomNumberGenerator.new(), [], 3, 9, 99, ["boss_rush", "few_skills", "abstinence", "iron_will"]).has("boss_rush"), "Last Light: the boss bets are not offered")
+	check(int(WV.cache(50, 0, "treasure", 1)["rares"]) == int(WV.cache(50, 0, "treasure")["rares"]) + 1 and int(WV.cache(50, 0, "riddle", 1)["rares"]) == int(WV.cache(50, 0, "riddle")["rares"]), "atelier Richer Caches: +1 rare in Treasure Vaults only")
+	var vcount := 0
+	for hx in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(hx) > 0 and AR.minor_mechanics(46, hx, 0, 1.0, {"vault": 1.5}).has("vault"):
+			vcount += 1
+	var vbase := 0
+	var hid := _atelier_state(46, ["pent_s1"])
+	var vlive := 0
+	for hx in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(hx) > 0 and AR.minor_mechanics(46, hx, 0).has("vault"):
+			vbase += 1
+		if AR.ring_of(hx) > 0 and AR.next_mechanics(hid, hx)["minor"].has("vault"):
+			vlive += 1
+	check(vcount >= vbase and vlive == vcount, "atelier Hidden Rooms: Vaults roll 50% more often", "%d vs %d (%d)" % [vcount, vbase, vlive])
+	# Underpainting
+	var up := _atelier_state(47, ["under_s1", "under_choice:a"])
+	check(AR.pigment_cost(up, "glazed") == int(round(float(AR.pigment_info("glazed")["cost"]) * 1.2 * 0.75)) and AR.pigment_cost(up, "unfinished") == int(round(float(AR.pigment_info("unfinished")["cost"]) * 1.2)), "atelier: craft costs (Generous Grind x1.2, Cheap Glaze x0.75)")
+	check(int(AR.add_pigment(up, "glazed")["charges"]) == int(AR.pig_cfg()["charges"]) + 1, "atelier Generous Grind: +1 charge")
+	var third := _atelier_state(48, ["under_notable"])
+	check(AR.pigment_slots(third, Vector2i(3, 0)) == 3 and AR.pigment_slots(third, Vector2i(1, 0)) == 2 and AR.easel_slots(third) == 3 and AR.easel_slots(_bare_state(48)) == 2, "atelier The Third Colour: +1 Pigment slot everywhere, a 3rd Easel slot")
+	var dang := _atelier_state(49, ["under_s2"])
+	var order: Array = AR.atelier_cfg()["pigment_danger"]["glazed"]
+	var hi0 := 0
+	var hi1 := 0
+	var plain := _bare_state(49)
+	for i in 60:
+		hi0 += order.find(str(AR.add_pigment(plain, "glazed")["mod"]))
+		hi1 += order.find(str(AR.add_pigment(dang, "glazed")["mod"]))
+		plain["pigments"] = []
+		dang["pigments"] = []
+	check(hi1 > hi0, "atelier Bold Mixing: modifiers lean to the more dangerous", "%d vs %d" % [hi1, hi0])
+	var sh := _atelier_state(50, ["under_s3"])
+	sh["rot"].erase("2,0")
+	check(AR.add_death_rot(sh, Vector2i(2, 0)) == 1 and AR.add_death_rot(sh, Vector2i(2, 0)) == 3, "atelier Steady Hand: +1 more Rot on death only in a Rot hex")
+	check(GR.vendor_left(_atelier_state(51, ["under_choice:c"])) == int(GR.cfg()["vendor"]["per_refresh"]) + 1, "atelier Guild Supplier: +1 Pigment per vendor refresh")
+	# Drawing
+	var force := _atelier_state(52, ["draw_choice:a"])
+	var only_glazed := true
+	var any := false
+	for hx in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(hx) == 0:
+			continue
+		for m in AR.next_mechanics(force, hx)["natural"]:
+			any = true
+			only_glazed = only_glazed and m == "glazed"
+	check(any and only_glazed, "atelier Study in Glaze: the natural mechanic is always Glazed")
+	var dbl := _atelier_state(53, ["draw_notable"])
+	var two := 0
+	for hx in AR.within(Vector2i.ZERO, 3):
+		for c in 6:
+			if AR.ring_of(hx) > 0:
+				var s3 := dbl.duplicate(true)
+				s3["clears"][AR.key(hx)] = c
+				two += 1 if AR.next_mechanics(s3, hx)["natural"].size() == 2 else 0
+	check(two > 0, "atelier Double Study: some zones roll 2 natural mechanics", str(two))
+	var busy := _atelier_state(54, ["draw_s3"])
+	check(is_equal_approx(float(AR.atelier_fx(busy)["natural_chance"]), 0.1) and AR.run_mods(54, Vector2i(2, 0), 0, d, 1).size() == AR.run_mods(54, Vector2i(2, 0), 0, d).size() + 1 and AR.run_mods(54, Vector2i(2, 0), 0, d, 1).slice(0, AR.run_mods(54, Vector2i(2, 0), 0, d).size()) == AR.run_mods(54, Vector2i(2, 0), 0, d), "atelier Busy Canvas: +1 base modifier (the first ones unchanged)")
+	# Bare Canvas
+	var bc := _atelier_state(55, ["bare_s2", "bare_choice:c"])
+	check(AR.summon_cost(bc) == AR.summon_cost() + 1 and AR.shard_cap(bc) == 12 and AR.shard_cap(_bare_state(55)) == 9, "atelier: Warden's Tithe +1 summon Shard, Deep Pockets cap 12")
+	check(AR.add_shards(bc, 2, 20) == 12 and AR.shards(bc, 2) == 12, "atelier Deep Pockets: 12 shards held")
+	ATR.set_nodes(bc, [])
+	check(AR.add_shards(bc, 2, 1) == 0 and AR.shards(bc, 2) == 12, "atelier: shards above the cap are kept after a respec")
+	var rf := _atelier_state(56, ["bare_s3"])
+	AR.add_shards(rf, 2, 3)
+	var vr := AR.warden_victory(rf, 2, 3)
+	check(int(vr["rot_shards"]) == 1 and AR.shards(rf, 2) == 1, "atelier Rot-Fed Wardens: +1 Ground Shard for a Warden killed at Rot 3+")
+	var pity := _atelier_state(57, ["bare_choice:a"])
+	var dry := 0
+	var max_dry := 0
+	for i in 40:
+		AR.add_shards(pity, 1, 3)
+		var r := AR.warden_victory(pity, 1)
+		dry = 0 if r["ground"] else dry + 1
+		max_dry = maxi(max_dry, dry)
+	check(max_dry <= 2, "atelier Patient Grinding: never more than 2 dry Warden kills", str(max_dry))
+	# guild: each Lantern-bearer counts as a boss; boss_fast counts the fast ones
+	var c1 := {"tpl": "bosses", "need": 9, "have": 0}
+	var c2 := {"tpl": "boss_fast", "need": 9, "have": 0}
+	var rep := {"zones": 1, "ring": 2, "rot": 0, "bosses": 3, "boss_time": 9999.0, "boss_times": [8.0, 25.0, 12.0]}
+	check(GR.progress_of(c1, rep) == 3 and GR.progress_of(c2, rep) == 2, "Last Light: 3 bosses per zone; 2 of them fast", "%d %d" % [GR.progress_of(c1, rep), GR.progress_of(c2, rep)])
+
+func test_atelier_save() -> void:
+	# Phase 3B: rings 4-6 get a seeded Rot source when first revealed
+	var st := AR.new_state(91)
+	check(st["ring_sources"].is_empty() and AR.plant_ring_sources(st).is_empty(), "ring sources: nothing while only rings 1-3 are revealed")
+	var s3 := AR.new_state(91)
+	for h in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(h) >= 1 and not s3["revealed"].has(AR.key(h)):
+			s3["revealed"].append(AR.key(h))
+	var rot3: Dictionary = s3["rot"].duplicate()
+	check(AR.plant_ring_sources(s3).is_empty() and s3["rot"] == rot3, "ring sources: a fully revealed ring 3 plants nothing")
+	var h3 := Vector2i(3, 0)
+	s3["clears"][AR.key(h3)] = 0
+	var rev := AR.complete(s3, h3)
+	var in4 := []
+	for k in s3["rot"]:
+		if AR.ring_of(AR.parse(str(k))) == 4:
+			in4.append(k)
+	check(s3["ring_sources"].has(4) and in4.size() == 1 and int(s3["rot"][in4[0]]) == int(AR.rot_cfg()["source_level"]), "ring sources: revealing ring 4 plants 1 source there", str(in4) + str(s3["ring_sources"]))
+	check(AR.plant_ring_sources(s3).is_empty(), "ring sources: never twice")
+	var s4 := AR.new_state(91)
+	for h in AR.within(Vector2i.ZERO, 3):
+		if AR.ring_of(h) >= 1 and not s4["revealed"].has(AR.key(h)):
+			s4["revealed"].append(AR.key(h))
+	s4["clears"][AR.key(h3)] = 0
+	AR.complete(s4, h3)
+	check(s4["rot"] == s3["rot"], "ring sources: seeded (same atlas seed = same source)")
+	# old saves that revealed ring 4 get it once on load
+	var raw6 := {"seed": 91, "revealed": ["4,0", "3,0"], "clears": {"3,0": 1}, "rot": {}}
+	var l1 := AR.sanitize(raw6)
+	var l2 := AR.sanitize(JSON.parse_string(JSON.stringify(l1)))
+	check(l1["ring_sources"].has(4) and l2["rot"] == l1["rot"] and l2["ring_sources"] == l1["ring_sources"], "ring sources: a v6 save with ring 4 revealed gets its source once", "%s %s / %s %s" % [str(l1["ring_sources"]), str(l1["rot"]), str(l2["ring_sources"]), str(l2["rot"])])
+	# save v7: Varnishes become Guild Seals
+	var v6 := {"seed": 92, "revealed": [], "clears": {}, "varnish": {"thin_varnish": 2, "greed_varnish": 1, "bogus": 4}, "varnish_slots": ["thin_varnish"]}
+	var m := AR.sanitize(v6)
+	check(not m.has("varnish") and not m.has("varnish_slots") and int(m["guild"]["seals"]) == 6 and m["atelier"]["taken"].is_empty(), "save v7: 3 Varnishes -> 6 Guild Seals, slots gone", str(m.get("guild", {}).get("seals", -1)))
+	check(AR.varnish_message(m).find("3 Varnishes") >= 0 and AR.varnish_message(m).find("6 Guild Seals") >= 0, "save v7: a one-time message", AR.varnish_message(m))
+	var m2 := AR.sanitize(JSON.parse_string(JSON.stringify(m)))
+	check(int(m2["guild"]["seals"]) == 6 and AR.varnish_message(m2) != "", "save v7: reloading converts nothing twice; the message waits until seen")
+	AR.ack_varnish_message(m2)
+	check(AR.varnish_message(AR.sanitize(JSON.parse_string(JSON.stringify(m2)))) == "", "save v7: the message is gone once seen")
+	var capped := AR.sanitize({"seed": 93, "revealed": [], "clears": {}, "varnish": {"dense_varnish": 6}, "guild": {"rep": 10, "seals": 95}})
+	check(int(capped["guild"]["seals"]) == 99 and AR.varnish_message(capped).find("Seal cap") >= 0, "save v7: the Seal cap holds", str(capped["guild"]["seals"]))
+	# atelier round trip through a character save
+	var ch = CharacterData.new()
+	ch.setup_new("warrior", "Dan")
+	ch.atlas = _bare_state(94)
+	ATR.state(ch.atlas)["bonus"] = 10
+	ATR.take(ch.atlas, "pent_s1")
+	ATR.take(ch.atlas, "pent_s2")
+	ATR.take(ch.atlas, "pent_choice", "c")
+	var ch2 = CharacterData.new()
+	ch2.from_dict(JSON.parse_string(JSON.stringify(ch.to_dict())))
+	check(int(ch.to_dict()["version"]) == 7 and ATR.taken(ch2.atlas) == ["pent_s1", "pent_s2", "pent_choice"] and ATR.choice_of(ch2.atlas, "pent_choice") == "c" and str(ch2.atlas["atelier"]) == str(ch.atlas["atelier"]) and ch2.atlas["ring_sources"] == ch.atlas["ring_sources"], "save v7: the Atelier survives a JSON save", str(ch2.atlas.get("atelier")))
+	var bad := ch.to_dict()
+	bad["atlas"]["atelier"] = {"taken": ["bogus", "bare_notable", "pent_choice"], "choices": {"pent_choice": "z"}, "bonus": "x"}
+	var ch3 = CharacterData.new()
+	ch3.from_dict(bad)
+	check(ATR.taken(ch3.atlas).is_empty() and int(ch3.atlas["atelier"]["bonus"]) == 0, "save v7: bad Atelier entries are dropped on load")
+
+func test_live_atelier() -> void:
+	var st: Dictionary = AR.ensure(Game.ch)
+	_open_atlas_all(st)
+	Game.atlas_force_mechanic = "none"
+	st["easel"] = []
+	st["pigments"] = []
+	var h := Vector2i(2, -1)
+	var hk := AR.key(h)
+	st["rot"].erase(hk)
+	st["restored"].erase(hk)
+	st["summons"] = {}
+	# no nodes: an ordinary boss
+	ATR.set_nodes(st, [])
+	main.enter_atlas(h, 7171)
+	await frames(3)
+	var lv = Game.level
+	check(not lv.def.get("last_light", false) and lv.afx == AR._FX_NEUTRAL, "live atelier: no nodes, no Last Light, neutral effects")
+	main.go_hub(false)
+	await frames(3)
+	# Last Light: waves of Lantern-bearer packs replace the boss
+	ATR.set_nodes(st, ["bare_tip"])
+	var clears0 := AR.clears(st, h)
+	main.enter_atlas(h, 7171)
+	await frames(3)
+	lv = Game.level
+	check(lv.def.get("last_light", false) and lv.objective_text().find("Last Light") >= 0, "live Last Light: the zone has no boss", lv.objective_text().substr(0, 80))
+	var p = lv.player
+	for o in lv.objectives:
+		if o["type"] != "boss":
+			o["done"] = true
+	lv._update_seal()
+	p.global_position = lv.cell_center(lv.rooms[lv.layout["boss"]]["anchor"])
+	var t := 0
+	while not lv.last_light.get("active", false) and t < 120:
+		await frames(2)
+		t += 2
+	var ll: Dictionary = AR.atelier_cfg()["last_light"]
+	check(lv.last_light.get("active", false) and lv.boss == null and int(lv.last_light["wave"]) == 1, "live Last Light: stepping into the arena starts wave 1", str(lv.last_light.get("wave", -1)))
+	var lead = lv.last_light["leaders"][0] if not lv.last_light.get("leaders", []).is_empty() else null
+	check(lead != null and lead.is_elite and lead.elite_mods.size() >= int(ll["leader_mods"]) + 1 and lead.display_name.find(str(ll["name"])) >= 0, "live Last Light: a Lantern-bearer leads the wave (+2 modifiers)", str(lead.display_name if lead != null else ""))
+	var waves := 0
+	var guard := 0
+	while not lv.boss_dead and guard < 40:
+		guard += 1
+		for e in lv.last_light["members"].duplicate():
+			if is_instance_valid(e) and e.alive:
+				e.process_mode = Node.PROCESS_MODE_INHERIT
+				e.die(p)
+		await frames(4)
+		waves = int(lv.last_light.get("wave", 0))
+	check(lv.boss_dead and waves == int(ll["waves"]) and lv.last_light["leaders"].size() == int(ll["waves"]), "live Last Light: 3 waves, then the zone is complete", "%s %d" % [str(lv.boss_dead), waves])
+	check(AR.clears(st, h) == clears0 + 1 and int(lv.guild_report.get("bosses", 0)) == 3 and lv.guild_report.get("boss_times", []).size() == 3, "live Last Light: the clear counts and each Lantern-bearer counts as a boss", str(lv.guild_report.get("bosses", -1)))
+	main.go_hub(true)
+	await frames(3)
+	# Hearts of Rot are not replaced
+	st["rot"][hk] = 3
+	main.enter_atlas(h, 7171)
+	await frames(3)
+	check(Game.level.def.get("heart", false) and not Game.level.def.get("last_light", false), "live Last Light: a Heart of Rot still ends a Heart zone")
+	main.go_hub(false)
+	await frames(3)
+	st["rot"].erase(hk)
+	ATR.set_nodes(st, [])
+	# the Atelier panel
+	var ui = main.ui
+	if ui != null:
+		ATR.state(st)["bonus"] = 3
+		ui.toggle("atelier")
+		var ap = ui.panels["atelier"]
+		check(ui.is_open("atelier") and ap.node_buttons.size() == 36 and ap.points_label.text.find("%d free" % ATR.points_free(st)) >= 0, "Atelier panel opens with 36 nodes and the points", ap.points_label.text.substr(0, 90))
+		ap._focus("var_s1")
+		check(ap.detail.text.find("[color=#80e080]+") >= 0 and ap.detail.text.find("[color=#ff7070]-") >= 0 and ap.actions.get_child_count() == 1, "Atelier panel: bonus in green, cost in red, a Take button")
+		(ap.actions.get_child(0) as Button).pressed.emit()
+		check(ATR.is_taken(st, "var_s1"), "Atelier panel: Take takes the node")
+		if args.has("shot"):
+			await _shot("atelier")
+		ap._respec()
+		check(ATR.taken(st).is_empty(), "Atelier panel: respec")
+		ui.toggle("easel")
+		check(ui.panels["easel"].atelier_box.get_child_count() >= 3, "Easel: the Varnish column became the Atelier summary")
+		ui.close_all()
+		ATR.state(st)["bonus"] = 0
 
 func test_live_pigments() -> void:
 	var st: Dictionary = AR.ensure(Game.ch)
@@ -1159,7 +1507,7 @@ func test_live_pigments() -> void:
 	Game.atlas_force_mechanic = "none"
 	st["pigments"] = []
 	st["easel"] = []
-	st["varnish_slots"] = []
+	ATR.set_nodes(st, [])
 	var h3 := Vector2i(3, 0)
 	st["rot"].erase(AR.key(h3))
 	st["restored"].erase(AR.key(h3))
@@ -1233,32 +1581,24 @@ func test_live_pigments() -> void:
 	await frames(3)
 	st["easel"] = []
 	st["rot"].erase(AR.key(h3))
-	# Varnish in a run: Dense = bigger packs, more rewards
-	AR.add_varnish(st, "dense_varnish")
-	st["varnish_slots"] = ["dense_varnish"]
+	# The Atelier in a run (Phase 3B): Dense Varnish (Craquelure notable) = bigger packs, more rewards
+	ATR.set_nodes(st, ["craq_notable"])
 	main.enter_atlas(h3, 6161)
 	await frames(3)
 	lv = Game.level
-	check(is_equal_approx(lv.density, dens0 * 1.25) and is_equal_approx(lv.reward_bonus, reward0 + 20.0), "live varnish: Dense raises pack size and rewards", "%.2f/%.1f" % [lv.density, lv.reward_bonus])
+	check(is_equal_approx(lv.density, dens0 * 1.25) and is_equal_approx(lv.reward_bonus, reward0 + 20.0), "live atelier: Dense Varnish raises pack size and rewards", "%.2f/%.1f" % [lv.density, lv.reward_bonus])
 	main.go_hub(false)
 	await frames(3)
-	st["varnish_slots"] = []
-	# Heart drops: Harvest always leaves a Varnish
+	ATR.set_nodes(st, [])
+	# Heart drops: Hearts no longer drop Varnishes (Phase 3B)
 	var hh := Vector2i(-3, 0)
 	st["restored"].erase(AR.key(hh))
 	st["rot"][AR.key(hh)] = 3
-	var owned0 := 0
-	for k in st["varnish"]:
-		owned0 += int(st["varnish"][k])
 	main.enter_atlas(hh)
 	await frames(3)
 	lv = Game.level
 	await _kill_boss(lv)
-	check(lv.choose_heart("harvest") and lv.varnish_drop != "", "live varnish: Harvesting a Heart drops a Varnish", lv.varnish_drop)
-	var owned1 := 0
-	for k in st["varnish"]:
-		owned1 += int(st["varnish"][k])
-	check(owned1 == owned0 + 1, "live varnish: the Varnish is banked on the atlas")
+	check(lv.choose_heart("harvest") and not st.has("varnish") and not "varnish_drop" in lv, "live atelier: Harvesting a Heart drops no Varnish any more")
 	main.go_hub(true)
 	await frames(3)
 	# the Easel panel
@@ -1381,7 +1721,7 @@ func test_live_wardens() -> void:
 	_open_atlas_all(st)
 	Game.atlas_force_mechanic = "none"
 	st["easel"] = []
-	st["varnish_slots"] = []
+	ATR.set_nodes(st, [])
 	for k in ["shards", "shard_dry", "summons", "ground", "ground_dry", "warden_kills"]:
 		st[k] = {}
 	Game.ch.progress["bosses_killed"].erase("atlas_warden_1")
@@ -1816,7 +2156,7 @@ func test_live_guild() -> void:
 	_open_atlas_all(st)
 	Game.atlas_force_mechanic = "none"
 	st["easel"] = []
-	st["varnish_slots"] = []
+	ATR.set_nodes(st, [])
 	st["summons"] = {}
 	var g := GR.ensure(st)
 	g["rep"] = 0
@@ -2025,7 +2365,7 @@ func test_live_wager() -> void:
 	var st: Dictionary = AR.ensure(Game.ch)
 	_open_atlas_all(st)
 	st["easel"] = []
-	st["varnish_slots"] = []
+	ATR.set_nodes(st, [])
 	st["summons"] = {}
 	var h := Vector2i(2, 0)
 	st["rot"].erase(AR.key(h))
@@ -2470,7 +2810,7 @@ func test_live_3a() -> void:
 	_open_all6(st)
 	Game.atlas_force_mechanic = "none"
 	st["easel"] = []
-	st["varnish_slots"] = []
+	ATR.set_nodes(st, [])
 	for k in ["shards", "shard_dry", "summons", "ground", "ground_dry", "warden_kills"]:
 		st[k] = {}
 	# a ring 4 Warden run with the pool signature
@@ -2510,11 +2850,14 @@ func test_live_3a() -> void:
 			if pools >= 3:
 				break
 		check(pools >= 3, "live 3A: Dead Colour blots leave lingering pools", str(pools))
-		# pools fade (each lives 4 s; the last blot lands about 1.9 s after the cast)
+		# pools fade (each lives 4 s). Phase 3B: checked per pool (no pool ever has more than its
+		# lifetime left, all gone in the end) instead of a frame budget, which flaked when a late blot landed
 		var left := -1
 		var waited := 0
 		var lives := []
-		while waited < 900:
+		var max_life := 0.0
+		var pool_life := float(AR.warden_cfg(4)["add"]["dead_colour"]["pool"]["life"])
+		while waited < 1200:
 			await frames(30)
 			waited += 30
 			left = 0
@@ -2522,10 +2865,11 @@ func test_live_3a() -> void:
 			for ch in lv.floor_layer.get_children():
 				if ch.get("kind") == "pool":
 					left += 1
+					max_life = maxf(max_life, float(ch.life))
 					lives.append("%.2f" % float(ch.life))
 			if left == 0:
 				break
-		check(left == 0 and waited <= 480, "live 3A: pools fade after their lifetime", "%d left after %d frames %s" % [left, waited, str(lives)])
+		check(left == 0 and max_life <= pool_life + 0.01, "live 3A: pools fade after their lifetime", "%d left after %d frames %s (max %.2f)" % [left, waited, str(lives), max_life])
 		b._start_pattern("dead_colour")
 		b.interrupt_windup()
 		await frames(90)

@@ -28,8 +28,19 @@ func _ready() -> void:
 func set_state(st: Dictionary, sel: Vector2i) -> void:
 	state = st
 	selected = sel
-	forecast = AtlasRules.forecast(st) if not st.is_empty() else []
+	_refresh_forecast()
 	queue_redraw()
+
+## The next spread's forecast. With the Atelier's Contained Bloom it depends on the region you
+## complete: the hovered region, else the selected one (Phase 3B).
+func _refresh_forecast() -> void:
+	if state.is_empty():
+		forecast = []
+		return
+	var from := Vector2i(9999, 9999)
+	if AtlasRules.forecast_depends_on_hex(state):
+		from = hover if AtlasRules.can_enter(state, hover) else selected
+	forecast = AtlasRules.forecast(state, from)
 
 ## Rings the view fits: the explored rings plus the fog ring, at least 3, at most the atlas.
 func view_radius() -> int:
@@ -86,6 +97,8 @@ func _gui_input(e: InputEvent) -> void:
 		var h := hex_at(e.position)
 		if h != hover:
 			hover = h
+			if not state.is_empty() and AtlasRules.forecast_depends_on_hex(state):
+				_refresh_forecast()
 			queue_redraw()
 	elif e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
 		var h2 := hex_at(e.position)
@@ -134,14 +147,17 @@ func _draw() -> void:
 			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -d), c + Vector2(d, 0), c + Vector2(0, d), c + Vector2(-d, 0)]), Color("#ffe8a0"))
 		if n > 0:
 			draw_circle(c + Vector2(hex_size * 0.42, -hex_size * 0.35), hex_size * 0.12, UIKit.GOOD)
-		var mech := AtlasRules.mechanic_info(AtlasRules.natural_mechanic(s0, h, n, float(AtlasRules.varnish_fx(state)["natural_mult"])))
-		if not mech.is_empty():   # Phase 1D: a small square in the mechanic's colour (top left)
+		var nx := AtlasRules.next_mechanics(state, h)   # Phase 3B: Atelier-aware
+		var ni := 0
+		for nmid in nx["natural"]:   # Phase 1D: a small square in the mechanic's colour (top left)
+			var mech := AtlasRules.mechanic_info(nmid)
 			var mq := hex_size * 0.11
-			var mc := c + Vector2(-hex_size * 0.42, -hex_size * 0.35)
+			var mc := c + Vector2(-hex_size * 0.42 + ni * hex_size * 0.26, -hex_size * 0.35)
 			draw_rect(Rect2(mc - Vector2(mq, mq), Vector2(mq, mq) * 2.0), Color(str(mech.get("color", "#ffffff"))))
 			draw_rect(Rect2(mc - Vector2(mq, mq), Vector2(mq, mq) * 2.0), Color(0, 0, 0, 0.8), false, 1.0)
+			ni += 1
 		var mi := 0
-		for mm in AtlasRules.minor_mechanics(s0, h, n, float(AtlasRules.varnish_fx(state)["natural_mult"])):   # Phase 2D: minor mechanics as small dots below
+		for mm in nx["minor"]:   # Phase 2D: minor mechanics as small dots below
 			mi += 1
 			var md := AtlasRules.mechanic_info(mm)
 			draw_circle(c + Vector2(-hex_size * 0.42 + (mi - 1) * hex_size * 0.2, -hex_size * 0.1), hex_size * 0.07, Color(str(md.get("color", "#ffffff"))))

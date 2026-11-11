@@ -44,3 +44,4 @@ dps_est 1353 -> 3358); mage T3 10/10 (clear 115 -> 104 s). Warrior and ranger 10
 +-6 s, dps_est within noise; their rows differ only because the new affixes change item rolls (10 of 60 rows identical).
 Full suite on the PC 47965/0. From now on compare against `caster_v1.csv`.
 d2_v1 summary (caster_v1 -> d2_v1): 52/60 rows identical. The 8 changed rows are T3 mage and ranger runs against Archon Velis (fire resist 40 -> 30); wins identical in all six class/tier cells, T3 mean clear mage 104.4 -> 103.8 s, ranger 132.7 -> 133.6 s; T6 and every warrior row byte-identical. Re-run after the Perfect Aim change: 60/60 identical (baseline bots take no keystones). From now on compare against `d2_v1.csv`.
+Endgame 3B (the Atelier, no nodes taken): 60/60 identical to `d2_v1.csv`; the D2 Rot 4 + 2 Pigments cell (ring 3 hex 3,0, typical, seed 900) is identical run for run (21/30). No new baseline; keep comparing against `d2_v1.csv`.

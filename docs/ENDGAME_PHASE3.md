@@ -1,5 +1,7 @@
 # Endgame Phase 3: the Pinnacle
 
+Stages: 3A (below), **3B the Atelier** (end of file).
+
 Plan: "Path of Dan Endgame Design: The Atlas of Ruin, Rot, Zone Mechanics and Pinnacle" (claude.ai project), section G, Phase 3.
 Branch `endgame-phase3` (from `main` at `6120de6`). Status doc: `claude/endgame_phase3_status.md` (project).
 
@@ -100,7 +102,77 @@ Ground Pigments of rings 4-6 count toward the pinnacle (4 of 6). Shards drop in 
 
 ## Open / for Dan
 
-1. **Rot in rings 4-6** only arrives by spreading out of ring 3 (2 fronts per completion, shared with the inner rings). Plant one extra seeded Rot source when ring 4 (and 5, 6) is first revealed? Default suggestion: yes, 1 source per new ring.
+1. **Rot in rings 4-6** only arrives by spreading out of ring 3 (2 fronts per completion, shared with the inner rings). Plant one extra seeded Rot source when ring 4 (and 5, 6) is first revealed? Default suggestion: yes, 1 source per new ring. **Approved and built in 3B.**
 2. Mage vs Wardens 4 and 6 (0/4 each at Rot 0) - class balance (D6) is out of Phase 3 scope, but 3E will report per class.
 3. Contracts have no ring 4-6 specific entries (the ring 2 / ring 3 contracts count deeper rings). Add "Complete N zones in ring 5 or deeper"? Not needed for 3B.
 4. Atelier, Burning Canvas, Pigment Wells and the Overpainter follow in 3B-3D.
+
+---
+
+# Stage 3B: The Atelier (2026-11-11, Claude)
+
+The Atelier replaces the Varnish slots: a per-character board of 36 zone-rule nodes in 6 wedges. Node list: `claude/atelier_node_draft.md` (approved as written). The rules the draft left open were decided by Dan on 2026-11-11 (`claude/atelier_3b_questions.md`): the proposed defaults 1-16, and for **Last Light** the expanded rules with cost B (Lantern-bearers +1 more modifier).
+
+## What was built
+
+| File | What |
+|---|---|
+| `data/atlas.json` | New `atelier` block (`_doc`, `fx_doc`): points, costs, path rule, 6 wedges x 6 nodes with bonus / cost text and `fx`, `last_light`, `varnish_map`, `varnish_seals`, `pigment_danger`, `preview_pool`. The `varnish` block is gone. `pigments`: `max_slots` 2 -> 3 (the 3rd slot only from The Third Colour), new `easel_slots` 2. `rot.ring_sources` 1. |
+| `scripts/core/atlas_rules.gd` | `atelier_fx(st)` (replaces `varnish_fx`; single source of zone-rule effects), `fx_of`, `atelier_nodes` / `atelier_node` / `atelier_option`, `_clean_atelier`. Rot: `spread(st, from)` + `_local_candidates`, `forecast(st, from)`, `forecast_depends_on_hex`, `restore` lowers neighbours, death Rot with the Atelier, `rot_reward_mult`, Heart life. `plant_ring_sources` (ring 4-6 Rot sources). `next_mechanics` (natural roll: chance add, force, second roll, major mult; minor: per-mechanic mults, one-of). `elite_preview`. Pigments: `pigment_slots`, `easel_slots`, `pigment_cost`, charges and danger roll. Wardens: `summon_cost(st)`, `shard_cap(st)`, `shard_cap_max`, chance bonus, pity, `warden_victory(st, ring, rot)` with Rot shards. Save v7: `_migrate_varnish`, `varnish_message` / `ack_varnish_message`. Varnish functions removed. |
+| `scripts/core/atelier_rules.gd` (new) | Points (computed from the atlas, never stored), paths, `take` / `refund` / `respec`, `set_nodes` (smartbot / dev, old Varnish ids map), `fix` (load), `node_status`. |
+| `scripts/main.gd` | Puts `atelier_fx` on the zone def; damage / life / Pigment reward and damage / elite mods / elite pool / base mods; marks Last Light zones. |
+| `scripts/world/dungeon.gd` | All in-zone node effects (below), Last Light waves, Hearts no longer drop Varnishes. |
+| `scripts/core/wager_vault_rules.gd` | `mults(max_mult)` (4x), `offers(..., exclude)`, `cache(..., treasure_extra)`. |
+| `scripts/core/guild_rules.gd` | `boss_times` (one fight time per Lantern-bearer) for the "within 20 s" contract; vendor +1 with Guild Supplier. |
+| `scripts/ui/atelier_panel.gd` (new) | The Atelier: wedge columns, node status colours, plain tooltips, a detail column with the bonus in green and the cost in red, Take / Refund / pick buttons, points line, Respec all. |
+| `scripts/ui/atlas_panel.gd`, `easel_panel.gd`, `components/atlas_map.gd`, `ui_root.gd`, `wager_panel.gd` | Atelier button on the Atlas panel; the Easel's Varnish column became an Atelier summary + button; Atelier-aware lines (mechanic chance, Pigment slots / reward / death charge, death Rot, forecast per region, elite preview, Last Light boss line); map shows up to 2 natural mechanics; the Wager panel offers 4x with High Stakes; one-time Varnish message. |
+| `scripts/core/character_data.gd` | `SAVE_VERSION` 6 -> **7**. |
+| `scripts/core/dev_tools.gd`, `scripts/ui/dev_panel.gd` | Atelier row: +5 points (dev bonus), Take all nodes, Respec. The Easel kit no longer grants Varnishes. |
+| `tests/smartbot/smartbot.gd` | `--atelier=<ids>` (choice picks as `id:b`); `--varnish=` still works (old ids map to their nodes). |
+| `tests/test_atlas.gd` | `test_atelier_rules`, `test_atelier_nodes`, `test_atelier_save`, `test_live_atelier` (Last Light live run, Heart zone unchanged, the panel, the Easel); Varnish tests replaced. `tests/test_runner.gd`: SAVE_VERSION 7. |
+
+## Board and points
+
+- 6 wedges (Varnish/Rot, Craquelure/packs, Pentimento/Vaults+Wager, Underpainting/Pigments, Drawing/natural mechanics, Bare Canvas/Wardens) x 6 nodes: 3 small (1 point), choice (1, pick 1 of 3), notable (2), tip rule-changer (3). 9 points per wedge, 54 for the board (51 without the two 3C nodes).
+- **Path:** smalls open from the hub in any order; the choice needs 2 smalls; the notable the choice; the tip the notable. Cheapest route to a tip: 8 points.
+- **Points** are counted from the atlas each time: +1 per cleared ring 2+ region (max 18) + 2 per Layer Warden first kill (12) = **30**; Master's Lesson (Bare Canvas choice b) makes it +3 per Warden (up to 36, retroactive). Existing characters get what their saves earned on load.
+- **Respec:** free "Respec all"; a single node can be refunded when nothing taken needs it and the points still cover the rest (so Master's Lesson can't leave you over budget). A choice pick changes only through a refund or respec. On load, nodes whose path broke are dropped; an overspent board is refunded with a message.
+- **Stacking:** % effects multiply; "+N" effects add; Rot reward bonuses add (+40 and +50 = +90%).
+- The Warden first-kill +1 passive point is unchanged.
+
+## The 36 nodes (as built; numbers are first guesses for 3E)
+
+| Wedge | Small 1 | Small 2 | Small 3 | Choice (a / b / c) | Notable (2) | Tip (3) |
+|---|---|---|---|---|---|---|
+| **Varnish** (Rot) | Contained Bloom: Rot spreads only into revealed regions next to the one you completed (else any revealed region); Rot rewards -10% | Ripened Hearts: +1 material roll per Rot level (Harvest 4 instead of 3, Restore 1); Hearts +15% life | Gilded Firebreak: Restore clears 1 Rot from each neighbour; Restored regions give no extra Pigment slot | Harvest gold +50% / Harvest +1 gem / Restore drops a Ground Shard 50% | Fermentation: Rot rewards +40%, +1 front per spread | **Thin Varnish**: 1 fewer front (min 1); Hearts from Rot 4 |
+| **Craquelure** (packs) | Swollen Packs: packs +10%, elites 10% rarer | Fine Cracks: elites +15%, packs -5% | Connoisseur's Eye: a run's elite modifiers (a seeded pool of 4) shown on the Atlas; monsters +5% damage | Crowned Bosses (zone bosses and Hearts: +1 elite modifier, +1 rare) / Crowded Finale (+2 elite packs in the deepest chamber) / First Blood (first elite drops a rare) | **Dense Varnish**: packs +25%, +20% items, elites 30% rarer | **Lacquered Varnish**: elites +50% with +1 modifier, packs -15% |
+| **Pentimento** (Vaults, Collector) | Hidden Rooms: Vaults x1.5, Wager x0.75 | The Collector's Favour: Wager x1.5, Vaults x0.75 | Thin Plaster: vault walls -30% life; Trap Vaults +1 elite | Treasure +1 rare / Riddles allow 1 mistake / stakes up to 4x | Always Something Beneath: every zone has a Vault or the Collector (never both); Glazed / Unfinished roll 30% less | **Greedy Varnish**: Rot rewards +50%, +1 more Rot on death |
+| **Underpainting** (Pigments) | Generous Grind: +1 charge; crafting +20% material | Bold Mixing: +5% reward per slotted Pigment; modifiers roll twice and keep the more dangerous | Steady Hand: no extra Pigment charge on death; +1 more Rot on death at Rot 1+ | Glazed Pigments -25% / Unfinished -25% / vendor +1 per refresh | The Third Colour: +1 Pigment slot everywhere (3rd slot, a 3rd Easel slot); +5% monster damage per slotted Pigment | **Binding Varnish**: +2 charges, 1 Pigment per zone |
+| **Drawing** (natural mechanics) | Thick Glaze: +1 Flake per peeled / shattered layer; Glazed Elites +1 layer | Loose Sketching: sketches need 1 fewer colour (min 1); Dust x0.8 | Busy Canvas: natural chance +10 points; +1 base modifier | always Glazed / always Unfinished / always Burning Canvas or Wells (**3C**) | Double Study: a second natural roll; monsters +10% life | **Blooming Varnish**: natural mechanics x2, monsters +10% damage |
+| **Bare Canvas** (Wardens) | Shard Seeker: shard chance +10 points; Wardens +10% life | Warden's Tithe: Warden fights +1 rare; summons cost +1 Shard | Rot-Fed Wardens: a Warden killed at Rot 3+ gives +1 Shard of its ring | Ground Pigment pity after 2 dry kills / Master's Lesson / Shard cap 12 | **Umber Well** (**3C**: Pigment Wells' 4th well) | **Last Light** (below) |
+
+Danger order for Bold Mixing: Biting > Hardened > Thick > Crowded; Vivid > Stubborn > Two-Tone > Crowded.
+
+## Last Light (Bare Canvas tip; Dan, 2026-11-11)
+
+Ordinary zones (not Hearts of Rot, not Warden runs) have no boss. Entering the arena wakes the Last Light: **3 waves** (+2 with Crowded Finale), each **2 elites + 3-5 normals**; the next wave comes when 1 monster or fewer is left. The first elite of each wave is a **Lantern-bearer**: x2.5 life, **+2 elite modifiers** (one boss-like, one as the node's cost), level +1, drops 1 rare. The last kill of the last wave is the zone's "boss death": clear, Rot spread, shard roll, Guild credit, XP, tier loot (from the last kill) and the exit portal. Each Lantern-bearer counts as a boss for contracts; "within 20 s of waking" times each one from its wave start. The Wager does not offer its four boss bets there. Numbers in `atelier.last_light` for 3E.
+
+## Save v7 and the Varnish migration
+
+- Slotted and owned Varnishes become **2 Guild Seals each** (Seal cap respected); a one-time message on the Atlas panel says how many (and if the cap kept some). Hearts no longer drop Varnishes (Harvest keeps the legendary + cache). New saves have no `varnish` / `varnish_slots`; v4, v5 and v6 saves load.
+- Old `--varnish=` smartbot runs map to the same effects: Thin -> `var_tip`, Dense -> `craq_notable`, Lacquered -> `craq_tip`, Binding -> `under_tip`, Blooming -> `draw_tip`, Greedy -> `pent_tip`.
+
+## Rot in rings 4-6 (Dan, 2026-11-11)
+
+When ring 4, 5 or 6 is first revealed it gets **1 extra Rot source** at `source_level`, seeded by atlas seed + ring and recorded in `atlas.ring_sources`. Nothing changes while only rings 1-3 are revealed. Saves that revealed ring 4+ before 3B get theirs once on load.
+
+## Results
+
+@@RESULTS@@
+
+## Open items / for 3C-3E
+
+1. **3C nodes:** Study in Fire (Drawing choice c) and Umber Well (Bare Canvas notable) are in the data, shown, and locked until 3C.
+2. **Smartbot and Last Light:** the bot fights the waves like any pack, but its runners have no Last Light cells yet; 3E measures it (target: a win rate close to a boss run, shorter time) and the 3x boss-contract pace.
+3. All node numbers are first guesses; 3E checks the specialisers with the bot (zone outcomes only, no build retests).
+4. Contracts: no Atelier-specific contracts; boss contracts go ~3x faster with Last Light.

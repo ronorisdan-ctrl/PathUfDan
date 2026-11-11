@@ -620,8 +620,12 @@ func _one_run(c: int, r: int, run_seed: int, lvl: int) -> Dictionary:
 				st["rot"][hk] = int(A["rot"])
 			else:
 				st["rot"].erase(hk)
-		# --pigments=glazed:thick_glaze,unfinished (Phase 1E): fresh Pigments slotted for every run (no mod = seeded)
 		var AR = load("res://scripts/core/atlas_rules.gd")
+		# --atelier=var_tip,pent_choice:b,... (Phase 3B): Atelier nodes taken for every run (paths and
+		# points ignored). --varnish=thin_varnish,... (Phase 1E runners) maps each old Varnish to its node.
+		var specs: Array = Array(str(A.get("atelier", "")).split(",", false)) + Array(str(A.get("varnish", "")).split(",", false))
+		load("res://scripts/core/atelier_rules.gd").set_nodes(st, specs)
+		# --pigments=glazed:thick_glaze,unfinished (Phase 1E): fresh Pigments slotted for every run (no mod = seeded)
 		st["pigments"] = []
 		st["easel"] = []
 		for spec in str(A.get("pigments", "")).split(",", false):
@@ -629,19 +633,13 @@ func _one_run(c: int, r: int, run_seed: int, lvl: int) -> Dictionary:
 			var pg: Dictionary = AR.add_pigment(st, bits[0], bits[1] if bits.size() > 1 else "")
 			if not pg.is_empty():
 				AR.slot_pigment(st, st["pigments"].size() - 1)
-		# --varnish=thin_varnish,... (Phase 1E): slotted Varnishes (slot limits ignored)
-		st["varnish_slots"] = []
-		for vid in str(A.get("varnish", "")).split(",", false):
-			if not AR.varnish_info(vid).is_empty():
-				AR.add_varnish(st, vid)
-				st["varnish_slots"].append(vid)
 		# --warden=1 (Phase 2A): summon the target ring's Layer Warden at the target hex every run
 		if str(A.get("warden", "")) in ["1", "true", "yes"]:
 			var wh: Vector2i = AR.parse(hk)
 			if int(st["clears"].get(hk, 0)) <= 0:
 				st["clears"][hk] = 1
 			var wr: int = AR.ring_of(wh)
-			AR.add_shards(st, wr, AR.summon_cost())
+			AR.add_shards(st, wr, AR.summon_cost(st))
 			AR.unsummon(st, wr)
 			AR.summon(st, wh)
 	# --mechanic=glazed|unfinished|none (Phase 1D): force the zone mechanic; unset = the hex's natural roll

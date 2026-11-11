@@ -5,6 +5,7 @@ extends "res://scripts/ui/base_panel.gd"
 const Chrome = preload("res://scripts/ui/components/station_chrome.gd")
 const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 const AtlasMap = preload("res://scripts/ui/components/atlas_map.gd")
+const AtelierRules = preload("res://scripts/core/atelier_rules.gd")
 
 var map
 var detail: RichTextLabel
@@ -12,6 +13,7 @@ var progress_label: Label
 var enter_btn: Button
 var back_btn: Button
 var easel_btn: Button
+var atelier_btn: Button
 var summon_btn: Button
 var chosen := Vector2i(1, 0)
 
@@ -46,8 +48,11 @@ func _init() -> void:
 	enter_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb.add_child(enter_btn)
 	easel_btn = UIKit.button("Easel", func(): ui.toggle("easel"))
-	easel_btn.tooltip_text = "Craft and slot Pigments, slot Varnishes"
+	easel_btn.tooltip_text = "Craft and slot Pigments"
 	hb.add_child(easel_btn)
+	atelier_btn = UIKit.button("Atelier", func(): ui.toggle("atelier"))
+	atelier_btn.tooltip_text = "The Atelier: spend points earned in the Atlas on zone rules (free respec)"
+	hb.add_child(atelier_btn)
 	summon_btn = UIKit.button("Summon Warden", _summon)
 	summon_btn.tooltip_text = "Spend nothing now: the next run of this region fights the layer's Warden. Shards are used only when you win."
 	hb.add_child(summon_btn)
@@ -77,16 +82,27 @@ func refresh() -> void:
 		progress_label.text = ""
 		enter_btn.disabled = true
 		easel_btn.disabled = true
+		atelier_btn.disabled = true
 		summon_btn.disabled = true
 		return
 	easel_btn.disabled = false
+	atelier_btn.disabled = false
 	var st := state()
+	var vmsg := AtlasRules.varnish_message(st)   # Phase 3B: one-time Varnish -> Seals message
+	if vmsg != "":
+		ui.toast(vmsg, Color("#e8d8a0"))
+		AtlasRules.ack_varnish_message(st)
+		Game.save_game()
+	if st.get("atelier_reset", false):
+		ui.toast("The Atelier changed: your points were refunded. Spend them again at the Atelier.", Color("#e8d8a0"))
+		st.erase("atelier_reset")
+	atelier_btn.text = "Atelier (%d)" % AtelierRules.points_free(st) if AtelierRules.points_free(st) > 0 else "Atelier"
 	if not AtlasRules.in_atlas(chosen):
 		chosen = Vector2i(1, 0)
 	map.set_state(st, chosen)
 	var sm := AtlasRules.summary(st)
 	progress_label.text = "Cleared %d of %d regions   Revealed %d   Rot %d / %d   Next spread: %d front%s\nGreen dot: cleared   Diamond: vantage   Blotches + number: Rot   Red heart: Heart boss   Dashed: next spread   Gold frame: restored   Square: zone mechanic   Dots: Wager / Vaults   Crown: Warden summoned   Wheel: zoom   Right-drag: pan" % [sm["cleared"], sm["total"], sm["revealed"], AtlasRules.rot_total(st), AtlasRules.rot_cap(st), AtlasRules.fronts_next(st), "" if AtlasRules.fronts_next(st) == 1 else "s"]
-	progress_label.text = _warden_summary(st) + "\n" + progress_label.text
+	progress_label.text = _warden_summary(st) + "   " + AtelierRules.summary_text(st) + "\n" + progress_label.text
 	var lines := []
 	var ring := AtlasRules.ring_of(chosen)
 	if ring == 0:
@@ -100,15 +116,22 @@ func refresh() -> void:
 		var rot := AtlasRules.rot_of(st, chosen)
 		var d := AtlasRules.apply_rot(AtlasRules.zone_def(int(st["seed"]), chosen), rot, int(st["seed"]), chosen, st)
 		var n := AtlasRules.clears(st, chosen)
-		var mods := AtlasRules.run_mods(int(st["seed"]), chosen, n, d)
+		var afx := AtlasRules.atelier_fx(st)
+		var mods := AtlasRules.run_mods(int(st["seed"]), chosen, n, d, int(afx["base_mods"]))
+		var last_light: bool = afx["last_light"] and AtlasRules.warden_at(st, chosen) == 0 and not d.get("heart", false)
 		lines = [
 			"[font_size=18][color=#e8c890]%s[/color][/font_size]" % info["name"],
 			"[color=#8a8494]Ring %d (%s layer)   Monster level %d[/color]" % [ring, info["layer"], info["level"]],
 			"", str(Data.zones[info["zone"]].get("desc", "")).trim_prefix("Endgame biome: "), "",
 			"[color=#c8a060]Monsters:[/color] %d%% more life, %d%% more damage, +%d%% resistances" % [int(round((float(d.get("life_mult", 1)) - 1) * 100)), int(round((float(d.get("damage_mult", 1)) - 1) * 100)), int(d.get("resist_bonus", 0))],
-			"[color=#c8a060]Boss:[/color] %s" % (str(AtlasRules.warden_def(Data.enemies.get(str(AtlasRules.warden_cfg(ring).get("boss", "")), {}), ring).get("name", "")) + " (summoned)" if AtlasRules.warden_at(st, chosen) > 0 else info["boss_name"]),
+			"[color=#c8a060]Boss:[/color] %s" % (str(AtlasRules.warden_def(Data.enemies.get(str(AtlasRules.warden_cfg(ring).get("boss", "")), {}), ring).get("name", "")) + " (summoned)" if AtlasRules.warden_at(st, chosen) > 0 else ("[color=#ffe9a8]Last Light[/color]: %d packs led by Lantern-bearers (Atelier)" % (int(AtlasRules.atelier_cfg().get("last_light", {}).get("waves", 3)) + int(afx["last_chamber_packs"])) if last_light else info["boss_name"])),
 			"[color=#c8a060]Rewards:[/color] +%d%% item rarity" % int(d.get("rarity_bonus", 0)),
 		]
+		if afx["elite_preview"]:   # Atelier Connoisseur's Eye
+			var en := []
+			for id in AtlasRules.elite_preview(int(st["seed"]), chosen, n):
+				en.append(str(Data.elite_mods.get(id, {}).get("name", id)))
+			lines.append("[color=#c8a060]Elite modifiers this run:[/color] %s" % ", ".join(en))
 		lines.append_array(_warden_lines(st, chosen, ring))
 		lines.append_array(_rot_lines(st, chosen, rot, d))
 		lines.append_array(_mechanic_lines(st, chosen, ring, rot))
@@ -137,7 +160,7 @@ func _warden_summary(st: Dictionary) -> String:
 	var parts := []
 	for r in AtlasRules.warden_rings():
 		var w := AtlasRules.warden_cfg(r)
-		parts.append("%s %d/%d" % [str(w.get("shard", "Shard")).replace(" Shard", ""), AtlasRules.shards(st, r), AtlasRules.summon_cost()])
+		parts.append("%s %d/%d" % [str(w.get("shard", "Shard")).replace(" Shard", ""), AtlasRules.shards(st, r), AtlasRules.summon_cost(st)])
 	return "Ground Shards: %s   Ground Pigments: %d of %d layers (%d open the pinnacle)" % [", ".join(parts), AtlasRules.ground_kinds(st), int(wc.get("layers_total", 6)), int(wc.get("pinnacle_need", 4))]
 
 func _warden_lines(st: Dictionary, h: Vector2i, ring: int) -> Array:
@@ -149,11 +172,11 @@ func _warden_lines(st: Dictionary, h: Vector2i, ring: int) -> Array:
 	var title := "%s, %s" % [bname, str(w.get("title", ""))]
 	if AtlasRules.warden_at(st, h) > 0:
 		out.append("[color=#ffe070]Warden summoned:[/color] %s replaces this region's boss on your next run (no Heart of Rot). %s" % [title, str(w.get("desc", ""))])
-		out.append("[color=#8a8494]Win to spend %d %ss and claim a chance at %s (always on the first kill, +1 passive point). Losing costs no shards.[/color]" % [AtlasRules.summon_cost(), str(w.get("shard", "")), str(w.get("ground", ""))])
+		out.append("[color=#8a8494]Win to spend %d %ss and claim a chance at %s (always on the first kill, +1 passive point). Losing costs no shards.[/color]" % [AtlasRules.summon_cost(st), str(w.get("shard", "")), str(w.get("ground", ""))])
 	else:
 		var where := AtlasRules.summoned_hex(st, ring)
 		var kills := AtlasRules.warden_kills(st, ring)
-		out.append("[color=#c8a060]Layer Warden:[/color] %s - %d/%d %ss%s%s" % [title, AtlasRules.shards(st, ring), AtlasRules.summon_cost(), str(w.get("shard", "")),
+		out.append("[color=#c8a060]Layer Warden:[/color] %s - %d/%d %ss%s%s" % [title, AtlasRules.shards(st, ring), AtlasRules.summon_cost(st), str(w.get("shard", "")),
 			("; summoned at %s" % where) if where != "" else "", ("; defeated %d time%s" % [kills, "" if kills == 1 else "s"]) if kills > 0 else ""])
 	return out
 
@@ -182,7 +205,8 @@ func _mechanic_lines(st: Dictionary, h: Vector2i, ring: int, rot: int) -> Array:
 	var pm := AtlasRules.pigment_mods(pigs)
 	var slots := AtlasRules.pigment_slots(st, h)
 	if mechs.is_empty():
-		out.append("[color=#8a8494]Mechanic: none on the next run (%d%% chance per run).[/color]" % int(round(float(AtlasRules.mech_cfg().get("natural_chance", 0.3)) * float(AtlasRules.varnish_fx(st)["natural_mult"]) * 100)))
+		var fx := AtlasRules.atelier_fx(st)
+		out.append("[color=#8a8494]Mechanic: none on the next run (%d%% chance per run).[/color]" % int(round((float(AtlasRules.mech_cfg().get("natural_chance", 0.3)) + float(fx["natural_chance"])) * float(fx["natural_mult"]) * float(fx["major_natural_mult"]) * 100)))
 	for id in mechs:
 		var mech := AtlasRules.mechanic_info(id)
 		var extra := ""
@@ -198,13 +222,9 @@ func _mechanic_lines(st: Dictionary, h: Vector2i, ring: int, rot: int) -> Array:
 		for p in pigs:
 			var m := AtlasRules.pigment_mod(str(p["id"]), str(p["mod"]))
 			names.append("%s [color=#8a8494](%s)[/color]" % [AtlasRules.pigment_label(p), str(m.get("desc", ""))])
-		out.append("[color=#e0c890]Pigments (%d slot%s, -1 charge per run, -%d more on death):[/color] %s  [color=#80e080](+%d%% rewards)[/color]" % [slots, "" if slots == 1 else "s", int(AtlasRules.pig_cfg().get("death_charges", 1)), "; ".join(names), int(float(AtlasRules.pig_cfg().get("reward", 10)) * pigs.size())])
-	var vs: Array = st.get("varnish_slots", [])
-	if not vs.is_empty():
-		var vn := []
-		for id in vs:
-			vn.append(str(AtlasRules.varnish_info(str(id)).get("name", id)))
-		out.append("[color=#e8d8a0]Varnish:[/color] %s" % ", ".join(vn))
+		var pfx := AtlasRules.atelier_fx(st)
+		var dc := 0 if pfx["death_no_charge"] else int(AtlasRules.pig_cfg().get("death_charges", 1))
+		out.append("[color=#e0c890]Pigments (%d slot%s, -1 charge per run, -%d more on death):[/color] %s  [color=#80e080](+%d%% rewards)[/color]" % [slots, "" if slots == 1 else "s", dc, "; ".join(names), int((float(AtlasRules.pig_cfg().get("reward", 10)) + float(pfx["pigment_reward"])) * pigs.size())])
 	return out
 
 func _rot_lines(st: Dictionary, h: Vector2i, rot: int, d: Dictionary) -> Array:
@@ -233,11 +253,12 @@ func _rot_lines(st: Dictionary, h: Vector2i, rot: int, d: Dictionary) -> Array:
 			out.append("[color=#b0e050]Heart of Rot:[/color] the boss is mutated - %s. Kill it to Restore the region or Harvest the Heart." % "; ".join(names))
 		elif rot < AtlasRules.heart_at_for(st):
 			out.append("[color=#8a8494]At Rot %d the boss becomes a Heart of Rot.[/color]" % AtlasRules.heart_at_for(st))
-	var fc := AtlasRules.forecast(st).count(AtlasRules.key(h))
+	var fc := AtlasRules.forecast(st, h if AtlasRules.forecast_depends_on_hex(st) else Vector2i(9999, 9999)).count(AtlasRules.key(h))
 	if fc > 0:
 		out.append("[color=#9ab84a]The next completion spreads Rot here (+%d).[/color]" % fc)
 	if not AtlasRules.is_restored(st, h) and AtlasRules.ring_of(h) >= int(AtlasRules.rot_cfg().get("min_ring", 2)):
-		out.append("[color=#8a8494]Dying here adds +%d Rot.[/color]" % (int(AtlasRules.rot_cfg().get("death_rot", 1)) + int(AtlasRules.varnish_fx(st)["death_rot"])))
+		var dfx := AtlasRules.atelier_fx(st)
+		out.append("[color=#8a8494]Dying here adds +%d Rot.[/color]" % (int(AtlasRules.rot_cfg().get("death_rot", 1)) + int(dfx["death_rot"]) + (int(dfx["death_rot_on_rot"]) if rot >= 1 else 0)))
 	return out
 
 func _enter() -> void:

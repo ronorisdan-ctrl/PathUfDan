@@ -408,7 +408,11 @@ func _build_dungeon(v: VBoxContainer) -> void:
 	var hat := _row(v, "Atlas")
 	_btn(hat, "Unlock", "Unlock the Atlas of Ruin without killing Malgrath", Dev.atlas_unlock)
 	_btn(hat, "Reveal all", "Reveal every Atlas region", Dev.atlas_reveal_all)
-	_btn(hat, "Grant Easel kit", "+300 Glaze Flakes, +100 Pigment Dust, one Pigment of each modifier, one of each Varnish", Dev.atlas_grant)
+	_btn(hat, "Grant Easel kit", "+300 Glaze Flakes, +100 Pigment Dust, one Pigment of each modifier", Dev.atlas_grant)
+	var hate := _row(v, "Atelier")
+	_btn(hate, "+5 points", "Grant 5 Atelier points (dev bonus, kept on the save)", func(): return Dev.atelier_grant(5))
+	_btn(hate, "Take all nodes", "Grant the points needed and take every node (choice nodes: option a; 3C nodes stay locked)", Dev.atelier_take_all)
+	_btn(hate, "Respec", "Refund every Atelier node (free)", Dev.atelier_respec)
 	var hrot := _row(v, "Atlas Rot")
 	atlas_hex_edit = LineEdit.new()
 	atlas_hex_edit.placeholder_text = "q,r"

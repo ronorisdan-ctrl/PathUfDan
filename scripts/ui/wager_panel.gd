@@ -53,7 +53,7 @@ func refresh() -> void:
 				l.fit_content = true
 				row.add_child(l)
 				var h := HBoxContainer.new()
-				for m in WV.mults():
+				for m in (lv.wager_mults() if lv.has_method("wager_mults") else WV.mults()):
 					var mm := int(m)
 					var pay := WV.payout(id, lv.monster_level, mm, lv.rot)
 					var btn := UIKit.button("%dx: stake %d, win %d" % [mm, WV.stake(lv.monster_level, mm), int(pay["gold"])], func(): _accept(id, mm))

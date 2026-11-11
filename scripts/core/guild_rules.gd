@@ -253,8 +253,16 @@ static func progress_of(c: Dictionary, report: Dictionary) -> int:
 	# Phase 2D filters: zone time, boss fight time, Pigments slotted
 	if t.has("max_time") and (not report.has("time") or float(report["time"]) > float(t["max_time"])):
 		return 0
-	if t.has("max_boss_time") and (not report.has("boss_time") or float(report["boss_time"]) > float(t["max_boss_time"])):
-		return 0
+	if t.has("max_boss_time"):
+		# Phase 3B Last Light: boss_times holds one fight time per Lantern-bearer; each fast one counts
+		if typeof(report.get("boss_times")) == TYPE_ARRAY and str(t.get("stat", "")) == "bosses":
+			var fast := 0
+			for bt in report["boss_times"]:
+				if float(bt) <= float(t["max_boss_time"]):
+					fast += 1
+			return fast
+		if not report.has("boss_time") or float(report["boss_time"]) > float(t["max_boss_time"]):
+			return 0
 	if int(report.get("pigments", 0)) < int(t.get("min_pigments", 0)):
 		return 0
 	return maxi(0, int(report.get(str(t.get("stat", "zones")), 0)))
@@ -275,7 +283,8 @@ static func on_death(st: Dictionary) -> int:
 
 ## Credits a run report: {zones, ring, rot, hearts, restore, harvest, peels, painted, elites,
 ## pigment_zones, wardens; Phase 2D: kills, bosses, wagers_won, wager_3x, vaults, trap_vaults,
-## riddle_vaults, time (s in the zone), boss_time (s from the boss waking to its death), pigments}. Returns {completed: [labels], rep, seals, rank_up (new rank or 0), refreshed}.
+## riddle_vaults, time (s in the zone), boss_time (s from the boss waking to its death), pigments;
+## Phase 3B: boss_times [s] per Last Light Lantern-bearer}. Returns {completed: [labels], rep, seals, rank_up (new rank or 0), refreshed}.
 static func credit(st: Dictionary, report: Dictionary) -> Dictionary:
 	var out := {"completed": [], "rep": 0, "seals": 0, "rank_up": 0, "refreshed": false}
 	if st.is_empty():
@@ -450,7 +459,8 @@ static func vendor_list() -> Array:
 	return cfg().get("vendor", {}).get("list", [])
 
 static func vendor_left(st: Dictionary) -> int:
-	return maxi(0, int(cfg().get("vendor", {}).get("per_refresh", 2)) - int(ensure(st).get("bought", 0)))
+	var per := int(cfg().get("vendor", {}).get("per_refresh", 2)) + int(AtlasRules.atelier_fx(st)["vendor_extra"])   # Atelier Guild Supplier
+	return maxi(0, per - int(ensure(st).get("bought", 0)))
 
 static func vendor_price(id: String) -> int:
 	for v in vendor_list():
