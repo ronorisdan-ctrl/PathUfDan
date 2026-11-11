@@ -24,3 +24,6 @@ tests/*_results.txt
 tests/*.log
 tests/zone_out/
 data/nppBackup/
+# Godot editor byproducts (CSV translation import, untracked screenshot imports)
+docs/*.translation
+tests/screens_out_atlas/*.import
