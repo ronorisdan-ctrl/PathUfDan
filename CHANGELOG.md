@@ -1,5 +1,19 @@
 # Changelog
 
+## Endgame Phase 3D: the Overpainter, Apprentice (2026-11-19)
+
+- **The pinnacle boss.** Click the Atlas centre hex: with Ground Pigments of any 4 of the 6 layers the **Bare Ground** opens. Pick 4 layers and enter the Overpainter's round studio (monster level 68, no Rot, zone mechanics, Pigments or Atelier rules).
+- **Three phases.** **Studies:** he casts the signature attack of each Warden whose Ground Pigment you brought, in the order you first beat them, so different sets give a different opening. **Erasure** (from 70% life): sections of the floor are painted over (watch the white outline); painted floor hurts and chills. Break his poise to restore the section nearest you. **Bare Canvas** (from 35%): void spirals, teleports and void pools, and his poise drains fast, so stun him on a rhythm.
+- **Tries.** Entering locks your set for 3 tries. A try is used when you enter, so dying, leaving or quitting mid-fight all cost one. A win, or the last try, spends 1 Ground Pigment of each layer. The panel and the centre hex show the locked set and tries left.
+- **Rewards:** +1 passive skill point on the first kill, a legendary and rares, and one of the **Overpainter's brushes**. The first kill gives your class's brush; later wins give one you don't have yet. Brushes go in the new **Brush slot** (between the rings) and any class can use them:
+  - **The Broad Stroke:** every 4th melee hit paints a wide stroke for 120% of the hit and leaves wet paint that chills enemies and makes you take 15% less damage while you stand in it.
+  - **The Rigger:** projectile hits paint enemies; hitting a painted enemy draws lines to up to 3 others that hurt everything they cross.
+  - **The Glazier:** spells stack up to 5 Glaze layers (+4% spell damage each); a spell cast at 5 layers casts twice.
+  Brushes have fixed modifiers and cannot be crafted, corrupted or salvaged. The loot filter always shows them.
+- **Restorers' Guild:** a rare new contract, "Defeat the Overpainter", after your first kill.
+- Dev panel: Overpainter row (4 Ground Pigments, reset the lock, give the brushes). Smartbot: `--pinnacle=a,b,c,d`, runner `run_atlas_p3d.ps1`.
+- Save version 9 (the pinnacle lock and tries, the Warden first-kill order, the Brush slot); v4-v8 saves load. Tests: `atlas_only` 874/0, `tree_only` 844/0, full suite 48022/0, smartbot frozen baseline 60/60 identical to `d2_v1.csv`; the Overpainter: 51/90 typical level-60 bot wins (warrior 19/30, ranger 27/30, mage 5/30). Details: `docs/ENDGAME_PHASE3.md`.
+
 ## Endgame Phase 3C: the Burning Canvas and the Pigment Wells (2026-11-12)
 
 - **Burning Canvas** (new zone mechanic): 15 s after you enter, the painting catches fire at the entrance and the fire front follows you through the corridors to the arena. It speeds up a little with every kill and keeps burning during the boss fight. Burnt floor (scorched, shown on the minimap) burns normal and magic items and gold left on the ground, and standing on it burns you (fire resistance helps). Kills just ahead of the front drop **Ash** at double rate. **Cisterns** (2 per zone, 3 with Rot): pump one for a second to push the fire back and hold it for 8 s.

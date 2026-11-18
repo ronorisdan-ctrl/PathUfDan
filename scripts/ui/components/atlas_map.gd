@@ -8,6 +8,7 @@ extends Control
 
 const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 const UIKit = preload("res://scripts/ui/ui_kit.gd")
+const PinnacleRules = preload("res://scripts/core/pinnacle_rules.gd")
 
 signal hex_clicked(h: Vector2i)
 
@@ -126,9 +127,7 @@ func _draw() -> void:
 		var pts := _corners(c, hex_size - 1.5)
 		var ring := AtlasRules.ring_of(h)
 		if ring == 0:
-			draw_colored_polygon(pts, Color("#3a3428"))
-			draw_polyline(pts + PackedVector2Array([pts[0]]), UIKit.GOLD, 2.0)
-			draw_string(font, c + Vector2(-14, 4), "Hub", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, UIKit.GOLD)
+			_draw_centre(c, pts, font)
 			continue
 		var rc := AtlasRules.ring_cfg(ring)
 		var layer_col := Color(str(rc.get("color", "#808080")))
@@ -173,6 +172,33 @@ func _draw() -> void:
 	if AtlasRules.in_atlas(selected) and AtlasRules.ring_of(selected) > 0:
 		var sp := _corners(hex_center(selected), hex_size - 1.0)
 		draw_polyline(sp + PackedVector2Array([sp[0]]), UIKit.GOLD, 3.0)
+
+## Endgame 3D: the centre hex shows the pinnacle state (locked, ready, set locked + tries, beaten).
+func _draw_centre(c: Vector2, pts: PackedVector2Array, font: Font) -> void:
+	var hs := PinnacleRules.hex_state(state)
+	var cols: Dictionary = PinnacleRules.cfg().get("colors", {})
+	var st_name := str(hs["state"])
+	var fill := Color("#3a3428")
+	if st_name == "ready":
+		fill = Color("#5c5644").lerp(Color(str(cols.get("hex", "#f4efe0"))), 0.12 + 0.06 * sin(Time.get_ticks_msec() / 400.0))
+	elif st_name == "set":
+		fill = Color("#4a4430")
+	draw_colored_polygon(pts, fill)
+	var edge: Color = UIKit.GOLD if st_name != "locked" else Color(str(cols.get("locked", "#7a7468")))
+	draw_polyline(pts + PackedVector2Array([pts[0]]), edge, 2.0 if st_name != "ready" else 3.0)
+	draw_string(font, c + Vector2(-14, -2), "Hub", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, UIKit.GOLD)
+	draw_string(font, c + Vector2(-hex_size * 0.6, hex_size * 0.42), str(hs["short"]), HORIZONTAL_ALIGNMENT_CENTER, hex_size * 1.2, 9, Color(str(cols.get("set", "#ffe070"))) if st_name in ["set", "ready"] else UIKit.MUTED)
+	if st_name == "set":   # one pip per layer in the locked set, in its layer colour
+		var s: Array = hs["set"]
+		for i in s.size():
+			var pc := Color(str(AtlasRules.ring_cfg(int(s[i])).get("color", "#ffffff")))
+			draw_circle(c + Vector2((i - (s.size() - 1) / 2.0) * hex_size * 0.22, hex_size * 0.12), hex_size * 0.08, pc)
+	if int(hs["wins"]) > 0:   # beaten: a gold mark (top right)
+		var g := Color(str(cols.get("beaten", "#ffd040")))
+		var m := c + Vector2(hex_size * 0.42, -hex_size * 0.35)
+		draw_colored_polygon(PackedVector2Array([m + Vector2(0, -5), m + Vector2(5, 0), m + Vector2(0, 5), m + Vector2(-5, 0)]), g)
+	if st_name == "ready":
+		queue_redraw()
 
 func _draw_rot(h: Vector2i, c: Vector2, font: Font) -> void:
 	var cols: Dictionary = AtlasRules.rot_cfg().get("colors", {})

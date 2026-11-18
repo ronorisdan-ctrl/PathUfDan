@@ -965,6 +965,47 @@ func atlas_summon_warden(hex_key: String) -> Dictionary:
 		return _fail(AtlasRules.summon_refusal(st, h))
 	return _ok("Warden of ring %d summoned at %s" % [ring, AtlasRules.key(h)])
 
+## The Overpainter (Endgame 3D): +1 Ground Pigment of `n` layers (rings 1..n, default 4).
+func atlas_grant_ground(n: int = 4) -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	var rings := AtlasRules.warden_rings()
+	var got := 0
+	for r in rings:
+		if got >= n:
+			break
+		AtlasRules._wset(st, "ground", int(r), AtlasRules.ground_count(st, int(r)) + 1)
+		got += 1
+	return _ok("+1 Ground Pigment of %d layers" % got)
+
+## The Overpainter: clears the locked set and its tries (keeps wins and brushes; spends nothing).
+func atlas_pinnacle_reset() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	_taint()
+	var st: Dictionary = AtlasRules.ensure(Game.ch)
+	var p: Dictionary = load("res://scripts/core/pinnacle_rules.gd").pin(st)
+	p["set"] = []
+	p["tries"] = 0
+	p["in_fight"] = false
+	return _ok("Pinnacle lock and tries reset")
+
+## The Overpainter: the 3 brushes (data/uniques.json, pinnacle) into the bag.
+func give_brushes() -> Dictionary:
+	var why := _gate()
+	if why != "":
+		return _fail(why)
+	var n := 0
+	for id in load("res://scripts/core/pinnacle_rules.gd").brush_ids():
+		if _give(Loot.make_unique(str(id), maxi(Game.ch.level, 60)))["ok"]:
+			n += 1
+	_taint()
+	return _ok("Added %d brushes" % n)
+
 func set_abyss_depth(depth: int) -> Dictionary:
 	var abyss := ""
 	for d in Data.dungeon_list:

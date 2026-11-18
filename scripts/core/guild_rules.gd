@@ -14,7 +14,8 @@ const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 
 const STATS := ["zones", "hearts", "restore", "harvest", "peels", "painted", "elites", "pigment_zones", "wardens",
 	"kills", "bosses", "wagers_won", "wager_3x", "vaults", "trap_vaults", "riddle_vaults",   # Phase 2D adds the second row
-	"cisterns", "wells_full"]   # Phase 3C
+	"cisterns", "wells_full",   # Phase 3C
+	"overpainter"]   # Phase 3D (credited by an Overpainter win)
 
 static func cfg() -> Dictionary:
 	return Data.atlas_cfg.get("guild", {})
@@ -151,6 +152,8 @@ static func eligible(st: Dictionary, t: Dictionary) -> bool:
 				any = true
 		if not any:
 			return false
+	if req.get("pinnacle", false) and (typeof(st.get("pinnacle")) != TYPE_DICTIONARY or int(st["pinnacle"].get("wins", 0)) <= 0):   # Phase 3D: after the first Overpainter kill
+		return false
 	if req.has("seen") and not AtlasRules.has_seen(st, str(req["seen"])):   # Phase 3C: met the mechanic
 		return false
 	if req.has("clears"):

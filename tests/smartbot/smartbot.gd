@@ -197,7 +197,8 @@ func _ready() -> void:
 	get_tree().quit()
 
 ## Phase D2 sweeps: --tune=rot.4.damage_mult=2.2;warden.2.damage_mult=1.5;bet.frenzy.count=32
-## (Endgame 3C: mech.<mechanic>.<key>, e.g. mech.burning.arena_time=200)
+## (Endgame 3C: mech.<mechanic>.<key>, e.g. mech.burning.arena_time=200; Endgame 3D: pinnacle.<key>,
+## e.g. pinnacle.life_mult=10)
 ## overrides atlas.json numbers in memory for this process (children inherit the arg).
 ## rot.<n>.<key> -> rot.levels[n-1]; warden.<ring>.<key> -> wardens.rings; bet.<id>.<key> -> wager.bets.
 func _apply_tune() -> void:
@@ -207,6 +208,10 @@ func _apply_tune() -> void:
 	for item in String(A["tune"]).split(";", false):
 		var kv := item.split("=")
 		var path := kv[0].split(".")
+		if kv.size() == 2 and path.size() == 2 and path[0] == "pinnacle":   # Endgame 3D: pinnacle.life_mult=10
+			cfg["pinnacle"][path[1]] = float(kv[1])
+			print("TUNE %s = %s" % [kv[0], kv[1]])
+			continue
 		if kv.size() != 2 or path.size() != 3:
 			push_error("bad --tune item " + item)
 			continue
@@ -258,6 +263,8 @@ func _setup_phase_b() -> void:
 	if did.begins_with("atlas:"):
 		var AR = load("res://scripts/core/atlas_rules.gd")
 		ring = int(AR.ring_of(AR.parse(did.trim_prefix("atlas:"))))
+	if A.has("pinnacle"):   # Endgame 3D: the Overpainter is fought with ring-6 gear
+		ring = 6
 	kit.ring = ring
 	var p := str(A["plan"])
 	plan_id = ""
@@ -645,9 +652,35 @@ func _one_run(c: int, r: int, run_seed: int, lvl: int) -> Dictionary:
 			AR.add_shards(st, wr, AR.summon_cost(st))
 			AR.unsummon(st, wr)
 			AR.summon(st, wh)
+	# --pinnacle=1,2,3,4 (Endgame 3D): the Overpainter with those Ground Pigments (granted; the list is
+	# also the Warden first-kill order, so it sets the order of the phase 1 studies). The lock carries
+	# over between the runs of one chain, so a chain shows the try use (a win or 3 tries spend the set).
+	var pin_rings := []
+	var pin_try := 0
+	if A.has("pinnacle"):
+		var PAR = load("res://scripts/core/atlas_rules.gd")
+		var PR = load("res://scripts/core/pinnacle_rules.gd")
+		var pst: Dictionary = PAR.ensure(ch, 1)
+		for s in str(A["pinnacle"]).split(",", false):
+			pin_rings.append(int(s))
+		pst["warden_order"] = pin_rings.duplicate()
+		for pr in pin_rings:
+			PAR._wset(pst, "ground", int(pr), maxi(1, PAR.ground_count(pst, int(pr))))
+			PAR._wset(pst, "warden_kills", int(pr), maxi(1, PAR.warden_kills(pst, int(pr))))
+		var srt := pin_rings.duplicate()
+		srt.sort()
+		if PR.locked(pst) and PR.locked_set(pst) != srt:
+			PR.pin(pst)["set"] = []
+		pin_try = PR.max_tries() - PR.tries_left(pst) + 1
+		did = "pinnacle"
 	# --mechanic=glazed|unfinished|none (Phase 1D): force the zone mechanic; unset = the hex's natural roll
 	Game.atlas_force_mechanic = str(A.get("mechanic", ""))
-	main.enter_dungeon(did, run_seed)
+	if not pin_rings.is_empty():
+		var perr: String = main.enter_pinnacle(pin_rings, run_seed)
+		if perr != "":
+			push_error("pinnacle refused: " + perr)
+	else:
+		main.enter_dungeon(did, run_seed)
 	await get_tree().physics_frame
 	var lv = Game.level
 	var p = lv.player
@@ -692,6 +725,13 @@ func _one_run(c: int, r: int, run_seed: int, lvl: int) -> Dictionary:
 	var notes := []
 	if "warden" in lv and int(lv.warden) > 0:
 		notes.append("warden:%d%s" % [int(lv.warden), "|ground" if lv.warden_result.get("ground", false) else ""])
+	if "pin_arena" in lv and lv.pin_arena != null:   # Endgame 3D run notes
+		var pn: Dictionary = lv.pin_arena.notes()
+		var set_bits := PackedStringArray()
+		for pr in pin_rings:
+			set_bits.append(str(pr))
+		notes.append("pin:set=%s|try=%d|phase=%d|t1=%.1f|t2=%.1f|t3=%.1f|painted=%d|restored=%d|breaks=%d|paint_hits=%d" % [";".join(set_bits), pin_try,
+			int(pn["phase"]), float(pn["t1"]), float(pn["t2"]), float(pn["t3"]), int(pn["painted"]), int(pn["restored"]), int(pn["breaks"]), int(pn["paint_hits"])])
 	if "rot" in lv and int(lv.rot) > 0:
 		notes.append("rot:%d%s" % [int(lv.rot), "|heart" if lv.def.get("heart", false) else ""])
 	if "mechanics" in lv and not lv.mechanics.is_empty():

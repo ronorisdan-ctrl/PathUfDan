@@ -577,5 +577,165 @@
   "effect": "starfall",
   "effect_text": "Every fifth spell you cast calls down a falling star on your target",
   "stage4": true
+ },
+ {
+  "id": "broad_stroke",
+  "name": "The Broad Stroke",
+  "base": "flat_brush",
+  "req_level": 60,
+  "pinnacle": true,
+  "theme": "warrior",
+  "flavor": "A house-painter's brush. It never asked what was underneath.",
+  "mods": [
+   {
+    "stat": "max_life",
+    "type": "flat",
+    "range": [
+     60,
+     80
+    ]
+   },
+   {
+    "stat": "armour",
+    "type": "inc",
+    "range": [
+     20,
+     30
+    ]
+   },
+   {
+    "stat": "area",
+    "type": "inc",
+    "range": [
+     10,
+     15
+    ]
+   },
+   {
+    "stat": "str",
+    "type": "flat",
+    "range": [
+     15,
+     25
+    ]
+   }
+  ],
+  "effect": "broad_stroke",
+  "effect_params": {
+   "every": 4,
+   "length": 180,
+   "width": 50,
+   "mult": 1.2,
+   "wet_life": 3.0,
+   "wet_dr": 15,
+   "tick": 0.25,
+   "wet_status": "chill"
+  },
+  "effect_text": "Every 4th melee hit paints a broad stroke along the swing for 120% of the hit. The wet paint lasts 3 s: enemies in it are chilled, and you take 15% less damage while you stand in it"
+ },
+ {
+  "id": "the_rigger",
+  "name": "The Rigger",
+  "base": "liner_brush",
+  "req_level": 60,
+  "pinnacle": true,
+  "theme": "ranger",
+  "flavor": "One long hair of sable, and the patience to pull it straight.",
+  "mods": [
+   {
+    "stat": "dex",
+    "type": "flat",
+    "range": [
+     15,
+     25
+    ]
+   },
+   {
+    "stat": "projectile_speed",
+    "type": "inc",
+    "range": [
+     15,
+     25
+    ]
+   },
+   {
+    "stat": "crit_chance",
+    "type": "inc",
+    "range": [
+     25,
+     40
+    ]
+   },
+   {
+    "stat": "max_life",
+    "type": "flat",
+    "range": [
+     40,
+     55
+    ]
+   }
+  ],
+  "effect": "the_rigger",
+  "effect_params": {
+   "paint_life": 4.0,
+   "links": 3,
+   "reach": 240,
+   "mult": 0.6,
+   "line_width": 10,
+   "cooldown": 0.5
+  },
+  "effect_text": "Projectile hits paint the target for 4 s. Hitting a painted enemy draws lines to up to 3 other painted enemies within 240; each line deals 60% of the hit to every enemy it crosses"
+ },
+ {
+  "id": "the_glazier",
+  "name": "The Glazier",
+  "base": "glazing_brush",
+  "req_level": 60,
+  "pinnacle": true,
+  "theme": "mage",
+  "flavor": "Thin coats, one over another, until the light comes from inside.",
+  "mods": [
+   {
+    "stat": "int",
+    "type": "flat",
+    "range": [
+     15,
+     25
+    ]
+   },
+   {
+    "stat": "cast_speed",
+    "type": "inc",
+    "range": [
+     10,
+     15
+    ]
+   },
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "range": [
+     40,
+     60
+    ]
+   },
+   {
+    "stat": "max_life",
+    "type": "flat",
+    "range": [
+     40,
+     55
+    ]
+   }
+  ],
+  "effect": "the_glazier",
+  "effect_params": {
+   "max_layers": 5,
+   "layer_life": 6.0,
+   "per_layer": 4,
+   "echo_mult": 0.7,
+   "echo_delay": 0.2
+  },
+  "effect_text": "Each spell you cast adds a Glaze layer (up to 5, 6 s, +4% spell damage each). A spell cast at 5 layers spends them and casts twice; the echo deals 70% damage"
  }
 ]

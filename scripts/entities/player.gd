@@ -3,6 +3,7 @@ extends "res://scripts/entities/actor.gd"
 ## (LMB, RMB, Q, E, R), dodge roll (Space), flasks (1, 2), interaction (F).
 
 const SkillExec = preload("res://scripts/combat/skill_exec.gd")
+const BrushFx = preload("res://scripts/combat/brush_fx.gd")   # Endgame 3D: The Glazier
 const Minion = preload("res://scripts/entities/minion.gd")
 const VFX = preload("res://scripts/fx/vfx.gd")
 
@@ -345,6 +346,8 @@ func try_use_slot(i: int) -> bool:
 	Combat.cast_serial += 1   # packets built during this cast carry the number (Training Grounds: targets hit per cast)
 	_before_skill(sk)
 	exec.execute(self, sk, aim_pos)
+	if ch.stats.has_flag("the_glazier"):
+		BrushFx.on_cast(self, sk, aim_pos)
 	_on_skill_used(sk)
 	Events.player_skill_used.emit(sk["id"])
 	var b: String = sk.get("behavior", "")
@@ -462,6 +465,8 @@ func damage_more(sk: Dictionary) -> float:
 		m *= 1.0 + 0.04 * mini(momentum, 10)
 	if sb.has_flag("twin_disciplines") and skill_style(sk) != "":
 		m *= twin_mult
+	if float(sk.get("_echo_mult", 0.0)) > 0.0:   # Endgame 3D, The Glazier: the echo of a spell
+		m *= float(sk["_echo_mult"])
 	return m
 
 func add_buff(id: String, mods: Array, duration: float) -> void:

@@ -99,6 +99,18 @@ func skip_enemy(e) -> bool:
 	var dp: int = b.dist_at(c.p.global_position)
 	return de >= 0 and de <= dp and e.global_position.distance_to(c.p.global_position) > 40.0
 
+## Endgame 3D: on painted (or about to be painted) floor in the Overpainter's arena, the bot walks
+## to the nearest clean floor (the centre disc or a clean section); it still fights from there.
+func paint_goal():
+	var lv = c.lv
+	if not ("pin_arena" in lv) or lv.pin_arena == null or lv.boss_dead:
+		return null
+	var pp: Vector2 = c.p.global_position
+	if lv.pin_arena.painted_at(pp) or lv.pin_arena.warned_at(pp):
+		log["paint_moves"] = int(log.get("paint_moves", 0)) + 1
+		return lv.pin_arena.safe_point(pp)
+	return null
+
 ## While channelling a cistern the bot stands still at it (it still fights from there).
 func hold_goal():
 	var b = _burn()

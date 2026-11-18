@@ -10,9 +10,10 @@ const EQUIP_LAYOUT := {
 	"main_hand": Vector2(80, 60), "chest": Vector2(150, 60), "off_hand": Vector2(220, 60),
 	"gloves": Vector2(80, 120), "belt": Vector2(150, 120), "boots": Vector2(220, 120),
 	"ring1": Vector2(90, 180), "ring2": Vector2(210, 180),
+	"brush": Vector2(150, 180),   # Endgame 3D: the Overpainter's brushes only
 }
 const PLACEHOLDERS := {"charm": "charm", "helmet": "helm", "amulet": "amulet", "main_hand": "sword", "chest": "plate", "off_hand": "shield",
-	"gloves": "glove", "belt": "belt", "boots": "boot", "ring1": "ring", "ring2": "ring"}
+	"gloves": "glove", "belt": "belt", "boots": "boot", "ring1": "ring", "ring2": "ring", "brush": "brush"}
 
 var equip_slots := {}
 var bag_slots := []
@@ -218,7 +219,7 @@ func _context_bag(idx: int, it: Dictionary) -> void:
 		opts.append(["Sell for %d gold" % Loot.sell_value(it), func(): sell(idx), not locked])
 	if ui.is_open("blacksmith"):
 		opts.append(["Select for crafting", func(): ui.panels["blacksmith"].select(it)])
-		opts.append(["Salvage", func(): salvage(idx), not locked])
+		opts.append(["Salvage", func(): salvage(idx), not locked and not it.get("pinnacle", false)])
 	if ui.is_open("stash"):
 		opts.append(["Move to " + ui.panels["stash"].target_name(), func(): ui.panels["stash"].deposit(idx)])
 	opts.append(["Destroy", func(): _destroy(idx), not locked])
@@ -290,7 +291,7 @@ func sell(idx: int) -> void:
 func salvage(idx: int) -> void:
 	var ch = Game.ch
 	var it = ch.inventory[idx]
-	if it == null or _refuse_locked(it):
+	if it == null or _refuse_locked(it) or it.get("pinnacle", false):   # Endgame 3D: brushes cannot be salvaged
 		return
 	var y: Dictionary = Loot.salvage_yield(it)
 	var do_salvage := func():

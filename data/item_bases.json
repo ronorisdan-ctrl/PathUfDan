@@ -2688,5 +2688,62 @@
    }
   ],
   "stage4": true
+ },
+ {
+  "id": "flat_brush",
+  "name": "Flat Brush",
+  "slot": "brush",
+  "category": "brush",
+  "icon": "brush",
+  "req_level": 60,
+  "tags": [
+   "brush"
+  ],
+  "implicit": [
+   {
+    "stat": "max_life",
+    "type": "flat",
+    "value": 40
+   }
+  ],
+  "pinnacle": true
+ },
+ {
+  "id": "liner_brush",
+  "name": "Liner Brush",
+  "slot": "brush",
+  "category": "brush",
+  "icon": "brush",
+  "req_level": 60,
+  "tags": [
+   "brush"
+  ],
+  "implicit": [
+   {
+    "stat": "projectile_speed",
+    "type": "inc",
+    "value": 10
+   }
+  ],
+  "pinnacle": true
+ },
+ {
+  "id": "glazing_brush",
+  "name": "Glazing Brush",
+  "slot": "brush",
+  "category": "brush",
+  "icon": "brush",
+  "req_level": 60,
+  "tags": [
+   "brush"
+  ],
+  "implicit": [
+   {
+    "stat": "max_mana",
+    "type": "flat",
+    "value": 30
+   }
+  ],
+  "pinnacle": true
  }
 ]

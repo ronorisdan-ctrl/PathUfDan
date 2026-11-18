@@ -565,3 +565,9 @@ the zone could offer it), `--stake=1|2|3`, `--vaults=0` (no detours for vaults),
 `--hits` (trace every hit) and the profile flag `--set=group_perception:true` (off by default). The mage uses Blink as a
 dodge when walking and the roll cannot clear a perceived telegraph (notes `blinks:N`). Runner: `run_atlas_p2e.ps1`;
 summaries: `p2e_summary.py` (bets / vaults) and `p2e_trap.py`.
+
+Phase 3D: `--pinnacle=a,b,c,d` fights the Overpainter (Apprentice) with those four Ground Pigments (granted; the list is
+also the Warden first-kill order, so it sets the order of the phase 1 studies; gear is picked for ring 6). The bot steps
+off painted or about-to-be-painted floor to the nearest clean spot (`pin_arena.safe_point`) and otherwise fights as
+against any boss. Run notes: `pin:set=..|try=|phase=|t1=|t2=|t3=|painted=|restored=|breaks=|paint_hits=`. `--tune=`
+accepts `pinnacle.<key>=<value>` (e.g. `pinnacle.life_mult=80`). Runner: `run_atlas_p3d.ps1`; summary: `p3d_summary.py`.

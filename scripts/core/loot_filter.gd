@@ -18,7 +18,7 @@ const MAX_RULES := 100
 const RARITIES := ["common", "uncommon", "rare", "epic", "legendary"]
 const KINDS := ["gear", "charm", "gem", "rune", "material", "other"]
 const SLOTS := ["weapon_1h", "weapon_2h", "offhand", "helm", "chest", "gloves",
-	"boots", "belt", "ring", "amulet", "charm"]
+	"boots", "belt", "ring", "amulet", "charm", "brush"]   # brush: Endgame 3D
 const VISIBILITY := ["show", "minimal", "hide"]
 const SIZES := {"small": 13, "normal": 16, "large": 20, "huge": 26}
 const MINIMAP_SHAPES := ["circle", "diamond", "square", "star"]
@@ -111,6 +111,13 @@ func evaluate(item: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	if res["visibility"] == "hide" and safe_i >= 0 and d["rarity_i"] >= safe_i:
 		res["visibility"] = "show"
 		res["safety_override"] = true
+	if item.get("pinnacle", false):   # Endgame 3D: the Overpainter's brushes are always shown, with a beam
+		if res["visibility"] != "show":
+			res["safety_override"] = true
+		res["visibility"] = "show"
+		if res["beam"] == null:
+			res["beam"] = Color("#f4efe0")
+		res["color"] = Color("#f4efe0")
 	# The show/hide decision itself. It never looks at the Alt reveal: reveal only
 	# changes what is drawn and what the player can target, never what a pet may take.
 	res["filter_hidden"] = res["visibility"] == "hide"

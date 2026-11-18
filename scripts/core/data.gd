@@ -67,8 +67,10 @@ func load_all() -> void:
 	var el = _load("enemies"); enemies = _index(el)
 	elite_mod_list = _load("elite_mods"); elite_mods = _index(elite_mod_list)
 	item_base_list = _load("item_bases"); item_bases = _index(item_base_list)
+	item_base_list = item_base_list.filter(func(x): return not (x is Dictionary and x.get("pinnacle", false)))   # Endgame 3D: brush bases never drop at random
 	affix_list = _load("affixes"); affixes = _index(affix_list)
 	unique_list = _load("uniques"); uniques = _index(unique_list)
+	unique_list = unique_list.filter(func(x): return not (x is Dictionary and x.get("pinnacle", false)))   # Endgame 3D: the Overpainter's brushes drop only from him
 	loot = _load("loot")
 	rarity_list = loot.get("rarities", []); rarities = _index(rarity_list)
 	materials = loot.get("materials", {})

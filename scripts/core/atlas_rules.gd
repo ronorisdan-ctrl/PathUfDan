@@ -198,7 +198,8 @@ static func new_state(seed_value: int) -> Dictionary:
 			rev.append(key(h))
 	var st := {"seed": seed_value, "revealed": rev, "clears": {}, "rot": {}, "restored": [], "spreads": 0, "fester": 0,
 		"pigments": [], "easel": [], "crafted": 0, "atelier": {"taken": [], "choices": {}, "bonus": 0}, "ring_sources": [],
-		"shards": {}, "shard_dry": {}, "summons": {}, "ground": {}, "ground_dry": {}, "warden_kills": {}, "seen": []}
+		"shards": {}, "shard_dry": {}, "summons": {}, "ground": {}, "ground_dry": {}, "warden_kills": {}, "seen": [],
+		"warden_order": [], "pinnacle": {"set": [], "tries": 0, "attempts": 0, "wins": 0, "in_fight": false, "first": false, "owned": []}}   # 3D: PinnacleRules.new_pin()
 	seed_rot(st)
 	return st
 
@@ -288,6 +289,16 @@ static func sanitize(raw) -> Dictionary:
 		for m in src_seen:
 			if not mechanic_info(str(m)).is_empty() and not st["seen"].has(str(m)):
 				st["seen"].append(str(m))
+	# Phase 3D (save v9): the Warden first-kill order and the pinnacle (set lock, tries, wins, brushes).
+	# Older saves: no order (kills fall back to ring order) and an empty pinnacle block.
+	st["warden_order"] = []
+	var src_wo = raw.get("warden_order", [])
+	if typeof(src_wo) == TYPE_ARRAY:
+		for r in src_wo:
+			var ri := int(r) if (r is int or r is float or str(r).is_valid_int()) else 0
+			if warden_rings().has(ri) and warden_kills(st, ri) > 0 and not st["warden_order"].has(ri):
+				st["warden_order"].append(ri)
+	load("res://scripts/core/pinnacle_rules.gd").sanitize(st, raw.get("pinnacle", {}))   # runtime load: it preloads this script
 	# Restorers' Guild (Phase 2C); loaded at runtime because guild_rules.gd preloads this script
 	var gs: Dictionary = load("res://scripts/core/guild_rules.gd").sanitize(raw.get("guild", {}))
 	if not gs.is_empty():
@@ -1368,6 +1379,11 @@ static func warden_victory(st: Dictionary, ring: int, rot: int = 0) -> Dictionar
 	unsummon(st, ring)
 	var kills := _wget(st, "warden_kills", ring) + 1
 	_wset(st, "warden_kills", ring, kills)
+	if kills == 1:   # Phase 3D: the Overpainter's studies follow the first-kill order
+		if typeof(st.get("warden_order")) != TYPE_ARRAY:
+			st["warden_order"] = []
+		if not st["warden_order"].has(ring):
+			st["warden_order"].append(ring)
 	var got := kills == 1
 	if not got:
 		got = _rng(int(st.get("seed", 0)), Vector2i(ring, 0), 600 + kills).randf() < float(wc.get("ground_chance", 0.34))

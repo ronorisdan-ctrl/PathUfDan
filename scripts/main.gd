@@ -153,6 +153,26 @@ func enter_atlas(h: Vector2i, seed_value: int = 0) -> bool:
 		seed_value = AtlasRules.layout_seed(s0, h, n)
 	return _start_run(def, seed_value, {"mods": AtlasRules.run_mods(s0, h, n, def, int(fx["base_mods"])), "depth": 1, "atlas": AtlasRules.key(h)})
 
+## Endgame 3D: the Bare Ground on the Atlas centre hex. Locks the set on first entry and uses a
+## try (PinnacleRules.enter), then starts the Overpainter fight. Not an Atlas zone: no hex, Rot,
+## zone mechanics, Pigments, run modifiers or Atelier rules. Returns "" or the refusal.
+func enter_pinnacle(rings: Array, seed_value: int = 0) -> String:
+	var ch = Game.ch
+	if ch == null:
+		return "No character"
+	var PR = load("res://scripts/core/pinnacle_rules.gd")
+	var st: Dictionary = AtlasRules.ensure(ch)
+	var why: String = PR.enter(st, rings)
+	if why != "":
+		return why
+	var def: Dictionary = PR.arena_def(st)
+	if seed_value == 0:
+		seed_value = maxi(1, AtlasRules._rng(int(st["seed"]), Vector2i(int(PR.pin(st)["attempts"]), 7), 960).randi())
+	if not _start_run(def, seed_value, {"depth": 1}):
+		PR.finish(st, false)   # the arena failed to build: the try stays used, as a leave would
+		return "The Bare Ground could not be opened"
+	return ""
+
 func _start_run(def: Dictionary, seed_value: int, run: Dictionary) -> bool:
 	Game.autosave()   # snapshot before the run starts
 	var minions: int = Game.carried_minions

@@ -6,6 +6,7 @@ const Chrome = preload("res://scripts/ui/components/station_chrome.gd")
 const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 const AtlasMap = preload("res://scripts/ui/components/atlas_map.gd")
 const AtelierRules = preload("res://scripts/core/atelier_rules.gd")
+const PinnacleRules = preload("res://scripts/core/pinnacle_rules.gd")
 
 var map
 var detail: RichTextLabel
@@ -16,6 +17,9 @@ var easel_btn: Button
 var atelier_btn: Button
 var summon_btn: Button
 var chosen := Vector2i(1, 0)
+var pin_box: HBoxContainer     # Endgame 3D: the Ground Pigment pick (centre hex)
+var pin_btns := {}             # ring -> toggle Button
+var pin_pick := []             # rings picked for the Overpainter
 
 func _init() -> void:
 	place = "center"
@@ -58,6 +62,16 @@ func _init() -> void:
 	hb.add_child(summon_btn)
 	back_btn = UIKit.button("Dungeon Gate", _back)
 	hb.add_child(back_btn)
+	pin_box = HBoxContainer.new()
+	pin_box.add_theme_constant_override("separation", 4)
+	for r in AtlasRules.warden_rings():
+		var b := UIKit.button(PinnacleRules.layer_name(int(r)), _toggle_pin.bind(int(r)))
+		b.toggle_mode = true
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		pin_btns[int(r)] = b
+		pin_box.add_child(b)
+	pin_box.visible = false
+	v.add_child(pin_box)
 	v.add_child(hb)
 
 func reposition() -> void:
@@ -103,11 +117,15 @@ func refresh() -> void:
 	var sm := AtlasRules.summary(st)
 	progress_label.text = "Cleared %d of %d regions   Revealed %d   Rot %d / %d   Next spread: %d front%s\nGreen dot: cleared   Diamond: vantage   Blotches + number: Rot   Red heart: Heart boss   Dashed: next spread   Gold frame: restored   Square: zone mechanic   Dots: Wager / Vaults   Crown: Warden summoned   Wheel: zoom   Right-drag: pan" % [sm["cleared"], sm["total"], sm["revealed"], AtlasRules.rot_total(st), AtlasRules.rot_cap(st), AtlasRules.fronts_next(st), "" if AtlasRules.fronts_next(st) == 1 else "s"]
 	progress_label.text = _warden_summary(st) + "   " + AtelierRules.summary_text(st) + "\n" + progress_label.text
+	progress_label.text = "Centre: " + str(PinnacleRules.hex_state(st)["text"]) + "\n" + progress_label.text   # Endgame 3D
 	var lines := []
 	var ring := AtlasRules.ring_of(chosen)
+	pin_box.visible = ring == 0
+	enter_btn.text = "Enter the Bare Ground" if ring == 0 else "Enter Zone"
 	if ring == 0:
-		lines = ["[font_size=18][color=#e8c890]Ashfall Sanctuary[/color][/font_size]", "", "The hub sits at the heart of the painting. Each ring outward is an older, deeper layer."]
-		enter_btn.disabled = true
+		lines = _pinnacle_lines(st)
+		enter_btn.disabled = PinnacleRules.set_refusal(st, pin_pick) != ""
+		enter_btn.tooltip_text = PinnacleRules.set_refusal(st, pin_pick)
 	elif not AtlasRules.is_revealed(st, chosen):
 		lines = ["[color=#8a8494]Unexplored %s region. Clear a neighbouring region to reveal it.[/color]" % str(AtlasRules.ring_cfg(ring).get("layer", ""))]
 		enter_btn.disabled = true
@@ -261,8 +279,67 @@ func _rot_lines(st: Dictionary, h: Vector2i, rot: int, d: Dictionary) -> Array:
 		out.append("[color=#8a8494]Dying here adds +%d Rot.[/color]" % (int(AtlasRules.rot_cfg().get("death_rot", 1)) + int(dfx["death_rot"]) + (int(dfx["death_rot_on_rot"]) if rot >= 1 else 0)))
 	return out
 
+# ------------------------------------------------------------------ the Overpainter (Endgame 3D)
+func _toggle_pin(r: int) -> void:
+	var st := state()
+	if st.is_empty() or PinnacleRules.locked(st):
+		refresh()
+		return
+	if pin_pick.has(r):
+		pin_pick.erase(r)
+	elif pin_pick.size() < PinnacleRules.need() and AtlasRules.ground_count(st, r) > 0:
+		pin_pick.append(r)
+	refresh()
+
+func _pinnacle_lines(st: Dictionary) -> Array:
+	var c := PinnacleRules.cfg()
+	var hs := PinnacleRules.hex_state(st)
+	if PinnacleRules.locked(st):
+		pin_pick = PinnacleRules.locked_set(st)
+	pin_pick = pin_pick.filter(func(r): return AtlasRules.ground_count(st, int(r)) > 0)
+	for r in pin_btns:
+		var b: Button = pin_btns[r]
+		b.text = "%s %d" % [PinnacleRules.layer_name(int(r)), AtlasRules.ground_count(st, int(r))]
+		b.disabled = PinnacleRules.locked(st) or AtlasRules.ground_count(st, int(r)) <= 0 or (pin_pick.size() >= PinnacleRules.need() and not pin_pick.has(r))
+		b.set_pressed_no_signal(pin_pick.has(r))
+	var out := ["[font_size=18][color=#f4efe0]The Bare Ground[/color][/font_size]",
+		"[color=#8a8494]Ashfall Sanctuary sits on it: the hub at the heart of the painting, where the Overpainter works.[/color]", "",
+		"[color=#e8c890]%s[/color]" % str(hs["text"]), "",
+		"[color=#c8a060]The Overpainter (Apprentice)[/color], monster level %d. No Rot, zone mechanics, Pigments or Atelier rules reach the studio." % int(c.get("level", 68)),
+		"[color=#c8a060]Phase 1, Studies:[/color] he casts the signature of each Warden whose Ground Pigment you bring, in the order you first beat them.",
+		"[color=#c8a060]Phase 2, Erasure:[/color] the floor is painted over in sections (painted floor hurts). Break his poise to restore a section.",
+		"[color=#c8a060]Phase 3, Bare Canvas:[/color] void pools, spirals and teleports; his poise drains fast, so stun him on a rhythm.", ""]
+	if PinnacleRules.locked(st):
+		out.append("[color=#ffe070]Locked set:[/color] %d tr%s left. A try is used when you enter; a win or the last try spends 1 Ground Pigment of each layer." % [PinnacleRules.tries_left(st), "y" if PinnacleRules.tries_left(st) == 1 else "ies"])
+	else:
+		out.append("[color=#c8a060]Pick %d layers below[/color] (%d picked). Entering locks the set for %d tries; a try is used when you enter. A win, or the last try, spends 1 Ground Pigment of each layer." % [PinnacleRules.need(), pin_pick.size(), PinnacleRules.max_tries()])
+	if pin_pick.size() == PinnacleRules.need():
+		var names := []
+		for r in PinnacleRules.study_order(st, pin_pick):
+			names.append("%s (%s)" % [PinnacleRules.layer_name(int(r)), str(AtlasRules.warden_cfg(int(r)).get("signature", "")).replace("_", " ")])
+		out.append("[color=#c8a060]Studies in order:[/color] %s" % " > ".join(names))
+	out.append("[color=#c8a060]Rewards:[/color] one of the Overpainter's brushes (the Brush slot; the first kill gives your class's), +1 passive point on the first kill, a legendary and rares.")
+	var own := []
+	for id in PinnacleRules.pin(st).get("owned", []):
+		own.append(str(Data.uniques.get(str(id), {}).get("name", id)))
+	if not own.is_empty():
+		out.append("[color=#c8a060]Brushes won:[/color] %s" % ", ".join(own))
+	return out
+
 func _enter() -> void:
-	if Game.ch == null or not AtlasRules.can_enter(state(), chosen):
+	if Game.ch == null:
+		return
+	if AtlasRules.ring_of(chosen) == 0:
+		var why := PinnacleRules.set_refusal(state(), pin_pick)
+		if why != "":
+			ui.toast(why, Color("#ff8080"))
+			return
+		ui.close_all()
+		var err: String = Game.main.enter_pinnacle(pin_pick.duplicate())
+		if err != "":
+			ui.toast(err, Color("#ff8080"))
+		return
+	if not AtlasRules.can_enter(state(), chosen):
 		return
 	ui.close_all()
 	Game.main.enter_atlas(chosen)

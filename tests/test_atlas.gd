@@ -82,6 +82,7 @@ func run_all() -> void:
 	test_contracts_2d()
 	test_phase3a()
 	test_phase3c()
+	test_phase3d()
 	main = load("res://scripts/main.gd").new()
 	add_child(main)
 	await frames(2)
@@ -100,6 +101,8 @@ func run_all() -> void:
 	await test_live_atelier()
 	await test_live_burning()
 	await test_live_wells()
+	await test_live_3d()
+	await test_live_brushes()
 	Game.atlas_force_mechanic = ""
 
 # ------------------------------------------------------------------ data
@@ -267,11 +270,11 @@ func test_state() -> void:
 
 # ------------------------------------------------------------------ save v5/v6
 func test_save() -> void:
-	check(CharacterData.SAVE_VERSION == 8, "SAVE_VERSION is 8 (3C: atlas.seen)")
+	check(CharacterData.SAVE_VERSION == 9, "SAVE_VERSION is 9 (3D: atlas.pinnacle, the brush slot)")
 	var ch = CharacterData.new()
 	ch.setup_new("mage", "Dan")
 	var d0: Dictionary = ch.to_dict()
-	check(not d0.has("atlas") and int(d0["version"]) == 8, "a character without an atlas writes no atlas key")
+	check(not d0.has("atlas") and int(d0["version"]) == 9, "a character without an atlas writes no atlas key")
 	check(not AR.unlocked(ch), "atlas locked for a new character")
 	ch.progress["bosses_killed"]["nightmare_vaults"] = 1
 	check(AR.unlocked(ch), "atlas unlocks after Malgrath")
@@ -287,7 +290,7 @@ func test_save() -> void:
 	d4["version"] = 4
 	var ch3 = CharacterData.new()
 	ch3.from_dict(d4)
-	check(ch3.atlas.is_empty() and int(ch3.to_dict()["version"]) == 8, "v4 save loads with no atlas and re-saves as v8")
+	check(ch3.atlas.is_empty() and int(ch3.to_dict()["version"]) == 9, "v4 save loads with no atlas and re-saves as v9")
 
 # ------------------------------------------------------------------ live
 func test_live() -> void:
@@ -1420,7 +1423,7 @@ func test_atelier_save() -> void:
 	ATR.take(ch.atlas, "pent_choice", "c")
 	var ch2 = CharacterData.new()
 	ch2.from_dict(JSON.parse_string(JSON.stringify(ch.to_dict())))
-	check(int(ch.to_dict()["version"]) == 8 and ATR.taken(ch2.atlas) == ["pent_s1", "pent_s2", "pent_choice"] and ATR.choice_of(ch2.atlas, "pent_choice") == "c" and str(ch2.atlas["atelier"]) == str(ch.atlas["atelier"]) and ch2.atlas["ring_sources"] == ch.atlas["ring_sources"], "save v7: the Atelier survives a JSON save", str(ch2.atlas.get("atelier")))
+	check(int(ch.to_dict()["version"]) == 9 and ATR.taken(ch2.atlas) == ["pent_s1", "pent_s2", "pent_choice"] and ATR.choice_of(ch2.atlas, "pent_choice") == "c" and str(ch2.atlas["atelier"]) == str(ch.atlas["atelier"]) and ch2.atlas["ring_sources"] == ch.atlas["ring_sources"], "save v7: the Atelier survives a JSON save", str(ch2.atlas.get("atelier")))
 	var bad := ch.to_dict()
 	bad["atlas"]["atelier"] = {"taken": ["bogus", "bare_notable", "pent_choice"], "choices": {"pent_choice": "z"}, "bonus": "x"}
 	var ch3 = CharacterData.new()
@@ -3369,3 +3372,403 @@ func test_live_wells() -> void:
 	await frames(3)
 	ATR.set_nodes(st, [])
 	Game.atlas_force_mechanic = "none"
+
+# ------------------------------------------------------------------ Phase 3D: the Overpainter
+const PNR = preload("res://scripts/core/pinnacle_rules.gd")
+const BrushFxT = preload("res://scripts/combat/brush_fx.gd")
+
+func _pin_state(seed_value: int = 777) -> Dictionary:
+	var st := AR.new_state(seed_value)
+	return st
+
+func test_phase3d() -> void:
+	var c := PNR.cfg()
+	check(not c.is_empty() and PNR.need() == 4 and PNR.max_tries() == 3 and int(c.get("level", 0)) == 68, "3D data: pinnacle block (need 4, 3 tries, level 68)")
+	var od: Dictionary = Data.enemies.get("overpainter", {})
+	check(not od.is_empty() and od.get("phases", []).size() == 3 and od.get("patterns", {}).has(str(c.get("filler", ""))), "3D data: the Overpainter has 3 phases and the filler pattern")
+	var ids := PNR.brush_ids()
+	var themes_ok := ids.size() == 3
+	for cls in ["warrior", "ranger", "mage"]:
+		var uid := str(PNR.brush_map().get(cls, ""))
+		var u: Dictionary = Data.uniques.get(uid, {})
+		themes_ok = themes_ok and u.get("pinnacle", false) and str(u.get("theme", "")) == cls and not u.get("effect_params", {}).is_empty() \
+			and str(Data.item_bases.get(str(u.get("base", "")), {}).get("slot", "")) == "brush"
+	check(themes_ok, "3D data: 3 brushes, one per class theme, on brush-slot bases with effect params", str(ids))
+	var listed := false
+	for u in Data.unique_list:
+		listed = listed or u.get("pinnacle", false)
+	for b in Data.item_base_list:
+		listed = listed or str(b.get("slot", "")) == "brush"
+	check(not listed, "3D data: brushes and brush bases are not in the random unique / base lists")
+	var rolled_brush := false
+	for i in 300:
+		var it: Dictionary = Loot.roll_unique(75, "warrior")
+		rolled_brush = rolled_brush or str(it.get("slot", "")) == "brush"
+		var it2: Dictionary = Loot.roll_item(75, 500.0, "mage")
+		rolled_brush = rolled_brush or str(it2.get("slot", "")) == "brush"
+	check(not rolled_brush, "3D data: random drops never roll a brush (600 rolls)")
+	check(str(AR.new_state(5)["pinnacle"]) == str(PNR.new_pin()) and AR.new_state(5)["warden_order"] == [], "3D state: a new atlas has an empty pinnacle block and warden order")
+	# first-kill order
+	var st := _pin_state()
+	AR.warden_victory(st, 3)
+	AR.warden_victory(st, 1)
+	AR.warden_victory(st, 3)
+	check(st["warden_order"] == [3, 1], "3D order: Warden first kills are recorded in order", str(st["warden_order"]))
+	var old := _pin_state()
+	old["warden_kills"] = {"2": 1, "4": 2}
+	check(PNR.kill_order(old).slice(0, 2) == [2, 4], "3D order: kills without a recorded order fall back to ring order", str(PNR.kill_order(old)))
+	check(PNR.study_order(st, [1, 2, 3, 4]) == [3, 1, 2, 4], "3D order: the set's studies follow the first-kill order, then ring order", str(PNR.study_order(st, [1, 2, 3, 4])))
+	# the set, the lock and tries
+	var ps := _pin_state()
+	check(PNR.set_refusal(ps, [1, 2, 3, 4]) != "" and PNR.hex_state(ps)["state"] == "locked", "3D lock: no Ground Pigments, no entry; the centre hex is locked")
+	for r in [1, 2, 3, 4, 5]:
+		AR._wset(ps, "ground", r, 1)
+	check(PNR.is_ready(ps) and PNR.hex_state(ps)["state"] == "ready", "3D lock: 4 layers open the Bare Ground (ready)")
+	check(PNR.set_refusal(ps, [1, 2, 3]) != "" and PNR.set_refusal(ps, [1, 2, 3, 6]) != "" and PNR.set_refusal(ps, [1, 1, 2, 3]) != "", "3D lock: a set must be 4 different owned layers")
+	check(PNR.enter(ps, [4, 2, 1, 3]) == "" and PNR.locked_set(ps) == [1, 2, 3, 4] and PNR.tries_left(ps) == 2 and PNR.pin(ps)["in_fight"], "3D lock: entering locks the set and uses a try")
+	check(PNR.hex_state(ps)["state"] == "set" and str(PNR.hex_state(ps)["text"]).find("2 tries") >= 0, "3D lock: the centre hex shows the locked set and tries left", str(PNR.hex_state(ps)["text"]))
+	check(PNR.set_refusal(ps, [1, 2, 3, 5]) != "", "3D lock: a locked set cannot be changed")
+	var r1 := PNR.finish(ps, false)
+	check(r1["spent"] == [] and AR.ground_count(ps, 1) == 1 and not PNR.pin(ps)["in_fight"] and PNR.finish(ps, false).is_empty(), "3D lock: a failure keeps the Ground Pigments (finish is idempotent)")
+	PNR.enter(ps, [1, 2, 3, 4])
+	PNR.finish(ps, false)
+	check(PNR.tries_left(ps) == 1 and PNR.locked(ps), "3D lock: 1 try left after 2 failures")
+	PNR.enter(ps, [1, 2, 3, 4])
+	var r3 := PNR.finish(ps, false)
+	check(r3["spent"] == [1, 2, 3, 4] and AR.ground_count(ps, 1) == 0 and AR.ground_count(ps, 5) == 1 and not PNR.locked(ps), "3D lock: the third failure spends the 4 Ground Pigments and unlocks", str(r3))
+	# wins and brushes
+	var ws := _pin_state(91)
+	for r in [1, 2, 3, 4, 5, 6]:
+		AR._wset(ws, "ground", r, 3)
+	PNR.enter(ws, [1, 2, 3, 4])
+	var w1 := PNR.finish(ws, true, "ranger")
+	check(w1["first"] and w1["brush"] == "the_rigger" and AR.ground_count(ws, 1) == 2 and AR.ground_count(ws, 5) == 3 and PNR.wins(ws) == 1 and not PNR.locked(ws), "3D win: the first win gives the class's brush and spends the set", str(w1))
+	var got := [w1["brush"]]
+	for i in 2:
+		PNR.enter(ws, [3, 4, 5, 6] if i == 0 else [1, 2, 5, 6])
+		got.append(PNR.finish(ws, true, "ranger")["brush"])
+	got.sort()
+	check(got == ["broad_stroke", "the_glazier", "the_rigger"] and PNR.pin(ws)["owned"].size() == 3, "3D win: later wins give a brush not owned yet (3 wins = all 3)", str(got))
+	PNR.enter(ws, [1, 2, 3, 4])
+	var w4 := PNR.finish(ws, true, "mage")
+	check(ids.has(w4["brush"]) and not w4["first"] and PNR.hex_state(ws)["wins"] == 4, "3D win: with all 3 owned a win still gives a brush", str(w4))
+	var cls_n := 0
+	for i in 60:
+		var t := _pin_state(1000 + i)
+		t["pinnacle"]["first"] = true
+		t["pinnacle"]["owned"] = ids.duplicate()
+		if PNR.pick_brush(t, "warrior") == "broad_stroke":
+			cls_n += 1
+	check(cls_n >= 24 and cls_n <= 50, "3D win: repeat brushes lean to the class (60/20/20)", str(cls_n))
+	# sanitize / save v9
+	var raw := {"set": [4, 3, 2, 1], "tries": 1, "attempts": 2, "wins": 0, "in_fight": true, "owned": ["the_glazier", "nope"]}
+	var sv := _pin_state()
+	for r in [1, 2, 3, 4]:
+		AR._wset(sv, "ground", r, 1)
+	PNR.sanitize(sv, raw)
+	check(PNR.locked_set(sv) == [1, 2, 3, 4] and PNR.tries_left(sv) == 1 and not PNR.pin(sv)["in_fight"] and PNR.pin(sv)["owned"] == ["the_glazier"] and AR.ground_count(sv, 1) == 1, "3D save: a fight open at close counts as a used try", str(sv["pinnacle"]))
+	raw["tries"] = 0
+	PNR.sanitize(sv, raw)
+	check(not PNR.locked(sv) and AR.ground_count(sv, 1) == 0, "3D save: closing mid-fight on the last try spends the set")
+	PNR.sanitize(sv, {"set": [1, 2], "tries": 9, "wins": -3})
+	check(not PNR.locked(sv) and PNR.wins(sv) == 0, "3D save: a malformed block loads empty")
+	var ch = CharacterData.new()
+	ch.setup_new("warrior", "Dan")
+	ch.progress["bosses_killed"]["nightmare_vaults"] = 1
+	AR.ensure(ch, 4040)
+	for r in [1, 2, 3, 4]:
+		AR._wset(ch.atlas, "ground", r, 1)
+		AR._wset(ch.atlas, "warden_kills", r, 1)
+	ch.atlas["warden_order"] = [2, 1, 3, 4]
+	PNR.enter(ch.atlas, [1, 2, 3, 4])
+	PNR.finish(ch.atlas, false)
+	var d9: Dictionary = ch.to_dict()
+	var ch9 = CharacterData.new()
+	ch9.from_dict(JSON.parse_string(JSON.stringify(d9)))
+	check(int(d9["version"]) == 9 and PNR.locked_set(ch9.atlas) == [1, 2, 3, 4] and PNR.tries_left(ch9.atlas) == 2 and ch9.atlas["warden_order"] == [2, 1, 3, 4], "3D save: the lock, tries and order survive a JSON save (v9)")
+	var d8 := d9.duplicate(true)
+	d8["version"] = 8
+	d8["atlas"].erase("pinnacle")
+	d8["atlas"].erase("warden_order")
+	d8["equipment"].erase("brush")
+	var ch8 = CharacterData.new()
+	ch8.from_dict(d8)
+	check(not PNR.locked(ch8.atlas) and ch8.atlas["warden_order"] == [] and PNR.study_order(ch8.atlas, [1, 2, 3, 4]) == [1, 2, 3, 4] and ch8.equipment.has("brush") and ch8.equipment["brush"] == null, "3D save: a v8 save loads (no lock, ring-order studies, empty Brush slot)")
+	# the boss def
+	var bd := PNR.boss_def(od, [3, 1, 2, 4])
+	var seq: Array = bd["phases"][0].get("sequence", [])
+	var sigs := []
+	for pid in seq:
+		sigs.append(int(bd["patterns"][pid].get("study", 0)))
+	check(sigs == [3, 1, 2, 4] and str(seq[0]).ends_with("underpainting") and bd["phases"][0]["patterns"].has(str(c["filler"])), "3D boss: phase 1 casts the 4 signatures in study order with the filler", str(seq))
+	check(is_equal_approx(float(bd["phases"][1]["at"]), 0.7) and is_equal_approx(float(bd["phases"][2]["at"]), 0.35) and bd["phases"][2].get("poise", {}).has("regen_per_sec"), "3D boss: phase thresholds 70% / 35%; phase 3 overrides poise")
+	check(is_equal_approx(float(bd["life"]), float(od["life"]) * float(c["life_mult"])) and int(bd["damage"][1]) == int(round(float(od["damage"][1]) * float(c["damage_mult"]))), "3D boss: life and damage from the pinnacle block")
+	# Erasure geometry
+	check(PNR.section_at(Vector2.ZERO) == -1 and PNR.section_at(Vector2(6 * 16, 0)) == 0 and PNR.section_at(Vector2(0, 6 * 16)) == 2 and PNR.section_at(Vector2(40 * 16, 0)) == -1, "3D erasure: sections by angle; the centre disc and outside are -1")
+	check(PNR.nearest_painted([0, 4], Vector2(0, 100)) in [0, 4] and PNR.nearest_painted([5], Vector2(-100, -10)) == 5 and PNR.nearest_painted([], Vector2.ONE) == -1, "3D erasure: the nearest painted section by angle")
+	var rr := RandomNumberGenerator.new()
+	rr.seed = 3
+	check(PNR.next_section([0, 1, 2, 3, 4, 5], rr) == -1 and not [0, 1].has(PNR.next_section([0, 1], rr)), "3D erasure: at most max_painted sections; the next one is unpainted")
+	# the arena def keeps the Atlas out
+	var ad := PNR.arena_def(ch9.atlas)
+	check(not ad.get("atlas", true) and ad["pinnacle"] and ad["mod_count"] == [0, 0] and not ad.has("mechanics") and not ad.has("atelier_fx") and int(ad["min_level"]) == 68 and ad["studies"] == [2, 1, 3, 4], "3D arena: not an Atlas zone (no mods, mechanics, Atelier), level 68, studies in order", str(ad.get("studies")))
+	# Guild contract
+	var gst := _pin_state()
+	var tpl := GR.template("overpainter")
+	check(not tpl.is_empty() and not GR.eligible(gst, tpl), "3D guild: Defeat the Overpainter is offered only after the first kill")
+	gst["pinnacle"]["wins"] = 1
+	check(GR.eligible(gst, tpl) and GR.progress_of({"tpl": "overpainter"}, {"overpainter": 1}) == 1, "3D guild: after a win the contract can be drawn and counts the kill")
+	# the Brush slot
+	check(CharacterData.EQUIP_SLOTS.has("brush"), "3D slot: EQUIP_SLOTS has the Brush slot")
+	var bc = CharacterData.new()
+	bc.setup_new("mage", "Dan")
+	bc.level = 60
+	var br: Dictionary = Loot.make_unique("broad_stroke", 68)
+	check(br.get("pinnacle", false) and str(br.get("slot", "")) == "brush" and br.get("affixes", []).is_empty(), "3D slot: a brush is a pinnacle item with no random affixes")
+	bc.inventory[0] = br
+	check(bc.equip_from_bag(0, "ring1") != "" and bc.equip_from_bag(0) == "" and bc.equipment["brush"] == br, "3D slot: a brush only goes in the Brush slot (any class)")
+	bc.inventory[1] = Loot.roll_item_of("bone_charm", "rare", 30)
+	check(bc.equip_from_bag(1, "brush") != "", "3D slot: nothing else fits the Brush slot")
+	check(bc.stats.has_flag("broad_stroke"), "3D slot: the equipped brush gives its effect")
+	check(Loot.craft_check("upgrade", br) != "" and Loot.craft_check("corrupt", br) != "", "3D slot: brushes cannot be crafted or corrupted")
+	check(LootFilter.evaluate(br)["visibility"] == "show", "3D slot: the loot filter always shows brushes")
+	check(Loot.tooltip(br).find("Brush slot") >= 0 if Loot.has_method("tooltip") else true, "3D slot: the tooltip names the Brush slot")
+
+func _atlas_snapshot(st: Dictionary) -> String:
+	var s := st.duplicate(true)
+	s.erase("pinnacle")
+	return JSON.stringify(s)
+
+func _find_brush(n) -> String:
+	if n.get_script() != null and str(n.get_script().resource_path).ends_with("loot_drop.gd"):
+		var it = n.get("item")
+		if typeof(it) == TYPE_DICTIONARY and it.get("pinnacle", false):
+			return str(it.get("unique", ""))
+	for k in n.get_children():
+		var r := _find_brush(k)
+		if r != "":
+			return r
+	return ""
+
+func test_live_3d() -> void:
+	var st: Dictionary = AR.ensure(Game.ch)
+	_open_atlas_all(st)
+	for r in [1, 2, 3, 4, 5, 6]:
+		AR._wset(st, "ground", r, 0)
+	for r in [1, 2, 3, 4]:
+		AR._wset(st, "ground", r, 2)
+		AR._wset(st, "warden_kills", r, maxi(1, AR.warden_kills(st, r)))
+	st["warden_order"] = [2, 1, 3, 4]
+	st["pinnacle"] = PNR.new_pin()
+	Game.ch.progress["bosses_killed"].erase("pinnacle_overpainter")
+	var snap := _atlas_snapshot(st)
+	check(main.enter_pinnacle([1, 2, 3, 5]) != "" and not PNR.locked(st), "live 3D: a set with a missing layer is refused")
+	var ui = main.ui
+	if ui != null:   # the pinnacle panel on the Atlas centre hex
+		ui.toggle("atlas")
+		var ap = ui.panels["atlas"]
+		ap.pin_pick = []
+		ap.select(Vector2i.ZERO)
+		check(ap.pin_box.visible and ap.detail.text.find("The Bare Ground") >= 0 and ap.enter_btn.disabled and ap.enter_btn.text == "Enter the Bare Ground", "live 3D: the centre hex opens the pinnacle panel (pick 4 first)", ap.detail.text.substr(0, 160))
+		check(ap.progress_label.text.find("The Bare Ground is open") >= 0, "live 3D: the Atlas panel line explains the centre hex", ap.progress_label.text.substr(0, 160))
+		check(ap.pin_btns[5].disabled and ap.pin_btns[1].text.find("2") >= 0, "live 3D: layers without a Ground Pigment cannot be picked; counts are shown")
+		for r in [1, 2, 3, 4]:
+			ap._toggle_pin(r)
+		check(not ap.enter_btn.disabled and ap.detail.text.find("Studies in order") >= 0, "live 3D: 4 picks enable Enter and show the study order")
+		if args.has("shot"):
+			await _shot("pinnacle_panel")
+		ui.close_all()
+	check(main.enter_pinnacle([4, 3, 2, 1]) == "", "live 3D: the Bare Ground opens with 4 owned layers")
+	await frames(3)
+	var lv = Game.level
+	check(lv.pinnacle and lv.atlas_hex == "" and lv.monster_level == 68 and lv.mechanics.is_empty() and lv.mods.is_empty() and lv.rot == 0 and lv.afx.is_empty(), "live 3D: the arena is level 68 with no Atlas hex, Rot, mechanics, modifiers or Atelier", "%d %s" % [lv.monster_level, str(lv.mechanics)])
+	check(lv.pin_arena != null and lv.enemies.is_empty() and lv.layout["rooms"].size() == 2, "live 3D: a round studio with no packs")
+	check(await _until(lv, func(): return lv.boss != null and is_instance_valid(lv.boss), 6.0), "live 3D: the Overpainter wakes after a short delay")
+	var b = lv.boss
+	var seq: Array = b.def["phases"][0].get("sequence", [])
+	var order := []
+	for pid in seq:
+		order.append(int(b.patterns[pid].get("study", 0)))
+	check(order == [2, 1, 3, 4] and b.def.get("pinnacle", false), "live 3D: phase 1 studies follow the first-kill order", str(order))
+	lv.player.invuln_t = 9999.0
+	check(await _until(lv, func():
+		lv.player.global_position = b.global_position + Vector2(0, 60)
+		return b.patterns_used.size() >= 2, 30.0), "live 3D: phase 1 casts studies and the filler", str(b.patterns_used))
+	if args.has("shot"):
+		lv.player.invuln_t = 9999.0
+		await _shot("pinnacle_phase1")
+	var p = lv.player
+	p.invuln_t = 9999.0
+	# phase 2: Erasure
+	b.life = b.max_life * 0.69
+	check(await _until(lv, func(): return lv.pin_arena.phase_idx == 1, 3.0), "live 3D: phase 2 (Erasure) at 70% life")
+	check(await _until(lv, func(): return lv.pin_arena.painted.size() >= 1, 15.0), "live 3D: a section of the floor is painted over", str(lv.pin_arena.notes()))
+	var ps: int = int(lv.pin_arena.painted[0])
+	var n := PNR.cfg()
+	var mid: Vector2 = lv.pin_arena.centre + Vector2.RIGHT.rotated((ps + 0.5) * TAU / int(n["sections"])) * (float(n["arena_radius"]) + float(n["safe_radius"])) * 8.0
+	b.process_mode = Node.PROCESS_MODE_DISABLED   # no boss hits pushing the player off the paint
+	p.global_position = mid
+	var h0: int = int(lv.pin_arena.stats["paint_hits"])
+	check(await _until(lv, func():
+		p.global_position = mid
+		return int(lv.pin_arena.stats["paint_hits"]) > h0, 3.0) and lv.pin_arena.painted_at(mid), "live 3D: painted floor hurts the player standing on it", "%s %s" % [str(lv.pin_arena.notes()), str(lv.pin_arena.painted)])
+	b.process_mode = Node.PROCESS_MODE_INHERIT
+	var np: int = lv.pin_arena.painted.size()
+	b._stagger()
+	check(lv.pin_arena.painted.size() == np - 1 and int(lv.pin_arena.stats["restored"]) == 1 and not lv.pin_arena.painted.has(ps), "live 3D: a poise break restores the painted section nearest the player")
+	if args.has("shot"):
+		await _until(lv, func(): return lv.pin_arena.painted.size() >= 1 or lv.pin_arena.warn >= 0, 12.0)
+		p.global_position = lv.pin_arena.centre + Vector2(0, 20)
+		await _shot("pinnacle_phase2")
+	check(not lv.pin_arena.painted_at(lv.pin_arena.safe_point(mid)) and PNR.section_at(Vector2.ZERO) == -1, "live 3D: safe_point picks unpainted floor")
+	# phase 3: Bare Canvas
+	b.life = b.max_life * 0.34
+	check(await _until(lv, func(): return lv.pin_arena.phase_idx == 2, 3.0), "live 3D: phase 3 (Bare Canvas) at 35% life")
+	check(is_equal_approx(float(b.stun_cfg["poise"]["regen_delay"]), float(n["phase3_poise"]["regen_delay"])) and is_equal_approx(float(Data.stun_cfg["poise"]["regen_delay"]), 3.0), "live 3D: phase 3 drains poise faster (the shared stun config is untouched)")
+	if args.has("shot"):
+		await _shot("pinnacle_phase3")
+	var painted3: int = lv.pin_arena.painted.size()
+	await _until(lv, func(): return false, 10.0)
+	check(lv.pin_arena.painted.size() <= painted3, "live 3D: no new sections are painted in phase 3")
+	b.poise_state["poise"] = 50.0
+	b.poise_state["since_hit"] = 0.0
+	await _until(lv, func(): return float(b.poise_state["poise"]) <= 0.0, 4.0)
+	check(float(b.poise_state["poise"]) <= 0.0, "live 3D: the poise bar empties within seconds in phase 3", str(b.poise_state))
+	# leaving alive uses the try
+	main.go_hub(false)
+	await frames(3)
+	check(PNR.tries_left(st) == 2 and not PNR.pin(st)["in_fight"] and AR.ground_count(st, 1) == 2, "live 3D: leaving alive uses a try and keeps the Pigments")
+	if ui != null:
+		ui.toggle("atlas")
+		var ap2 = ui.panels["atlas"]
+		ap2.select(Vector2i.ZERO)
+		check(ap2.detail.text.find("Locked set") >= 0 and ap2.pin_btns[1].disabled and ap2.progress_label.text.find("2 tries left") >= 0 and not ap2.enter_btn.disabled, "live 3D: the panel shows the locked set and tries left", ap2.progress_label.text.substr(0, 160))
+		if args.has("shot"):
+			await _shot("pinnacle_locked")
+		ui.close_all()
+	check(_atlas_snapshot(st) == snap, "live 3D: the run reveals nothing, spreads no Rot and credits nothing on the Atlas")
+	# a death uses the next try
+	main.enter_pinnacle([1, 2, 3, 4])
+	await frames(3)
+	lv = Game.level
+	await _until(lv, func(): return lv.boss != null, 6.0)
+	lv.player.invuln_t = 0.0
+	lv.player.life = 0.0
+	lv.player.die(null)
+	await frames(5)
+	main.go_hub(false)
+	await frames(3)
+	check(PNR.tries_left(st) == 1 and PNR.locked(st), "live 3D: a death uses a try")
+	check(_atlas_snapshot(st) == snap, "live 3D: a death adds no Rot anywhere")
+	# a win on the last try
+	var pts0: int = Game.ch.bonus_passive_points
+	main.enter_pinnacle([1, 2, 3, 4])
+	await frames(3)
+	lv = Game.level
+	await _until(lv, func(): return lv.boss != null, 6.0)
+	lv.boss.die(lv.player)
+	await frames(10)
+	check(PNR.wins(st) == 1 and not PNR.locked(st) and AR.ground_count(st, 1) == 1 and AR.ground_count(st, 4) == 1, "live 3D: a win spends 1 Ground Pigment of each layer in the set")
+	check(Game.ch.bonus_passive_points == pts0 + 1 and int(Game.ch.progress["bosses_killed"].get("pinnacle_overpainter", 0)) == 1, "live 3D: the first kill gives +1 passive point")
+	var bid := _find_brush(lv)
+	check(bid == str(PNR.brush_map().get(Game.ch.class_id, "")) and PNR.pin(st)["owned"].has(bid), "live 3D: the first kill drops the class's brush", bid)
+	check(_has_legendary(lv), "live 3D: the Overpainter drops a legendary")
+	check(GR.eligible(st, GR.template("overpainter")), "live 3D: the Guild contract opens after the first kill")
+	if ui != null and bid != "":   # the Brush slot in the inventory
+		var keep_b = Game.ch.equipment["brush"]
+		Game.ch.equipment["brush"] = Loot.make_unique(bid, 68)
+		Game.ch.recalc()
+		ui.open("inventory")
+		var inv = ui.panels["inventory"]
+		check(inv.equip_slots.has("brush"), "live 3D: the inventory shows the Brush slot")
+		if args.has("shot"):
+			await _shot("brush_slot")
+		ui.close_all()
+		Game.ch.equipment["brush"] = keep_b
+		Game.ch.recalc()
+	check(PNR.hex_state(st)["state"] == "beaten" or PNR.hex_state(st)["state"] == "ready", "live 3D: the centre hex shows the win", str(PNR.hex_state(st)))
+	main.go_hub(true)
+	await frames(3)
+	check(PNR.wins(st) == 1 and PNR.pin(st)["attempts"] == 3, "live 3D: leaving after a win changes nothing more")
+	# closing the game mid-fight: the try stays used
+	main.enter_pinnacle([1, 2, 3, 4])
+	await frames(3)
+	var dm: Dictionary = Game.ch.to_dict()
+	var chm = CharacterData.new()
+	chm.from_dict(JSON.parse_string(JSON.stringify(dm)))
+	check(PNR.tries_left(chm.atlas) == 2 and not PNR.pin(chm.atlas)["in_fight"], "live 3D: a save taken mid-fight loads with the try used")
+	main.go_hub(false)
+	await frames(3)
+	st["pinnacle"]["set"] = []
+	st["pinnacle"]["tries"] = 0
+
+## The brushes' effects on a live level (the arena: the boss and two spawned enemies).
+func test_live_brushes() -> void:
+	var st: Dictionary = AR.ensure(Game.ch)
+	for r in [1, 2, 3, 4]:
+		AR._wset(st, "ground", r, maxi(1, AR.ground_count(st, r)))
+	main.enter_pinnacle([1, 2, 3, 4])
+	await frames(3)
+	var lv = Game.level
+	await _until(lv, func(): return lv.boss != null, 6.0)
+	var p = lv.player
+	p.invuln_t = 9999.0
+	var ch = Game.ch
+	var keep = ch.equipment["brush"]
+	var b = lv.boss
+	b.max_life *= 100.0
+	b.life = b.max_life
+	b.process_mode = Node.PROCESS_MODE_DISABLED
+	p.global_position = b.global_position + Vector2(-30, 0)
+	# The Broad Stroke
+	ch.equipment["brush"] = Loot.make_unique("broad_stroke", 68)
+	ch.recalc()
+	var pk: Dictionary = Combat.player_packet(ch, Data.skills["heavy_strike"])
+	for i in 4:
+		Combat.deal(pk, p, b)
+	check(int(p.get_meta("brush_strokes", 0)) == 1 and _count_script(lv, "wet_paint.gd") >= 1, "live brush: every 4th melee hit of The Broad Stroke paints a stroke and wet paint")
+	await frames(20)
+	check(p.has_buff("wet_paint") and b.has_status("chill"), "live brush: wet paint chills enemies and shields the player standing in it")
+	# The Rigger
+	ch.equipment["brush"] = Loot.make_unique("the_rigger", 68)
+	ch.recalc()
+	var e1 = lv.spawn_enemy(Data.enemies["ghoul"], 68, [], b.global_position + Vector2(90, 0))
+	var e2 = lv.spawn_enemy(Data.enemies["ghoul"], 68, [], b.global_position + Vector2(0, 90))
+	for e in [e1, e2]:
+		e.max_life *= 100.0
+		e.life = e.max_life
+		e.process_mode = Node.PROCESS_MODE_DISABLED
+	var pp: Dictionary = Combat.player_packet(ch, Data.skills["quick_shot"])
+	for t in [e1, e2, b]:
+		Combat.deal(pp, p, t)
+	var l0: float = e1.life
+	Combat.deal(pp, p, b)
+	check(int(p.get_meta("brush_lines", 0)) >= 2 and e1.life < l0, "live brush: The Rigger draws lines between painted enemies that hurt", str(p.get_meta("brush_lines", 0)))
+	# The Glazier
+	ch.equipment["brush"] = Loot.make_unique("the_glazier", 68)
+	ch.recalc()
+	var fb: Dictionary = Data.skills["firebolt"]
+	for i in 5:
+		BrushFxT.on_cast(p, fb, b.global_position)
+	check(int(p.get_meta("glaze_layers", 0)) == 5 and p.has_buff("glaze"), "live brush: The Glazier stacks 5 Glaze layers")
+	BrushFxT.on_cast(p, fb, b.global_position)
+	check(int(p.get_meta("glaze_echoes", 0)) == 1 and int(p.get_meta("glaze_layers", 0)) == 0 and not p.has_buff("glaze"), "live brush: a cast at 5 layers spends them and echoes")
+	var fe: Dictionary = fb.duplicate()
+	fe["_echo_mult"] = 0.7
+	check(is_equal_approx(p.damage_more(fe), p.damage_more(fb) * 0.7), "live brush: the echo deals 70% damage")
+	ch.equipment["brush"] = keep
+	ch.recalc()
+	b.process_mode = Node.PROCESS_MODE_INHERIT
+	main.go_hub(false)
+	await frames(3)
+	st["pinnacle"]["set"] = []
+	st["pinnacle"]["tries"] = 0
+	st["pinnacle"]["in_fight"] = false
+
+func _count_script(n, suffix: String) -> int:
+	var k := 0
+	if n.get_script() != null and str(n.get_script().resource_path).ends_with(suffix):
+		k += 1
+	for c in n.get_children():
+		k += _count_script(c, suffix)
+	return k

@@ -413,6 +413,10 @@ func _movement() -> Vector2:
 	goal_loot_id = 0
 	if t < retreat_until:
 		return _away_dir(240.0)
+	var pgl = eg.paint_goal()   # Endgame 3D: off the painted floor first
+	if pgl != null:
+		goal_kind = "paint:safe"
+		return _path_dir(pgl)
 	var hg = eg.hold_goal()   # Endgame 3C: stand at the cistern while pumping it
 	if hg != null:
 		goal_kind = "fire:pump"

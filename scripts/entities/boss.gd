@@ -34,6 +34,9 @@ var spiral_t := 0.0
 var extra_summons := 0
 var patterns_used := {}   # for tests / telemetry
 var poise_state := {}     # boss poise (data/stun.json): poise, since_hit, immune, stagger
+var stun_cfg := {}        # data/stun.json, with the current phase's `poise` overrides (Endgame 3D)
+var seq_i := 0            # phase `sequence` (Endgame 3D Studies): next pattern in the sequence
+var seq_filler := false   # the pick after a sequence pattern is a filler (a non-sequence pattern)
 
 func _ready() -> void:
 	super._ready()
@@ -41,6 +44,7 @@ func _ready() -> void:
 	aggro = true
 	patterns = def.get("patterns", {})
 	poise_state = Stun.new_poise()
+	stun_cfg = Data.stun_cfg
 	extra_summons = 2 if level != null and level.enemy_run.get("boss_summons", false) else 0
 
 func active_patterns() -> Array:
@@ -55,8 +59,8 @@ func _physics_process(delta: float) -> void:
 	if Dev.freeze_ai():
 		super._physics_process(delta)   # the enemy freeze path: no patterns, charges or phases
 		return
-	if not Data.stun_cfg.is_empty() and not poise_state.is_empty():
-		Stun.poise_tick(Data.stun_cfg, poise_state, delta)
+	if not stun_cfg.is_empty() and not poise_state.is_empty():
+		Stun.poise_tick(stun_cfg, poise_state, delta)
 	_check_phase()
 	for k in cds.keys():
 		cds[k] -= delta
@@ -109,6 +113,14 @@ func _check_phase() -> void:
 		Sfx.play("boss", 0.0)
 		if extra_summons > 0 or patterns.has("summon"):
 			_summon_adds(def.get("summon", "ghoul"), 2 + extra_summons)
+		if p.has("poise") and not Data.stun_cfg.is_empty():   # Endgame 3D Bare Canvas: the poise bar drains faster
+			stun_cfg = Data.stun_cfg.duplicate(true)
+			for k in p["poise"]:
+				stun_cfg["poise"][k] = p["poise"][k]
+		seq_i = 0
+		seq_filler = false
+		if level.has_method("on_boss_phase"):
+			level.on_boss_phase(self, phase_idx)
 
 # ------------------------------------------------------------------ decision
 func _chase() -> Vector2:
@@ -137,9 +149,24 @@ func _chase() -> Vector2:
 	return dir * speed
 
 func _choose(dist: float) -> String:
+	var ph: Array = def.get("phases", [])
+	var seq: Array = ph[phase_idx].get("sequence", []) if not ph.is_empty() else []
+	if not seq.is_empty():   # Endgame 3D Studies: the sequence in order, a filler pattern between them
+		if not seq_filler:
+			var sn := str(seq[seq_i % seq.size()])
+			var sd: Dictionary = patterns.get(sn, {})
+			var sr: Array = sd.get("range", [0, 999])
+			if not sd.is_empty() and cds.get(sn, 0.0) <= 0 and dist >= float(sr[0]) and dist <= float(sr[1]):
+				seq_i += 1
+				seq_filler = true
+				return sn
+		else:
+			seq_filler = false
 	var total := 0.0
 	var opts := []
 	for n in active_patterns():
+		if seq.has(n):
+			continue
 		var pd: Dictionary = patterns.get(n, {})
 		if pd.is_empty() or cds.get(n, 0.0) > 0:
 			continue
@@ -412,14 +439,16 @@ func receive_hit(rolled: Dictionary, p: Dictionary, source, crit: bool) -> float
 		for k in rolled:
 			rolled[k] *= 1.5
 	var dealt: float = super.receive_hit(rolled, p, source, crit)
-	if alive and dealt > 0 and not Data.stun_cfg.is_empty() and not poise_state.is_empty():
-		if Stun.poise_hit(Data.stun_cfg, poise_state, dealt, max_life):
+	if alive and dealt > 0 and not stun_cfg.is_empty() and not poise_state.is_empty():
+		if Stun.poise_hit(stun_cfg, poise_state, dealt, max_life):
 			_stagger()
 	return dealt
 
 ## Poise broken: a short stagger that interrupts the current telegraph (and a charge).
 func _stagger() -> void:
-	var pc: Dictionary = Data.stun_cfg["poise"]
+	var pc: Dictionary = stun_cfg["poise"]
+	if level != null and level.has_method("on_boss_stagger"):   # Endgame 3D: a poise break restores a painted section
+		level.on_boss_stagger(self)
 	var dur := float(pc.get("stagger_duration", 1.0))
 	add_status("stun", dur, {})
 	statuses["stun"]["dur"] = statuses["stun"]["t"]

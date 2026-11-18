@@ -1,6 +1,6 @@
 # Endgame Phase 3: the Pinnacle
 
-Stages: 3A (below), **3B the Atelier** (end of file).
+Stages: 3A (below), 3B the Atelier, 3C Burning Canvas + Pigment Wells, **3D the Overpainter** (end of file).
 
 Plan: "Path of Dan Endgame Design: The Atlas of Ruin, Rot, Zone Mechanics and Pinnacle" (claude.ai project), section G, Phase 3.
 Branch `endgame-phase3` (from `main` at `6120de6`). Status doc: `claude/endgame_phase3_status.md` (project).
@@ -271,3 +271,93 @@ Tests: `atlas_only` **790/0** (+86), `tree_only` **844/0**, full suite **48015/0
 3. The bot rarely uses cisterns (0-0.4 per run): by the time the front is close it is usually past them. Players may use them more; the contract needs 2-4.
 4. Not built (as agreed): Cinder items, the front revealing Pentimento Vaults, Wager bets for the new mechanics, vendor Pigments.
 5. All numbers are first values for 3E (`mechanics.burning`, `mechanics.wells`, Pigment costs and modifiers).
+
+---
+
+# Stage 3D: the Overpainter, Apprentice (2026-11-19, Claude)
+
+Dan's decisions (2026-11-10 and 2026-11-18) and "yes to defaults" on the 3D question list (`claude/endgame_phase3d_questions.md` in the claude.ai project).
+
+## What was built
+
+- **The Bare Ground** on the Atlas centre hex. Clicking the hub hex opens the pinnacle panel: the owned Ground Pigments (one toggle per layer with its count), a pick of exactly 4, the study order of the picked set, tries left, rewards and Enter. It opens with Ground Pigments of any 4 of the 6 layers (`PinnacleRules.is_ready`).
+- **The lock and tries** (`scripts/core/pinnacle_rules.gd`, pure). Entering locks the set (`atlas.pinnacle.set`) with 3 tries; **a try is used on entry**, so dying, leaving through the portal ("Leave (the try is used)") and closing the game mid-fight all count. A win, or the end of the last try, spends 1 Ground Pigment of each layer in the set and unlocks it. A locked set cannot be changed. `in_fight` is saved at entry: a save loaded with it set counts the try as used and, on the last try, spends the set (`PinnacleRules.sanitize`).
+- **The arena** (`scripts/world/pinnacle_gen.gd`, `scripts/world/pinnacle_arena.gd`). A fixed round studio, radius 12 tiles, no packs or chambers, monster level 68. The dungeon builds it (`def.generator = "pinnacle"`) but the run is not an Atlas zone. `enter_pinnacle` (main.gd) never calls the Rot, Pigment, mechanic, Atelier or run-modifier code, and the def has no `atlas` flag, so `dungeon.atlas_hex` stays "". Everything hex-keyed (reveal, clears, Rot spread and death Rot, contract credit, `mark_seen`) is skipped. Live tests check that the atlas state (minus the pinnacle block) is byte-identical after a leave, a death and a win. The boss wakes 1.5 s after you arrive. Fight rolls use the arena's own RNG (seeded from the run seed); the main run stream is not touched.
+- **The Overpainter** (`data/enemies.json` `overpainter`, built by `PinnacleRules.boss_def`).
+  - Phase 1, **Studies** (100-70%): the signature pattern of each Warden whose Ground Pigment you brought (`wardens.rings[].add[signature]`, at the Warden's numbers x `study_mult`), in the order of your first kills, on a loop, with a void fan (`study_fan`) between them. Boss phases can now carry a `sequence` (boss.gd `_choose`).
+  - Phase 2, **Erasure** (70-35%): ring wash, blots and erase strokes. Every 9 s one of 8 pie sections is painted over after a 2 s white warning (at most 6 painted; the centre disc, radius 3 tiles, is never painted). Painted floor hits for 0.15 x the boss hit as void every 0.5 s and chills. **A poise break restores the painted section nearest you** (boss.gd calls `level.on_boss_stagger`).
+  - Phase 3, **Bare Canvas** (35-0%): void spirals, teleport (vanish, then a 5-orb volley), primer mortars that leave void pools on you, erase strokes. No new sections are painted. **The poise bar drains fast**: a phase can override `data/stun.json` poise (`regen_delay` 1.0 s instead of 3.0, `regen_per_sec` 30 instead of 15, `immunity_after_stagger` 5 s instead of 8), so you stun him on a rhythm. The shared stun config is untouched.
+- **First-kill order** (save v9): `atlas.warden_order` records each Warden's first kill from now on (`AtlasRules.warden_victory`). Older kills without an entry follow in ring order, then the rings never beaten (`PinnacleRules.kill_order`).
+- **Rewards** (`_on_pinnacle_dead`): +1 passive point on the first kill; one of the Overpainter's brushes (the first kill gives your class's brush; later wins give one you don't own yet, weighted 60/20/20 to your class, then any brush 60/20/20); a legendary, 2 rares (+320 rarity) and 50 gold per monster level, like a ring-6 Warden. `progress.bosses_killed.pinnacle_overpainter` counts kills.
+- **The Brush slot and the three brushes** (below).
+- **Hooks:** the Atlas map draws the centre hex by state (locked: grey; ready: a pulsing pale fill; set locked: 4 layer-colour pips and "N tries left"; beaten: a gold mark). The Atlas panel's first line explains it. The Guild offers "Defeat the Overpainter" (weight 0.25, 25 rep, 5 Seals) only after the first kill; a win credits it. No Wager, no Atelier nodes. Dev panel row "Overpainter": 4 Ground Pigments, reset the lock, give the 3 brushes.
+- **Smartbot:** `--pinnacle=a,b,c,d` (grants the set; the list is also the first-kill order), `pinnacle.<key>` in `--tune`, run notes `pin:...`, the bot steps off painted floor (`sb_endgame.paint_goal`). Runner `tests/smartbot/run_atlas_p3d.ps1`, summary `p3d_summary.py`.
+
+## Research: dedicated endgame slots and pinnacle-exclusive uniques
+
+| Game | System | What works | What players complain about | What fits Path of Dan |
+|---|---|---|---|---|
+| Path of Exile 1 | Jewels in passive-tree sockets, free to swap; cluster jewels extend the tree. Each pinnacle boss (Shaper, Elder, Uber Elder, Maven, Sirus, the Ubers) has its own unique list; GGG designed the Elder uniques as a themed cycle split by damage type; Uber Elder can drop the 3-mod Watcher's Eye; Shaper / Elder drop the fragments of the next fight. | A themed set per boss; key chains (boss A drops boss B's key), like our Ground Pigments. | Chase drops are rare on purpose (the 3-mod Watcher's Eye); the Uber tier is for few players. | The themed cycle (3 brushes, one per class). Not the rarity: we have one boss. |
+| Path of Exile 2 | Charms in belt charm slots; a belt has 1-3 slots, random by item level; charms are normal / magic / unique only. | Automatic triggers, no flask juggling. | A belt with 3 charm slots is luck; it became a meme. | Never gate the slot on a roll: the Brush slot is always there. |
+| Grim Dawn | One relic slot; relics are crafted at the Blacksmith from blueprints in 3 tiers (Mythical from level 60, blueprints from bosses), each craft adds a random bonus. | A slot that never competes with gear; the craft chain is a long goal. | A character uses about 3 relics in its life; relic icons have little character; weak relics are never used because the slot is so valuable. | One slot, but three items that are all worth using (a real choice) with their own art. |
+| Last Epoch | The idol grid (20 cells, Tetris-style), fixed non-modifiable idols. Timeline bosses drop from a pool of 4 uniques, one very rare and only in Empowered timelines; Uber Aberroth has its own items. | Fixed items are easy to read and balance. | Boss-only uniques with low drop rates behind harder content; aspirational loot should feel optional. | No grid (3 items). Guaranteed drops. Strong, but not needed for the rest of the game. |
+| Diablo IV | Lord of Hatred's Talisman: its own tab, a Seal in the centre and up to 6 Charms, not competing with gear. Uber uniques (e.g. the Harlequin Crest) dropped about 2% from Uber Duriel. | Endgame power on top of gear, in its own space. | Uber uniques were "a carrot no one can reach"; Blizzard raised the rates and ran double-drop events. | A guaranteed brush per win, no duplicate until you own all 3. |
+
+Sources: [PoE wiki: The Uber Elder](https://www.poewiki.net/wiki/The_Uber_Elder), [Maxroll: Uber Elder](https://maxroll.gg/poe/bosses/the-uber-elder-boss-guide), [Maxroll: The Elder](https://maxroll.gg/poe/bosses/the-elder-boss-guide), [GameBanshee: Designing the Elder Uniques](https://gamebanshee.com/k4934), [PoE wiki: Passive skill (jewel sockets)](https://www.poewiki.net/wiki/Passive), [PoE: Cluster Jewels announcement](https://pathofexile.com/forum/view-thread/2783927), [PoE2 wiki: Charm](https://poe2wiki.net/wiki/Charm), [Mein-MMO: PoE 2 belt charm slots](https://mein-mmo.de/en/players-of-path-of-exile-2-demand-changes-to-loot-especially-one-type-of-item-annoys-them,1210743), [Grim Dawn: Relics](https://www.grimdawn.com/guide/items/relics), [Crate forum: Relics of the Past](https://forums.crateentertainment.com/t/grim-misadventure-40-relics-of-the-past/28485), [Crate forum: What do you think of Relics? (p13)](https://forums.crateentertainment.com/t/what-do-you-think-of-relics/28534?page=13), [(p9)](https://forums.crateentertainment.com/t/what-do-you-think-of-relics/28534?page=9), [Icy Veins: Last Epoch idols](https://www.icy-veins.com/last-epoch/unlocking-idols), [GINX: Last Epoch idols](https://www.ginx.tv/en/?p=61147), [LE forum: the case against boss-specific drops](https://forum.lastepoch.com/t/the-case-against-boss-specific-unique-set-item-drops/35936), [LE forum: aspirational content should feel optional](https://forum.lastepoch.com/t/aspirational-content-should-always-feel-100-optional-uber-abby-does-not-feel-that-way/76416?page=5), [d4guides: Talisman](https://d4guides.gg/guides/miscellaneous/talisman-lord-of-hatred), [DiabloBytes: Talismans](https://www.diablobytes.com/diablo-iv/lord-of-hatred/talismans/), [PC Gamer: Uber Unique drop rate doubled](https://pcgamer.com/blizzard-just-doubled-the-drop-rate-of-diablo-4s-rarest-loot-so-nows-your-chance-to-grab-those-uber-uniques), [Mein-MMO: "a carrot that no one can reach"](https://mein-mmo.de/en/diablo-4-players-do-not-understand-a-decision-from-blizzard-a-carrot-that-no-one-can-reach,1040802), [Icy Veins: Uber unique drop chance](https://wp-prod.icy-veins.com/uber-unique-drop-chance-buffed-in-patch-1-3-2/).
+
+## The Brush slot
+
+- `CharacterData.EQUIP_SLOTS` gains `brush` (save v9; older saves load with it empty). Paper doll: the empty cell between Ring 1 and Ring 2, under the belt, with a brush placeholder icon (`art.gd` ICONS `brush`).
+- Only items whose slot is `brush` go there, and a brush goes nowhere else (`equip_from_bag`). Any class can wear one; only one at a time.
+- Brushes are uniques with fixed rolled mods (`data/uniques.json`, `pinnacle: true`) on three brush bases (`data/item_bases.json`, `pinnacle: true`, level 60). `Data` keeps them out of `unique_list` and `item_base_list`, so no random drop, Guild cache, Wells chest, dev "all bases" list or corruption pool can roll one. Items carry `pinnacle: true`: `Loot.craft_check` and `corruption_refusal` refuse them, salvage is off (sell, stash and drop work), the tooltip says so, and the loot filter always shows them with a pale beam.
+- Touched: `character_data.gd`, `data.gd`, `loot.gd`, `loot_filter.gd` (slot `brush`), `inventory_panel.gd`, `art.gd`, `combat.gd`, `player.gd`, `guild_rules.gd` (contract and stat), `dev_tools.gd`, `dev_panel.gd`, `data/art/sprites.json` (manifest entry for the boss). The smartbot gear code needed no change (it never rolls brushes and does not equip them; brushes stay off for the 3E baseline).
+
+## The three brushes (numbers in `data/uniques.json` `effect_params`)
+
+| Brush | Theme | Mods | Effect |
+|---|---|---|---|
+| **The Broad Stroke** (Flat Brush: +40 life) | warrior | +60-80 life, +20-30% armour, +10-15% area, +15-25 Str | Every 4th melee hit paints a stroke along the swing (180 x 50) for 120% of the hit. The wet paint lasts 3 s: enemies in it are chilled; you take 15% less damage while you stand in it. |
+| **The Rigger** (Liner Brush: +10% projectile speed) | ranger | +15-25 Dex, +15-25% projectile speed, +25-40% crit chance, +40-55 life | Projectile hits paint the target for 4 s. Hitting a painted enemy draws lines to up to 3 other painted enemies within 240; each line deals 60% of the hit to every enemy it crosses (0.5 s per target). |
+| **The Glazier** (Glazing Brush: +30 mana) | mage | +15-25 Int, +10-15% cast speed, +40-60 mana, +40-55 life | Each spell adds a Glaze layer (max 5, 6 s, +4% spell damage each). A spell cast at 5 layers spends them and casts again 0.2 s later at 70% damage. |
+
+Brush hits carry `brush_extra` so they never trigger a brush again (`scripts/combat/brush_fx.gd`, `scripts/entities/wet_paint.gd`).
+
+## Numbers (data/atlas.json `pinnacle`; starting values for 3E)
+
+need 4, tries 3, level 68, life_mult **80** (x the boss's 825 base), damage_mult **1.2** (x 16-26), resist +45, phases at 70% / 35%, study_mult 1.0, filler `study_fan`, arena 12 tiles / safe disc 3 / 8 sections, paint every 9 s (the first after 4.5 s), warning 2 s, max 6 painted, tick 0.5 s at 0.15 x the boss hit (void, chill), phase 3 poise regen_delay 1.0 / regen_per_sec 30 / immunity 5 s, reward 1 legendary + 2 rares (+320) + 50 gold/level, brushes warrior / ranger / mage, weights 60 / 20.
+
+**Life and damage were tuned in 3D** from the 12 / 1.7 of the question list: at 12 the warrior killed the boss in 13 s. Sweep (set 1,2,3,4, 5 runs per class, timeout 600 s): life 100 / damage 1.7: 5/15 wins (warrior 1, ranger 4, mage 0); 60 / 1.7: 7/15 (3, 4, 0); 60 / 1.2: 10/15 (4, 4, 2); **80 / 1.2: 8/15 (2, 4, 2)**. Damage 1.2 keeps the mage above 0%.
+
+## Save v9
+
+`atlas.warden_order: [ring...]`, `atlas.pinnacle: {set, tries, attempts, wins, in_fight, first, owned}` and `equipment.brush`. v4-v8 saves load: an empty pinnacle block, `warden_order` empty (studies fall back to ring order), an empty Brush slot. `new_state` writes the same empty block as `PinnacleRules.new_pin()` (a test checks they match).
+
+## Results
+
+Tests: `atlas_only` **874/0** (+84: `test_phase3d` rules / data / save / slot, `test_live_3d` the fight, panel and tries, `test_live_brushes` the three effects), `tree_only` **844/0**, full suite **48022/0** (+7; two existing checks extended: the loot filter's slot list and the art manifest now include the brush and the Overpainter). Screenshots in `tests/screens_out_atlas/`: `pinnacle_panel.png` (the pick), `pinnacle_locked.png` (the locked set and tries), `pinnacle_phase1.png`, `pinnacle_phase2.png` (painted sections and a warning), `pinnacle_phase3.png`, `brush_slot.png` (the inventory with a brush).
+
+**Unchanged checks.** Frozen baseline (`run_baseline.ps1` vs `baseline/d2_v1.csv`, dungeon tiers): **60/60 identical**. D2 Rot cell (`phaseD_runner.py --groups d2rot --only rot4p --gears typical --tag p3d`): **21/30, identical run for run** to 3C (outcome, clear time, damage taken, kills and boss life of all 30 runs). The pinnacle is not reachable from either: brushes never drop at random and the bot never equips one.
+
+**Smartbot: the Overpainter** (`run_atlas_p3d.ps1 -Runs 10 -Tag v1 -Timeout 600`; level 60, Competent, balanced, typical gear for ring 6, no brush, seed 900; one fight per run; summary `tests/smartbot/out/p3d/p3d_summary_v1.txt`). "In 3" = the chance a set is beaten within its 3 tries at that win rate (1 - (1-p)^3); "tries" = expected tries used per set.
+
+| Set (study order) | Warrior | Ranger | Mage | All |
+|---|---|---|---|---|
+| early 1,2,3,4 (glaze tide, fault lines, underpainting, dead colour) | 5/10 | 9/10 | 2/10 | 16/30 |
+| late 3,4,5,6 (underpainting, dead colour, contour lines, gesso) | 6/10 | 9/10 | 0/10 | 15/30 |
+| mixed 1,3,5,6 (glaze tide, underpainting, contour lines, gesso) | 8/10 | 9/10 | 3/10 | 20/30 |
+| **all** | **19/30 (63%)** | **27/30 (90%)** | **5/30 (17%)** | **51/90 (57%)** |
+
+- **Fight time:** median win 82 s; mean win time warrior 136-198 s, ranger 35-39 s, mage 207-248 s. 3 timeouts in 90 (all warrior, 600 s).
+- **Which phase kills the bot:** of 36 deaths, phase 1: 5, phase 2: 10, phase 3: 21 (the mage's 25 deaths are spread over all three phases; all 11 warrior and ranger deaths are in phase 3). Killing blows: blot 9, erase stroke 8, primer 8, contact 5, vanish 2, spiral 2, gesso 1, fan 1.
+- **Erasure:** 1.5-5.1 sections painted per fight (more in longer fights), 0.9-1.5 restored, 2.1-2.5 poise breaks per fight; the bot stood on painted floor for 7-40 ticks (warriors most: melee follows the boss onto the paint).
+- **Try use** (from the win rate, each run being one fight): a set is beaten within its 3 tries 88-99% of the time for the warrior, 100% for the ranger and 0-66% for the mage; expected tries per set 1.1 (ranger), 1.2-1.8 (warrior), 2.2-3.0 (mage).
+- **The class spread is the main finding.** The bot's DPS estimate at level 60 (p10-p90 over the 30 runs; median) is 10-39k (median 15k) for the ranger, 8-18k (10k) for the warrior and 2-14k (6k) for the mage, and its EHP is 4.7k, 8.6k and 3.6k. So the ranger wins in about 35 s, the warrior outlasts a 2-3 minute fight, and the mage, with the lowest of both, dies to the accumulated damage in phase 2-3. The pinnacle numbers cannot fix that alone: lowering damage helps the mage (life 60 / damage 1.2: mage 2/5) but pushes the ranger and warrior toward 100%.
+
+## Open items / for 3E
+
+1. **Win rate 57% (51/90)** at life 80 / damage 1.2, near the ~50% target. 3E can move it with `pinnacle.life_mult` / `damage_mult` (`--tune=pinnacle.<key>=`).
+2. **Class balance:** ranger 90%, warrior 63%, mage 17% (0/10 on the late set). This is the D2 class gap (mage DPS / EHP) at its widest in a long single-target fight. Options for Dan: accept it for Apprentice; tune per class elsewhere (D6); or make the Erasure / primer pressure scale with fight time.
+3. The bot does not play the poise rhythm on purpose: it attacks whenever it can, like against Glazed elites and Wardens. Poise breaks (2-2.5 per fight) come from that. A player who saves big hits for the poise window will restore more sections.
+4. The brushes are unmeasured (the bot never equips one, to keep the 3E baseline clean). A `--brush=` option for the bot is a small 3E add.
+5. Master, Masterpiece and the Overpaint ladder are Phase 4. Nothing blocks them: `pinnacle` can gain tiers, the boss def is built per fight, and the lock state has room for a tier field.
+6. The boss uses the brute body with a pale tint (art manifest entry `overpainter`, fallback `brute`) until it has its own sheets.

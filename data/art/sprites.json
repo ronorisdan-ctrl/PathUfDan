@@ -986,6 +986,54 @@
         }
       }
     },
+    "overpainter": {
+      "category": "bosses",
+      "phase": "V3",
+      "directions": 4,
+      "mirror": true,
+      "frame": [
+        160,
+        160
+      ],
+      "pivot": [
+        80,
+        152
+      ],
+      "shadow": "large",
+      "desc": "the Overpainter: a pale figure who paints over the world (Endgame 3D pinnacle)",
+      "notes": "Pinnacle boss (Endgame 3D). Until its own sheets exist it uses the brute body with a pale tint.",
+      "fallback": "brute",
+      "anims": {
+        "idle": {
+          "frames": 4,
+          "loop": true
+        },
+        "run": {
+          "frames": 6,
+          "loop": true
+        },
+        "attack": {
+          "frames": 7,
+          "impact_frame": 4,
+          "sync": "windup"
+        },
+        "phase_change": {
+          "frames": 8,
+          "loop": false
+        },
+        "stagger": {
+          "frames": 4,
+          "loop": true
+        },
+        "hit": {
+          "frames": 2
+        },
+        "death": {
+          "frames": 8,
+          "corpse_frame": 7
+        }
+      }
+    },
     "skeleton_warrior": {
       "category": "minions",
       "phase": "V3",

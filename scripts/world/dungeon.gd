@@ -14,6 +14,9 @@ const WV = preload("res://scripts/core/wager_vault_rules.gd")
 const VaultSeal = preload("res://scripts/world/vault_seal.gd")
 const ZoneFire = preload("res://scripts/world/zone_fire.gd")
 const ZoneWells = preload("res://scripts/world/zone_wells.gd")
+const PinnacleRules = preload("res://scripts/core/pinnacle_rules.gd")
+const PinnacleGen = preload("res://scripts/world/pinnacle_gen.gd")
+const PinnacleArena = preload("res://scripts/world/pinnacle_arena.gd")
 
 var def := {}
 var layout := {}
@@ -77,6 +80,9 @@ var last_light := {}           # Atelier Last Light: {active, wave, waves, membe
 # Layer Wardens (Endgame Phase 2A): the ring whose Warden this run fights (0 = none)
 var warden := 0
 var warden_result := {}         # AtlasRules.warden_victory result (tests / UI)
+var pinnacle := false           # Endgame 3D: the Overpainter's Bare Ground (not an Atlas zone)
+var pin_arena = null            # scripts/world/pinnacle_arena.gd (the live fight)
+var pin_result := {}            # PinnacleRules.finish result (tests / UI)
 var shard_drop := 0             # Ground Shards this run's clear dropped
 var warden_name := ""
 var mech_rng := RandomNumberGenerator.new()
@@ -108,6 +114,9 @@ func setup(d: Dictionary, ch, seed_value: int = 0, run: Dictionary = {}) -> bool
 	if d.get("endless", false):
 		level_name = "%s  -  Depth %d" % [d["name"], depth]
 	atlas_hex = str(run.get("atlas", "")) if d.get("atlas", false) else ""
+	pinnacle = d.get("pinnacle", false) and atlas_hex == ""
+	if pinnacle:
+		level_name = "%s  - the Overpainter (Apprentice)" % d["name"]
 	if atlas_hex != "":
 		level_name = "%s  (Atlas ring %d)" % [d["name"], int(d.get("atlas_ring", 1))]
 		rot = int(d.get("rot", 0))
@@ -158,7 +167,7 @@ func setup(d: Dictionary, ch, seed_value: int = 0, run: Dictionary = {}) -> bool
 		elite_mult *= float(afx.get("elite_mult", 1.0))
 		reward_bonus += float(afx.get("reward", 0.0))
 	is_zone = d.get("generator", "") == "zone"
-	var gen = ZoneGen.new() if is_zone else DungeonGen.new()
+	var gen = ZoneGen.new() if is_zone else (PinnacleGen.new() if pinnacle else DungeonGen.new())
 	layout = gen.generate(d, run_seed)
 	if layout.is_empty():
 		return false
@@ -189,7 +198,11 @@ func setup(d: Dictionary, ch, seed_value: int = 0, run: Dictionary = {}) -> bool
 	var portal_pos := cell_center(start["anchor"]) + Vector2(0, -40)
 	if is_solid(portal_pos):
 		portal_pos = cell_center(start["anchor"]) + Vector2(32, 0)
-	_add_portal(portal_pos, "Town Portal", "town_portal", Color("#6080ff"))
+	_add_portal(portal_pos, "Leave (the try is used)" if pinnacle else "Town Portal", "town_portal", Color("#6080ff"))
+	if pinnacle:
+		pin_arena = PinnacleArena.new()
+		pin_arena.setup(self, cell_center(layout["centre"]), run_seed)
+		floor_layer.add_child(pin_arena)
 	_populate()
 	if has_mech("unfinished"):
 		_sketch_packs()
@@ -614,6 +627,10 @@ func objective_text() -> String:
 		lines.append(("[x] " if o["done"] else "[ ] ") + _obj_name(o))
 	if sealed_cells.size() > 0:
 		lines.append("The boss arena is sealed")
+	if pinnacle:
+		var pst: Dictionary = AtlasRules.ensure(player.ch) if player != null else {}
+		lines.append("The Overpainter (Apprentice): %d tr%s left with this set" % [PinnacleRules.tries_left(pst), "y" if PinnacleRules.tries_left(pst) == 1 else "ies"] if not pst.is_empty() else "The Overpainter (Apprentice)")
+		return "\n".join(lines)
 	lines.append("Monsters remaining: %d" % enemies.filter(func(e): return is_instance_valid(e) and not e.def.get("object", false)).size())
 	if mechanic != "":
 		lines.append(_mechanic_line())
@@ -705,6 +722,8 @@ func _physics_process(delta: float) -> void:
 		burn.tick(delta)
 	if wells != null:
 		wells.tick(delta)
+	if pin_arena != null:
+		pin_arena.tick(delta)
 	if (burn != null or wells != null) and not boss_dead:
 		mech_obj_t -= delta
 		if mech_obj_t <= 0.0:
@@ -718,6 +737,8 @@ func minimap_marks() -> Array:
 		out.append_array(burn.marks())
 	if wells != null:
 		out.append_array(wells.marks())
+	if pin_arena != null:
+		out.append_array(pin_arena.marks())
 	return out
 
 func _track_room() -> void:
@@ -750,7 +771,10 @@ func _spawn_boss(r: Dictionary) -> void:
 		bd = AtlasRules.heart_def(bd, def.get("heart_mutations", []))
 		bd["life"] = float(bd.get("life", 100)) * float(def.get("heart_life", 1.0))   # Atelier Ripened Hearts
 	var bmods := []
-	if warden > 0:
+	if pinnacle:   # Endgame 3D: the Overpainter (studies from the locked set, pinnacle life / damage)
+		bd = PinnacleRules.boss_def(bd, def.get("studies", []))
+		blvl = monster_level
+	elif warden > 0:
 		bd = AtlasRules.warden_def(bd, warden)
 		blvl += int(AtlasRules.ward_cfg().get("level_bonus", 2))
 		bd["life"] = float(bd.get("life", 100)) * float(afx.get("warden_life", 1.0))   # Atelier Shard Seeker
@@ -1034,6 +1058,8 @@ func _on_boss_dead(e) -> void:
 			markers["rot_restore"] = _add_portal(clamp_to_floor(e.global_position, e.global_position + Vector2(-56, -24)), "Restore the Region", "rot_restore", Color(str(AtlasRules.rot_cfg().get("colors", {}).get("restored", "#e8c060"))))
 			markers["rot_harvest"] = _add_portal(clamp_to_floor(e.global_position, e.global_position + Vector2(56, -24)), "Harvest the Heart", "rot_harvest", Color(str(AtlasRules.rot_cfg().get("colors", {}).get("heart", "#b0e050"))))
 			Events.message.emit("The Heart of Rot lies still. Restore the region, or harvest the Heart?", Color("#b0e050"))
+	if pinnacle:
+		_on_pinnacle_dead(e)
 	if not spike:
 		var key: String = def["id"]
 		var first: bool = not ch.progress["bosses_killed"].has(key)
@@ -1247,6 +1273,58 @@ func _on_warden_dead(e) -> void:
 	spawn_drop({"kind": "gold", "amount": monster_level * int(rw.get("gold_per_level", 40))}, pos)
 	add_fx(VFX.make("nova", pos, gold, 1.0, 110))
 
+# ------------------------------------------------------------------ the Overpainter (Endgame 3D)
+func on_boss_phase(_b, i: int) -> void:
+	if pin_arena != null:
+		pin_arena.on_phase(i)
+
+func on_boss_stagger(_b) -> void:
+	if pin_arena != null:
+		pin_arena.on_stagger()
+
+## A win: spends the set, +1 passive point on the first kill, the brush, ring-6 Warden loot, the Guild.
+func _on_pinnacle_dead(e) -> void:
+	var ch = player.ch
+	var st: Dictionary = AtlasRules.ensure(ch)
+	var pc := PinnacleRules.cfg()
+	pin_result = PinnacleRules.finish(st, true, str(ch.class_id))
+	var gold := Color(str(pc.get("colors", {}).get("beaten", "#ffd040")))
+	ch.progress["bosses_killed"]["pinnacle_overpainter"] = int(ch.progress["bosses_killed"].get("pinnacle_overpainter", 0)) + 1
+	if pin_result.get("first", false) and pc.get("passive_point", true):
+		ch.bonus_passive_points += 1
+		Events.message.emit("First victory over the Overpainter: +1 Passive Skill Point!", Color("#ffd040"))
+	var names := []
+	for r in pin_result.get("spent", []):
+		names.append(str(AtlasRules.warden_cfg(int(r)).get("ground", "Ground Pigment")))
+	if not names.is_empty():
+		Events.message.emit("Spent: %s" % ", ".join(names), Color("#e0c890"))
+	var pos: Vector2 = e.global_position
+	var cid: String = ch.class_id
+	var rw: Dictionary = pc.get("reward", {})
+	for i in int(rw.get("legendary", 1)):
+		spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, 0.0, cid, "legendary")}, pos)
+	for i in int(rw.get("rares", 2)):
+		spawn_drop({"kind": "item", "item": Loot.roll_item(monster_level + 1, float(rw.get("rarity", 320)) + rarity_bonus(), cid, "rare")}, pos)
+	spawn_drop({"kind": "gold", "amount": monster_level * int(rw.get("gold_per_level", 50))}, pos)
+	var bid := str(pin_result.get("brush", ""))
+	if bid != "" and Data.uniques.has(bid):
+		spawn_drop({"kind": "item", "item": Loot.make_unique(bid, monster_level)}, pos + Vector2(0, -16))
+		Events.message.emit("%s drops from the Overpainter's hand!" % str(Data.uniques[bid].get("name", bid)), gold)
+	guild_result = GuildRules.credit(st, {"overpainter": 1})
+	_announce_guild(guild_result)
+	add_fx(VFX.make("nova", pos, gold, 1.0, 120))
+
+## The fight ended without a win (death or leaving): the try is already used; the last try spends the set.
+func _pinnacle_fail() -> void:
+	var st: Dictionary = AtlasRules.ensure(player.ch)
+	pin_result = PinnacleRules.finish(st, false)
+	if pin_result.is_empty():
+		return
+	if not pin_result.get("spent", []).is_empty():
+		Events.message.emit("The last try is gone: the Ground Pigments of the set are spent", Color("#ff8080"))
+	else:
+		Events.message.emit("The Overpainter remains. %d tr%s left with this set." % [int(pin_result.get("tries_left", 0)), "y" if int(pin_result.get("tries_left", 0)) == 1 else "ies"], Color("#e0c890"))
+
 ## Endgame 2B: item drops in an Atlas zone at Rot 4+ may be Rot-touched (own stream).
 func _on_item_drop(it: Dictionary) -> void:
 	if atlas_hex == "" or rot <= 0:
@@ -1363,6 +1441,8 @@ func _reveal_around(p: Vector2, rad: int) -> void:
 		minimap_tex.update(minimap_img)
 
 func cleanup() -> void:
+	if pinnacle and not boss_dead and player != null and is_instance_valid(player):
+		_pinnacle_fail()
 	_wager_disconnect()
 	if burn != null:
 		burn.cleanup()

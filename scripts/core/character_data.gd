@@ -11,9 +11,9 @@ const CorruptionRules = preload("res://scripts/core/corruption_rules.gd")
 const CorruptionEffects = preload("res://scripts/core/corruption_effects.gd")
 const AtlasRules = preload("res://scripts/core/atlas_rules.gd")
 
-const SAVE_VERSION := 8   # 2: adds the pets block; 3: stash tabs (stash_extra_tabs); 4: tree_version (full passive refund when the tree changes); 5: atlas (Endgame Phase 1A); 6: atlas radius 6 (Endgame 3A; AtlasRules.sanitize reveals ring 4 next to cleared ring 3 regions); 7: the Atelier replaces the Varnish slots (Endgame 3B; Varnishes -> 2 Guild Seals each, atlas.atelier, atlas.ring_sources); 8: atlas.seen, the zone mechanics met (Endgame 3C; Guild contracts for the Burning Canvas / Pigment Wells; older saves start with none)
+const SAVE_VERSION := 9   # 2: adds the pets block; 3: stash tabs (stash_extra_tabs); 4: tree_version (full passive refund when the tree changes); 5: atlas (Endgame Phase 1A); 6: atlas radius 6 (Endgame 3A; AtlasRules.sanitize reveals ring 4 next to cleared ring 3 regions); 7: the Atelier replaces the Varnish slots (Endgame 3B; Varnishes -> 2 Guild Seals each, atlas.atelier, atlas.ring_sources); 8: atlas.seen, the zone mechanics met (Endgame 3C; Guild contracts for the Burning Canvas / Pigment Wells; older saves start with none); 9: the Overpainter (Endgame 3D): atlas.warden_order, atlas.pinnacle (set lock, tries, wins, brushes) and the brush equipment slot (older saves: empty)
 const BAG_SIZE := 40
-const EQUIP_SLOTS := ["main_hand", "off_hand", "helmet", "chest", "gloves", "boots", "belt", "amulet", "ring1", "ring2", "charm"]
+const EQUIP_SLOTS := ["main_hand", "off_hand", "helmet", "chest", "gloves", "boots", "belt", "amulet", "ring1", "ring2", "charm", "brush"]   # brush: Endgame 3D, the Overpainter's brushes only
 const HOTBAR_SIZE := 7
 const MAX_SKILL_LEVEL := 20
 const MAX_LEVEL := 60
@@ -1135,6 +1135,8 @@ func corruption_refusal(uid: int, action_id: String = "") -> String:
 	var it = corruption_item(uid)
 	if it == null:
 		return "Item is missing, unowned or has a duplicate ID"
+	if it.get("pinnacle", false):   # Endgame 3D: the Overpainter's brushes
+		return "The Overpainter's brushes cannot be corrupted"
 	if is_locked(it):
 		return "Unlock this protected item before risking destruction"
 	for flag in Data.corruption_cfg.get("restricted_item_flags", []):
@@ -1280,6 +1282,8 @@ func equip_from_bag(index: int, force_slot: String = "") -> String:
 	if why != "":
 		return why
 	var slot := force_slot if force_slot != "" else slot_for(item)
+	if (slot == "brush") != (str(item.get("slot", "")) == "brush"):   # Endgame 3D: the brush slot takes the Overpainter's brushes only
+		return "Only the Overpainter's brushes fit the Brush slot" if slot == "brush" else "A brush goes in the Brush slot"
 	var to_bag := []
 	var main = equipment.get("main_hand")
 	if slot == "main_hand" and is_two_handed(item):

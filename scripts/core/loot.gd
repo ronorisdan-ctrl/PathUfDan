@@ -260,6 +260,8 @@ func make_unique(uid: String, ilvl: int) -> Dictionary:
 	it["unique"] = uid
 	it["req_level"] = maxi(int(it["req_level"]), int(u.get("req_level", 1)))
 	it["legendary_effect"] = u.get("effect", "")
+	if u.get("pinnacle", false):   # Endgame 3D: the Overpainter's brushes (no crafting, corruption or salvage)
+		it["pinnacle"] = true
 	var fixed := []
 	for m in u.get("mods", []):
 		var v: float
@@ -557,6 +559,10 @@ func tooltip(it: Dictionary, ch = null, show_corruption: bool = true) -> String:
 	var fix_line := AtlasCraft.fix_tooltip(it)
 	if fix_line != "":
 		lines.append(fix_line)
+	if it.get("pinnacle", false):
+		lines.append("[color=#f4efe0]The Overpainter's brush: goes in the Brush slot. Fixed modifiers; cannot be crafted, corrupted or salvaged.[/color]")
+		lines.append("[color=#8a8494]Sell: %d gold[/color]" % sell_value(it))
+		return "\n".join(lines)
 	lines.append("[color=#8a8494]Sell: %d gold   Salvage: %s[/color]" % [sell_value(it), cost_text(salvage_yield(it))])
 	return "\n".join(lines)
 
@@ -696,11 +702,15 @@ func craft_cost(op: String, it: Dictionary) -> Dictionary:
 			return AtlasCraft.fix_cost(it)
 	return {}
 
+const PINNACLE_REFUSAL := "The Overpainter's brushes cannot be crafted or corrupted"
+
 func craft_check(op: String, it: Dictionary, affix_index: int = -1) -> String:
 	if it.is_empty():
 		return "Select an item"
 	if it.get("destroyed", false):
 		return "This item was destroyed"
+	if it.get("pinnacle", false):
+		return PINNACLE_REFUSAL
 	if op == "corrupt":
 		return Game.ch.corruption_refusal(int(it.get("uid", 0))) if Game.ch != null else "No active character"
 	# Corruption first: the permanent seal refuses every craft before costs.

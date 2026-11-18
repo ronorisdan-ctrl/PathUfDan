@@ -407,7 +407,8 @@
       {"id": "two_pigments", "text": "Complete %d zones with 2 Pigments slotted", "stat": "zones", "min_pigments": 2, "need": [1, 2], "rep": 7, "seals": 1.0, "w": 1, "req": {"ring": 3, "clears": 10}},
       {"id": "rot4", "text": "Complete %d zones at Rot 4 or higher", "stat": "zones", "min_rot": 4, "need": [1, 2], "rep": 8, "seals": 1.2, "w": 1, "req": {"rot": 4}},
       {"id": "cisterns", "text": "Douse %d cisterns in the Burning Canvas", "stat": "cisterns", "need": [2, 4], "rep": 1.5, "seals": 0.25, "w": 1, "req": {"seen": "burning"}},
-      {"id": "wells_full", "text": "Fill %d Pigment Wells", "stat": "wells_full", "need": [2, 4], "rep": 1.5, "seals": 0.25, "w": 1, "req": {"seen": "wells"}}
+      {"id": "wells_full", "text": "Fill %d Pigment Wells", "stat": "wells_full", "need": [2, 4], "rep": 1.5, "seals": 0.25, "w": 1, "req": {"seen": "wells"}},
+      {"id": "overpainter", "text": "Defeat the Overpainter %d time", "stat": "overpainter", "need": [1, 1], "rep": 25, "seals": 5, "w": 0.25, "req": {"pinnacle": true}}
     ],
     "caches": [
       {"id": "weapon", "name": "Armoury Cache", "desc": "3 weapons or off-hands: 2 rares and one with +400 rarity.", "w": 1, "slots": ["main_hand", "off_hand"], "items": 3, "rarity": 400},
@@ -500,5 +501,39 @@
        "tune": {"summon": {"cooldown": 18}},
        "final_phase": {"at": 0.25, "add": ["gesso_field", "spiral"], "attack_speed": 1.2, "speed": 1.2, "tint": "#ffffff", "message": "The canvas is bare - Stormheart primes the world white!"}}
     ]
+  },
+  "pinnacle": {
+    "_doc": "Endgame Phase 3D: the Overpainter, the pinnacle boss (Apprentice). docs/ENDGAME_PHASE3.md Stage 3D. Ground Pigments of any `need` layers open the Bare Ground on the Atlas centre hex. Choosing a set of exactly `need` layers and entering locks it in with `tries` tries; a try is used on entry (dying, leaving or closing the game mid-fight keep it used). A win, or the end of the last try, spends 1 Ground Pigment of each layer in the set and unlocks it. The fight: a round studio arena (radius `arena_radius` tiles, a centre disc of `safe_radius` tiles that is never painted, `sections` pie sections), monster level `level`, no Rot, zone mechanics, Pigments, run modifiers or Atelier rules. Phase 1 (Studies) casts the signature pattern of each brought Warden in the order of their first kills (atlas.warden_order; older saves: ring order) on a loop, with the boss's filler pattern between them; each study at the Warden's numbers x `study_mult`. Phase 2 (Erasure, from `phase2_at` life): every `paint_every` s one section is painted over after a `paint_warn` s warning (at most `max_painted`); painted floor hits for `paint_mult` of the boss hit every `paint_tick` s as `paint_dtype` and chills; a poise break restores the painted section nearest the player. Phase 3 (Bare Canvas, from `phase3_at`): no new sections; spiral, teleport and primer pools; the poise bar drains faster (`phase3_poise` overrides data/stun.json poise). Rewards: `reward` (like a ring-6 Warden), +1 passive point on the first kill, and one of the Overpainter's brushes (`brushes`: theme -> unique id): the first kill gives the class's brush, later wins an unowned brush first (weights `class_weight` / `other_weight`), then any. Phase 3D values are starting values for 3E (target: ~50% wins for a typical level 60 bot).",
+    "need": 4,
+    "tries": 3,
+    "level": 68,
+    "life_mult": 80.0,
+    "damage_mult": 1.2,
+    "resist_bonus": 45,
+    "rarity_bonus": 320,
+    "phase2_at": 0.7,
+    "phase3_at": 0.35,
+    "study_mult": 1.0,
+    "filler": "study_fan",
+    "arena_radius": 12,
+    "safe_radius": 3,
+    "sections": 8,
+    "paint_every": 9.0,
+    "paint_warn": 2.0,
+    "max_painted": 6,
+    "paint_tick": 0.5,
+    "paint_mult": 0.15,
+    "paint_dtype": "void",
+    "paint_status": "chill",
+    "phase3_poise": {"regen_delay": 1.0, "regen_per_sec": 30.0, "immunity_after_stagger": 5.0},
+    "transition": 1.5,
+    "palette": "sanctum",
+    "ambient": "#8a8478",
+    "colors": {"painted": "#f2eee2", "warn": "#ffffff", "hex": "#f4efe0", "locked": "#7a7468", "set": "#ffe070", "beaten": "#ffd040"},
+    "reward": {"legendary": 1, "rares": 2, "rarity": 320, "gold_per_level": 50},
+    "passive_point": true,
+    "brushes": {"warrior": "broad_stroke", "ranger": "the_rigger", "mage": "the_glazier"},
+    "class_weight": 60,
+    "other_weight": 20
   }
 }

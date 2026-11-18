@@ -10,6 +10,7 @@ extends Node
 const DamageNumber = preload("res://scripts/fx/damage_number.gd")
 const VFX = preload("res://scripts/fx/vfx.gd")
 const CorruptionEffects = preload("res://scripts/core/corruption_effects.gd")
+const BrushFx = preload("res://scripts/combat/brush_fx.gd")   # Endgame 3D: the Overpainter's brushes
 
 const DAMAGE_TYPES := ["physical", "fire", "cold", "lightning", "arcane", "void"]
 const ELEMENTAL := ["fire", "cold", "lightning"]
@@ -521,6 +522,10 @@ func _on_hit_passives(p: Dictionary, fl: Dictionary, source, target, rolled: Dic
 	var tags: Array = p.get("tags", [])
 	if not is_instance_valid(target):
 		return
+	if fl.has("broad_stroke") or fl.has("the_rigger"):
+		BrushFx.on_hit(p, fl, source, target, tags)
+		if not is_instance_valid(target):
+			return
 	_on_hit_phase3(p, fl, source, target, rolled, crit, was_marked, origin, tags)
 	if crit and fl.has("opened_veins") and tags.has("melee") and target.alive:
 		apply_status(target, {"type": "bleed"}, rolled, p)
